@@ -4,10 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9b054eca-f19d-4e8b-ba86-c2382a8c8a86" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/assets/fonts/GolosText-VariableFont_wght.ttf" afterDir="false" />
+    <list default="true" id="9b054eca-f19d-4e8b-ba86-c2382a8c8a86" name="Changes" comment="added font">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/content/index.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/api/levelTravelApi.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/api/levelTravelApi.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/styles/globals.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/styles/globals.css" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -81,7 +80,7 @@
       <recent name="$PROJECT_DIR$/src/components/header" />
     </key>
   </component>
-  <component name="RunManager" selected="npm.dev">
+  <component name="RunManager" selected="npm.build">
     <configuration name="build" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/package.json" />
       <command value="run" />
@@ -104,8 +103,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="npm.dev" />
         <item itemvalue="npm.build" />
+        <item itemvalue="npm.dev" />
       </list>
     </recent_temporary>
   </component>
@@ -139,11 +138,24 @@
       <workItem from="1748357427166" duration="12319000" />
       <workItem from="1748448099446" duration="14369000" />
       <workItem from="1748510063939" duration="23116000" />
-      <workItem from="1748607671067" duration="886000" />
+      <workItem from="1748607671067" duration="1081000" />
     </task>
+    <task id="LOCAL-00001" summary="added font">
+      <option name="closed" value="true" />
+      <created>1748608695865</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1748608695865</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="added font" />
+    <option name="LAST_COMMIT_MESSAGE" value="added font" />
   </component>
 </project>
