@@ -1,0 +1,72 @@
+.calendarWrapper{
+    width: 100%;
+}
+.headerCalendar {
+    display: flex;
+    justify-content: space-between;
+    align-Items: center;
+    height: 48px;
+}
+.headerCalendar>button{
+    background: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+}
+.headerCalendar>p{
+    color: var(--textPrimary);
+    /*font-family: "Golos Text";*/
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 20px; /* 125% */
+    letter-spacing: -0.32px;
+}
+.daysRow{
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+    height: 48px;
+    align-items: center;
+    margin: 1px 0;
+}
+.dayName {
+    width: 14.28%;
+    text-align: center;
+    color: var(--textTertiary);
+    /*font-family: "Golos Text";*/
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 16px; /* 133.333% */
+    letter-spacing: -0.24px;
+}
+.weekRow{
+    display: flex;
+    justify-content: space-between;
+    /*border: 1px solid;*/
+    height: 48px;
+    align-items: center;
+}
+.cell{
+    width: 48px;
+    height: 48px;
+    /*border: 1px solid;*/
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /*border-radius: 50%;*/
+    transition: 0.2s ease;
+}
+.toggleRow{
+    border-top: 1px solid var(--borderTertiary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: flex-end;
+    /*height: 48px;*/
+    margin-top: 18px;
+    padding-top: 18px;
+}

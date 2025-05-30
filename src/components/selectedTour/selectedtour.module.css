@@ -1,0 +1,127 @@
+.selectedTour{
+    display: flex;
+    padding: 16px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    align-self: stretch;
+    border-radius: 16px;
+    background: var(--bgPrimary);
+}
+.selectedTourHead{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+}
+.selectedTourCheck{
+    display: flex;
+    align-items: center;
+    gap:8px;
+    flex: 1 0 0;
+}
+.selectedTourCheck>p{
+    color: var(--secondary_green, #39BF87);
+    text-align: center;
+    /*font-family: "Golos Text";*/
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 20px;
+    letter-spacing: -0.32px;
+}
+.selectedTourMore{
+    display: flex;
+    padding: 4px;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+}
+.selectedTourMore>p{
+    color: var(--textSecondary, #3D3D3D);
+    /*font-family: "Golos Text";*/
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 16px;
+    letter-spacing: -0.24px;
+    border-bottom: 1px dotted var(--textPrimary);
+}
+.selectedTourBody{
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    align-self: stretch;
+}
+.selectedTourImage{
+    display: flex;
+    width: 223px;
+    height: 160px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    border-radius: 8px;
+    background: var(--borderTertiary);
+}
+.selectedTourInfo{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    flex: 1 0 0;
+}
+.selectedTourInfo>ul{
+    list-style-type: none;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+.selectedTourInfo>ul>li{
+    display: flex;
+    height: 24px;
+    padding: 0px 9px;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    border-radius: 20px;
+}
+.selectedTourInfo>ul>li>p{
+    color: var(--textPrimary);
+    text-align: center;
+    /*font-family: "Golos Text";*/
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 16px;
+    letter-spacing: -0.24px;
+}
+.selectedTourInfo>ul>li:nth-child(1){
+    border: 1px solid var(--secondary_green);
+}
+.selectedTourInfo>ul>li:nth-child(2){
+    border: 1px solid var(--secondary_yellow);
+}
+.selectedTourName{
+    color: var(--textPrimary);
+    /*font-family: "Golos Text";*/
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 24px;
+    letter-spacing: -0.4px;
+}
+.selectedTourList{
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+.selectedTourList>p{
+    color: var(--textSecondary, #3D3D3D);
+    /*font-family: "Golos Text";*/
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 18px;
+    letter-spacing: -0.28px;
+}

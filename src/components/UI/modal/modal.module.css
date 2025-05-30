@@ -1,0 +1,74 @@
+.modalOverlay {
+    background-color: rgba(0, 0, 0, 0.5);
+    position: fixed;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.appModal {
+    display: flex;
+    padding: 16px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    border-radius: 16px;
+    background: var(--bgPrimary);
+    outline: none;
+}
+
+.modalHeader {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    align-self: stretch;
+}
+.modalHeaderInfo{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 4px;
+    flex: 1 0 0;
+}
+.modalHeaderInfo>p:nth-child(1){
+    color: var(--textPrimary);
+    text-align: center;
+    /*font-family: "Golos Text";*/
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 20px;
+    letter-spacing: -0.32px;
+}
+.modalHeaderInfo>p:nth-child(2){
+    color: var(--textTertiary);
+    /*font-family: "Golos Text";*/
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 18px;
+    letter-spacing: -0.28px;
+}
+.modalCloseBtn {
+    display: flex;
+    height: 48px;
+    width: 48px;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    border-radius: 24px;
+    border: 1px solid var(--textTertiary);
+    cursor: pointer;
+}
+.appModalLine{
+    width: 100%;
+    height: 1px;
+    background: var(--borderTertiary);
+}
+.modalBody{
+    max-height: 85vh;
+    overflow-y: auto;
+    width: 100%;
+}

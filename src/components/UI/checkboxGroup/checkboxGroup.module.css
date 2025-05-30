@@ -1,0 +1,41 @@
+.wrapperGroupCheckbox {
+    display: flex;
+    flex-direction: column;
+    /*gap: 8px;*/
+}
+
+
+.checkboxItem {
+    display: flex;
+    align-items: center;
+    height: 48px;
+    /*font-size: 16px;*/
+    /*cursor: pointer;*/
+    /*padding: 4px 0;*/
+    /*border: 1px solid;*/
+    gap:10px
+}
+.checkboxItem >span{
+    color: var(--textPrimary, #1F1F1F);
+    /*font-family: "Golos Text";*/
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 20px; /* 125% */
+    letter-spacing: -0.32px;
+    cursor: pointer;
+}
+
+/*.checkboxItem input {*/
+/*    margin-right: 8px;*/
+/*    width: 24px;*/
+/*    height: 24px;*/
+/*    accent-color: var(--core_Orange); !* Change checkbox checkmark color *!*/
+/*    cursor: pointer;*/
+/*}*/
+
+/*.checkboxItem input:checked + span {*/
+/*    font-weight: 300;*/
+/*    font-size: 12px;*/
+/*    !*color: #0070f3;*!*/
+/*}*/

@@ -1,0 +1,18 @@
+.tagItem{
+    display: flex;
+    height: 40px;
+    padding: 16px;
+    justify-content: center;
+    align-items: center;
+    border-radius: 20px;
+    gap: 8px;
+}
+.tagItemName{
+    color: var(--textPrimary);
+    /*font-family: "Golos Text";*/
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 18px;
+    letter-spacing: -0.28px;
+}

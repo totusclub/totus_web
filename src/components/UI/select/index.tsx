@@ -1,0 +1,96 @@
+import React, { useState, useRef, useEffect } from 'react';
+import styles from './select.module.css';
+import Icon from "@/components/icons/Icon";
+
+interface OptionType {
+    name: string;
+    value: string;
+}
+
+interface SelectProps {
+    options: OptionType[];
+    value?: string;
+    onChange: (option: string) => void;
+    placeholder?: string;
+    label?: string;
+    isFull?: boolean;
+}
+
+const Select: React.FC<SelectProps> = ({
+                                           options,
+                                           value,
+                                           onChange,
+                                           placeholder = 'Select an option',
+                                           label,
+                                           isFull = false,
+                                       }) => {
+    const [open, setOpen] = useState(false);
+    const [openUp, setOpenUp] = useState(false);
+    const selectRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (selectRef.current && !selectRef.current.contains(event.target as Node)) {
+                setOpen(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
+
+    useEffect(() => {
+        if (open && selectRef.current) {
+            const rect = selectRef.current.getBoundingClientRect();
+            const spaceBelow = window.innerHeight - rect.bottom;
+            const spaceAbove = rect.top;
+            const estimatedHeight = Math.min(options.length * 40, 200);
+            setOpenUp(spaceBelow < estimatedHeight && spaceAbove > estimatedHeight);
+        }
+    }, [open, options.length]);
+
+    const handleSelect = (option: string) => {
+        onChange(option);
+        setOpen(false);
+    };
+
+    return (
+        <div
+            ref={selectRef}
+            className={styles.customSelect}
+            style={{ flex: isFull ? 1 : 'none' }}
+        >
+            <div className={styles.selectButton} onClick={() => setOpen(prev => !prev)}>
+                <div className={styles.selectButtonInfo}>
+                    {label && <p className={styles.selectLabel}>{label}</p>}
+                    <p className={styles.selectValue}>{value?.name || placeholder}</p>
+                </div>
+                <div className={styles.arrow}>
+                    <Icon name="downArrow" size={24} />
+                </div>
+            </div>
+
+            {open && (
+                <ul
+                    className={`${styles.optionsList} ${
+                        openUp ? styles.openUp : styles.openDown
+                    }`}
+                >
+                    {options.map((option) => (
+                        <li
+                            key={option.id}
+                            onClick={() => handleSelect(option)}
+                            className={styles.optionItem}
+                        >
+                            {option.name}
+                        </li>
+                    ))}
+                </ul>
+            )}
+        </div>
+    );
+};
+
+export default Select;

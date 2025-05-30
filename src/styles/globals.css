@@ -1,0 +1,107 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary_a: #1F1F1F;
+    --primary_b: #FFFFFF;
+    --primary_blue: #0D77D3;
+    --secondary_blue:#61AAF2;
+    --primary_red:#CF3030;
+    --secondary_red:#F26161;
+    --primary_green:#288556;
+    --secondary_green:#39BF87;
+    --primary_yellow:#CE8508;
+    --secondary_yellow:#FACD64;
+    --core_Orange:#FE732E;
+    --primary_orange:#C2410B;
+    --secondary_orange:#FA8842;
+    --glassPrimary:#80808030;
+    --primary_purple:#7E24B2;
+    --secondary_purple:#A985F2;
+    --primary_pink:#F285C5;
+    --bgPrimary:#FFFFFF;
+    --bgSecondary:#F5F5F5;
+    --bgTertiary:#B6B6B6;
+    --bgDisabled:#F5F5F5;
+    --bgActive:#E0E0E0;
+    --textPrimary:#1F1F1F;
+    --textSecondary:#3D3D3D;
+    --textTertiary:#7A7A7A;
+    --textDisabled:#B8B8B8;
+    --textPrimaryB:#FFFFFF;
+    --borderPrimary:#1F1F1F;
+    --borderSecondary:#B8B8B8;
+    --borderTertiary:#E0E0E0;
+    --hoverPrimary:#E2E2E2;
+}
+
+[data-theme='dark'] {
+    --primary_a: #111111;
+    --primary_b: #ffffff;
+    --primary_blue: #0D77D3;
+    --secondary_blue:#61AAF2;
+    --primary_red:#CF3030;
+    --secondary_red:#F26161;
+    --primary_green:#288556;
+    --secondary_green:#0DD6A4;
+    --primary_yellow:#CE8508;
+    --secondary_yellow:#FACD64;
+    --core_Orange:#FE732E;
+    --primary_orange:#C2410B;
+    --secondary_orange:#FA8842;
+    --glassPrimary:#80808030;
+    --primary_purple:#7E24B2;
+    --secondary_purple:#A985F2;
+    --primary_pink:#F285C5;
+    --bgPrimary:#141414;
+    --bgSecondary:#1F1F1F;
+    --bgTertiary:#7A7A7A;
+    --bgDisabled:#1F1F1F;
+    --bgActive:#3D3D3D;
+    --textPrimary:#FFFFFF;
+    --textSecondary:#B8B8B8;
+    --textTertiary:#7A7A7A;
+    --textDisabled:#3D3D3D;
+    --textPrimaryB:#1F1F1F;
+    --borderPrimary:#7A7A7A;
+    --borderSecondary:#3D3D3D;
+    --borderTertiary:#1F1F1F;
+    --hoverPrimary:#4C4C4C;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.content{
+    width: 1280px;
+    margin: 0 auto;
+    /*border: 1px solid var(--core_Orange);*/
+}
+.searchContainer{
+    background: var(--bgSecondary);
+    min-height: 43vh;
+    padding-bottom: 20px;
+}
+
+.slick-dots>ul>.slick-active>div{
+    background: var(--core_Orange)!important;
+    transform: scale(1.2) !important;
+    bottom: -28px!important;
+}
+
+/*.customDot {*/
+/*    background: var(--core_Orange)!important;*/
+/*    transform: scale(1.2) !important;*/
+/*    bottom: -28px!important;*/
+/*}*/
+.slick-slider{
+    padding-bottom: 24px!important;
+    margin-bottom: 30px!important;
+}

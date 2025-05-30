@@ -1,0 +1,219 @@
+.itemHotProduct{
+    padding-left: 16px;
+    padding-right: 16px;
+}
+.itemProduct{
+    margin-left: -16px;
+}
+
+.hotProductTitle{
+    color: var(--textPrimary);
+    /*font-family: "Golos Text";*/
+    font-size: 32px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 40px; /* 125% */
+    letter-spacing: -0.64px;
+    margin-top: 16px;
+    margin-bottom: 24px;
+}
+.nextArrowHot,
+.prevArrowHot {
+    position: absolute;
+    top: 38%;
+    z-index: 1;
+    background: var(--bgPrimary);
+    box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.12), 0px 4px 12px 0px rgba(0, 0, 0, 0.12);
+    color: white;
+    /*padding: 12px;*/
+    display: flex;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    transform: translateY(-50%);
+}
+
+.nextArrowHot {
+    right: 0;
+}
+
+.prevArrowHot {
+    left: -15px; /* adjust as needed */
+}
+/*.customDotsWrapper {*/
+/*    margin-top: 28px;*/
+/*}*/
+
+.nextArrowRec,
+.prevArrowRec {
+    position: absolute;
+    top: 43%;
+    z-index: 1;
+    background: var(--bgPrimary);
+    box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.12), 0px 4px 12px 0px rgba(0, 0, 0, 0.12);
+    color: white;
+    /*padding: 12px;*/
+    display: flex;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    transform: translateY(-50%);
+}
+
+.nextArrowRec {
+    right: 0;
+}
+
+.prevArrowRec {
+    left: -15px; /* adjust as needed */
+}
+.customDotsWrapper ul {
+    display: flex;
+    justify-content: center;
+    padding: 0;
+    list-style: none;
+}
+
+.customDot {
+    width: 8px;
+    height: 8px;
+    margin: 0 5px;
+    background: var(--textDisabled);
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+/*.slick-slider{*/
+/*    padding-bottom: 24px!important;*/
+/*    margin-bottom: 30px!important;*/
+/*}*/
+/* Active dot */
+/*.slick-dots li.slick-active .customDot {*/
+/*    background: var(--core_Orange);*/
+/*    transform: scale(1.2);*/
+/*    bottom: -28px;*/
+/*}*/
+.serviceList{
+    display: flex;
+    gap: 16px;
+    margin-top: 48px;
+    margin-bottom: 32px;
+}
+.serviceItem{
+    display: flex;
+    flex: 1;
+    height: 316px;
+    border-radius: 24px;
+    border: 1px solid var(--borderTertiary);
+    padding: 24px 20px;
+    flex-direction: column;
+    /*justify-content: space-between;*/
+
+}
+.serviceItemInfo{
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    flex: 1;
+}
+.serviceItemIcon{
+    width: 100px;
+    height: 100px;
+    background: var(--borderTertiary);
+    border-radius: 8px;
+}
+.serviceItemTitle{
+    color: var(--textPrimary);
+    /* Headline/Regular */
+    /*font-family: "Golos Text";*/
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 24px; /* 120% */
+    letter-spacing: -0.4px;
+}
+.serviceItemText{
+    color: var(--textTertiary);
+    /* Headline - Body/Regular */
+    /*font-family: "Golos Text";*/
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 20px; /* 125% */
+    letter-spacing: -0.32px;
+}
+.serviceItemFooter{
+    display: flex;
+    flex-direction: row;
+}
+.serviceItemFooter>p{
+    color: var(--textPrimary);
+    /* Textlink/Medium */
+    /*font-family: "Golos Text";*/
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 20px;
+    letter-spacing: -0.28px;
+    text-decoration-line: underline;
+    text-decoration-style: solid;
+    text-decoration-skip-ink: none;
+    text-decoration-thickness: auto;
+    text-underline-offset: auto;
+    text-underline-position: from-font;
+    cursor: pointer;
+}
+.tourItem{
+    display: flex;
+    padding: 12px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    flex: 1 0 0;
+    border-radius: 24px;
+    border: 1px solid var(--borderTertiary);
+    background: var(--bgPrimary);
+}
+.tourItemBadge{
+    display: flex;
+    padding: 3px 6px 4px 6px;
+    align-items: center;
+    gap: 4px;
+    border-radius: 20px;
+    background: var(--secondary_green);
+}
+.tourItemBadge>p{
+    color: var(--textPrimaryB);
+    /* Caption/Regular */
+    /*font-family: "Golos Text";*/
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 16px; /* 133.333% */
+    letter-spacing: -0.24px;
+}
+.tourItemTitle{
+    color: var(--textPrimary);
+    /* Body - Caption/Regular */
+    /*font-family: "Golos Text";*/
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 18px; /* 128.571% */
+    letter-spacing: -0.28px;
+}
+.tourItemText{
+    color: var(--textTertiary, #7A7A7A);
+    /* Body - Caption/Regular */
+    /*font-family: "Golos Text";*/
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 18px; /* 128.571% */
+    letter-spacing: -0.28px;
+}

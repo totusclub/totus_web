@@ -1,0 +1,37 @@
+.header {
+    display: flex;
+    height: 80px;
+    padding: 0 12px;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--borderTertiary);
+    background-color: var(--bgPrimary);
+}
+.headerRow{
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    height: 80px;
+    align-items: center;
+}
+.menu{
+    display: flex;
+    flex-direction: row;
+}
+.logo a {
+    font-size: 1.5rem;
+    color: #fff;
+    text-decoration: none;
+}
+.favorite{
+    width: 48px;
+    height: 48px;
+    border-radius: 24px;
+    border: 1px solid var(--textTertiary);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+

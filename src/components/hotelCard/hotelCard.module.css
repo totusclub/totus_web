@@ -1,0 +1,166 @@
+.hotelCard{
+    display: flex;
+    width: 100%;
+    height: 184px;
+    padding: 16px;
+    align-items: flex-start;
+    gap: 16px;
+    border-radius:24px;
+    border: 1px solid var(--borderTertiary);
+    background: var(--bgPrimary);
+}
+.hotelCardImage{
+    display: flex;
+    width: 212px;
+    height: 152px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    flex-shrink: 0;
+    border-radius:  8px;
+    background: var(--textTertiary);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+.hotelCardInfo{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    flex: 1 0 0;
+    align-self: stretch;
+    /*border: 1px solid var(--borderTertiary);*/
+}
+.hotelCardPrice{
+    display: flex;
+    width: 160px;
+    padding-left: 8px;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-shrink: 0;
+    align-self: stretch;
+    border-left: 1px solid var(--borderTertiary);
+}
+.hotelCardHead{
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+.hotelCardCity{
+    display: flex;
+    height: 24px;
+    padding: 0px 9px;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    border-radius: 12px;
+    border: 1px solid var(--secondary_green);
+}
+.hotelCardCity>p{
+    color: var(--textPrimary);
+    text-align: center;
+    /*font-family: "Golos Text";*/
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 16px; /* 133.333% */
+    letter-spacing: -0.24px;
+}
+.hotelCardRate{
+    display: flex;
+    height: 24px;
+    padding: 0px 9px;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    border-radius: 12px;
+    border: 1px solid var(--secondary_yellow);
+}
+.hotelCardRate>p{
+    color: var(--textPrimary);
+    text-align: center;
+    /*font-family: "Golos Text";*/
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 16px; /* 133.333% */
+    letter-spacing: -0.24px;
+}
+.hotelCardName{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    flex: 1 0 0;
+    align-self: stretch;
+}
+.hotelCardName > p{
+    color: var(--textPrimary, #1F1F1F);
+    /*font-family: "Golos Text";*/
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 24px;
+    letter-spacing: -0.4px;
+}
+.hotelCardTags{
+    display: flex;
+    align-items: center;
+    align-content: center;
+    gap: 4px;
+    align-self: stretch;
+    flex-wrap: wrap;
+}
+.hotelCardTagItem{
+    display: flex;
+    padding: 4px 8px;
+    justify-content: center;
+    align-items: center;
+    border-radius: 12px;
+    background: var(--bgSecondary);
+}
+.hotelCardTagItem>p{
+    color: var(--textPrimary);
+    /*font-family: "Golos Text";*/
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 16px;
+    letter-spacing: -0.24px;
+}
+.hotelCardDate{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    align-self: stretch;
+}
+.hotelCardDate>p{
+    color: var(--textTertiary);
+    text-align: center;
+    /*font-family: "Golos Text";*/
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 18px;
+    letter-spacing: -0.28px;
+}
+.hotelCardCheckout{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    align-self: stretch;
+}
+.hotelCardCheckout>p{
+    color: var(--textPrimary);
+    text-align: center;
+    /*font-family: "Golos Text";*/
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 24px; /* 120% */
+    letter-spacing: -0.4px;
+}

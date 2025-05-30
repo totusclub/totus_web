@@ -1,0 +1,58 @@
+.optionsWrap {
+    display: flex;
+    flex-direction: column;
+    /*gap: 8px;*/
+    flex: 1 0 0;
+    padding: 0px 16px;
+}
+
+.optionTitle {
+    color: var(--textPrimary, #1F1F1F);
+    /*font-family: "Golos Text";*/
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 20px; /* 125% */
+    letter-spacing: -0.32px;
+}
+
+.optionsList {
+    display: flex;
+    gap: 12px;
+}
+
+.optionButton {
+    width: 24px;
+    height: 24px;
+    border: 2px solid var(--bgTertiary);
+    background-color: var(--textPrimaryB);
+    border-radius:12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+/*.optionButton:hover {*/
+/*    background-color: #f3f3f3;*/
+/*}*/
+
+.selected {
+    border-color: var(--core_Orange);
+    background-color: var(--core_Orange);
+    color: white;
+}
+.optionButtonWrap{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex:1;
+    cursor: pointer;
+}
+.optionButtonWrap>p{
+    color: var(--textPrimary);
+    /*font-family: "Golos Text";*/
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 20px; /* 125% */
+    letter-spacing: -0.32px;
+}

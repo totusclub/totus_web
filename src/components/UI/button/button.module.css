@@ -1,0 +1,23 @@
+.button {
+    background-color: var(--core_Orange);
+    color: var(--primary_b);
+    padding: 16px 24px;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: 0.2s;
+}
+.button:hover {
+    background-color: var(--secondary_orange);
+}
+.buttonTitle{
+    color: var(--primary_b);
+    /*font-family: "Golos Text";*/
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 20px; /* 125% */
+    letter-spacing: -0.32px;
+}

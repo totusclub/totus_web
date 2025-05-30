@@ -1,0 +1,57 @@
+.tagsItem{
+    display: flex;
+    /*padding: var(--8, 8px) var(--16, 16px) var(--16, 16px) var(--16, 16px);*/
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    align-self: stretch;
+    margin-top: 24px;
+}
+.tagsItemHead>p{
+    color: var(--textPrimary);
+    /*font-family: "Golos Text";*/
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 18px; /* 128.571% */
+    letter-spacing: -0.28px;
+
+}
+.tagsItemsList{
+    display: flex;
+    padding: 16px;
+    align-items: center;
+    /*gap: 16px;*/
+    align-self: stretch;
+    width: 100%;
+
+}
+
+.tagsItemList{
+    display: flex;
+    /*padding: 4px 16px 4px 0px;*/
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    flex: 0.33;
+    gap: 8px;
+}
+
+.tagsItemList>p{
+    color: var(--textPrimary);
+    /*font-family: "Golos Text";*/
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 20px; /* 125% */
+    letter-spacing: -0.32px;
+}
+.tagsItemsWrapper{
+    background: var(--bgDisabled);
+    width: 100%;
+    border-radius: 16px;
+}
+.tagsItemsList:not(:last-child) {
+    border-bottom: 1px solid var(--borderTertiary);
+}
+
