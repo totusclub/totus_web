@@ -20,8 +20,8 @@ const Header = () => {
     return (
         <>
             <Head>
-                <title>My Amazing Website</title>
-                <meta name="description" content="The best website for amazing products." />
+                <title>Арлекино тур</title>
+                <meta name="description" content="Лучшие туры с Арлекино тур – незабываемые путешествия и отдых." />
             </Head>
             <header className={styles.header}>
                 <div className={styles.headerRow}>
