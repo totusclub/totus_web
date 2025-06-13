@@ -77,9 +77,9 @@
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
+    margin-bottom: 16px;
 }
 .resultListSorting{
-    margin-top: 16px;
     width: 100%;
     display: flex;
     justify-content: space-between;

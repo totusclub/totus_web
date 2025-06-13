@@ -5,14 +5,16 @@ import Input from "@/components/UI/input";
 interface RangeInputProps {
     values: number[];
     setValues: (value: number[]) => void;
+    onChangeComplete: (name:string,value: number[]) => void;
     title: string;
     symbol: string;
     step: number;
     min: number;
     max: number;
+    name: string;
 }
 
-export default function RangeInput({ setValues, values, title ,symbol,step,min,max}: RangeInputProps) {
+export default function RangeInput({ setValues, values, title ,symbol,step,min,max,name,onChangeComplete}: RangeInputProps) {
 
     return (
         <div className={styles.rangeInput}>
@@ -22,7 +24,7 @@ export default function RangeInput({ setValues, values, title ,symbol,step,min,m
                     <p>{`От ${min}${symbol} – До ${max}${symbol}`}</p>
                 </div>
             </div>
-            <RangeStep step={step} min={min} max={max} values={values} setValues={setValues}/>
+            <RangeStep step={step} min={min} max={max} values={values} onChangeComplete={(e)=>onChangeComplete(name,e)} setValues={(e)=>setValues(e)}/>
             <div className={styles.rangeInputGroup}>
                 <Input
                     label={'Минимум'}

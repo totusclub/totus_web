@@ -1,32 +1,41 @@
 import styles from '../hotelDetails.module.css';
 
 
-const HotelDetailsDesc = () => {
+const HotelDetailsDesc = ({info}:any) => {
     return (
-        <div className={styles.HotelDetailsDesc}>
-            <div className={styles.HotelDetailsDescHead}>
-                <p>Описание</p>
-            </div>
-            <div className={styles.HotelDetailsDescItems}>
-                <div className={styles.HotelDetailsDescItem}>
-                    <p>1-я линия</p>
+        <div>
+            <div className={styles.HotelDetailsDesc}>
+                <div className={styles.HotelDetailsDescHead}>
+                    <p>Описание</p>
                 </div>
-                <div className={styles.HotelDetailsDescItem}>
-                    <p>Песок</p>
-                </div>
-                <div className={styles.HotelDetailsDescItem}>
-                    <p>12 км до пляжа</p>
-                </div>
-                <div className={styles.HotelDetailsDescItem}>
-                    <p>20 км до аэропорта</p>
-                </div>
-                <div className={styles.HotelDetailsDescItem}>
-                    <p>Бесплатный Wi-Fi</p>
+                <div className={styles.HotelDetailsDescText}>
+                    <p>{`${info?.hotel_info}`}</p>
                 </div>
             </div>
-            <div className={styles.HotelDetailsDescText}>
-                <p>Отель расположен в прибрежной зоне, в регионе, который может похвастаться своими красивыми мангровыми лесами и богатыми культурными традициями, которые запечатлены в местной архитектуре. Великолепные залы этого комплекса оформлены в арабском стиле и имеют сводчатые потолки.</p>
-            </div>
+            {/*<div className={styles.HotelDetailsDesc}>*/}
+            {/*    <div className={styles.HotelDetailsDescHead}>*/}
+            {/*        <p>Развлечения</p>*/}
+            {/*    </div>*/}
+            {/*    <div className={styles.HotelDetailsDescItems}>*/}
+            {/*        {info?.attractions?.map((item,index) => (*/}
+            {/*            <div key={index} className={styles.HotelDetailsDescItem}>*/}
+            {/*                <p>{item}</p>*/}
+            {/*            </div>*/}
+            {/*        ))}*/}
+            {/*    </div>*/}
+            {/*</div>*/}
+            {/*<div className={styles.HotelDetailsDesc}>*/}
+            {/*    <div className={styles.HotelDetailsDescHead}>*/}
+            {/*        <p>Территория</p>*/}
+            {/*    </div>*/}
+            {/*    <div className={styles.HotelDetailsDescItems}>*/}
+            {/*        {info?.territory?.map((item,index) => (*/}
+            {/*            <div key={index} className={styles.HotelDetailsDescItem}>*/}
+            {/*                <p>{item}</p>*/}
+            {/*            </div>*/}
+            {/*        ))}*/}
+            {/*    </div>*/}
+            {/*</div>*/}
         </div>
     );
 };

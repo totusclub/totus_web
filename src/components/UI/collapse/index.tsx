@@ -8,16 +8,28 @@ interface CollapseProps {
     open?: boolean;
 }
 
-export default function Collapse({ title, children, open }: CollapseProps) {
+export default function Collapse({ title, children, open = false }: CollapseProps) {
     const [isOpen, setIsOpen] = useState(open);
     const [height, setHeight] = useState<string | number>('0px');
     const contentRef = useRef<HTMLDivElement>(null);
 
+    // Recalculate height when isOpen or children/content size changes
     useEffect(() => {
-        if (contentRef.current) {
-            setHeight(isOpen ? `${contentRef.current.scrollHeight}px` : '0px');
+        const updateHeight = () => {
+            if (contentRef.current) {
+                setHeight(isOpen ? `${contentRef.current.scrollHeight}px` : '0px');
+            }
+        };
+
+        updateHeight();
+
+        if (typeof ResizeObserver !== 'undefined' && contentRef.current) {
+            const observer = new ResizeObserver(updateHeight);
+            observer.observe(contentRef.current);
+
+            return () => observer.disconnect();
         }
-    }, [isOpen]);
+    }, [isOpen, children]);
 
     const toggle = () => setIsOpen((prev) => !prev);
 
@@ -28,11 +40,14 @@ export default function Collapse({ title, children, open }: CollapseProps) {
                 <Icon name={isOpen ? 'upArrow' : 'downArrow'} size={24} />
             </div>
             <div
-                ref={contentRef}
                 className={styles.contentWrapper}
-                style={{ height }}
+                style={{
+                    height,
+                    transition: 'height 0.3s ease',
+                    overflow: 'hidden',
+                }}
             >
-                <div className={styles.content}>
+                <div ref={contentRef} className={styles.content}>
                     {children}
                 </div>
             </div>

@@ -1,10 +1,11 @@
 import axios from 'axios';
 
-const BASE_URL = 'http://localhost:3001';
+const BASE_URL = 'http://213.109.202.180:3001';
 
 export async function startSearch(params) {
     try {
-        const res = await axios.get(`${BASE_URL}/start-search`, { params });
+        console.log('params22222',params)
+        const res = await axios.get(`${BASE_URL}/start-search`,{params});
         return res.data;
     } catch (error) {
         console.error('Error starting search:', error);
@@ -24,15 +25,12 @@ export async function checkSearchStatus(requestId) {
     }
 }
 
-export async function getGroupedHotels(requestId, operatorIds) {
+export async function getGroupedHotels(params) {
     try {
         const res = await axios.get(`${BASE_URL}/grouped-hotels`, {
-            params: {
-                request_id: requestId,
-                operator_ids: operatorIds.join(','),
-            },
+            params: params,
         });
-        return res.data;
+        return {...res.data,...params};
     } catch (error) {
         console.error('Error getting grouped hotels:', error);
         throw error;
@@ -87,3 +85,91 @@ export async function getHotelOffers(data ) {
 
     return response.data;
 };
+
+
+export async function getHotelRooms(data ) {
+    if (!data.request_id && !data?.hotel_id) {
+        throw new Error('Missing request_id or hotel_id');
+    }
+
+    const params = {
+        request_id:data.request_id,
+        hotel_id:data.hotel_id,
+    };
+
+
+    console.log('params',params)
+
+    const response = await axios.get(`${BASE_URL}/hotels-rooms`, {
+        params,
+    });
+
+    return response.data;
+};
+
+export async function getHotelInfo(data:any ) {
+    console.log('data.....',data)
+    if (!data.hotel_id) {
+        throw new Error('Missing request_id or hotel_id');
+    }
+
+    const params = {
+        hotel_ids:data.hotel_id,
+        search_type:'package'
+    };
+
+
+    // console.log('params',params)
+
+    const response = await axios.get(`${BASE_URL}/references/hotels`, {
+        params,
+    });
+
+    return response.data.hotels[0];
+};
+
+export async function createPackage(data:any ) {
+    if (!data.request_id || !data.tour_id) {
+        throw new Error('Missing request_id or hotel_id');
+    }
+
+    const params = {
+        request_id:data.request_id,
+        tour_id:data.tour_id,
+    };
+    const response = await axios.get(`${BASE_URL}/packages/package_details`, {
+        params,
+    });
+
+    return response.data;
+};
+export async function PackagesActualize(id:any ) {
+    if (!id) {
+        throw new Error('Missing package_id');
+    }
+
+    const params = {
+        package_id:id,
+        search_type:'package'
+    };
+    const response = await axios.get(`${BASE_URL}/packages/actualize`, {
+        params,
+    });
+
+    return response.data;
+};
+export async function Packagesflights(params: any) {
+    if (!params) {
+        throw new Error('Missing package_id');
+    }
+
+    // const data = {
+    //     package_id: id,
+    // };
+    console.log('Packagesflights',params)
+
+    const response = await axios.post(`${BASE_URL}/packages/flights`, params);
+
+    return response.data;
+}
+

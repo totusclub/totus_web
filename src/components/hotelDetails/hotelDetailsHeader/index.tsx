@@ -10,7 +10,7 @@ import Icon from "@/components/icons/Icon";
 
 
 
-const HotelDetailsHeader = () => {
+const HotelDetailsHeader = ({info}:any) => {
 
 
     return (
@@ -18,15 +18,14 @@ const HotelDetailsHeader = () => {
             <div className={styles.HotelDetailsHeaderRow}>
                 <div className={styles.HotelDetailsHeaderCity}>
                     <Icon name={'hotel'} size={14}/>
-                    <p>{'Шарм-эль-Шейх, Отель 5*'}</p>
+                    <p>{info?.stars}  <Icon name={'star'} size={14}/></p>
                 </div>
                 <div className={styles.HotelDetailsHeaderRate}>
-                    <Icon name={'star'} size={14}/>
-                    <p>{'5'} ･ Превосходно</p>
+                    <p>{info?.rating}</p>
                 </div>
             </div>
-            <p className={styles.HotelDetailsHeaderName}>Eastern Mangroves Hotel & Spa By Anantara</p>
-            <p className={styles.HotelDetailsHeaderAddress}>P.O. Box 128555 Sheikh Zayed Street Abu Dhabi, 128555 Абу-Даби, ОАЭ</p>
+            <p className={styles.HotelDetailsHeaderName}>{info?.name}</p>
+            <p className={styles.HotelDetailsHeaderAddress}>{info?.address}</p>
 
         </div>
     );

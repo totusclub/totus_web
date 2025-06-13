@@ -41,6 +41,8 @@ import InfoIcon from "@/components/icons/info";
 import EaysIcon from "@/components/icons/eays";
 import CloseLineIcon from "@/components/icons/closeLine";
 import AirIcon from "@/components/icons/air";
+import Prev from "@/components/icons/prev";
+import HelpIcon from "@/components/icons/help";
 
 
 const icons = {
@@ -87,6 +89,8 @@ const icons = {
     eays: EaysIcon,
     closeLine: CloseLineIcon,
     air: AirIcon,
+    prev: Prev,
+    help: HelpIcon,
 }
 
 type IconName = keyof typeof icons;

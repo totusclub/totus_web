@@ -3,7 +3,7 @@ import styles from './search.module.css';
 import Icon from "@/components/icons/Icon";
 
 
-const People = () => {
+const People = ({handleChange,value}) => {
     const [adults, setAdults] = useState<number>(1);
     const [children, setChildren] = useState<number>(0);
     const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -13,6 +13,7 @@ const People = () => {
         setAdults(prev => {
             if (type === 'plus') return prev + 1;
             if (type === 'minus' && prev > 1) return prev - 1;
+            handleChange(adults,'adults')
             return prev;
         });
     };

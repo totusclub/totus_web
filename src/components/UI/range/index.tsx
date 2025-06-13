@@ -6,9 +6,11 @@ interface RangeStepProps {
     max: number;
     values: number[];
     setValues: (value: number[]) => void;
+    onChangeComplete: (value: number[]) => void;
+
 }
 
-const RangeStep = ({step,min,max,values,setValues }: RangeStepProps) => {
+const RangeStep = ({step,min,max,values,setValues,onChangeComplete}: RangeStepProps) => {
     return (
         <Range
             values={values}
@@ -17,6 +19,7 @@ const RangeStep = ({step,min,max,values,setValues }: RangeStepProps) => {
             max={max}
             rtl={false}
             onChange={(values) => setValues(values)}
+            onFinalChange={(vals) => onChangeComplete ? onChangeComplete(vals) : null}
             renderTrack={({props, children}) => (
                 <div
                     onMouseDown={props.onMouseDown}

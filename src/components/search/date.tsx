@@ -4,8 +4,8 @@ import Icon from "@/components/icons/Icon";
 import Calendar from "@/components/UI/calendar";
 import {format} from "date-fns";
 
-const SelectDate = () => {
-    const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
+const SelectDate = ({handleChange,value,name}) => {
+    const [selectedDate, setSelectedDate] = useState<Date | null>(new Date(value));
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const wrapperRef = useRef<HTMLDivElement>(null);
 
@@ -24,6 +24,12 @@ const SelectDate = () => {
     const handleToggle = () => {
         setIsOpen(prev => !prev);
     };
+
+    const handleSelectDate = (dates) => {
+        setSelectedDate(dates)
+        const formatDate = format(new Date(selectedDate as Date), 'dd.MM.yy')
+        handleChange(dates,name)
+    }
     return (
         <div className={styles.searchField} ref={wrapperRef} onClick={handleToggle}>
             <Icon name={'calendar'} size={24} color="#000"/>
@@ -34,7 +40,7 @@ const SelectDate = () => {
             <Icon name={'downArrow'} size={24} color="#000"/>
             {isOpen && (
                 <div className={styles.dateModal} onClick={(e) => e.stopPropagation()}>
-                    <Calendar setSelectedDate={setSelectedDate} selectedDate={selectedDate}/>
+                    <Calendar setSelectedDate={handleSelectDate} selectedDate={selectedDate}/>
                 </div>
             )}
 

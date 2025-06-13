@@ -4,81 +4,46 @@ import Icon from "@/components/icons/Icon";
 import HotelDetailsPriceList from "@/components/hotelDetails/hotelDetailsRooms/priceList";
 import SmallSlider from "@/components/UI/smallSlide";
 import Image from "next/image";
+import {useEffect, useMemo, useState} from "react";
+
+const HotelDetailsRoomItem = ({item,selectedDate}:any) => {
+    const [selectedOperator, setSelectedOperator] = useState<number | null>(null);
+
+   const roomItems =  useMemo(() => {
+        if (selectedDate && item?.offers) {
+            const filteredOffers = Object.entries(item.offers)
+                .flatMap(([type, offers]) =>
+                    offers
+                        .filter(offer => offer.start_date === selectedDate)
+                        .map(offer => ({ type, ...offer }))
+                );
+
+            const seen = new Set();
+            const uniqueOperators = filteredOffers.filter(offer => {
+                if (seen.has(offer.operator_id)) return false;
+                seen.add(offer.operator_id);
+                return true;
+            });
+
+            const simplified = uniqueOperators.map(offer => ({
+                id: offer.operator_id,
+                name: offer.operator_name
+            }));
+
+            console.log('Filtered Offers:', selectedDate, filteredOffers, simplified);
+            setSelectedOperator(simplified[0]?.['id'])
+            return {offersRoom:filteredOffers,operators:simplified}
+        }
+    }, [selectedDate, item?.offers]);
 
 
-const MOCK_AGENTS = [
-    {id:0,name:'Все'},
-    {id:1,name:'AnexTour'},
-    {id:2,name:'Intourist'},
-    {id:3,name:'Level.Travel'},
-]
-const MOCK_PRICES = [
-    {
-        id:1,
-        title:'Без питания',
-        description:'',
-        items:[
-            {
-                id:1,
-                date:'14 ночей, до 22.05',
-                tourAgent:'Level.Travel',
-                price:'1793276'
-            },
-            {
-                id:2,
-                date:'14 ночей, до 22.05',
-                tourAgent:'Level.Travel',
-                price:'1793276'
-            }
-        ]
-    },
-    {
-        id:2,
-        title:'Завтрак',
-        description:'',
-        items:[
-            {
-                id:1,
-                date:'14 ночей, до 22.05',
-                tourAgent:'Level.Travel',
-                price:'1793276'
-            },
-            {
-                id:2,
-                date:'14 ночей, до 22.05',
-                tourAgent:'Level.Travel',
-                price:'1793276'
-            }
-        ]
-    },
-    {
-        id:2,
-        title:'Завтрак и обед или ужин',
-        description:'Выбор типа питания зависит от отеля',
-        items:[
-            {
-                id:1,
-                date:'14 ночей, до 22.05',
-                tourAgent:'Level.Travel',
-                price:'1793276'
-            },
-            {
-                id:2,
-                date:'14 ночей, до 22.05',
-                tourAgent:'Level.Travel',
-                price:'1793276'
-            }
-        ]
-    }
-]
 
-const HotelDetailsRoomItem = ({images}:any) => {
 
     return (
         <div className={styles.HotelDetailsRoomItem}>
             <div className={styles.HotelDetailsRoom}>
-                {images.length > 1 ? (
-                    <SmallSlider/>
+                {item?.room?.images?.length > 1 ? (
+                    <SmallSlider images={item?.room?.images}/>
                 ) : (
                     <div className={styles.HotelDetailsRoomImage}>
                         <img alt={'imag'}
@@ -87,7 +52,7 @@ const HotelDetailsRoomItem = ({images}:any) => {
                 )}
 
                 <div className={styles.HotelDetailsRoomInforamation}>
-                    <p>Двухместный Люкс Panoramic Дуплекс (Двуспальная Кровать)</p>
+                    <p>{item?.room?.name_ru}</p>
                     <div className={styles.HotelDetailsRoomOptions}>
                         <div className={styles.HotelDetailsRoomOption}>
                             <Icon name={'verify'}/>
@@ -101,10 +66,13 @@ const HotelDetailsRoomItem = ({images}:any) => {
 
                 </div>
             </div>
-            <TourAgents agents={MOCK_AGENTS}/>
-            {MOCK_PRICES.map((item, index) => (
-                <HotelDetailsPriceList key={index} item={item}/>
-            ))}
+
+            <TourAgents agents={roomItems?.operators} selectedOperator={selectedOperator} setSelectedOperator={setSelectedOperator}/>
+
+            {Object.entries(item?.offers)?.map(([type, offer], index) =>
+                    <HotelDetailsPriceList key={index} selectedOperator={selectedOperator} selectedDate={selectedDate} item={roomItems?.offersRoom} type={type}  />
+            )}
+
 
         </div>
     );

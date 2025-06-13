@@ -1,10 +1,11 @@
-import React, {CSSProperties, useState} from 'react';
+import React, {CSSProperties, useEffect, useState} from 'react';
 import Slider from 'react-slick';
 import styles from './smallSlide.module.css';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Icon from "@/components/icons/Icon";
 import Image from "next/image";
+import AppImage from "@/components/UI/appImage";
 
 
 interface ArrowProps {
@@ -29,17 +30,16 @@ const PrevArrow = ({ onClick }: ArrowProps) => {
     );
 };
 
-const SmallSlider = () => {
-    const images = [
-        'https://www.staysomedays.com/wp-content/uploads/2021/12/hotel-grof-800x800.jpg',
-        'https://www.staysomedays.com/wp-content/uploads/2021/12/hotel-grof-800x800.jpg',
-        'https://www.staysomedays.com/wp-content/uploads/2021/12/hotel-grof-800x800.jpg',
-        'https://www.staysomedays.com/wp-content/uploads/2021/12/hotel-grof-800x800.jpg',
-        'https://www.staysomedays.com/wp-content/uploads/2021/12/hotel-grof-800x800.jpg',
-        'https://www.staysomedays.com/wp-content/uploads/2021/12/hotel-grof-800x800.jpg',
-    ];
+const SmallSlider = ({images}) => {
+    const [selectedIndex, setSelectedIndex] = useState(null);
 
-    const [selectedIndex, setSelectedIndex] = useState(0);
+    useEffect(() => {
+        if(images?.length > 0){
+            console.log(images[0]['x900'])
+            setSelectedIndex(images[0]['x900']);
+        }
+
+    },[images])
 
     const settings = {
         dots: false,
@@ -54,22 +54,23 @@ const SmallSlider = () => {
     return (
         <div className={styles.containerSmallSlider}>
             <div className={styles.selectedImageWrapper}>
-                <img
-                    src={images[selectedIndex]}
-                    alt="Selected"
+                {/*<img*/}
+                {/*    src={selectedIndex}*/}
+                {/*    alt="Selected"*/}
 
-                    className={styles.selectedImage}
-                />
+                {/*    className={styles.selectedImage}*/}
+                {/*/>*/}
+                <AppImage imageUrl={selectedIndex}/>
             </div>
             <Slider {...settings}>
                 {images.map((img, index) => (
-                    <div key={index} onClick={() => setSelectedIndex(index)}>
+                    <div key={index} onClick={() => setSelectedIndex(img['x900'])}>
                         <div
                             className={`${styles.slideItem} ${
-                                selectedIndex === index ? styles.selected : ''
+                                selectedIndex === img['x900'] ? styles.selected : ''
                             }`}
                         >
-                            <img  src={img} alt={`No Image`} className={styles.thumbnail} />
+                            <img  src={img['x900']} alt={`No Image`} className={styles.thumbnail} />
                         </div>
                     </div>
                 ))}

@@ -7,16 +7,53 @@ import { useState, FC } from "react";
 
 interface TicketItemProps {
     green?: boolean;
+    item:any
+    price?: number
 }
 
-const TicketItem: FC<TicketItemProps> = ({ green }) => {
+const TicketItem: FC<TicketItemProps> = ({ green,item ,price}) => {
     const [open, setOpen] = useState<boolean>(false);
     const router = useRouter();
 
     const handleClick = () => {
         router.push('/booking');
     };
+    // console.log('item',item)
 
+    function formatRussianDateTime(isoString) {
+        // console.log('isoString',isoString)
+        const date = new Date(isoString);
+
+        const timeFormatter = new Intl.DateTimeFormat('ru-RU', {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false,
+            timeZone: 'Europe/Moscow', // Adjust if needed
+        });
+
+        const dateFormatter = new Intl.DateTimeFormat('ru-RU', {
+            day: '2-digit',
+            month: 'short',
+            weekday: 'short',
+            timeZone: 'Europe/Moscow',
+        });
+
+        const time = timeFormatter.format(date);          // "14:45"
+        const datePart = dateFormatter.format(date);      // "20 июл, вс"
+
+        return `${time} ${datePart}`;
+    }
+
+
+    function secondsToRussianTime(seconds) {
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+
+        const hoursStr = hours > 0 ? `${hours}ч` : '';
+        const minutesStr = minutes > 0 ? `${minutes}м` : '';
+
+        return `${hoursStr} ${minutesStr}`.trim();
+    }
     return (
         <>
             <div className={green ? styles.ticketItemWrapper : ''}>
@@ -29,29 +66,50 @@ const TicketItem: FC<TicketItemProps> = ({ green }) => {
                             <p>Лучший выбор</p>
                         </div>
 
-                        {[1, 2].map((_, i) => (
-                            <div key={i} className={styles.ticketItemLine}>
-                                <div className={styles.ticketItemLineItem}>
-                                    <div className={styles.ticketItemLogo}></div>
-                                    <div className={styles.ticketItemDate}>
-                                        <p>15:55 – 22:15 </p>
-                                        <p>Уральские авиалинии</p>
-                                    </div>
-                                </div>
-                                <div className={styles.ticketItemLineItem}>
-                                    <div className={styles.ticketItemDate}>
-                                        <p>Прямой</p>
-                                        <p>ATH</p>
-                                    </div>
-                                </div>
-                                <div className={styles.ticketItemLineItem}>
-                                    <div className={styles.ticketItemDate}>
-                                        <p>3ч 10м</p>
-                                        <p>EVN–FCO</p>
-                                    </div>
+
+                        <div className={styles.ticketItemLine}>
+                            <div className={styles.ticketItemLineItem}>
+                                <div className={styles.ticketItemLogo}></div>
+                                <div className={styles.ticketItemDate}>
+                                    <p>{formatRussianDateTime(item?.to?.departure)} - {formatRussianDateTime(item?.to?.arrival)}</p>
+                                    <p>Уральские авиалинии</p>
                                 </div>
                             </div>
-                        ))}
+                            <div className={styles.ticketItemLineItem}>
+                                <div className={styles.ticketItemDate}>
+                                    <p>Прямой</p>
+                                    <p>ATH</p>
+                                </div>
+                            </div>
+                            <div className={styles.ticketItemLineItem}>
+                                <div className={styles.ticketItemDate}>
+                                    <p>{secondsToRussianTime(item?.to?.time)}</p>
+                                    <p>EVN–FCO</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div className={styles.ticketItemLine}>
+                            <div className={styles.ticketItemLineItem}>
+                                <div className={styles.ticketItemLogo}></div>
+                                <div className={styles.ticketItemDate}>
+                                    <p>{formatRussianDateTime(item?.back?.departure)} - {formatRussianDateTime(item?.back?.arrival)}</p>
+                                    <p>Уральские авиалинии</p>
+                                </div>
+                            </div>
+                            <div className={styles.ticketItemLineItem}>
+                                <div className={styles.ticketItemDate}>
+                                    <p>Прямой</p>
+                                    <p>ATH</p>
+                                </div>
+                            </div>
+                            <div className={styles.ticketItemLineItem}>
+                                <div className={styles.ticketItemDate}>
+                                    <p>{secondsToRussianTime(item?.back?.time)}</p>
+                                    <p>EVN–FCO</p>
+                                </div>
+                            </div>
+                        </div>
+
 
                         <ul>
                             <li>Блочный</li>
@@ -65,7 +123,8 @@ const TicketItem: FC<TicketItemProps> = ({ green }) => {
 
                     <div className={styles.ticketItemPriceInfo}>
                         <div className={styles.ticketItemPrice}>
-                            <p>99 143₽</p>
+                            <p>{price}₽</p>
+                            <p>Доплаты и сборы: +{item?.fuel_charge}₽</p>
                             <p>За тур с перелётом</p>
                         </div>
                         <Button
@@ -75,7 +134,7 @@ const TicketItem: FC<TicketItemProps> = ({ green }) => {
                             full={true}
                         />
                         <div onClick={() => setOpen(true)} className={styles.ticketItemDetails}>
-                            <Icon name="info" size={16} />
+                            <Icon name="info" size={16}/>
                             <p>Детали перелёта</p>
                         </div>
                     </div>
@@ -83,15 +142,18 @@ const TicketItem: FC<TicketItemProps> = ({ green }) => {
 
                 {green && (
                     <div className={styles.ticketItemAlert}>
-                        <Icon name="light" size={20} color="var(--bgPrimary)" />
+                        <Icon name="light" size={20} color="var(--bgPrimary)"/>
                         <p>Самый выгодный рейс к туру</p>
                     </div>
                 )}
             </div>
 
-            <TicketModal open={open} setOpen={setOpen} />
+            <TicketModal open={open} setOpen={setOpen}/>
         </>
     );
 };
 
 export default TicketItem;
+
+
+

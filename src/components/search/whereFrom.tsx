@@ -1,22 +1,14 @@
 import styles from './search.module.css';
 import Icon from "@/components/icons/Icon";
-import {useEffect, useRef, useState} from "react";
+import { useEffect, useRef, useState } from "react";
+import {useDepartureSearch} from "@/hooks/useDepartureSearch";
 
-
-const MOCK_DATA = [
-    {id:1,name:'Dubai, United Arab Emirates',icon:'location',type:'Город'},
-    {id:2,name:'Dubai, United Arab Emirates YUL',icon:'plane',type:'Dubai Intl'},
-    {id:3,name:'Dubai, United Arab Emirates DWC',icon:'plane',type:'Al Maktoum Intl'},
-    {id:4,name:'Dubai International Hotel',icon:'hotel',type:'Dubai, United Arab Emirates'},
-    {id:5,name:'Dubai Mall, Dubai, United Arab Emirates',icon:'circle',type:'Landmark'},
-]
-
-const WhereFrom = () => {
+const WhereFrom = ({handleChange,value,name}) => {
     const wrapperRef = useRef<HTMLDivElement>(null);
-    const [isOpen, setIsOpen] = useState<boolean>(false);
+    const [isOpen, setIsOpen] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
-    const [searchValue, setSearchValue] = useState<string>('');
-    const [filteredData, setFilteredData] = useState(MOCK_DATA);
+    const [searchValue, setSearchValue] = useState("");
+    const { results, status, error } = useDepartureSearch(searchValue);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -30,28 +22,28 @@ const WhereFrom = () => {
         };
     }, []);
 
-    useEffect(() => {
-        const filtered = MOCK_DATA.filter(item =>
-            item.name.toLowerCase().includes(searchValue.toLowerCase())
-        );
-        setFilteredData(filtered);
-    }, [searchValue]);
-
     const handleToggle = () => {
         setIsOpen(prev => !prev);
-        setTimeout(() => {
-            inputRef.current?.focus();
-        }, 0);
+        setTimeout(() => inputRef.current?.focus(), 0);
     };
 
-    const handleSelect = (name: string) => {
-        setSearchValue(name);
+    const handleSelect = (item: string) => {
+        setSearchValue(item?.name);
+        // console.log('handleSelect',item);
+        if(item.iata){
+            handleChange(item,name)
+        }else{
+            handleChange(item,name)
+        }
         setIsOpen(false);
     };
 
+    if (status === "loading") return <p>Loading...</p>;
+    if (status === "failed") return <p>Error: {error}</p>;
+
     return (
         <div className={`${styles.searchField} ${styles.whereFrom}`} ref={wrapperRef} onClick={handleToggle}>
-            <Icon name={'from'} size={24} color="#000" />
+            <Icon name="from" size={24} color="#000" />
             <div className={styles.searchFieldInfo}>
                 <p className={styles.searchFieldsLabel}>Откуда?</p>
                 <input
@@ -67,12 +59,18 @@ const WhereFrom = () => {
                     placeholder="Москва"
                 />
             </div>
-            <Icon name={'downArrow'} size={24} color="#000" />
+            <Icon name="downArrow" size={24} color="#000" />
             {isOpen && (
                 <div className={styles.whereFromModal} onClick={(e) => e.stopPropagation()}>
-                    {filteredData.length > 0 ? (
-                        filteredData.map((item) => (
-                            <div onClick={() => handleSelect(item.name)}  className={styles.locationItem} key={item.id}>
+                    {searchValue.trim() === "" ? (
+                        <p className={styles.noResults}>Введите город или аэропорт</p>
+                    ) : results.length > 0 ? (
+                        results.map((item) => (
+                            <div
+                                key={item.id}
+                                onClick={() => handleSelect(item)}
+                                className={styles.locationItem}
+                            >
                                 <Icon name={item.icon} size={24} color="#000" />
                                 <div>
                                     <p className={styles.locationItemName}>{item.name}</p>

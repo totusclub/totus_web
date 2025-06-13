@@ -41,7 +41,7 @@ const data = [
     }
 ];
 
-const HotelDetailsServices = () => {
+const HotelDetailsServices = ({info}:any) => {
     return (
         <div className={styles.HotelDetailsServices}>
             <div className={styles.HotelDetailsServicesHead}>

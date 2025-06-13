@@ -2,6 +2,7 @@ import styles from '../hotelDetails.module.css';
 import Button from "@/components/UI/button";
 import { useRouter } from "next/router";
 import React from "react";
+import {createPackage} from "@/api/levelTravelApi";
 
 interface RoomItem {
     date: string;
@@ -17,35 +18,61 @@ interface HotelDetailsItem {
 
 interface HotelDetailsPriceListProps {
     item: HotelDetailsItem;
+    type:string;
+    selectedDate:any;
+    selectedOperator:any
 }
 
-const HotelDetailsPriceList: React.FC<HotelDetailsPriceListProps> = ({ item }) => {
+const HotelDetailsPriceList: React.FC<HotelDetailsPriceListProps> = ({ item,selectedDate,selectedOperator,type }) => {
     const router = useRouter();
 
-    const handleBook = () => {
-        router.push("/tickets");
+    const handleBook =async (id) => {
+      const res =  await createPackage({request_id:router.query.request_id,tour_id:id})
+        console.log('handleBook',res.package.id)
+        router.push(`/tickets?package=${res.package.id}`);
     };
+
+    const formatDate = (dateStr) => {
+        const [year, month, day] = dateStr.split('-');
+        return `до ${day}.${month}`;
+    };
+    const roomTypeName= {
+        BB:'Завтрак',
+        RO:'Без питания',
+        AI:'Всё включено',
+        UAI:'Ультра всё включено',
+        HB:'Завтрак и ужин',
+        FB:'Завтрак, обед, ужин',
+        HBD:'Завтрак и ужин',
+        AI24:'Всё включено 24 часа',
+        DNR:'Ужин',
+        AIL:'Всё включено с ограничениями',
+        'FB+':'Завтрак, обед, ужин +',
+        'HB+':'Завтрак и ужин +',
+        HBL:'Завтрак и обед'
+    }
 
     return (
         <div className={styles.HotelDetailsPriceList}>
             <div className={styles.HotelDetailsPriceListHead}>
-                <p>{item.title}</p>
-                {item.description.length > 1 && <p>{item.description}</p>}
+                <p>{roomTypeName?.[type]}</p>
+                {item?.description?.length > 1 && <p>{item?.description}</p>}
             </div>
             <div className={styles.HotelDetailsPriceListItems}>
-                {item.items.map((room, index) => (
+                {item?.map((room, index) =>
+                    room.operator_id === selectedOperator ? (
                     <div key={index} className={styles.HotelDetailsPriceListItem}>
                         <div>
-                            <p>{room.date}</p>
-                            <p>{room.tourAgent}</p>
+                            <p>{room.nights_count} ночей  {formatDate(room?.start_date)}</p>
+                            <p>{room?.operator_name}</p>
                         </div>
                         <div>
-                            <p>{room.price}</p>
+                            <p>{room?.price?.toString()?.replace(/\B(?=(\d{3})+(?!\d))/g, '\u202F')}₽</p>
                             <p>тур с перелётом</p>
                         </div>
                         <div>
                             <Button
-                                onClick={handleBook}
+                                onClick={()=>handleBook(room.id)}
                                 width="148px"
                                 height="40px"
                                 full={false}
@@ -53,7 +80,7 @@ const HotelDetailsPriceList: React.FC<HotelDetailsPriceListProps> = ({ item }) =
                             />
                         </div>
                     </div>
-                ))}
+                ):null)}
             </div>
         </div>
     );

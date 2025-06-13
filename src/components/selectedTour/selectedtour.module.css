@@ -62,6 +62,9 @@
     align-items: flex-start;
     gap: 8px;
     border-radius: 8px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
     background: var(--borderTertiary);
 }
 .selectedTourInfo{
@@ -124,4 +127,31 @@
     font-weight: 400;
     line-height: 18px;
     letter-spacing: -0.28px;
+}
+.actualePackageLable{
+    color: var(--textPrimary);
+    text-align: right;
+    /* Body - Caption/Regular */
+    font-family: "Golos Text";
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 18px; /* 128.571% */
+    letter-spacing: -0.28px;
+}
+.actualePackageTotal{
+    color: var(--Color-Content-textPrimary, #1F1F1F);
+    text-align: right;
+    /* Headline/Medium */
+    font-family: "Golos Text";
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 24px; /* 120% */
+    letter-spacing: -0.4px;
+}
+.actualePackageParices{
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
 }

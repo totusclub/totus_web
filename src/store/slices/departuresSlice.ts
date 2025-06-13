@@ -1,0 +1,36 @@
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import axios from 'axios';
+
+export const fetchDepartures = createAsyncThunk(
+    'departures/fetchDepartures',
+    async (params = {}) => {
+        const res = await axios.get('http://213.109.202.180:3001/references/departures', { params });
+        return res.data;
+    }
+);
+
+const departuresSlice = createSlice({
+    name: 'departures',
+    initialState: {
+        data: [],
+        status: 'idle',
+        error: null,
+    },
+    reducers: {},
+    extraReducers: builder => {
+        builder
+            .addCase(fetchDepartures.pending, state => {
+                state.status = 'loading';
+            })
+            .addCase(fetchDepartures.fulfilled, (state, action) => {
+                state.status = 'succeeded';
+                state.data = action.payload;
+            })
+            .addCase(fetchDepartures.rejected, (state, action) => {
+                state.status = 'failed';
+                state.error = action.error.message;
+            });
+    },
+});
+
+export default departuresSlice.reducer;

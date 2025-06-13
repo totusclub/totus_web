@@ -7,14 +7,14 @@ import TrackPrices from "@/components/UI/trackPrices";
 import {router} from "next/client";
 
 
-const HotelDetailsInfo = () => {
+const HotelDetailsInfo = ({images}:any) => {
 const [priceTrack, setPriceTrack] = useState<boolean>(false);
 const handelBook = ()=>{
     router.push("/tickets");
 }
     return (
         <div className={styles.HotelDetailsInfoRow}>
-            <VerticalSlider/>
+            <VerticalSlider images={images}/>
             <div className={styles.HotelDetailsInfo}>
                 <div className={styles.HotelDetailsInfoPrice}>
                     <p className={styles.HotelDetailsInfoPriceText}>от 1 396 810 ₽</p>

@@ -4,9 +4,58 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9b054eca-f19d-4e8b-ba86-c2382a8c8a86" name="Changes" comment="travel apis">
+    <list default="true" id="9b054eca-f19d-4e8b-ba86-c2382a8c8a86" name="Changes" comment="meta desc">
+      <change afterPath="$PROJECT_DIR$/src/components/UI/appImage/index.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/components/icons/help.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/components/icons/prev.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/components/icons/time.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/hooks/useDepartureSearch.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/hooks/useDestinationsSearch.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/store/slices/departuresSlice.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/store/slices/destinationsSlice.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/store/slices/searchSlice.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/header/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/header/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/api/levelTravelApi.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/api/levelTravelApi.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/UI/checkboxGroup/checkboxGroup.module.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/UI/checkboxGroup/checkboxGroup.module.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/UI/checkboxGroup/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/UI/checkboxGroup/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/UI/collapse/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/UI/collapse/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/UI/itemSwitch/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/UI/itemSwitch/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/UI/progress/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/UI/progress/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/UI/range/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/UI/range/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/UI/rangeInput/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/UI/rangeInput/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/UI/smallSlide/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/UI/smallSlide/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/UI/verticalSlide/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/UI/verticalSlide/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/hotelCard/hotelCard.module.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/hotelCard/hotelCard.module.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/hotelCard/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/hotelCard/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/hotelDetails/hotelDetailsDesc/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/hotelDetails/hotelDetailsDesc/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/hotelDetails/hotelDetailsHeader/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/hotelDetails/hotelDetailsHeader/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/hotelDetails/hotelDetailsInfo/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/hotelDetails/hotelDetailsInfo/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/hotelDetails/hotelDetailsRooms/datesPrice.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/hotelDetails/hotelDetailsRooms/datesPrice.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/hotelDetails/hotelDetailsRooms/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/hotelDetails/hotelDetailsRooms/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/hotelDetails/hotelDetailsRooms/priceList.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/hotelDetails/hotelDetailsRooms/priceList.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/hotelDetails/hotelDetailsRooms/roomItem.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/hotelDetails/hotelDetailsRooms/roomItem.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/hotelDetails/hotelDetailsRooms/services.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/hotelDetails/hotelDetailsRooms/services.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/hotelDetails/hotelDetailsRooms/tourAgents.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/hotelDetails/hotelDetailsRooms/tourAgents.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/icons/Icon.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/icons/Icon.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/search/date.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/search/date.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/search/nights.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/search/nights.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/search/people.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/search/people.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/search/search.module.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/search/search.module.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/search/searchForm.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/search/searchForm.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/search/whereFrom.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/search/whereFrom.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/search/whereTo.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/search/whereTo.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/searchPage/searchPage.module.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/searchPage/searchPage.module.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/searchPage/searchResult/filters.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/searchPage/searchResult/filters.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/searchPage/searchResult/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/searchPage/searchResult/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/searchPage/searchResult/resultList.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/searchPage/searchResult/resultList.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/searchPage/searchResult/searchTicketList.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/searchPage/searchResult/searchTicketList.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/selectedTour/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/selectedTour/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/selectedTour/selectedtour.module.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/selectedTour/selectedtour.module.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/ticketItem/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/ticketItem/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/_app.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/_app.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/hotel-details/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/hotel-details/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/tickets/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/tickets/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/index.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -27,18 +76,18 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "Hayk95"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;Hayk95&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "git@github.com:tosmedia/kedam_WEB.git",
-    "accountId": "08a0515f-7799-46a6-aa89-61dfa44c5bd4"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/tosmedia/kedam_WEB.git&quot;,
+    &quot;accountId&quot;: &quot;08a0515f-7799-46a6-aa89-61dfa44c5bd4&quot;
   }
-}]]></component>
+}</component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/src/components/header/Header.tsx" root0="SKIP_INSPECTION" />
   </component>
@@ -50,23 +99,24 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "main",
-    "last_opened_file_path": "/Users/haykmaruqyan/Desktop/KEDAM/web/src/assets/fonts",
-    "list.type.of.created.stylesheet": "CSS",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "npm.build.executor": "Run",
-    "npm.dev.executor": "Run",
-    "ts.external.directory.path": "/Users/haykmaruqyan/Desktop/KEDAM/web/node_modules/typescript/lib",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/haykmaruqyan/Desktop/KEDAM/web&quot;,
+    &quot;list.type.of.created.stylesheet&quot;: &quot;CSS&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;npm.build.executor&quot;: &quot;Run&quot;,
+    &quot;npm.dev.executor&quot;: &quot;Run&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;/Users/haykmaruqyan/Desktop/KEDAM/web/node_modules/typescript/lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/src/assets/fonts" />
@@ -74,6 +124,7 @@
       <recent name="$PROJECT_DIR$/src/assets/icons" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src" />
       <recent name="$PROJECT_DIR$/src/components/modals/ticketModal" />
       <recent name="$PROJECT_DIR$/src/components/UI/rating" />
       <recent name="$PROJECT_DIR$/src/components/header" />
@@ -137,7 +188,19 @@
       <workItem from="1748357427166" duration="12319000" />
       <workItem from="1748448099446" duration="14369000" />
       <workItem from="1748510063939" duration="23116000" />
-      <workItem from="1748607671067" duration="1978000" />
+      <workItem from="1748607671067" duration="2874000" />
+      <workItem from="1748676398258" duration="13717000" />
+      <workItem from="1749107451920" duration="2862000" />
+      <workItem from="1749111265390" duration="1474000" />
+      <workItem from="1749117548487" duration="4883000" />
+      <workItem from="1749128610537" duration="6563000" />
+      <workItem from="1749201425873" duration="29018000" />
+      <workItem from="1749295501277" duration="28109000" />
+      <workItem from="1749562846407" duration="1509000" />
+      <workItem from="1749631131214" duration="3399000" />
+      <workItem from="1749655266736" duration="11000" />
+      <workItem from="1749755645349" duration="4412000" />
+      <workItem from="1749820415626" duration="6939000" />
     </task>
     <task id="LOCAL-00001" summary="added font">
       <option name="closed" value="true" />
@@ -155,7 +218,15 @@
       <option name="project" value="LOCAL" />
       <updated>1748608926417</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="meta desc">
+      <option name="closed" value="true" />
+      <created>1748634671800</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1748634671800</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -164,6 +235,7 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="added font" />
     <MESSAGE value="travel apis" />
-    <option name="LAST_COMMIT_MESSAGE" value="travel apis" />
+    <MESSAGE value="meta desc" />
+    <option name="LAST_COMMIT_MESSAGE" value="meta desc" />
   </component>
 </project>

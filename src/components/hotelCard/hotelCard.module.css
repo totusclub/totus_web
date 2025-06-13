@@ -22,6 +22,58 @@
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
+    padding: 8px;
+}
+.hotelCardImageInfo{
+    width: 100%;
+    display: flex;
+    -webkit-box-align: center;
+    align-items: center;
+    justify-content: flex-end;
+    flex-direction: row;
+    padding: 3px 8px;
+    border-radius: 8px;
+    gap: 4px;
+
+}
+.hotelCardImageInfo>p:nth-child(1){
+    color: var(--textPrimary);
+    text-align: right;
+    leading-trim: both;
+    text-edge: cap;
+    font-family: "Golos Text";
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 16px; /* 100% */
+    letter-spacing: -0.32px;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+.hotelCardImageInfo>p:nth-child(2){
+    /*color: var(--textPrimary);*/
+    /*font-size: 9px;*/
+    /*font-style: normal;*/
+    /*font-weight: 400;*/
+background: var(--textPrimary);
+    color: var(--textPrimaryB, #FFF);
+    text-align: center;
+    leading-trim: both;
+    text-edge: cap;
+    font-family: "Golos Text";
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 16px; /* 100% */
+    letter-spacing: -0.32px;
+    display: flex;
+    padding: 4px;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    border-radius: 4px;
+    background: var(--primary_green);
 }
 .hotelCardInfo{
     display: flex;
@@ -45,7 +97,8 @@
 }
 .hotelCardHead{
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    /*align-items: center;*/
     gap: 4px;
 }
 .hotelCardCity{
@@ -87,14 +140,17 @@
     font-weight: 400;
     line-height: 16px; /* 133.333% */
     letter-spacing: -0.24px;
+
 }
 .hotelCardName{
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: flex-start;
-    flex: 1 0 0;
+    /*flex: 1 0 0;*/
     align-self: stretch;
+    overflow: hidden;
+    /*max-width: 100%;*/
 }
 .hotelCardName > p{
     color: var(--textPrimary, #1F1F1F);
@@ -104,6 +160,10 @@
     font-weight: 500;
     line-height: 24px;
     letter-spacing: -0.4px;
+    white-space: nowrap;       /* Prevent line breaks */
+    overflow: hidden;          /* Hide overflowed content */
+    text-overflow: ellipsis;
+    width: 400px;
 }
 .hotelCardTags{
     display: flex;

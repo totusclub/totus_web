@@ -8,6 +8,8 @@ interface DatesPriceItem {
 
 interface DatesPriceProps {
     dates: DatesPriceItem[];
+    selectedDate:string,
+    setSelectedDate:any
 }
 
 function formatDateToRussian(date: Date): string {
@@ -21,11 +23,17 @@ function formatDateToRussian(date: Date): string {
 
     return `${day} ${month}, ${weekday}`;
 }
-const DatesPrice = ({ dates }: DatesPriceProps) => {
-    const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+const DatesPrice = ({ dates,selectedDate, setSelectedDate }: DatesPriceProps) => {
+
 
     useEffect(() => {
-        setSelectedDate(dates[0]['date']);
+        // setSelectedDate(dates[0]['date']);
+        const firstEntry = Object.entries(dates)[0];
+        if (firstEntry) {
+            const [firstDate, firstPrice] = firstEntry;
+            setSelectedDate(firstDate)
+            console.log(firstDate); // "2025-07-19"
+        }
     },[dates])
 
     const handleDateChange = (date: Date) => {
@@ -33,12 +41,38 @@ const DatesPrice = ({ dates }: DatesPriceProps) => {
     }
     return (
         <div className={styles.HotelDetailsDatePrices}>
-            {dates.map((item, index) => (
-                <div onClick={()=>handleDateChange(item.date)} className={styles.HotelDetailsDatePrice} style={{backgroundColor:`var(${selectedDate===item.date?'--core_Orange':'--bgSecondary'})`}} key={index}>
-                    <p style={{color:`var(${selectedDate===item.date?'--textPrimaryB':'--textPrimary'})`}} >{formatDateToRussian(item.date)}</p>
-                    <p style={{color:`var(${selectedDate===item.date?'--textPrimaryB':'--textTertiary'})`}}>от {item.price} ₽</p>
+            {Object.entries(dates)?.map(([date, price], index) => (
+                <div
+                    onClick={() => handleDateChange(date)}
+                    className={styles.HotelDetailsDatePrice}
+                    style={{
+                        backgroundColor: `var(${
+                            selectedDate === date ? '--core_Orange' : '--bgSecondary'
+                        })`,
+                    }}
+                    key={index}
+                >
+                    <p
+                        style={{
+                            color: `var(${
+                                selectedDate === date ? '--textPrimaryB' : '--textPrimary'
+                            })`,
+                        }}
+                    >
+                        {formatDateToRussian(new Date(date))}
+                    </p>
+                    <p
+                        style={{
+                            color: `var(${
+                                selectedDate === date ? '--textPrimaryB' : '--textTertiary'
+                            })`,
+                        }}
+                    >
+                        от {price} ₽
+                    </p>
                 </div>
             ))}
+
         </div>
     );
 };

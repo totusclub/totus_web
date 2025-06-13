@@ -10,10 +10,11 @@ interface FilterItem {
     id: number;
     name: string;
     active: boolean;
+    packages: any;
 
 }
 
-const ResultTicketList = () => {
+const ResultTicketList = ({flights,packages}:any) => {
     const [filters, setFilters] = useState<FilterItem[]>([
         { id: 1, name: 'Регулярный', active: true },
         { id: 2, name: 'Без пересадок', active: false },
@@ -34,9 +35,11 @@ const ResultTicketList = () => {
 
     }
 
+    console.log('packages',packages)
+
     return (
         <div className={styles.resultList}>
-            <SelectedTour/>
+            <SelectedTour packages={packages}/>
             <div className={styles.resultListSelectedFilter}>
                 <div className={styles.selectedFiltersList}>
                     {filters.map((item) => (
@@ -67,9 +70,9 @@ const ResultTicketList = () => {
             </div>
 
                 <div className={styles.resultListItems}>
-                    {Array.from({ length: 13 }).map((item,index) => (
+                    {flights.map((item,index) => (
                         <>
-                            <TicketItem green={index===3}/>
+                            <TicketItem price={packages.price} item={item} green={index===3}/>
                             {index === 4 && (
                                 <TrackPrices text={'Получайте автоматические оповещения при изменении цен.'} priceTrack={priceTrack} setPriceTrack={setPriceTrack}/>
                             )}

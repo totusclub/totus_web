@@ -9,7 +9,7 @@ const MIN = 0;
 const MAX = 30;
 
 
-const Nights = () => {
+const Nights = ({handleChange,value,name}) => {
     const [values, setValues] = useState([7]);
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [isOn, setIsOn] = useState<boolean>(false);
@@ -31,6 +31,11 @@ const Nights = () => {
         setIsOpen(prev => !prev);
     };
 
+    const handleChangeNights = e => {
+        setValues(e)
+        handleChange(e[0],name)
+    }
+
     return (
         <div className={styles.searchField} ref={wrapperRef} onClick={handleToggle}>
             <Icon name={'moon'} size={24} color="#000"/>
@@ -44,7 +49,7 @@ const Nights = () => {
                     <div className={styles.nightsModalHead}>
                         <p>Количество ночей: {values[0]}</p>
                     </div>
-                    <RangeStep step={STEP} min={MIN} max={MAX} values={values} setValues={setValues}/>
+                    <RangeStep  step={STEP} min={MIN} max={MAX} values={values} setValues={handleChangeNights}/>
                     <div className={styles.nightsModalFooter}>
                         <div>
                             <p>Длительность тура ±2 ночи</p>
