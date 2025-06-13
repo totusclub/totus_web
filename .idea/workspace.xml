@@ -4,58 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9b054eca-f19d-4e8b-ba86-c2382a8c8a86" name="Changes" comment="meta desc">
-      <change afterPath="$PROJECT_DIR$/src/components/UI/appImage/index.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/components/icons/help.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/components/icons/prev.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/components/icons/time.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/hooks/useDepartureSearch.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/hooks/useDestinationsSearch.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/store/slices/departuresSlice.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/store/slices/destinationsSlice.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/store/slices/searchSlice.ts" afterDir="false" />
+    <list default="true" id="9b054eca-f19d-4e8b-ba86-c2382a8c8a86" name="Changes" comment="conected api">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/api/levelTravelApi.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/api/levelTravelApi.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/UI/checkboxGroup/checkboxGroup.module.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/UI/checkboxGroup/checkboxGroup.module.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/UI/checkboxGroup/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/UI/checkboxGroup/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/UI/collapse/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/UI/collapse/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/UI/itemSwitch/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/UI/itemSwitch/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/UI/progress/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/UI/progress/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/UI/range/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/UI/range/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/UI/rangeInput/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/UI/rangeInput/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/UI/smallSlide/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/UI/smallSlide/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/UI/verticalSlide/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/UI/verticalSlide/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/hotelCard/hotelCard.module.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/hotelCard/hotelCard.module.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/hotelCard/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/hotelCard/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/hotelDetails/hotelDetailsDesc/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/hotelDetails/hotelDetailsDesc/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/hotelDetails/hotelDetailsHeader/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/hotelDetails/hotelDetailsHeader/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/hotelDetails/hotelDetailsInfo/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/hotelDetails/hotelDetailsInfo/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/hotelDetails/hotelDetailsRooms/datesPrice.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/hotelDetails/hotelDetailsRooms/datesPrice.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/hotelDetails/hotelDetailsRooms/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/hotelDetails/hotelDetailsRooms/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/hotelDetails/hotelDetailsRooms/priceList.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/hotelDetails/hotelDetailsRooms/priceList.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/hotelDetails/hotelDetailsRooms/roomItem.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/hotelDetails/hotelDetailsRooms/roomItem.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/hotelDetails/hotelDetailsRooms/services.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/hotelDetails/hotelDetailsRooms/services.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/hotelDetails/hotelDetailsRooms/tourAgents.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/hotelDetails/hotelDetailsRooms/tourAgents.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/icons/Icon.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/icons/Icon.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/search/date.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/search/date.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/search/nights.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/search/nights.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/search/people.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/search/people.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/search/search.module.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/search/search.module.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/search/searchForm.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/search/searchForm.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/search/whereFrom.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/search/whereFrom.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/search/whereTo.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/search/whereTo.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/searchPage/searchPage.module.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/searchPage/searchPage.module.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/searchPage/searchResult/filters.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/searchPage/searchResult/filters.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/searchPage/searchResult/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/searchPage/searchResult/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/searchPage/searchResult/resultList.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/searchPage/searchResult/resultList.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/searchPage/searchResult/searchTicketList.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/searchPage/searchResult/searchTicketList.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/selectedTour/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/selectedTour/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/selectedTour/selectedtour.module.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/selectedTour/selectedtour.module.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/ticketItem/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/ticketItem/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pages/_app.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/_app.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pages/hotel-details/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/hotel-details/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pages/tickets/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/tickets/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/store/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/checkoutPage/checkOutItems.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/checkoutPage/checkOutItems.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -200,7 +151,7 @@
       <workItem from="1749631131214" duration="3399000" />
       <workItem from="1749655266736" duration="11000" />
       <workItem from="1749755645349" duration="4412000" />
-      <workItem from="1749820415626" duration="6939000" />
+      <workItem from="1749820415626" duration="8263000" />
     </task>
     <task id="LOCAL-00001" summary="added font">
       <option name="closed" value="true" />
@@ -226,7 +177,15 @@
       <option name="project" value="LOCAL" />
       <updated>1748634671800</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="conected api">
+      <option name="closed" value="true" />
+      <created>1749831440606</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1749831440606</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -236,6 +195,7 @@
     <MESSAGE value="added font" />
     <MESSAGE value="travel apis" />
     <MESSAGE value="meta desc" />
-    <option name="LAST_COMMIT_MESSAGE" value="meta desc" />
+    <MESSAGE value="conected api" />
+    <option name="LAST_COMMIT_MESSAGE" value="conected api" />
   </component>
 </project>

@@ -123,18 +123,18 @@ const CheckoutItems = () => {
                     <div className={styles.checkoutItemLayout}>
                         <div className={styles.checkoutInfoItem}>
                             <div className={styles.checkoutItemsList}>
-                                <p>+7 999 799 01 12</p>
+                                <p>+7 *** *** ** **</p>
                             </div>
                         </div>
                         <div className={styles.checkoutInfoItem}>
                             <div className={styles.checkoutItemsList}>
-                                <p>belluads@gmail.com</p>
+                                <p>********@gmail.com</p>
                             </div>
                         </div>
                     </div>
                     <div className={styles.checkoutMessage}>
                         <Icon name={'info'} size={24} color={'var(--core_Orange'}/>
-                        <p>Отправим документы на <span>belluads@gmail.com</span></p>
+                        <p>Отправим документы на <span>********@gmail.com</span></p>
                     </div>
                 </div>
             </div>
