@@ -4,10 +4,6 @@ import Icon from "@/components/icons/Icon";
 import TicketModal from "@/components/modals/ticketModal";
 
 
-
-
-
-
 const CheckoutItems = () => {
     const [modalTicket, setModalTicket] = useState<boolean>(false);
     return (
@@ -123,18 +119,18 @@ const CheckoutItems = () => {
                     <div className={styles.checkoutItemLayout}>
                         <div className={styles.checkoutInfoItem}>
                             <div className={styles.checkoutItemsList}>
-                                <p>+7 *** *** ** **</p>
+                                <p>+79057990000</p>
                             </div>
                         </div>
                         <div className={styles.checkoutInfoItem}>
                             <div className={styles.checkoutItemsList}>
-                                <p>********@gmail.com</p>
+                                <p>tokclub@yandex.ru</p>
                             </div>
                         </div>
                     </div>
                     <div className={styles.checkoutMessage}>
                         <Icon name={'info'} size={24} color={'var(--core_Orange'}/>
-                        <p>Отправим документы на <span>********@gmail.com</span></p>
+                        <p>Отправим документы на <span>tokclub@yandex.ru</span></p>
                     </div>
                 </div>
             </div>
