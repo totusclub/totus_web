@@ -29,7 +29,6 @@ const WhereFrom = ({handleChange,value,name}) => {
 
     const handleSelect = (item: string) => {
         setSearchValue(item?.name);
-        // console.log('handleSelect',item);
         if(item.iata){
             handleChange(item,name)
         }else{
@@ -62,6 +61,27 @@ const WhereFrom = ({handleChange,value,name}) => {
             <Icon name="downArrow" size={24} color="#000" />
             {isOpen && (
                 <div className={styles.whereFromModal} onClick={(e) => e.stopPropagation()}>
+                    <div className={styles.whereFromModalHead}>
+                        <p>Город вылета</p>
+                        <div onClick={()=>setIsOpen(false)}>
+                            <Icon name={'closeLine'} size={24} color="#000" />
+                        </div>
+                    </div>
+                    <div className={styles.searchFieldInfoM}>
+                        <input
+                            className={styles.searchFieldsValue}
+                            type="text"
+                            ref={inputRef}
+                            value={searchValue}
+                            onChange={(e) => setSearchValue(e.target.value)}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setIsOpen(true);
+                            }}
+                            placeholder="Москва"
+                        />
+                    </div>
+
                     {searchValue.trim() === "" ? (
                         <p className={styles.noResults}>Введите город или аэропорт</p>
                     ) : results.length > 0 ? (
@@ -71,7 +91,7 @@ const WhereFrom = ({handleChange,value,name}) => {
                                 onClick={() => handleSelect(item)}
                                 className={styles.locationItem}
                             >
-                                <Icon name={item.icon} size={24} color="#000" />
+                                <Icon name={item.icon} size={24} color="#000"/>
                                 <div>
                                     <p className={styles.locationItemName}>{item.name}</p>
                                     <p className={styles.locationItemType}>{item.type}</p>

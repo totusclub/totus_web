@@ -142,3 +142,95 @@
     line-height: 20px;
     letter-spacing: -0.32px;
 }
+.mobileFilterHeader{
+    display: none;
+}
+.mobileFilterFooter{
+    display: none;
+}
+.buttonFilterMob{
+    display: none;
+}
+@media (max-width: 768px) {
+    .stepsWrapper{
+        display: none
+    }
+    .filters{
+        display: none;
+    }
+    .searchForm{
+        display: none!important;
+    }
+    .resultListSelectedFilter{
+        display: flex;
+    }
+    .resultList{
+        width: 100%;
+    }
+    .buttonFilterMob{
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        width: 36px;
+        height: 56px;
+        position: fixed;
+        top: 0;
+        right: 15px;
+        text-align: right;
+        padding-top: 16px;
+        z-index: 900000;
+
+    }
+    .resultListSorting{
+        display: none;
+    }
+    .activeModal{
+        background-color: #fff;
+        position: fixed;
+        z-index: 900010;
+        width: 100%;
+        /*min-height: 100vh;*/
+        /*height: 100vh;*/
+        display: block;
+        top: 0;
+        left: 0;
+        min-height: 100vh;
+        max-height: 100vh;
+        overflow: auto;
+    }
+    .mobileFilterHeader{
+        display: flex;
+        justify-content: space-between;
+        padding: 15px;
+        border-bottom: 1px solid var(--borderTertiary)
+    }
+    .mobileFilterHeader>p:nth-child(1){
+        color: var(--textPrimary);
+        font-family: "Golos Text";
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 20px;
+        letter-spacing: -0.32px;
+    }
+    .mobileFilterHeader>p:nth-child(2){
+        color: var(--core_Orange);
+        text-align: right;
+        font-family: "Golos Text";
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 20px;
+        letter-spacing: -0.32px;
+    }
+    .mobileFilterFooter{
+        display: flex;
+        position: fixed;
+        bottom: 0;
+        border-bottom: 1px solid var(--borderTertiary);
+        background: var(--bgPrimary);
+        box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.12), 0px 4px 12px 0px rgba(0, 0, 0, 0.12);
+        width: 100%;
+        padding: 8px;
+    }
+}

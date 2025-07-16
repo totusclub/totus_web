@@ -42,15 +42,6 @@ const MOCK_DATA= [
         review:196,
         image:'https://www.timeoutjeddah.com/cloud/timeoutjeddah/2023/03/21/EcDaM5jl-St-regis-red-sea-resort-the-red-sea-2-800x600.png'
     },
-    {
-        id:2,
-        name:'Rixos Premium Seagate Resort & Spa',
-        rate:4.5,
-        city:'Египет',
-        price:55723,
-        review:196,
-        image:'http://1hotels.com/sites/1hotels.com/files/styles/card/public/brandfolder/2j9vwq2tqz8qt8c52jgtwn6j/230814_1HotelMayfair1403_046_HiResh1280.png?h=c1c10988&itok=w2p01mMy'
-    }
 ]
 interface ArrowProps {
     onClick?: () => void;
@@ -113,24 +104,30 @@ export default function HotDealsSlide({slidesToShow,title}:{slidesToShow:number,
             {
                 breakpoint: 480,
                 settings: {
-                    slidesToShow: 1,
-                    slidesToScroll: 1
+                    slidesToShow: 1.2,
+                    slidesToScroll: 1,
+                    dots: false,
+                    arrows:false
                 }
             }
+
         ]
     };
     return (
-        <div className={'content'}>
+        <div className={styles.contentFull}>
             <p className={styles.hotProductTitle}>{title}</p>
+            <div className={styles.recomendlist}>
+                    {MOCK_DATA.map((item, index) => (
+                        <HotelBoxCard {...item} />
+                    ))}
+            </div>
+            <div className={styles.recomendlistMob}>
                 <Slider {...settings}>
                     {MOCK_DATA.map((item, index) => (
-                        <div className={styles.itemHotProduct} key={index}>
-                            <div className={styles.itemProduct}>
-                                <HotelBoxCard {...item} />
-                            </div>
-                        </div>
+                        <HotelBoxCard {...item} />
                     ))}
                 </Slider>
+            </div>
         </div>
     );
 }

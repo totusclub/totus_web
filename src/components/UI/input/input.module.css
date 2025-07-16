@@ -10,7 +10,7 @@
     height: 56px;
     align-items: flex-start;
     flex-direction: column;
-    flex: 1 0 0;
+    flex: auto;
     border-radius: 16px;
     border: 1px solid var(--borderSecondary);
     overflow: hidden;
@@ -28,7 +28,7 @@
 }
 .input>input{
     width: 100%;
-    height: 100%;
+    height: 56px;
     border: none;
     outline: none;
     -moz-appearance: textfield;
@@ -41,4 +41,10 @@
     font-weight: 500;
     line-height: 20px; /* 125% */
     letter-spacing: -0.32px;
+}
+@media (max-width: 768px) {
+    .input{
+        width: 100%;
+    }
+
 }

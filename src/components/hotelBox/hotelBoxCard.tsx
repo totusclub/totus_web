@@ -21,9 +21,9 @@ const HotelBoxCard = ({id,name,rate,city,price,review,image }: ProductCardProps)
                     <div className={styles.hotelBoxCardStatus}>
                         <p>Самый популярный</p>
                     </div>
-                    <div className={styles.hotelBoxCardFavorite}>
-                        <Icon name={'heart'} size={16} color="#000" />
-                    </div>
+                    {/*<div className={styles.hotelBoxCardFavorite}>*/}
+                    {/*    <Icon name={'heart'} size={16} color="#000" />*/}
+                    {/*</div>*/}
                 </div>
             </div>
             <div className={styles.hotelBoxCardInfo}>
@@ -35,13 +35,13 @@ const HotelBoxCard = ({id,name,rate,city,price,review,image }: ProductCardProps)
                     </div>
                 </div>
                 <p className={styles.hotelBoxCardCity}>{city}</p>
-                <div className={styles.hotelBoxCardFooter}>
-                    <p className={styles.hotelBoxCardPrice}>от {price} ₽</p>
-                    <div className={styles.hotelBoxCardReview}>
-                        <Icon name={'message'} size={24} color="#000" />
-                        <span>{review} отзывов</span>
-                    </div>
-                </div>
+                {/*<div className={styles.hotelBoxCardFooter}>*/}
+                {/*    <p className={styles.hotelBoxCardPrice}>от {price} ₽</p>*/}
+                {/*    <div className={styles.hotelBoxCardReview}>*/}
+                {/*        <Icon name={'message'} size={24} color="#000" />*/}
+                {/*        <span>{review} отзывов</span>*/}
+                {/*    </div>*/}
+                {/*</div>*/}
             </div>
         </div>
     );

@@ -4,6 +4,7 @@ import counterReducer from './slices/counterSlice';
 import departuresReducer from './slices/departuresSlice';
 import destinationsReducer from './slices/destinationsSlice';
 import searchReducer from './slices/searchSlice';
+import authReducer from './slices/authSlice';
 
 const makeStore = () =>
     configureStore({
@@ -12,6 +13,7 @@ const makeStore = () =>
             departures: departuresReducer,
             destinations: destinationsReducer,
             search: searchReducer,
+            auth:authReducer
         },
     });
 

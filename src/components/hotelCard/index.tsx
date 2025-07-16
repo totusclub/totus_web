@@ -154,29 +154,31 @@ const HotelCard = ({item,request_id}: HotelCardState) => {
 
             <div className={styles.hotelCardInfo}>
                 <div className={styles.hotelCardHead}>
-                    {/*<div className={styles.hotelCardCity}>*/}
-                    {/*    <Icon name={'hotel'} size={14}/>*/}
-                    {/*    <p>{hotel?.city}</p>*/}
-                    {/*</div>*/}
-                    {/*<div className={styles.hotelCardRate}>*/}
-                    {/*    <Icon name={'star'} size={14}/>*/}
-                    {/*    <p>{hotel?.stars} ･ Превосходно</p>*/}
-                    {/*</div>*/}
-
                     <div className={styles.hotelStart}>
-                        <Icon name={'star'} size={18} color={hotel?.stars >=1?'var(--core_Orange)':'var(--bgSecondary)'}/>
-                        <Icon name={'star'} size={18} color={hotel?.stars >=2?'var(--core_Orange)':'var(--bgSecondary)'}/>
-                        <Icon name={'star'} size={18} color={hotel?.stars >=3?'var(--core_Orange)':'var(--bgSecondary)'}/>
-                        <Icon name={'star'} size={18} color={hotel?.stars >=4?'var(--core_Orange)':'var(--bgSecondary)'}/>
-                        <Icon name={'star'} size={18} color={hotel?.stars >=5?'var(--core_Orange)':'var(--bgSecondary)'}/>
+                        <Icon name={'star'} size={18}
+                              color={hotel?.stars >= 1 ? 'var(--core_Orange)' : 'var(--bgSecondary)'}/>
+                        <Icon name={'star'} size={18}
+                              color={hotel?.stars >= 2 ? 'var(--core_Orange)' : 'var(--bgSecondary)'}/>
+                        <Icon name={'star'} size={18}
+                              color={hotel?.stars >= 3 ? 'var(--core_Orange)' : 'var(--bgSecondary)'}/>
+                        <Icon name={'star'} size={18}
+                              color={hotel?.stars >= 4 ? 'var(--core_Orange)' : 'var(--bgSecondary)'}/>
+                        <Icon name={'star'} size={18}
+                              color={hotel?.stars >= 5 ? 'var(--core_Orange)' : 'var(--bgSecondary)'}/>
                     </div>
                     <div className={styles.hotelCardName}>
                         <p>{hotel?.name}</p>
                     </div>
+                    <div className={styles.hotelCardImageInfoM}>
+                        <p><Icon name={'message'} size={14}
+                                 color="#000"/> {hotel.reviews_count > 0 ? `${hotel.reviews_count} отзывов` : 'нет отзывов'}
+                        </p>
+                        {hotel?.rating > 0 && (
+                            <p>{hotel.rating}</p>
+                        )}
+                    </div>
+
                 </div>
-                {/*<div className={styles.hotelCardName}>*/}
-                {/*    <p>{hotel?.name}</p>*/}
-                {/*</div>*/}
                 <div className={styles.hotelCardTags}>
                     {TAGS?.map(tag => (
                         <div className={styles.hotelCardTagItem} key={tag}>
@@ -184,10 +186,14 @@ const HotelCard = ({item,request_id}: HotelCardState) => {
                         </div>
                     ))}
                 </div>
+                <div className={styles.hotelCardPriceM}>
+                    <p>{analytics_min_price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '\u202F')}₽</p>
+                    <p>от {formattedDate}, на {min_price_nights} ночей</p>
+                </div>
 
             </div>
             <div className={styles.hotelCardPrice}>
-                <div className={styles.hotelCardImageInfo}>
+            <div className={styles.hotelCardImageInfo}>
                     <p><Icon name={'message'} size={14} color="#000" /> {hotel.reviews_count > 0 ? `${hotel.reviews_count} отзывов`:'нет отзывов'}</p>
                     {hotel?.rating > 0 &&(
                         <p>{hotel.rating}</p>

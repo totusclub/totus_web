@@ -3,6 +3,7 @@ import styles from './search.module.css';
 import Icon from "@/components/icons/Icon";
 import Calendar from "@/components/UI/calendar";
 import {format} from "date-fns";
+import Button from "@/components/UI/button";
 
 const SelectDate = ({handleChange,value,name}) => {
     const [selectedDate, setSelectedDate] = useState<Date | null>(new Date(value));
@@ -40,11 +41,18 @@ const SelectDate = ({handleChange,value,name}) => {
             <Icon name={'downArrow'} size={24} color="#000"/>
             {isOpen && (
                 <div className={styles.dateModal} onClick={(e) => e.stopPropagation()}>
+                    <div className={styles.dateFromModalHead}>
+                        <p>Дата вылета</p>
+                        <div onClick={() => setIsOpen(false)}>
+                            <Icon name={'closeLine'} size={24} color="#000"/>
+                        </div>
+                    </div>
                     <Calendar setSelectedDate={handleSelectDate} selectedDate={selectedDate}/>
+                    <div className={styles.dateFooter}>
+                        <Button onClick={() => setIsOpen(false)} full={true} title={'Готово'}/>
+                    </div>
                 </div>
             )}
-
-
         </div>
     );
 };

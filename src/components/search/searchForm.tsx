@@ -174,13 +174,28 @@ const SearchForm = ({ header }: SearchFormProps) => {
         return parsed;
     };
 
+    function formatDateToRussian(dateStr) {
+        const russianMonths = [
+            'января', 'февраля', 'марта', 'апреля', 'мая', 'июня',
+            'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'
+        ];
+
+        const [year, month, day] = dateStr.split('-');
+        const monthName = russianMonths[parseInt(month, 10) - 1];
+
+        return `${parseInt(day, 10)} ${monthName}`;
+    }
+
     return (
-        <div className={styles.searchForm}>
+        <>
+        <div className={`${styles.searchForm} ${header && styles.searchFormM}`}>
             <div className={styles.searchFields}>
                 <WhereFrom handleChange={handleChange} name={'from_city'} value={params.from_city} />
                 <WhereTo handleChange={handleChange} name={'to_city'} value={params.to_city} />
-                <SelectDate handleChange={handleChange} name={'form_date'} value={params.start_date} />
-                <Nights handleChange={handleChange} name={'nights'} value={params.nights} />
+                <div className={styles.searchGroup}>
+                    <SelectDate handleChange={handleChange} name={'form_date'} value={params.start_date} />
+                    <Nights handleChange={handleChange} name={'nights'} value={params.nights} />
+                </div>
                 <People handleChange={handleChange} value={{ adults: params.adults, kids: params.kids, kids_ages: params.kids_ages }} />
             </div>
             <Button
@@ -190,6 +205,13 @@ const SearchForm = ({ header }: SearchFormProps) => {
                 onClick={handleClick}
             />
         </div>
+            {header && (
+                <div className={styles.selectdFormM}>
+                    <p>{params.to_city}</p>
+                    <p>{formatDateToRussian(params.start_date)} , {params.nights} ночей, {parseInt(params.adults || 0) + parseInt(params.kids || 0)} туриста</p>
+                </div>
+            )}
+        </>
     );
 };
 

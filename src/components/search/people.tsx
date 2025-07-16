@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import styles from './search.module.css';
 import Icon from "@/components/icons/Icon";
+import Button from "@/components/UI/button";
 
 
 const People = ({handleChange,value}) => {
@@ -64,11 +65,11 @@ const People = ({handleChange,value}) => {
                         </div>
                         <ul>
                             <li onClick={() => handleAdults('minus')}>
-                                <Icon name={'minus'} size={20} color="#000" />
+                                <Icon name={'minus'} size={20} color="#000"/>
                             </li>
                             <li>{adults}</li>
-                            <li onClick={() => handleAdults('plus') }>
-                                <Icon name={'plus'} size={20} color="#000" />
+                            <li onClick={() => handleAdults('plus')}>
+                                <Icon name={'plus'} size={20} color="#000"/>
                             </li>
                         </ul>
                     </div>
@@ -79,13 +80,16 @@ const People = ({handleChange,value}) => {
                         </div>
                         <ul>
                             <li onClick={() => handleChildren('minus')}>
-                                <Icon name={'minus'} size={20} color="#000" />
+                                <Icon name={'minus'} size={20} color="#000"/>
                             </li>
                             <li>{children}</li>
                             <li onClick={() => handleChildren('plus')}>
-                                <Icon name={'plus'} size={20} color="#000" />
+                                <Icon name={'plus'} size={20} color="#000"/>
                             </li>
                         </ul>
+                    </div>
+                    <div className={styles.nightsFooter}>
+                        <Button onClick={() => setIsOpen(false)} full={true} title={'Готово'}/>
                     </div>
                 </div>
             )}

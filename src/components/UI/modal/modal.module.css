@@ -5,6 +5,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 8888;
 }
 
 .appModal {
@@ -24,7 +25,16 @@
     gap: 8px;
     align-self: stretch;
 }
+
 .modalHeaderInfo{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 4px;
+    flex: 1 0 0;
+}
+.modalHeaderInfoAuth{
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -41,6 +51,15 @@
     font-weight: 600;
     line-height: 20px;
     letter-spacing: -0.32px;
+}
+.modalHeaderInfoAuth>p:nth-child(1){
+    color: var(--textPrimary);
+    font-family: "Golos Text";
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 24px; /* 120% */
+    letter-spacing: -0.4px;
 }
 .modalHeaderInfo>p:nth-child(2){
     color: var(--textTertiary);
@@ -60,6 +79,16 @@
     gap: 8px;
     border-radius: 24px;
     border: 1px solid var(--textTertiary);
+    cursor: pointer;
+}
+.modalCloseBtnAuth{
+    display: flex;
+    height: 48px;
+    width: 48px;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    border-radius: 24px;
     cursor: pointer;
 }
 .appModalLine{

@@ -40,3 +40,8 @@
     background: #fff;
     border-top: 1px solid var(--borderTertiary);
 }
+@media (max-width: 768px) {
+    .collapseTitle{
+        font-size: 14px;
+    }
+}

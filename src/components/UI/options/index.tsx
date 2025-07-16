@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import styles from './options.module.css';
 
 export interface Option {
@@ -10,15 +10,24 @@ interface OptionsProps {
     title: string;
     options: Option[];
     onSelect: (option: Option) => void;
+    defoultValue?:any
 }
 
-const Options: React.FC<OptionsProps> = ({ title, options, onSelect }) => {
+const Options: React.FC<OptionsProps> = ({ title, options, onSelect,defoultValue }) => {
     const [selectedId, setSelectedId] = useState<string | number | null>(null);
 
     const handleSelect = (option: Option) => {
         setSelectedId(option.id);
         onSelect(option);
     };
+
+    useEffect(()=>{
+        if(defoultValue){
+            setSelectedId(defoultValue)
+        }
+    },[defoultValue])
+
+
 
     return (
         <div className={styles.optionsWrap}>

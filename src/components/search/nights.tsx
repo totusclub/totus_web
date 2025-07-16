@@ -3,6 +3,7 @@ import Icon from "@/components/icons/Icon";
 import {useEffect, useRef, useState} from "react";
 import RangeStep from "@/components/UI/range";
 import SwitchToggle from "@/components/UI/switch";
+import Button from "@/components/UI/button";
 
 const STEP = 1;
 const MIN = 0;
@@ -57,6 +58,10 @@ const Nights = ({handleChange,value,name}) => {
                         </div>
                         <SwitchToggle setIsOn={setIsOn} isOn={isOn} />
                     </div>
+                    <div className={styles.nightsFooter}>
+                        <Button onClick={()=>setIsOpen(false)} full={true} title={'Готово'}/>
+                    </div>
+
                 </div>
             )}
         </div>

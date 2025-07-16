@@ -1,7 +1,7 @@
 .hotelBoxCard{
     width: 100%;
     /*background-color: green;*/
-    height: 394px;
+    /*height: 350px;*/
     cursor: pointer;
 }
 .hotelBoxCardImage{
@@ -130,4 +130,12 @@
     background: linear-gradient(95deg, #FFF 0%, rgba(255, 255, 255, 0.60) 65.1%, rgba(255, 255, 255, 0.80) 100%);
     box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.10);
     backdrop-filter: blur(50px);
+}
+@media (max-width: 768px) {
+   .hotelBoxCard{
+       padding-right: 16px;
+   }
+    .hotelBoxCard:nth-child(1){
+        margin-left: 16px;
+    }
 }

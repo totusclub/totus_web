@@ -5,34 +5,14 @@ import Icon from "@/components/icons/Icon";
 import Button from "@/components/UI/button";
 import {router} from "next/client";
 import {useEffect, useMemo, useState} from "react";
-
-const MOCK_DATES = [
-    {
-        date:new Date('2025-05-08'),
-        price:1234
-    },
-    {
-        date:new Date('2025-05-09'),
-        price:1234
-    },
-    {
-        date:new Date('2025-05-10'),
-        price:1234
-    },
-    {
-        date:new Date('2025-05-11'),
-        price:1234
-    },
-    {
-        date:new Date('2025-05-12'),
-        price:1234
-    }
-]
-
-
+import {createPackage} from "@/api/levelTravelApi";
+import {useRouter} from "next/router";
 
 const HotelDetailsRooms = ({rooms}:any) => {
+    const router = useRouter();
     const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+    const [fisrtDate, setFisrtDate] = useState(null);
+    const [loading, setLoading] = useState(false);
     const pricesList = useMemo(() => {
         if (!rooms) return;
 
@@ -84,6 +64,57 @@ const HotelDetailsRooms = ({rooms}:any) => {
 
 
 
+    useEffect(() => {
+
+        const closestOffer = (() => {
+            let earliest = null;
+
+            rooms?.forEach(room => {
+                const offers = room?.offers || {};
+                Object.values(offers).forEach(offerList => {
+                    offerList.forEach(item => {
+                        const date = item?.start_date;
+                        if (!date) return;
+
+                        const itemDate = new Date(date);
+                        if (
+                            !earliest ||
+                            itemDate < new Date(earliest.start_date)
+                        ) {
+                            earliest = item;
+                        }
+                    });
+                });
+            });
+
+            return earliest;
+        })();
+        setFisrtDate(closestOffer)
+    },[rooms])
+
+
+    const handleBook =  async (id:any) => {
+        setLoading(true)
+        const res =  await createPackage({request_id:router.query.request_id,tour_id:id})
+        console.log('handleBook',res.package.id)
+        setLoading(false)
+        router.push(`/tickets?package=${res.package.id}`);
+    };
+
+    const formatDate= useMemo(() => {
+        if(fisrtDate?.start_date){
+            const date = new Date(fisrtDate?.start_date);
+
+            const formatter = new Intl.DateTimeFormat('ru-RU', {
+                day: 'numeric',
+                month: 'long'
+            });
+
+            const formatted = formatter.format(date);
+
+            return `с ${formatted}`;
+        }
+    },[fisrtDate?.start_date])
 
     return (
         <div className={styles.HotelDetailsRoomsRow}>
@@ -108,12 +139,12 @@ const HotelDetailsRooms = ({rooms}:any) => {
                     </div>
                 </div>
                 <div className={styles.HotelDetailsInfoPrice}>
-                    <p className={styles.HotelDetailsInfoPriceText}>от 1 396 810 ₽</p>
+                    <p className={styles.HotelDetailsInfoPriceText}>от {fisrtDate?.price.toString()?.replace(/\B(?=(\d{3})+(?!\d))/g, '\u202F')}₽</p>
                     <div className={styles.HotelDetailsInfoDate}>
                         <p className={styles.HotelDetailsInfoDateTitle}>Цена за тур с перелётом</p>
-                        <p className={styles.HotelDetailsInfoDateText}>с 8 мая, 7 ночей, 1 взрослый</p>
+                        <p className={styles.HotelDetailsInfoDateText}>{formatDate}, {fisrtDate?.nights_count} ночей</p>
                     </div>
-                    <Button onClick={()=> router.push("/tickets")} title={'Выбрать номер'} full={true}/>
+                    <Button loading={loading} onClick={()=>handleBook(fisrtDate?.id)} title={'Выбрать номер'} full={true}/>
                 </div>
 
             </div>

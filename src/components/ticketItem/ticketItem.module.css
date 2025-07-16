@@ -75,7 +75,12 @@
     width: 34px;
     height: 34px;
     border-radius: 50%;
-    background: var(--secondary_yellow);
+    /*background: var(--secondary_yellow);*/
+}
+.ticketItemLogo>img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 .ticketItemDate>p:nth-child(1){
     color: var(--textPrimary);
@@ -128,7 +133,7 @@
 }
 .ticketItemPrice>p:nth-child(1){
     color: var(--textPrimary);
-    text-align: center;
+    text-align: right;
     align-self: stretch;
     /*font-family: "Golos Text";*/
     font-size: 20px;
@@ -138,20 +143,28 @@
     letter-spacing: -0.4px;
 }
 .ticketItemPrice>p:nth-child(2){
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 1;
+    color: var(--textSecondary, #3D3D3D);
+    font-family: "Golos Text";
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 18px;
+    letter-spacing: -0.28px;
     align-self: stretch;
-    overflow: hidden;
-    color: var(--textTertiary);
-    text-align: center;
+    text-align: right;
     text-overflow: ellipsis;
-    /*font-family: "Golos Text";*/
+}
+.ticketItemPrice>p:nth-child(3){
+    color: var(--textTertiary);
+    font-family: "Golos Text";
     font-size: 12px;
     font-style: normal;
     font-weight: 400;
     line-height: 16px;
-    letter-spacing: -0.24px;
+    letter-spacing: -0.28px;
+    align-self: stretch;
+    text-align: right;
+    text-overflow: ellipsis;
 }
 .ticketItemDetails{
     display: flex;

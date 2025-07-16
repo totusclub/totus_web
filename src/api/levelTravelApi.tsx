@@ -1,5 +1,6 @@
 import axios from 'axios';
 
+// const BASE_URL = 'http://213.109.202.180:3001';
 const BASE_URL = 'http://213.109.202.180:3001';
 
 export async function startSearch(params) {
@@ -173,3 +174,94 @@ export async function Packagesflights(params: any) {
     return response.data;
 }
 
+export async function PackagesActualizeFlight(id:any,f_id:any ) {
+    if (!id) {
+        throw new Error('Missing package_id');
+    }
+
+    const params = {
+        package_id:id,
+        flight_pair_id:f_id,
+        search_type:'package'
+    };
+    const response = await axios.get(`${BASE_URL}/packages/actualize`, {
+        params,
+    });
+
+    return response.data;
+};
+
+export async function validateTourist(params:any) {
+    try {
+        if (!params) {
+            throw new Error('Missing package_id');
+        }
+        const response = await axios.post(`${BASE_URL}/validate-tourists`, params);
+        return response.data;
+    }catch(err) {
+        return err
+    }
+};
+export async function createOrder(params:any) {
+    try {
+        if (!params) {
+            throw new Error('Missing package_id');
+        }
+        const response = await axios.post(`${BASE_URL}/create-package`, params);
+        return response.data;
+    }catch(err) {
+        return err
+    }
+};
+
+export async function createPay(params:any) {
+    try {
+        if (!params) {
+            throw new Error('Missing package_id');
+        }
+        const response = await axios.post(`${BASE_URL}/vtb/create-order`, params);
+        return response.data;
+    }catch(err) {
+        return err
+    }
+};
+export async function checkPay(params:any) {
+    try {
+        if (!params) {
+            throw new Error('Missing package_id');
+        }
+        const response = await axios.post(`${BASE_URL}/check_pay`, params);
+        return response.data;
+    }catch(err) {
+        return err
+    }
+};
+
+export async function getOrder(id:any) {
+    if (!id) {
+        throw new Error('Missing package_id');
+    }
+
+    const params = {
+        order_id:id,
+    };
+    const response = await axios.get(`${BASE_URL}/orders`, {
+        params,
+    });
+
+    return response.data;
+};
+export async function getOrdersUsers(id:any) {
+    if (!id) {
+        throw new Error('Missing package_id');
+    }
+
+    const params = {
+        user_id:id,
+    };
+    const response = await axios.get(`${BASE_URL}/user/orders`, {
+        params,
+    });
+
+    return response.data;
+};

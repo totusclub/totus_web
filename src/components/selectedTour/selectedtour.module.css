@@ -18,7 +18,7 @@
     display: flex;
     align-items: center;
     gap:8px;
-    flex: 1 0 0;
+    /*flex: 1 0 0;*/
 }
 .selectedTourCheck>p{
     color: var(--secondary_green, #39BF87);
@@ -138,6 +138,10 @@
     font-weight: 400;
     line-height: 18px; /* 128.571% */
     letter-spacing: -0.28px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 4px;
 }
 .actualePackageTotal{
     color: var(--Color-Content-textPrimary, #1F1F1F);
@@ -154,4 +158,33 @@
     display: flex;
     gap: 8px;
     justify-content: flex-end;
+    align-items: center;
+}
+.timeDown{
+    display: flex;
+    gap: 4px;
+    align-items: center;
+}
+.timeDown>p{
+    color: var(--textSecondary);
+    font-family: "Golos Text";
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 16px; /* 133.333% */
+    letter-spacing: -0.24px;
+}
+.timeDown>p:nth-child(3){
+    width: 30px;
+    /*text-align: right;*/
+}
+.feesText{
+    color: var(--textSecondary);
+    font-family: "Golos Text";
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 18px;
+    letter-spacing: -0.28px;
+    text-align: right;
 }

@@ -1,6 +1,6 @@
 import styles from './booking.module.css';
 import Input from "@/components/UI/input";
-import { useState } from "react";
+import {useEffect, useState} from "react";
 import ItemSwitch from "@/components/UI/itemSwitch";
 import Options from "@/components/UI/options";
 import Select from "@/components/UI/select";
@@ -28,57 +28,63 @@ type Params = {
 };
 
 const genderOptions: GenderOption[] = [
-    { id: 'male', name: 'Мужской' },
-    { id: 'female', name: 'Женский' },
+    { id: 'M', name: 'Мужской' },
+    { id: 'F', name: 'Женский' },
 ];
 
-const BookingOrderForm = () => {
+const BookingOrderForm = ({params,handleChangeTourist,handleChange}) => {
     const [selected, setSelected] = useState<string>('');
 
     const options = [{ value: 'RUB', name: 'Россия' }];
 
-    const [params, setParams] = useState<Params>({
-        email: "",
-        phone: "",
-        tourist: [
-            {
-                name: "",
-                lastName: "",
-                surNameSwitch: false,
-                surName: '',
-                birthDate: '',
-                gender: null,
-                passport: '',
-                passportDate: ''
-            },
-            {
-                name: "",
-                lastName: "",
-                surNameSwitch: false,
-                surName: '',
-                birthDate: '',
-                gender: null,
-                passport: '',
-                passportDate: ''
-            },
-        ]
-    });
+    // const [params, setParams] = useState<Params>({
+    //     email: "",
+    //     phone: "",
+    //     tourist: []
+    // });
 
-    const handleChangeTourist = (value: string | boolean | number, key: keyof Tourist, index: number) => {
-        const updatedTourists = [...params.tourist];
-        updatedTourists[index] = {
-            ...updatedTourists[index],
-            [key]: value,
-        };
-        setParams({
-            ...params,
-            tourist: updatedTourists,
-        });
-    };
 
-    const handleChange = (value: string | number, key: keyof Params) => {
-        setParams({ ...params, [key]: value });
-    };
+    // useEffect(() => {
+    //     if(packageData){
+    //         let allTourist = [];
+    //         for(let i=0; i<packageData?.adults_count; i++){
+    //             allTourist.push({
+    //                 name: "MIKHAIL",
+    //                 surname: "LEVELOV",
+    //                 patronymic: "TRAVELOVICH",
+    //                 gender: "M",
+    //                 birthday: "06.01.1991",
+    //                 document_number: "124567890",
+    //                 document_expires_on: "01.07.2030",
+    //                 nationality_id: 225,
+    //                 child: false,
+    //                 doc_type: "international_passport"
+    //             })
+    //         }
+    //         setParams({
+    //             ...params,
+    //             tourist: allTourist,
+    //         });
+    //
+    //     }
+    //
+    // }, [packageData]);
+
+    // const handleChangeTourist = (value: string | boolean | number, key: keyof Tourist, index: number) => {
+    //     const updatedTourists = [...params.tourist];
+    //     updatedTourists[index] = {
+    //         ...updatedTourists[index],
+    //         [key]: value,
+    //     };
+    //     setParams({
+    //         ...params,
+    //         tourist: updatedTourists,
+    //     });
+    // };
+    //
+    // const handleChange = (value: string | number, key: keyof Params) => {
+    //     setParams({ ...params, [key]: value });
+    // };
 
     return (
         <div className={styles.bookingForm}>
@@ -113,46 +119,52 @@ const BookingOrderForm = () => {
                                 <p>Взрослый</p>
                                 <p>старше 17 лет</p>
                             </div>
-                            <div className={styles.outlineButton}>
-                                <p>Выбрать туриста</p>
-                            </div>
+                            {/*<div className={styles.outlineButton}>*/}
+                            {/*    <p>Выбрать туриста</p>*/}
+                            {/*</div>*/}
                         </div>
 
                         <div className={styles.bookingFormInputs}>
                             <Input
                                 placeholder={'Фамилия латиницей'}
-                                value={params.tourist[index].lastName}
-                                onChange={(e: string | number) => handleChangeTourist(e, 'lastName', index)}
+                                value={params.tourist[index].surname}
+                                onChange={(e: string | number) => handleChangeTourist(e, 'surname', index)}
                             />
                             <Input
                                 placeholder={'Имя латиницей'}
                                 value={params.tourist[index].name}
                                 onChange={(e: string | number) => handleChangeTourist(e, 'name', index)}
                             />
-                        </div>
-
-                        <div className={styles.bookingFormInputs}>
                             <Input
                                 placeholder={'Отчество латиницей'}
-                                value={params.tourist[index].surName}
-                                onChange={(e: string | number) => handleChangeTourist(e, 'surName', index)}
-                            />
-                            <ItemSwitch
-                                isFull={true}
-                                title={'Нет отчества'}
-                                isOn={params.tourist[index].surNameSwitch}
-                                setIsOn={(e: boolean) => handleChangeTourist(e, 'surNameSwitch', index)}
+                                value={params.tourist[index].patronymic}
+                                onChange={(e: string | number) => handleChangeTourist(e, 'patronymic', index)}
                             />
                         </div>
+
+                        {/*<div className={styles.bookingFormInputs}>*/}
+                        {/*    <Input*/}
+                        {/*        placeholder={'Отчество латиницей'}*/}
+                        {/*        value={params.tourist[index].patronymic}*/}
+                        {/*        onChange={(e: string | number) => handleChangeTourist(e, 'patronymic', index)}*/}
+                        {/*    />*/}
+                        {/*    <ItemSwitch*/}
+                        {/*        isFull={true}*/}
+                        {/*        title={'Нет отчества'}*/}
+                        {/*        isOn={params.tourist[index].surNameSwitch}*/}
+                        {/*        setIsOn={(e: boolean) => handleChangeTourist(e, 'surNameSwitch', index)}*/}
+                        {/*    />*/}
+                        {/*</div>*/}
 
                         <div className={styles.bookingFormInputs}>
                             <Input
                                 placeholder={'Дата рождения'}
-                                value={params.tourist[index].birthDate}
-                                onChange={(e: string | number) => handleChangeTourist(e, 'birthDate', index)}
+                                value={params.tourist[index].birthday}
+                                onChange={(e: string | number) => handleChangeTourist(e, 'birthday', index)}
                             />
                             <Options
                                 title={'Пол:'}
+                                defoultValue={params.tourist[index].gender}
                                 options={genderOptions}
                                 onSelect={(option) => handleChangeTourist(option.id, 'gender', index)}
                             />
@@ -181,13 +193,13 @@ const BookingOrderForm = () => {
                         <div className={styles.bookingFormInputs}>
                             <Input
                                 placeholder={'Серия и номер документа'}
-                                value={params.tourist[index].passport}
-                                onChange={(e: string | number) => handleChangeTourist(e, 'passport', index)}
+                                value={params.tourist[index].passport_number}
+                                onChange={(e: string | number) => handleChangeTourist(e, 'passport_number', index)}
                             />
                             <Input
                                 placeholder={'Срок действия'}
-                                value={params.tourist[index].passportDate}
-                                onChange={(e: string | number) => handleChangeTourist(e, 'passportDate', index)}
+                                value={params.tourist[index].passport_expires_on}
+                                onChange={(e: string | number) => handleChangeTourist(e, 'passport_expires_on', index)}
                             />
                         </div>
                     </div>

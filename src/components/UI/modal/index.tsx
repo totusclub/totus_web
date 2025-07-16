@@ -8,11 +8,14 @@ interface AppModalProps {
     title: string;
     isOpen: boolean;
     onClose: () => void;
+    onBack: () => void;
     width?: string | number;
     subTitle?: string;
     children: React.ReactNode;
+    auth?: boolean;
+    back?:boolean
 }
-const AppModal: React.FC<AppModalProps> = ({ isOpen, onClose, title, width = '500px', children,subTitle }:AppModalProps) => {
+const AppModal: React.FC<AppModalProps> = ({ isOpen, onClose, title, width = '500px', children,subTitle,auth,back,onBack }:AppModalProps) => {
     return (
         <Modal
             isOpen={isOpen}
@@ -26,15 +29,22 @@ const AppModal: React.FC<AppModalProps> = ({ isOpen, onClose, title, width = '50
             }}
         >
             <div className={styles.modalHeader}>
-                <div className={styles.modalHeaderInfo}>
+                {back && (
+                    <div style={{height: '100%'}} onClick={() => onBack()}>
+                        <Icon name={'back'}/>
+                    </div>
+                )}
+                <div className={auth ? styles.modalHeaderInfoAuth : styles.modalHeaderInfo}>
                     <p>{title}</p>
                     {subTitle && (<p>{subTitle}</p>)}
                 </div>
-                <div className={styles.modalCloseBtn} onClick={onClose}>
+                <div className={auth?styles.modalCloseBtnAuth:styles.modalCloseBtn} onClick={onClose}>
                     <Icon name={'closeLine'}/>
                 </div>
             </div>
-            <div className={styles.appModalLine}></div>
+            {!auth && (
+                <div className={styles.appModalLine}></div>
+            )}
             <div className={styles.modalBody}>{children}</div>
         </Modal>
     );

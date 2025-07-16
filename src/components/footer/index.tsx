@@ -10,6 +10,27 @@ const Footer = () => {
         <footer className={styles.footer}>
             <div className={'content'}>
                 <div className={styles.footerRow}>
+                    <div className={styles.footerColumnM}>
+                        <p className={styles.footerColumnTitle}>Скачать приложение</p>
+                        <div className={styles.appStore}>
+                            <Icon name={"appStore"} size={'100%'}/>
+                        </div>
+                        <div className={styles.social}>
+                            <p className={styles.socialTitle}>Мы в соц. сетях</p>
+                            <ul>
+                                <li><Icon name={"vk"} size={24}/></li>
+                                <li><Icon name={"rutube"} size={24}/></li>
+                                <li><Icon name={"aiStar"} size={24}/></li>
+                                <li><Icon name={"vc"} size={24}/></li>
+                            </ul>
+                        </div>
+                        <p className={styles.footerColumnTitle}>Можно платить</p>
+                        <div className={styles.footerPayList}>
+                            <div><Icon name={'mir'} size={41}/></div>
+                            <div><Icon name={'visa'} size={38}/></div>
+                            <div><Icon name={'master'} size={29}/></div>
+                        </div>
+                    </div>
                     <div className={styles.footerColumn}>
                         <p className={styles.footerColumnTitle}>Компания</p>
                         <ul>
@@ -42,21 +63,25 @@ const Footer = () => {
                             <li>Безопасность</li>
                         </ul>
                     </div>
-                    <div className={styles.footerColumn}>
+                    <div className={`${styles.footerColumn} ${styles.noneMobile}`}>
+                        <p className={styles.footerColumnTitle}>Можно платить</p>
+                        <div className={styles.footerPayList}>
+                            <div><Icon name={'mir'} size={41}/></div>
+                            <div><Icon name={'visa'} size={38}/></div>
+                            <div><Icon name={'master'} size={29}/></div>
+                        </div>
+
                         <p className={styles.footerColumnTitle}>Скачать приложение</p>
                         <div className={styles.appStore}>
-                            <Icon name={"appStore"} size={'100%'} />
-                        </div>
-                        <div className={styles.googlePlay}>
-                            <Icon name={"googlePlay"} size={'100%'} />
+                            <Icon name={"appStore"} size={'100%'}/>
                         </div>
                         <div className={styles.social}>
                             <p className={styles.socialTitle}>Мы в соц. сетях</p>
                             <ul>
-                                <li><Icon name={"fb"} size={24} /></li>
-                                <li><Icon name={"instagram"} size={24} /></li>
-                                <li><Icon name={"x"} size={24} /></li>
-                                <li><Icon name={"youtube"} size={24} /></li>
+                                <li><Icon name={"vk"} size={24}/></li>
+                                <li><Icon name={"rutube"} size={24}/></li>
+                                <li><Icon name={"aiStar"} size={24}/></li>
+                                <li><Icon name={"vc"} size={24}/></li>
                             </ul>
                         </div>
 

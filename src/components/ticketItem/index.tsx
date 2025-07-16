@@ -4,6 +4,8 @@ import Button from "@/components/UI/button";
 import Icon from "@/components/icons/Icon";
 import TicketModal from "@/components/modals/ticketModal";
 import { useState, FC } from "react";
+import useAuth from "@/hooks/useAuth";
+import AuthModal from "@/components/auth";
 
 interface TicketItemProps {
     green?: boolean;
@@ -14,14 +16,19 @@ interface TicketItemProps {
 const TicketItem: FC<TicketItemProps> = ({ green,item ,price}) => {
     const [open, setOpen] = useState<boolean>(false);
     const router = useRouter();
+    const [authModal,setAuthModal] = useState(false)
+    const {user,token} = useAuth()
 
-    const handleClick = () => {
-        router.push('/booking');
+    const handleClick = (id) => {
+        if(token){
+            router.push(`/booking?package=${router.query.package}&flight_pair_id=${id}`);
+        }else{
+            setAuthModal(true)
+        }
+
     };
-    // console.log('item',item)
 
     function formatRussianDateTime(isoString) {
-        // console.log('isoString',isoString)
         const date = new Date(isoString);
 
         const timeFormatter = new Intl.DateTimeFormat('ru-RU', {
@@ -31,18 +38,22 @@ const TicketItem: FC<TicketItemProps> = ({ green,item ,price}) => {
             timeZone: 'Europe/Moscow', // Adjust if needed
         });
 
-        const dateFormatter = new Intl.DateTimeFormat('ru-RU', {
-            day: '2-digit',
-            month: 'short',
-            weekday: 'short',
-            timeZone: 'Europe/Moscow',
-        });
-
         const time = timeFormatter.format(date);          // "14:45"
-        const datePart = dateFormatter.format(date);      // "20 июл, вс"
-
-        return `${time} ${datePart}`;
+        return `${time}`;
     }
+
+   const formatRussianDate =(isoString)=>{
+       const date = new Date(isoString);
+
+       const dateFormatter = new Intl.DateTimeFormat('ru-RU', {
+           day: '2-digit',
+           month: 'short',
+           weekday: 'short',
+           timeZone: 'Europe/Moscow',
+       });
+       const datePart = dateFormatter.format(date);
+       return `${datePart}`
+   }
 
 
     function secondsToRussianTime(seconds) {
@@ -53,6 +64,11 @@ const TicketItem: FC<TicketItemProps> = ({ green,item ,price}) => {
         const minutesStr = minutes > 0 ? `${minutes}м` : '';
 
         return `${hoursStr} ${minutesStr}`.trim();
+    }
+
+    const classFlight = {
+        econom:'Эконом',
+        business:'Бизнес'
     }
     return (
         <>
@@ -69,66 +85,80 @@ const TicketItem: FC<TicketItemProps> = ({ green,item ,price}) => {
 
                         <div className={styles.ticketItemLine}>
                             <div className={styles.ticketItemLineItem}>
-                                <div className={styles.ticketItemLogo}></div>
+                                {/*<div className={styles.ticketItemLogo}>*/}
+                                {/*    <img src={item?.to?.airline?.logo?.src} alt={item?.to?.airline?.name}/>*/}
+                                {/*</div>*/}
                                 <div className={styles.ticketItemDate}>
                                     <p>{formatRussianDateTime(item?.to?.departure)} - {formatRussianDateTime(item?.to?.arrival)}</p>
-                                    <p>Уральские авиалинии</p>
+                                    <p>{formatRussianDate(item?.to?.departure)}</p>
+
                                 </div>
                             </div>
                             <div className={styles.ticketItemLineItem}>
                                 <div className={styles.ticketItemDate}>
-                                    <p>Прямой</p>
-                                    <p>ATH</p>
+                                    <p>{item.back.direct ? 'Прямой' : item?.direction}</p>
+                                    <p>{item?.to?.airline?.name}</p>
                                 </div>
                             </div>
                             <div className={styles.ticketItemLineItem}>
                                 <div className={styles.ticketItemDate}>
                                     <p>{secondsToRussianTime(item?.to?.time)}</p>
-                                    <p>EVN–FCO</p>
+                                    <p>{item.to.origin.code}-{item.to.destination.code}</p>
                                 </div>
                             </div>
                         </div>
                         <div className={styles.ticketItemLine}>
                             <div className={styles.ticketItemLineItem}>
-                                <div className={styles.ticketItemLogo}></div>
+                                {/*<div className={styles.ticketItemLogo}>*/}
+                                {/*    <img src={item?.back?.airline?.logo?.src} alt={item?.to?.airline?.name}/>*/}
+                                {/*</div>*/}
                                 <div className={styles.ticketItemDate}>
                                     <p>{formatRussianDateTime(item?.back?.departure)} - {formatRussianDateTime(item?.back?.arrival)}</p>
-                                    <p>Уральские авиалинии</p>
+                                    <p>{formatRussianDate(item?.back?.departure)}</p>
+
                                 </div>
                             </div>
                             <div className={styles.ticketItemLineItem}>
                                 <div className={styles.ticketItemDate}>
-                                    <p>Прямой</p>
-                                    <p>ATH</p>
+                                    <p>{item.back.direct ? 'Прямой' : item?.direction}</p>
+                                    <p>{item?.back?.airline?.name}</p>
                                 </div>
                             </div>
                             <div className={styles.ticketItemLineItem}>
                                 <div className={styles.ticketItemDate}>
                                     <p>{secondsToRussianTime(item?.back?.time)}</p>
-                                    <p>EVN–FCO</p>
+                                    <p>{item.back.origin.code}-{item.back.destination.code}</p>
                                 </div>
                             </div>
                         </div>
 
 
                         <ul>
-                            <li>Блочный</li>
-                            <li>ЭкономЭконом</li>
-                            <li>Ручная кладь 10 кг туда</li>
-                            <li>Ручная кладь 5 кг обратно</li>
-                            <li>Багаж 10 кг туда</li>
-                            <li>Багаж 20 кг обратно</li>
+                            <li>{classFlight[item.to.class]}</li>
+                            {item?.to?.luggage?.hand?.count > 0 && (
+                                <li>Ручная кладь {item?.to?.luggage?.hand?.weight} кг туда</li>
+                            )}
+                            {item?.back?.luggage?.hand?.count > 0 && (
+                                <li>Ручная кладь {item?.back?.luggage?.hand?.weight} кг обратно</li>
+                            )}
+                            {item?.to?.luggage?.hold?.count > 0 && (
+                                <li>Багаж {item?.to?.luggage?.hold?.weight} кг туда</li>
+                            )}
+                            {item?.to?.luggage?.hold?.count > 0 && (
+                                <li>Багаж {item?.to?.luggage?.hold?.weight} кг обратно</li>
+                            )}
+
                         </ul>
                     </div>
 
                     <div className={styles.ticketItemPriceInfo}>
                         <div className={styles.ticketItemPrice}>
-                            <p>{price}₽</p>
+                            <p>{(price + item?.fuel_charge).toString()?.replace(/\B(?=(\d{3})+(?!\d))/g, '\u202F')}₽</p>
                             <p>Доплаты и сборы: +{item?.fuel_charge}₽</p>
                             <p>За тур с перелётом</p>
                         </div>
                         <Button
-                            onClick={handleClick}
+                            onClick={()=>handleClick(item?.flight_pair_id)}
                             title="Выбрать"
                             height="40px"
                             full={true}
@@ -149,6 +179,7 @@ const TicketItem: FC<TicketItemProps> = ({ green,item ,price}) => {
             </div>
 
             <TicketModal open={open} setOpen={setOpen}/>
+            <AuthModal open={authModal} setOpen={setAuthModal} />
         </>
     );
 };

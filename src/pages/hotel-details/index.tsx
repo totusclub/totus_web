@@ -45,7 +45,7 @@ export default function HotelDetails() {
             <Steps active={2}/>
             <div className={'content'}>
                  <HotelDetailsHeader info={hotel}/>
-                 <HotelDetailsInfo images={hotel?.images || []} />
+                 <HotelDetailsInfo rooms={rooms} images={hotel?.images || []} />
                  <HotelDetailsDesc info={hotel} />
                  <HotelDetailsRooms  rooms={rooms}/>
                  <HotelDetailsServices info={hotel}/>

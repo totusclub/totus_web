@@ -5,9 +5,13 @@
 import Search from "@/components/search";
 import HotDealsSlide from "@/components/home/hotDeals";
 import Services from "@/components/home/services";
-import TourRecomend from "@/components/home/tourRecomend";
 import {wrapper} from "@/store";
 import {increment} from "@/store/slices/counterSlice";
+import HomeBanners from "@/components/home/banners";
+import Partner from "@/components/home/partner";
+import PopularDestinations from "@/components/home/popularDestinations";
+import CallRequest from "@/components/home/callRequest";
+import Faq from "@/components/home/faq";
 
 
 export default function Home() {
@@ -16,10 +20,13 @@ export default function Home() {
     return (
         <main>
             <Search/>
-            <HotDealsSlide title={'Горячие предложения отелей'} slidesToShow={3}/>
+            <HomeBanners/>
+            <HotDealsSlide title={'Начните планирование путешествия здесь'} slidesToShow={3}/>
             <Services/>
-            <HotDealsSlide title={'Начните планирование путешествия здесь'} slidesToShow={4}/>
-            <TourRecomend title={'Путешественники рекомендуют Арлекинотур'} slidesToShow={3}/>
+            <Partner/>
+            <PopularDestinations/>
+            <CallRequest/>
+            <Faq/>
         </main>
     );
 }

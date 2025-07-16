@@ -1,11 +1,36 @@
-import React ,{useState} from "react";
+import React, {useMemo, useState} from "react";
 import styles from './checkout.module.css';
 import Icon from "@/components/icons/Icon";
 import TicketModal from "@/components/modals/ticketModal";
 
 
-const CheckoutItems = () => {
+const CheckoutItems = ({order}:any) => {
     const [modalTicket, setModalTicket] = useState<boolean>(false);
+
+
+    const formatDate = useMemo(()=>{
+        if(order){
+            const startDate = new Date(order?.package?.dates_info?.start_date);
+            const endDate = new Date(order?.package?.dates_info?.end_date);
+
+            const formatter = new Intl.DateTimeFormat("ru-RU", {
+                day: "numeric",
+                month: "long"
+            });
+
+            const weekdayFormatter = new Intl.DateTimeFormat("ru-RU", {
+                weekday: "short"
+            });
+
+            const startDay = formatter.format(startDate);
+            const startWeekday = weekdayFormatter.format(startDate);
+
+            const endDay = formatter.format(endDate);
+            const endWeekday = weekdayFormatter.format(endDate);
+            return `${startDay}, ${startWeekday} – ${endDay}, ${endWeekday}`;
+        }
+
+    },[order])
     return (
         <div className={styles.checkoutItemsWrap}>
             <div className={styles.checkoutMessage}>
@@ -14,7 +39,7 @@ const CheckoutItems = () => {
             </div>
             <div className={styles.checkoutItems}>
                 <div className={styles.checkoutItemsHead}>
-                    <p>Отдыхаем 8 ночей</p>
+                    <p>Отдыхаем {order?.package?.dates_info?.nights_count} ночей</p>
                 </div>
                 <div className={styles.checkoutItem}>
                     <div className={styles.checkoutItemHead}>
@@ -24,16 +49,19 @@ const CheckoutItems = () => {
                         <div className={styles.checkoutInfoItem} onClick={() => setModalTicket(true)}>
                             <div className={styles.checkoutItemsList}>
                                 <p>Даты перелёта</p>
-                                <p>12 мая, пн - 20 мая, вт</p>
+                                <p>{formatDate}</p>
                             </div>
                             <Icon name={'rightArrow'}/>
                         </div>
                         <div className={styles.checkoutInfoItem}>
                             <div className={styles.checkoutItemsList}>
                                 <p>Курорт</p>
-                                <p>Египет, Сома-Бэй</p>
+                                <p>{order?.package?.hotel?.city}, {order?.package?.hotel?.country}</p>
                             </div>
-                            <p>Требуется виза</p>
+                            {order?.package?.hotel?.visa?.needed && (
+                                <p>Требуется виза</p>
+                            )}
+
                         </div>
                         <div className={styles.checkoutInfoItem}>
                             <div className={styles.checkoutItemsList}>
@@ -45,7 +73,7 @@ const CheckoutItems = () => {
                         <div className={styles.checkoutInfoItem}>
                             <div className={styles.checkoutItemsList}>
                                 <p>Туроператор</p>
-                                <p>Level.Travel</p>
+                                <p>{order?.package?.operator?.name}</p>
                             </div>
                             <Icon name={'rightArrow'}/>
                         </div>
@@ -56,13 +84,16 @@ const CheckoutItems = () => {
                         <p>Кто летит</p>
                     </div>
                     <div className={styles.checkoutItemLayout}>
-                        <div className={styles.checkoutInfoItem}>
-                            <div className={styles.checkoutItemsList}>
-                                <p>Borisov Ivan</p>
-                                <p>22 июля 1984, загран. паспорт 34 4782746</p>
+                        {order?.tourists.map((item) => (
+                            <div className={styles.checkoutInfoItem}>
+                                <div className={styles.checkoutItemsList}>
+                                    <p>{item.name} {item.surname}</p>
+                                    <p>{item.birthday}, загран. паспорт {item.passport}</p>
+                                </div>
+                                <Icon name={'rightArrow'}/>
                             </div>
-                            <Icon name={'rightArrow'}/>
-                        </div>
+                        ))}
+
                     </div>
                 </div>
                 <div className={styles.checkoutItem}>
@@ -73,21 +104,21 @@ const CheckoutItems = () => {
                         <div className={styles.checkoutInfoItem}>
                             <div className={styles.checkoutItemsList}>
                                 <p>Отель</p>
-                                <p>Amwaj Beach Club Abu Soma (Ex. Amwaj Blue Beach Resort & Spa - Abu Soma), 4*</p>
+                                <p>{order?.package?.hotel?.name}</p>
                             </div>
                             <Icon name={'rightArrow'}/>
                         </div>
                         <div className={styles.checkoutInfoItem}>
                             <div className={styles.checkoutItemsList}>
                                 <p>Номер</p>
-                                <p>Стандартный с видом на бассейн</p>
+                                <p>{order?.package?.room_info?.name_ru}</p>
                             </div>
                             <Icon name={'rightArrow'}/>
                         </div>
                         <div className={styles.checkoutInfoItem}>
                             <div className={styles.checkoutItemsList}>
                                 <p>Питание</p>
-                                <p>Всё включено</p>
+                                <p>{order?.package?.pansion_description}</p>
                             </div>
                         </div>
                     </div>

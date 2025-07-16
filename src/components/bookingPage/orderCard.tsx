@@ -2,11 +2,39 @@ import styles from './booking.module.css';
 import Button from "@/components/UI/button";
 import Icon from "@/components/icons/Icon";
 import {router} from "next/client";
+import {useMemo} from "react";
 
 
 
 
-const BookingOrderCard = () => {
+const BookingOrderCard = ({packageData,handleSubmit,loading}:any) => {
+    console.log('packageData',packageData)
+
+    const formatDate = useMemo(() => {
+        if(packageData?.dates_info?.start_date && packageData?.dates_info?.end_date){
+            const startDate = new Date(packageData?.dates_info?.start_date);
+            const endDate = new Date(packageData?.dates_info?.end_date);
+
+            const formatterSameMonth = new Intl.DateTimeFormat('ru-RU', {
+                day: 'numeric',
+                month: 'long'
+            });
+
+            const formatterDifferentMonth = new Intl.DateTimeFormat('ru-RU', {
+                day: 'numeric',
+                month: 'long'
+            });
+
+            const sameMonth = startDate.getMonth() === endDate.getMonth();
+
+            return sameMonth
+                ? `${startDate.getDate()} ${formatterSameMonth.format(startDate).split(' ')[1]} – ${endDate.getDate()} ${formatterSameMonth.format(endDate).split(' ')[1]}`
+                : `${formatterDifferentMonth.format(startDate)} – ${formatterDifferentMonth.format(endDate)}`;
+        }
+
+
+    },[packageData])
+
     return (
         <div className={styles.bookingCardWrap}>
             <div className={styles.bookingCard}>
@@ -15,20 +43,20 @@ const BookingOrderCard = () => {
                 </div>
                 <div className={styles.bookingCardInfo}>
                     <div className={styles.bookingCardInfoItem}>
-                        <p>Тур в Шарм-эль-Шейх, Египет</p>
-                        <p>120 593 ₽</p>
+                        <p>Тур в {packageData?.hotel?.city}, {packageData?.hotel?.country}</p>
+                        <p>{packageData?.price.toString()?.replace(/\B(?=(\d{3})+(?!\d))/g, '\u202F')} ₽</p>
                     </div>
                     <div className={styles.bookingCardInfoItem}>
-                        <p>14 – 21 мая, на 7 ночей</p>
+                        <p>{formatDate}, на {packageData?.nights_count} ночей</p>
                     </div>
                 </div>
                 <div className={styles.bookingLine}/>
                 <div className={styles.bookingCardPrice}>
                     <p>Итого</p>
-                    <p>120 593 ₽</p>
+                    <p>{packageData?.price.toString()?.replace(/\B(?=(\d{3})+(?!\d))/g, '\u202F')} ₽</p>
                 </div>
                 <div className={styles.bookingCardFooter}>
-                    <Button onClick={()=>router.push('checkout')} title={'Перейти к оформлению'} full={true}/>
+                    <Button loading={loading} onClick={()=>handleSubmit()} title={'Перейти к оформлению'} full={true}/>
                     <div className={styles.bookingCardText}>
                         <p>Нажимая на кнопку, вы ознакомлены и соглашаетесь с <span>Политикой по перс. данным</span> и <span>Условиями продажи</span>, в т.ч. с потреб. свойствами Тура, указанными в Заказе</p>
                     </div>

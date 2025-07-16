@@ -13,6 +13,9 @@
     flex-direction: column;
     flex: 1;
 }
+.footerColumnM{
+    display: none;
+}
 .footerColumn>ul{
     display: flex;
     flex-direction: column;
@@ -89,7 +92,7 @@
     cursor: pointer;
 }
 .social{
-    margin-top: 24px;
+    /*margin-top: 24px;*/
 }
 .social>ul{
    list-style-type: none;
@@ -118,4 +121,48 @@
     font-weight: 500;
     line-height: 20px; /* 125% */
     letter-spacing: -0.32px;
+}
+.footerPayList{
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+@media (max-width: 768px) {
+    .footerRow{
+        flex-direction: column;
+    }
+    .footerBottom >ul{
+        flex-direction: column;
+    }
+    .footerColumnM{
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+    }
+    .noneMobile{
+        display: none;
+    }
+    .social > ul{
+        margin-bottom: 16px;
+        justify-content: space-between;
+    }
+    .social > ul > li{
+        width: 40px;
+        height: 40px;
+    }
+    .appStore{
+        width: 50%;
+        height: 62px;
+    }
+    .footerPayList{
+        margin-bottom: 16px;
+    }
+    .footerColumn > ul{
+        margin-bottom: 16px;
+    }
+    .footerBottom > ul{
+        flex-direction: column-reverse;
+        align-items: flex-start;
+        gap: 16px;
+    }
 }

@@ -5,15 +5,18 @@ import ResultTicketList from "@/components/searchPage/searchResult/searchTicketL
 import {useSelector} from "react-redux";
 import {RootState} from "@/store";
 import {useMemo} from "react";
+import FiltersPackage from "@/components/searchPage/searchResult/filtersPackage";
 
 
 interface SearchResultProps {
     tickets?:boolean
     flights?:any
     packages?:any
+    flightsFilter?:any
+    setFiltersRequest?:any
 }
 
-const SearchResult = ({tickets,flights,packages}: SearchResultProps) => {
+const SearchResult = ({tickets,flights,packages,flightsFilter,setFiltersRequest}: SearchResultProps) => {
     const { hotels, loading} = useSelector((state: RootState) => state.search);
 
     const selectedFilters = useMemo(() => {
@@ -28,7 +31,13 @@ const SearchResult = ({tickets,flights,packages}: SearchResultProps) => {
     return (
         <div className={'content'}>
             <div  className={styles.searchResultWrapper}>
-                <Filters statistics={hotels?.statistics} allFilters={hotels?.filters} selectedFilters={selectedFilters} />
+
+                {tickets ? (
+                    <FiltersPackage netPrice={packages?.price} allFilters={flightsFilter} setFiltersRequest={setFiltersRequest}  />
+                ):(
+                    <Filters statistics={hotels?.statistics} allFilters={hotels?.filters} selectedFilters={selectedFilters} />
+                )}
+
                 {tickets?<ResultTicketList packages={packages} flights={flights}/>:<ResultList  data={hotels} loading={loading} tickets={hotels}/>}
             </div>
         </div>

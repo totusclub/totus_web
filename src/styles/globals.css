@@ -107,3 +107,21 @@ body {
     font-family: "Golos Text";
     transition: background-color 0.3s, color 0.3s;
 }
+.row{
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+}
+
+
+@media (max-width: 768px) {
+    .content{
+        width: 100%;
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+    .slick-slider{
+        padding-bottom: 16px!important;
+        margin-bottom: 0px!important;
+    }
+}

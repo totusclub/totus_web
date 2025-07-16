@@ -1,0 +1,52 @@
+.authCard{
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    height: auto;
+}
+
+.authCardText{
+    color: var(--textTertiary);
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 16px; /* 133.333% */
+    letter-spacing: -0.24px;
+}
+.authCardLine{
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+.authCardLine >div{
+    height: 1px;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    /*flex:1 0 0;*/
+    background: var(--borderTertiary);
+}
+.authCardLine>p{
+    width: 70%;
+    text-align: center;
+    color: var(--textTertiary);
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 16px; /* 133.333% */
+    letter-spacing: -0.24px;
+}
+.authCardMethods{
+    display: flex;
+    justify-content: space-between;
+}
+.authCardMethodsItem{
+    width: 52px;
+    height: 52px;
+}
+.containerVerify{
+    margin-top:16px;
+}
+.containerVerify>p{
+    margin-top: 32px;
+}

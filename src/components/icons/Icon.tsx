@@ -43,6 +43,29 @@ import CloseLineIcon from "@/components/icons/closeLine";
 import AirIcon from "@/components/icons/air";
 import Prev from "@/components/icons/prev";
 import HelpIcon from "@/components/icons/help";
+import CardIcon from "@/components/icons/card";
+import FaqIcon from "@/components/icons/faq";
+import TouristIcon from "@/components/icons/tourist";
+import FavoriteIcon from "@/components/icons/favorite";
+import LogoutIcon from "@/components/icons/logout";
+import ProfileIcon from "@/components/icons/profile";
+import BackIcon from "@/components/icons/back";
+import tezTour from "@/components/icons/partner/tezTour";
+import onexTour from "@/components/icons/partner/onexTour";
+import funAndSun from "@/components/icons/partner/funAndSun";
+import biblioGlobus from "@/components/icons/partner/biblioGlobus";
+import pegasTour from "@/components/icons/partner/pegasTour";
+import coralTravel from "@/components/icons/partner/coralTravel";
+import NextIcon from "@/components/icons/next";
+import MasterIcon from "@/components/icons/master";
+import VisaIcon from "@/components/icons/visa";
+import MirIcon from "@/components/icons/mir";
+import VkIcon from "@/components/icons/vk";
+import VcIcon from "@/components/icons/vc";
+import AiStarIcon from "@/components/icons/aiStar";
+import RutubeIcon from "@/components/icons/rutube";
+import FilterIcon from "@/components/icons/filter";
+import TimeIcon from "@/components/icons/time";
 
 
 const icons = {
@@ -91,6 +114,29 @@ const icons = {
     air: AirIcon,
     prev: Prev,
     help: HelpIcon,
+    card: CardIcon,
+    faq: FaqIcon,
+    tourist: TouristIcon,
+    favorite: FavoriteIcon,
+    logout: LogoutIcon,
+    profile: ProfileIcon,
+    back: BackIcon,
+    tezTour: tezTour,
+    onexTour: onexTour,
+    funAndSun: funAndSun,
+    biblioGlobus: biblioGlobus,
+    pegasTour: pegasTour,
+    coralTravel: coralTravel,
+    next: NextIcon,
+    master: MasterIcon,
+    visa: VisaIcon,
+    mir: MirIcon,
+    vk: VkIcon,
+    vc: VcIcon,
+    aiStar: AiStarIcon,
+    rutube: RutubeIcon,
+    filter: FilterIcon,
+    time: TimeIcon,
 }
 
 type IconName = keyof typeof icons;
