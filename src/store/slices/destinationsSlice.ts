@@ -4,7 +4,7 @@ import axios from 'axios';
 export const fetchDestinations = createAsyncThunk(
     'destinations/fetchDestinations',
     async (params = {}) => {
-        const res = await axios.get('http://213.109.202.180:3001/references/destinations', { params });
+        const res = await axios.get('https://api.totus.club/references/destinations', { params });
         return res.data;
     }
 );

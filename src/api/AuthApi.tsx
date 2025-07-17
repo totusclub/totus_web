@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = 'http://213.109.202.180:3001';
+const BASE_URL = 'https://api.totus.club';
 // const BASE_URL = 'http://192.168.1.104:3001';
 
 

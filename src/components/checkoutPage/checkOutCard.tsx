@@ -19,7 +19,7 @@ const CheckoutCard = ({order}) => {
                 value: order?.full_price,
                 code: "RUB"
             },
-            returnUrl :"http://213.109.202.180:3000/pay"
+            returnUrl :"https://totus.club/pay"
         })
         console.log('payInfo',payInfo)
         if (payInfo?.object?.payUrl) {

@@ -43,7 +43,7 @@ function MyApp({ Component, pageProps }: AppProps) {
         const token = loadToken();
         if (token) {
             const user = decodeToken(token);
-            if (user && user.exp * 1000 > Date.now()) {
+            if (user && user?.exp * 1000 > Date.now()) {
                 dispatch(setAuth({ token, user }));
             }
         }
