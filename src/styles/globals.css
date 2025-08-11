@@ -4,7 +4,9 @@
     box-sizing: border-box;
 
 }
-
+#root{
+    display: none;
+}
 :root {
     --primary_a: #1F1F1F;
     --primary_b: #FFFFFF;
@@ -134,5 +136,8 @@ body {
     }
     .mobShow{
         display: flex;
+    }
+    #root{
+        display: block;
     }
 }
