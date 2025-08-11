@@ -177,12 +177,14 @@
         top: 0;
         right: 15px;
         text-align: right;
-        padding-top: 16px;
+        /*padding-top: 16px;*/
         z-index: 900000;
 
     }
     .resultListSorting{
-        display: none;
+        /*display: none;*/
+        /*flex-direction: row-reverse;*/
+        gap: 10px;
     }
     .activeModal{
         background-color: #fff;
@@ -194,6 +196,7 @@
         display: block;
         top: 0;
         left: 0;
+        padding-bottom: 60px;
         min-height: 100vh;
         max-height: 100vh;
         overflow: auto;
@@ -226,11 +229,15 @@
     .mobileFilterFooter{
         display: flex;
         position: fixed;
-        bottom: 0;
+        bottom: 58px;
         border-bottom: 1px solid var(--borderTertiary);
         background: var(--bgPrimary);
         box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.12), 0px 4px 12px 0px rgba(0, 0, 0, 0.12);
         width: 100%;
         padding: 8px;
+    }
+    .searchResultWrapper{
+        width: 100%;
+        flex-direction: column;
     }
 }

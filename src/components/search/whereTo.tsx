@@ -8,7 +8,7 @@ const WhereFrom = ({handleChange,value,name}) => {
     const [isOpen, setIsOpen] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
     const [searchValue, setSearchValue] = useState("");
-    const { results, status, error } = useDestinationsSearch(searchValue);
+    const { results, status, error } = useDestinationsSearch(searchValue,'Moscow');
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -37,7 +37,7 @@ const WhereFrom = ({handleChange,value,name}) => {
     if (status === "failed") return <p>Error: {error}</p>;
 
     return (
-        <div className={styles.searchField} ref={wrapperRef} onClick={handleToggle}>
+        <div className={`${styles.searchField} ${styles.radioFrom}`} ref={wrapperRef} onClick={handleToggle}>
             <Icon name={'to'} size={24} color="#000"/>
             <div className={styles.searchFieldInfo}>
                 <p className={styles.searchFieldsLabel}>Страна или город?</p>

@@ -43,13 +43,13 @@ export default function HotelDetails() {
     return (
         <main className={'searchContainer'}>
             <Steps active={2}/>
-            <div className={'content'}>
+            {/*<div className={'content'}>*/}
                  <HotelDetailsHeader info={hotel}/>
                  <HotelDetailsInfo rooms={rooms} images={hotel?.images || []} />
                  <HotelDetailsDesc info={hotel} />
                  <HotelDetailsRooms  rooms={rooms}/>
-                 <HotelDetailsServices info={hotel}/>
-            </div>
+                 {/*<HotelDetailsServices info={hotel}/>*/}
+            {/*</div>*/}
         </main>
     );
 }

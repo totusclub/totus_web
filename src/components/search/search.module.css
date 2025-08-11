@@ -59,13 +59,12 @@
 /*.searchField:nth-child(3){*/
 /*    flex: 1;*/
 /*}*/
-.searchField:nth-child(4){
+
+.searchField:nth-child(3){
     flex: .5;
 }
 .searchField{
     height: 56px;
-    /*width: 100%;*/
-
     display: flex;
     gap: 7px;
     align-items: center;
@@ -85,7 +84,7 @@
 }
 .searchFieldsLabel{
     color: var(--textTertiary);
-    /*font-family: "Golos Text";*/
+    font-family: "Golos Text";
     font-size: 12px;
     font-style: normal;
     font-weight: 400;
@@ -94,7 +93,7 @@
 }
 .searchFieldsValue{
     color: var(--textPrimary);
-    /*font-family: "Golos Text";*/
+    font-family: "Golos Text";
     font-size: 16px;
     font-style: normal;
     font-weight: 400;
@@ -105,14 +104,20 @@
     width: 100%;
 }
 .whereFrom{
-    border-bottom-left-radius: 16px;
-    border-top-left-radius: 16px;
-}
-
-.people{
     border-bottom-right-radius: 16px;
     border-top-right-radius: 16px;
-    border: 1px solid var(--borderSecondary);
+    border-right: 1px solid var(--borderSecondary);
+}
+
+.radioFrom{
+    border-bottom-left-radius: 16px!important;
+    border-top-left-radius: 16px!important;
+    border-left: 1px solid var(--borderSecondary);
+}
+.people{
+    /*border-bottom-right-radius: 16px;*/
+    /*border-top-right-radius: 16px;*/
+    /*border: 1px solid var(--borderSecondary);*/
 }
 .modalPeople{
     width: 354px;
@@ -378,6 +383,12 @@
         border-left: none;
         border-top: none;
         border-radius: 0;
+        border-right: none;
+    }
+    .whereFrom:last-child{
+        border-bottom: none;
+        border-top: 1px solid var(--borderSecondary);
+
     }
     .whereFrom >svg,.searchField>svg{
         display: none;
@@ -436,6 +447,7 @@
         width: 100%;
         border-bottom-right-radius: 0;
         border-bottom-left-radius: 0;
+        z-index: 999999999;
     }
     .modalPeople{
         position: fixed;
@@ -443,6 +455,7 @@
         width: 100%;
         border-bottom-right-radius: 0;
         border-bottom-left-radius: 0;
+        z-index: 999999999;
     }
 
     .nightsFooter{
@@ -480,6 +493,8 @@
         display: flex;
         flex-direction: column;
         align-items: center;
+        width: 100%;
+        margin-left: 40px;
     }
     .selectdFormM>p:nth-child(2){
         color: var(--textTertiary);
@@ -491,6 +506,13 @@
         line-height: 16px; /* 133.333% */
         letter-spacing: -0.24px;
     }
+    .radioFrom{
+        border-bottom-left-radius: 0px!important;
+        border-top-left-radius: 0px!important;
+        border-left: none;
+    }
+    .modalPeople{
 
+    }
 
 }

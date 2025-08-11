@@ -10,28 +10,41 @@ interface ButtonProps {
     width?: string;
     height?: string;
     loading?: boolean;
+    disabled?: boolean; // ✅ new
 }
 
-const Button = ({ title, icon, br, onClick, full, width, height, loading }: ButtonProps) => {
+const Button = ({
+                    title,
+                    icon,
+                    br,
+                    onClick,
+                    full,
+                    width,
+                    height,
+                    loading,
+                    disabled
+                }: ButtonProps) => {
+    const isInactive = loading || disabled;
+
     return (
         <div
             className={styles.button}
             style={{
                 borderRadius: br ?? 24,
-                cursor: onClick && !loading ? 'pointer' : 'default',
+                cursor: !isInactive && onClick ? 'pointer' : 'default',
                 width: full ? '100%' : width ?? 'auto',
                 height: height ?? 'auto',
-                opacity: loading ? 0.6 : 1,
-                pointerEvents: loading ? 'none' : 'auto',
+                opacity: isInactive ? 0.6 : 1,
+                pointerEvents: isInactive ? 'none' : 'auto',
             }}
-            onClick={!loading ? onClick : undefined}
+            onClick={!isInactive ? onClick : undefined}
         >
             {loading ? (
-                <div className={styles.loader} >Загрузка</div>
+                <div className={styles.loader}>Загрузка</div>
             ) : (
                 <>
                     {title && <span className={styles.buttonTitle}>{title}</span>}
-                    {icon && <Icon name={icon} size={20} color="#000" />}
+                    {icon && <Icon name={icon} size={20} color="#fff" />}
                 </>
             )}
         </div>

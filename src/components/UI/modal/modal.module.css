@@ -5,7 +5,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 8888;
+    z-index: 9000888;
 }
 
 .appModal {
@@ -17,6 +17,7 @@
     border-radius: 16px;
     background: var(--bgPrimary);
     outline: none;
+
 }
 
 .modalHeader {
@@ -100,4 +101,14 @@
     max-height: 85vh;
     overflow-y: auto;
     width: 100%;
+}
+@media (max-width: 768px) {
+    .appModal{
+        width: 100%;
+        height: 100%;
+        border-radius: 0;
+    }
+    .modalHeaderInfoAuth > p:first-child{
+        font-size: 16px;
+    }
 }

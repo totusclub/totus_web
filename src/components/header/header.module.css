@@ -62,6 +62,12 @@
 .headerRowM{
     display: none    ;
 }
+.pageName{
+    display: none;
+}
+.shareBtn{
+    display: none;
+}
 @media screen and (max-width: 768px) {
     .header{
         height: 56px;
@@ -69,9 +75,17 @@
         top: 0;
         width: 100%;
         left: 0;
+        z-index: 900000;
+        /*display: none;*/
+    }
+    .hide{
+        display: none!important;
     }
     .backM{
         display: flex;
+        position: absolute;
+        top: 16px;
+        left: 16px;
     }
     .logo{
         display: none;
@@ -80,6 +94,23 @@
         display: none;
     }
     .headerRowM{
-        display: flex;
+        display: block;
+        width: 48px
+        /*flex: 1 0 0;*/
+    }
+    .profileButton{
+        display: none;
+    }
+    .shareBtn{
+        position: absolute;
+        top:16px;
+        right: 16px;
+        display: block;
+    }
+    .pageName{
+        width: 100%;
+        margin-left: 40px;
+        text-align: center;
+        display: inline
     }
 }

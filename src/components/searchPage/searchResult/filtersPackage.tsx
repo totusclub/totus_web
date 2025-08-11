@@ -6,12 +6,15 @@ import CheckboxGroup from "@/components/UI/checkboxGroup";
 import RangeInput from "@/components/UI/rangeInput";
 import {searchFilters} from "@/store/slices/searchSlice";
 import {useDispatch} from "react-redux";
+import Icon from "@/components/icons/Icon";
+import Button from "@/components/UI/button";
 
 const FiltersPackage = ({allFilters,setFiltersRequest,netPrice}:any) => {
     const dispatch = useDispatch();
     const [price, setPrice] = useState([20,100]);
     const [km, setKm] = useState([20,60]);
     const [meter, setMeter] = useState([20,60]);
+    const [mobileModal,setMobileModal]=useState(false);
     const [filters,setFilters] = useState(    {
         arrival_airports: [],
         departure_airports: [],
@@ -64,81 +67,94 @@ const FiltersPackage = ({allFilters,setFiltersRequest,netPrice}:any) => {
 
 
     return (
-        <div className={styles.filters}>
-            {/*<ItemSwitch name={'filter_instant_confirm'} title={'Быстрое подтверждение'} setIsOn={onChangeFilters} isOn={instantConfirm} />*/}
-            {allFilters?.backward_airlines && (
-                <Collapse title={'Авиакомпания туда'} open={true}>
-                    <CheckboxGroup
-                        name={'forward_airlines'}
-                        options={[...allFilters?.forward_airlines] || []}
-                        // selected={selectedIds}
-                        onChange={onChangeFilters}
-                        pk={true}
-                        netPrice={netPrice}
-                    />
-                </Collapse>
-            )}
-            {allFilters?.operators && (
-                <Collapse title={'Туроператор'} open={true}>
-                    <CheckboxGroup
-                        name={'operators'}
-                        options={[...allFilters?.operators] || []}
-                        // selected={selectedIds}
-                        onChange={onChangeFilters}
-                        pk={true}
-                        netPrice={netPrice}
-                    />
-                </Collapse>
-            )}
-            {allFilters?.luggage_types && (
-                <Collapse title={'С багажом'} open={true}>
-                    <CheckboxGroup
-                        name={'luggage_types'}
-                        options={[...allFilters?.luggage_types] || []}
-                        // selected={selectedIds}
-                        onChange={onChangeFilters}
-                        pk={true}
-                        netPrice={netPrice}
-                    />
-                </Collapse>
-            )}
-            {allFilters?.luggage_types && (
-                <Collapse title={'Класс перелета'} open={true}>
-                    <CheckboxGroup
-                        name={'flight_classes'}
-                        options={[...allFilters?.flight_classes] || []}
-                        // selected={selectedIds}
-                        onChange={onChangeFilters}
-                        pk={true}
-                        netPrice={netPrice}
-                    />
-                </Collapse>
-            )}
-            {allFilters?.flight_types && (
-                <Collapse title={'Тип рейса'} open={true}>
-                    <CheckboxGroup
-                        name={'flight_types'}
-                        options={[...allFilters?.flight_types] || []}
-                        // selected={selectedIds}
-                        onChange={onChangeFilters}
-                        pk={true}
-                        netPrice={netPrice}
-                    />
-                </Collapse>
-            )}
-            {allFilters?.transitions_count && (
-                <Collapse title={'Пересадки'} open={true}>
-                    <CheckboxGroup
-                        name={'transitions_count'}
-                        options={[...allFilters?.transitions_count] || []}
-                        // selected={selectedIds}
-                        onChange={onChangeFilters}
-                        pk={true}
-                        netPrice={netPrice}
-                    />
-                </Collapse>
-            )}
-        </div>
+        <>
+            <div className={styles.buttonFilterMob} onClick={() => setMobileModal(true)}>
+                <Icon name={'filter'}/>
+            </div>
+            <div className={`${styles.filters} ${mobileModal && styles.activeModal}`}>
+                <div className={styles.mobileFilterHeader}>
+                    <p>Фильтры</p>
+                    <p onClick={()=>setMobileModal(false)} >Отменить</p>
+                </div>
+                {/*<ItemSwitch name={'filter_instant_confirm'} title={'Быстрое подтверждение'} setIsOn={onChangeFilters} isOn={instantConfirm} />*/}
+                {allFilters?.backward_airlines && (
+                    <Collapse title={'Авиакомпания туда'} open={true}>
+                        <CheckboxGroup
+                            name={'forward_airlines'}
+                            options={[...allFilters?.forward_airlines] || []}
+                            // selected={selectedIds}
+                            onChange={onChangeFilters}
+                            pk={true}
+                            netPrice={netPrice}
+                        />
+                    </Collapse>
+                )}
+                {allFilters?.operators && (
+                    <Collapse title={'Туроператор'} open={true}>
+                        <CheckboxGroup
+                            name={'operators'}
+                            options={[...allFilters?.operators] || []}
+                            // selected={selectedIds}
+                            onChange={onChangeFilters}
+                            pk={true}
+                            netPrice={netPrice}
+                        />
+                    </Collapse>
+                )}
+                {allFilters?.luggage_types && (
+                    <Collapse title={'С багажом'} open={true}>
+                        <CheckboxGroup
+                            name={'luggage_types'}
+                            options={[...allFilters?.luggage_types] || []}
+                            // selected={selectedIds}
+                            onChange={onChangeFilters}
+                            pk={true}
+                            netPrice={netPrice}
+                        />
+                    </Collapse>
+                )}
+                {allFilters?.luggage_types && (
+                    <Collapse title={'Класс перелета'} open={true}>
+                        <CheckboxGroup
+                            name={'flight_classes'}
+                            options={[...allFilters?.flight_classes] || []}
+                            // selected={selectedIds}
+                            onChange={onChangeFilters}
+                            pk={true}
+                            netPrice={netPrice}
+                        />
+                    </Collapse>
+                )}
+                {allFilters?.flight_types && (
+                    <Collapse title={'Тип рейса'} open={true}>
+                        <CheckboxGroup
+                            name={'flight_types'}
+                            options={[...allFilters?.flight_types] || []}
+                            // selected={selectedIds}
+                            onChange={onChangeFilters}
+                            pk={true}
+                            netPrice={netPrice}
+                        />
+                    </Collapse>
+                )}
+                {allFilters?.transitions_count && (
+                    <Collapse title={'Пересадки'} open={true}>
+                        <CheckboxGroup
+                            name={'transitions_count'}
+                            options={[...allFilters?.transitions_count] || []}
+                            // selected={selectedIds}
+                            onChange={onChangeFilters}
+                            pk={true}
+                            netPrice={netPrice}
+                        />
+                    </Collapse>
+                )}
+                <div className={styles.mobileFilterFooter}>
+                    <Button title={'Закрыть'} full={true} onClick={() => setMobileModal(false)}/>
+                </div>
+            </div>
+        </>
+
     );
 };
 

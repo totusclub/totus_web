@@ -188,3 +188,27 @@
     letter-spacing: -0.28px;
     text-align: right;
 }
+@media (max-width: 768px) {
+    .selectedTourBody{
+        flex-direction: column;
+    }
+    .selectedTourImage{
+        width: 100%;
+    }
+    .selectedTourInfo{
+        width: 100%;
+    }
+    .actualePackageLable{
+        text-align: left;
+        letter-spacing:0
+    }
+    .actualePackageTotal{
+        text-align: left;
+    }
+    .actualePackageParices{
+        justify-content: flex-start;
+    }
+    .feesText{
+        text-align: left;
+    }
+}

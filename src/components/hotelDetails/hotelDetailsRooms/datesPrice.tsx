@@ -40,40 +40,78 @@ const DatesPrice = ({ dates,selectedDate, setSelectedDate }: DatesPriceProps) =>
         setSelectedDate(date);
     }
     return (
-        <div className={styles.HotelDetailsDatePrices}>
-            {Object.entries(dates)?.map(([date, price], index) => (
-                <div
-                    onClick={() => handleDateChange(date)}
-                    className={styles.HotelDetailsDatePrice}
-                    style={{
-                        backgroundColor: `var(${
-                            selectedDate === date ? '--core_Orange' : '--bgSecondary'
-                        })`,
-                    }}
-                    key={index}
-                >
-                    <p
+        <>
+            <div className={styles.HotelDetailsDatePrices}>
+                {Object.entries(dates)?.map(([date, price], index) => (
+                    <div
+                        onClick={() => handleDateChange(date)}
+                        className={styles.HotelDetailsDatePrice}
                         style={{
-                            color: `var(${
-                                selectedDate === date ? '--textPrimaryB' : '--textPrimary'
+                            backgroundColor: `var(${
+                                selectedDate === date ? '--core_Orange' : '--bgSecondary'
                             })`,
                         }}
+                        key={index}
                     >
-                        {formatDateToRussian(new Date(date))}
-                    </p>
-                    <p
-                        style={{
-                            color: `var(${
-                                selectedDate === date ? '--textPrimaryB' : '--textTertiary'
-                            })`,
-                        }}
-                    >
-                        от {price} ₽
-                    </p>
-                </div>
-            ))}
+                        <p
+                            style={{
+                                color: `var(${
+                                    selectedDate === date ? '--textPrimaryB' : '--textPrimary'
+                                })`,
+                            }}
+                        >
+                            {formatDateToRussian(new Date(date))}
+                        </p>
+                        <p
+                            style={{
+                                color: `var(${
+                                    selectedDate === date ? '--textPrimaryB' : '--textTertiary'
+                                })`,
+                            }}
+                        >
+                            от {price} ₽
+                        </p>
+                    </div>
+                ))}
 
-        </div>
+            </div>
+            <div className={styles.HotelDetailsDatePricesMob}>
+                <div className={styles.HotelDetailsDatePricesMobRows}>
+                    {Object.entries(dates)?.map(([date, price], index) => (
+                        <div
+                            onClick={() => handleDateChange(date)}
+                            className={styles.HotelDetailsDatePriceMob}
+                            style={{
+                                backgroundColor: `var(${
+                                    selectedDate === date ? '--core_Orange' : '--bgSecondary'
+                                })`,
+                            }}
+                            key={index}
+                        >
+                            <p
+                                style={{
+                                    color: `var(${
+                                        selectedDate === date ? '--textPrimaryB' : '--textPrimary'
+                                    })`,
+                                }}
+                            >
+                                {formatDateToRussian(new Date(date))}
+                            </p>
+                            <p
+                                style={{
+                                    color: `var(${
+                                        selectedDate === date ? '--textPrimaryB' : '--textTertiary'
+                                    })`,
+                                }}
+                            >
+                                от {price} ₽
+                            </p>
+                        </div>
+                    ))}
+                </div>
+
+            </div>
+        </>
     );
 };
 

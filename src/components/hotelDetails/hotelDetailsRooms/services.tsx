@@ -43,16 +43,18 @@ const data = [
 
 const HotelDetailsServices = ({info}:any) => {
     return (
-        <div className={styles.HotelDetailsServices}>
-            <div className={styles.HotelDetailsServicesHead}>
-                <p>Услуги и развлечения</p>
-            </div>
-            <div className={styles.HotelDetailsServicesBody}>
-                <TourAgents agents={MOCK_AGENTS}/>
-                {data.map((item,index) => (
-                    <Tags key={index} item={item}/>
-                ))}
+        <div className={'content'}>
+            <div className={styles.HotelDetailsServices}>
+                <div className={styles.HotelDetailsServicesHead}>
+                    <p>Услуги и развлечения</p>
+                </div>
+                <div className={styles.HotelDetailsServicesBody}>
+                    <TourAgents agents={MOCK_AGENTS}/>
+                    {data.map((item, index) => (
+                        <Tags key={index} item={item}/>
+                    ))}
 
+                </div>
             </div>
         </div>
     );

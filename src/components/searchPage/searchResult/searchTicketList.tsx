@@ -41,46 +41,44 @@ const ResultTicketList = ({flights,packages}:any) => {
         <div className={styles.resultList}>
             <SelectedTour packages={packages}/>
             <div className={styles.resultListSelectedFilter}>
-                <div className={styles.selectedFiltersList}>
-                    {filters.map((item) => (
-                        <Tag
-                            key={item.id}
-                            title={item.name}
-                            active={item.active}
-                            onClick={() => handleFilterToggle(item.id)}
-                        />
-                    ))}
-                    <Tag
-                        key={12345}
-                        title={'Очистить все'}
-                        active={false}
-                        onClick={() => removeAll()}
-                        icon={'trash'}
-                    />
-                </div>
+                {/*<div className={styles.selectedFiltersList}>*/}
+                {/*    {filters.map((item) => (*/}
+                {/*        <Tag*/}
+                {/*            key={item.id}*/}
+                {/*            title={item.name}*/}
+                {/*            active={item.active}*/}
+                {/*            onClick={() => handleFilterToggle(item.id)}*/}
+                {/*        />*/}
+                {/*    ))}*/}
+                {/*    <Tag*/}
+                {/*        key={12345}*/}
+                {/*        title={'Очистить все'}*/}
+                {/*        active={false}*/}
+                {/*        onClick={() => removeAll()}*/}
+                {/*        icon={'trash'}*/}
+                {/*    />*/}
+                {/*</div>*/}
                 <div className={styles.resultListSorting}>
-                    <p>Найдено 404 отеля</p>
-                    <Select
-                        options={options}
-                        value={selected}
-                        onChange={setSelected}
-                        label={'Сортировка'}
-                        placeholder="По рекомендации"/>
+                    <p>Найдено {flights?.length}</p>
+                    {/*<Select*/}
+                    {/*    options={options}*/}
+                    {/*    value={selected}*/}
+                    {/*    onChange={setSelected}*/}
+                    {/*    label={'Сортировка'}*/}
+                    {/*    placeholder="По рекомендации"/>*/}
                 </div>
             </div>
 
                 <div className={styles.resultListItems}>
                     {flights.map((item,index) => (
                         <>
-                            <TicketItem price={packages.price} item={item} green={index===3}/>
+                            <TicketItem price={packages.price} item={item} green={index===0}/>
                             {index === 4 && (
                                 <TrackPrices text={'Получайте автоматические оповещения при изменении цен.'} priceTrack={priceTrack} setPriceTrack={setPriceTrack}/>
                             )}
                         </>
                     ))}
                 </div>
-
-
         </div>
     );
 };

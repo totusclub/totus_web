@@ -64,3 +64,6 @@
 .prevArrowSmall {
     left: -15px; /* adjust as needed */
 }
+@media (max-width: 768px) {
+
+}

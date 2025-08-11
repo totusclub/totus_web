@@ -12,7 +12,7 @@ interface SearchItem {
     [key: string]: any;
 }
 
-export const useDestinationsSearch = (searchValue: string) => {
+export const useDestinationsSearch = (searchValue: string,from_city:string) => {
     const dispatch = useDispatch<AppDispatch>();
     const { data, status, error } = useSelector((state: RootState) => state.destinations);
 
@@ -21,11 +21,11 @@ export const useDestinationsSearch = (searchValue: string) => {
     useEffect(() => {
         if (status === "idle") {
             dispatch(fetchDestinations());
+            // dispatch(fetchDestinations({query:'""',from_city:from_city,search_type:'package'}));
         }
     }, [dispatch, status]);
 
     useEffect(() => {
-        console.log('data useDestinationsSearch',data)
         if (status === "succeeded" && data.countries?.length > 0 && searchValue.trim() !== "") {
 
             const citiesWithAirports = data.countries.flatMap(countrie => {

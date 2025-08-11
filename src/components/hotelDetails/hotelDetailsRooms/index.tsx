@@ -117,36 +117,39 @@ const HotelDetailsRooms = ({rooms}:any) => {
     },[fisrtDate?.start_date])
 
     return (
-        <div className={styles.HotelDetailsRoomsRow}>
-            <div className={styles.HotelDetailsRooms}>
-                <div className={styles.HotelDetailsRoomsHead}>
-                    <p>Выберите номер</p>
-                </div>
-                <DatesPrice dates={pricesList} selectedDate={selectedDate} setSelectedDate={setSelectedDate}/>
-                {rooms.map((r,i)=>(
-                    <HotelDetailsRoomItem item={r} selectedDate={selectedDate}/>
-                ))}
+        <div className={'content'}>
+            <div className={styles.HotelDetailsRoomsRow}>
+                <div className={styles.HotelDetailsRooms}>
+                    <div className={styles.HotelDetailsRoomsHead}>
+                        <p>Выберите номер</p>
+                    </div>
+                    <DatesPrice dates={pricesList} selectedDate={selectedDate} setSelectedDate={setSelectedDate}/>
+                    {rooms.map((r, i) => (
+                        <HotelDetailsRoomItem item={r} selectedDate={selectedDate}/>
+                    ))}
 
-            </div>
-            <div className={styles.HotelDetailsMap}>
-                <div className={styles.HotelDetailsMapBox}>
-                    <div className={styles.HotelDetailsMapBoxTitle}>
-                        <Icon name={'location'} size={16}/>
-                        <p> Jumeirah Beach Road, Дубай, ОАЭ</p>
-                    </div>
-                    <div className={styles.map}>
-                        {/*<Map defaultState={{ center: [55.75, 37.57], zoom: 9 }} />*/}
-                    </div>
                 </div>
-                <div className={styles.HotelDetailsInfoPrice}>
-                    <p className={styles.HotelDetailsInfoPriceText}>от {fisrtDate?.price.toString()?.replace(/\B(?=(\d{3})+(?!\d))/g, '\u202F')}₽</p>
-                    <div className={styles.HotelDetailsInfoDate}>
-                        <p className={styles.HotelDetailsInfoDateTitle}>Цена за тур с перелётом</p>
-                        <p className={styles.HotelDetailsInfoDateText}>{formatDate}, {fisrtDate?.nights_count} ночей</p>
+                <div className={styles.HotelDetailsMap}>
+                    <div className={styles.HotelDetailsMapBox}>
+                        <div className={styles.HotelDetailsMapBoxTitle}>
+                            <Icon name={'location'} size={16}/>
+                            <p> Jumeirah Beach Road, Дубай, ОАЭ</p>
+                        </div>
+                        <div className={styles.map}>
+                            {/*<Map defaultState={{ center: [55.75, 37.57], zoom: 9 }} />*/}
+                        </div>
                     </div>
-                    <Button loading={loading} onClick={()=>handleBook(fisrtDate?.id)} title={'Выбрать номер'} full={true}/>
-                </div>
+                    <div className={styles.HotelDetailsInfoPrice}>
+                        <p className={styles.HotelDetailsInfoPriceText}>от {fisrtDate?.price.toString()?.replace(/\B(?=(\d{3})+(?!\d))/g, '\u202F')}₽</p>
+                        <div className={styles.HotelDetailsInfoDate}>
+                            <p className={styles.HotelDetailsInfoDateTitle}>Цена за тур с перелётом</p>
+                            <p className={styles.HotelDetailsInfoDateText}>{formatDate}, {fisrtDate?.nights_count} ночей</p>
+                        </div>
+                        <Button loading={loading} onClick={() => handleBook(fisrtDate?.id)} title={'Выбрать номер'}
+                                full={true}/>
+                    </div>
 
+                </div>
             </div>
         </div>
     );

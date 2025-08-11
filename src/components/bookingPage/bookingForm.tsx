@@ -119,9 +119,6 @@ const BookingOrderForm = ({params,handleChangeTourist,handleChange}) => {
                                 <p>Взрослый</p>
                                 <p>старше 17 лет</p>
                             </div>
-                            {/*<div className={styles.outlineButton}>*/}
-                            {/*    <p>Выбрать туриста</p>*/}
-                            {/*</div>*/}
                         </div>
 
                         <div className={styles.bookingFormInputs}>
@@ -141,24 +138,9 @@ const BookingOrderForm = ({params,handleChangeTourist,handleChange}) => {
                                 onChange={(e: string | number) => handleChangeTourist(e, 'patronymic', index)}
                             />
                         </div>
-
-                        {/*<div className={styles.bookingFormInputs}>*/}
-                        {/*    <Input*/}
-                        {/*        placeholder={'Отчество латиницей'}*/}
-                        {/*        value={params.tourist[index].patronymic}*/}
-                        {/*        onChange={(e: string | number) => handleChangeTourist(e, 'patronymic', index)}*/}
-                        {/*    />*/}
-                        {/*    <ItemSwitch*/}
-                        {/*        isFull={true}*/}
-                        {/*        title={'Нет отчества'}*/}
-                        {/*        isOn={params.tourist[index].surNameSwitch}*/}
-                        {/*        setIsOn={(e: boolean) => handleChangeTourist(e, 'surNameSwitch', index)}*/}
-                        {/*    />*/}
-                        {/*</div>*/}
-
                         <div className={styles.bookingFormInputs}>
                             <Input
-                                placeholder={'Дата рождения'}
+                                placeholder={'Дата рождения (01.07.2030)'}
                                 value={params.tourist[index].birthday}
                                 onChange={(e: string | number) => handleChangeTourist(e, 'birthday', index)}
                             />
@@ -194,6 +176,7 @@ const BookingOrderForm = ({params,handleChangeTourist,handleChange}) => {
                             <Input
                                 placeholder={'Серия и номер документа'}
                                 value={params.tourist[index].passport_number}
+                                type={'number'}
                                 onChange={(e: string | number) => handleChangeTourist(e, 'passport_number', index)}
                             />
                             <Input

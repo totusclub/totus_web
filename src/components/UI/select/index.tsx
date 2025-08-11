@@ -14,6 +14,7 @@ interface SelectProps {
     placeholder?: string;
     label?: string;
     isFull?: boolean;
+    type?: string;
 }
 
 const Select: React.FC<SelectProps> = ({
@@ -23,6 +24,7 @@ const Select: React.FC<SelectProps> = ({
                                            placeholder = 'Select an option',
                                            label,
                                            isFull = false,
+                                            type
                                        }) => {
     const [open, setOpen] = useState(false);
     const [openUp, setOpenUp] = useState(false);

@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import styles from './verificationCodeInput.module.css'
 
-export default function VerificationCodeInput({ onComplete }) {
+export default function VerificationCodeInput({ onComplete,valid }) {
     const [code, setCode] = useState(['', '', '', '']);
     const inputsRef = useRef([]);
 
@@ -45,6 +45,7 @@ export default function VerificationCodeInput({ onComplete }) {
                     onKeyDown={(e) => handleKeyDown(e, idx)}
                     ref={(el) => (inputsRef.current[idx] = el)}
                     className={styles.inputsCode}
+                    style={{borderColor:valid?'red':'grey'}}
                 />
             ))}
         </div>

@@ -124,4 +124,15 @@ body {
         padding-bottom: 16px!important;
         margin-bottom: 0px!important;
     }
+    .searchContainer {
+        margin-top: 35px;
+        padding-top: 1px;
+        min-height: 100vh;
+    }
+    .mobHide{
+        display: none;
+    }
+    .mobShow{
+        display: flex;
+    }
 }

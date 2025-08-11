@@ -9,19 +9,21 @@ import {setAuth} from "@/store/slices/authSlice";
 export default function Verification({email,setOpen}:any) {
     const [secondsLeft, setSecondsLeft] = useState(60);
     const dispatch = useDispatch();
+    const [valid, setValid] = useState<boolean>(false);
 
     const handleComplete = async (fullCode) => {
       const data =  await verifyCodeRequest({code:fullCode,email:email})
-        console.log('Verification code entered:', data.auth);
       if(data.auth){
           const user = decodeToken(data.authToken);
-          console.log('user',user)
           saveToken(data.authToken)
           dispatch(setAuth({
               token: data.authToken,
               user,
           }));
           setOpen(false)
+      }else{
+          console.log('data',data)
+          setValid(true)
       }
     };
 
@@ -37,7 +39,7 @@ export default function Verification({email,setOpen}:any) {
 
     return (
         <div className={styles.containerVerify}>
-            <VerificationCodeInput onComplete={handleComplete}  />
+            <VerificationCodeInput valid={valid} onComplete={handleComplete}  />
             <p>
                 {secondsLeft > 0
                     ? `Выслать код повторно через ${secondsLeft} сек.`

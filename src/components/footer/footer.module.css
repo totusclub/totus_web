@@ -128,6 +128,9 @@
     align-items: center;
 }
 @media (max-width: 768px) {
+    .footer{
+        display: none;
+    }
     .footerRow{
         flex-direction: column;
     }

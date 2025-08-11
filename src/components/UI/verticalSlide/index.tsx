@@ -5,17 +5,6 @@ import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import Icon from "@/components/icons/Icon";
 
-// const images = [
-//     'https://s1.at.atcdn.net/wp-content/uploads/2025/01/2025-openings-australia-1-800x600.png',
-//     'https://xohotels.com/wp-content/uploads/2025/01/x3.-XO-Hotel-Inner-Twin-room-800x800.jpg.pagespeed.ic.o5Dzxvw734.jpg',
-//     'https://image-tc.galaxy.tf/wijpeg-5w2ddxfspi5d5hfg7p5e8d503/falkensteiner-hotel-bozen-zimmerbild-1-980x980.jpg?width=800',
-//     'https://so-hotels.com/wp-content/uploads/sites/19/2023/02/vienna-sq-800x800-room-lofty-weilguny014.jpg',
-//     'https://vretreats.com/wp-content/uploads/2024/08/atlantis_bay_taormina_5-800x800.jpg',
-//     'https://vretreats.com/wp-content/uploads/2024/08/atlantis_bay_taormina_5-800x800.jpg',
-//     'https://www.rimrockresort.com/content/uploads/2023/06/Signature-GrandView_800_Room_1_1920w-800x800.jpg',
-//     'https://xohotels.com/wp-content/uploads/2024/08/x24.-Artemis-Restaurant-terrace-800x800.jpg.pagespeed.ic.gS9NTtd-88.jpg',
-// ];
-
 interface ArrowProps {
     onClick?: () => void;
     className?: string;
@@ -39,7 +28,7 @@ const ArrowTop = ({ onClick }: ArrowProps) => {
 };
 
 const VerticalSlider = ({images}:any) => {
-    const [selectedImage, setSelectedImage] = useState(null);
+    const [selectedImage, setSelectedImage] = useState(0);
 
 
     useEffect(() => {
@@ -52,10 +41,40 @@ const VerticalSlider = ({images}:any) => {
         vertical: true,
         slidesToShow: 6,
         slidesToScroll: 1,
-        infinite: false,
+        infinite: true,
         arrows: true,
         nextArrow: <ArrowBottom />,
         prevArrow: <ArrowTop />,
+        responsive: [
+            {
+                breakpoint: 1024,
+                settings: {
+                    slidesToShow: 3,
+                    slidesToScroll: 3,
+                    infinite: true,
+                    dots: true
+                }
+            },
+            {
+                breakpoint: 600,
+                settings: {
+                    slidesToShow: 2,
+                    slidesToScroll: 2,
+                    initialSlide: 2
+                }
+            },
+            {
+                breakpoint: 480,
+                settings: {
+                    vertical:false,
+                    slidesToShow: 1,
+                    slidesToScroll: 1,
+                    dots: false,
+                    arrows:false
+                }
+            }
+
+        ]
     };
 
 
@@ -72,7 +91,7 @@ const VerticalSlider = ({images}:any) => {
                                 className={`${styles.thumbnail} ${
                                     selectedImage === `https://img.cdn.level.travel/${img['x500']}` ? styles.selectedThumbnail : ''
                                 }`}
-                                tabIndex={-1}
+                                tabIndex={index}
                             />
                         </div>
                     ))}

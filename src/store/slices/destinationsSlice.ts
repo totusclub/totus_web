@@ -4,6 +4,7 @@ import axios from 'axios';
 export const fetchDestinations = createAsyncThunk(
     'destinations/fetchDestinations',
     async (params = {}) => {
+        // const res = await axios.get('http://localhost:3001/references/autocomplete_v2', {params} );
         const res = await axios.get('https://api.totus.club/references/destinations', { params });
         return res.data;
     }

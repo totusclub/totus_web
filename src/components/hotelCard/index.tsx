@@ -149,7 +149,7 @@ const HotelCard = ({item,request_id}: HotelCardState) => {
 
 
     return (
-        <div className={styles.hotelCard}>
+        <div onClick={()=>handleClick()} className={styles.hotelCard}>
             <div className={styles.hotelCardImage} style={{backgroundImage: `url(${showImage})`}}/>
 
             <div className={styles.hotelCardInfo}>

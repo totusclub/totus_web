@@ -66,6 +66,8 @@ import AiStarIcon from "@/components/icons/aiStar";
 import RutubeIcon from "@/components/icons/rutube";
 import FilterIcon from "@/components/icons/filter";
 import TimeIcon from "@/components/icons/time";
+import ShareIcon from "@/components/icons/share";
+import OrderIcon from "@/components/icons/orders";
 
 
 const icons = {
@@ -137,6 +139,8 @@ const icons = {
     rutube: RutubeIcon,
     filter: FilterIcon,
     time: TimeIcon,
+    share: ShareIcon,
+    order: OrderIcon,
 }
 
 type IconName = keyof typeof icons;

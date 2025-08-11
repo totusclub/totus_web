@@ -38,11 +38,13 @@ const OrderItem = ({item}:any) => {
 
     },[item])
 
+    console.log('item.package.status',item)
+
     return (
         <div className={`${styles.orderItem} ${styles[item.package.status]}`}>
             <div className={styles.orderItemHead}>
                 <div className={styles.orderItemHeadLeft}>
-                    <p>Тур <span className={styles.orderItemId}>№ {item?.order_id}</span> <span style={{backgroundColor:statusColor[item.package.status]}}  className={styles.orderItemStatus}>{statusText[item.package.status]}</span></p>
+                    <p>Тур <span className={styles.orderItemId}>№ {item?.order_id}</span> <span style={{backgroundColor:statusColor[item.package.state]}}  className={styles.orderItemStatus}>{statusText[item.package.state]}</span></p>
                     <p className={styles.orderItemDate}>От 12 июня</p>
                 </div>
                 <div className={styles.orderItemPrices}>

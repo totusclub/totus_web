@@ -47,36 +47,36 @@ const BookingCard = () => {
 
     useEffect(() => {
         if(packageData){
+            console.log('packageData',packageData.adults_count)
+            console.log('packageData',packageData.kids_count)
             let allTourist = [];
             for(let i=0; i<packageData?.adults_count; i++){
-                if(i === 0){
                     allTourist.push({
                         gender: "F",
-                        name: "SOFIA",
-                        surname: "BUDNIK",
-                        patronymic: "DMITRIEVNA",
-                        birthday: "22.09.2002",
-                        passport_number: "111357262",
-                        passport_expires_on: "01.01.2028",
+                        name: "",
+                        surname: "",
+                        patronymic: "",
+                        birthday: "",
+                        passport_number: "",
+                        passport_expires_on: "",
                         nationality_id: 225,
                         child: false,
                         doc_type: "international_passport"
                     })
-                }else{
-                    allTourist.push({
-                        name: "MIKHAIL",
-                        surname: "LEVELOV",
-                        patronymic: "TRAVELOVICH",
-                        gender: "M",
-                        birthday: "06.01.1991",
-                        passport_number: "124567890",
-                        passport_expires_on: "01.07.2030",
-                        nationality_id: 225,
-                        child: false,
-                        doc_type: "international_passport"
-                    })
-                }
-
+            }
+            for(let i=0; i<packageData?.kids_count; i++){
+                allTourist.push({
+                    gender: "F",
+                    name: "",
+                    surname: "",
+                    patronymic: "",
+                    birthday: "",
+                    passport_number: "",
+                    passport_expires_on: "",
+                    nationality_id: 225,
+                    child: true,
+                    doc_type: "international_passport"
+                })
             }
             setParams({
                 ...params,
@@ -113,15 +113,20 @@ const BookingCard = () => {
            tourists:params?.tourist
         }
         const res = await validateTourist(data)
+        if(!res?.valid){
+            alert('Пожалуйста, введите корректные данные туриста')
+        }
+
         let dataOtrderCreat = {...data,flight_pair_id:router?.query?.flight_pair_id,user_id:user?.id}
         if(res.valid){
              const c_order = await createOrder(dataOtrderCreat)
             setLoading(false)
-            router.push(`checkout?order_id=${c_order?.order?.id}`)
+            alert('Запрос отправлен успешно')
+            router.push('/')
+            // router.push(`checkout?order_id=${c_order?.order?.id}`)
         }else{
             setLoading(false)
         }
-        console.log('handleSubmit',res)
 
     }
 

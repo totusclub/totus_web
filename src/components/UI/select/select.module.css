@@ -18,7 +18,6 @@
     height: 56px;
     padding-left: 16px;
     padding-right: 16px;
-
 }
 .selectButtonInfo{
     width: 100%;
@@ -78,4 +77,19 @@
 
 .optionItem:hover {
     background-color: #f2f2f2;
+}
+@media (max-width: 768px) {
+    .customSelect{
+        flex: 1!important;
+    }
+    .selectButton{
+        border-radius: 6px;
+        height: 40px;
+    }
+    .selectLabel{
+        font-size: 11px;
+    }
+    .selectValue{
+        font-size: 12px;
+    }
 }

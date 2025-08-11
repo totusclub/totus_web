@@ -74,10 +74,11 @@ const MOCK_DATA = [
         tourist:'TOSUNYAN EDVARD'
     },
 ]
-const OrderList = () => {
+const OrderList = (show:boolean) => {
     const [selected, setSelected] = useState<string>();
     const {user,token} = useAuth()
     const [orders,setOrders] = useState([]);
+
 
     useEffect(() => {
         if(user){
@@ -88,27 +89,32 @@ const OrderList = () => {
         }
 
     },[user])
-    return (
-        <div className={styles.orderList}>
-            <div className={styles.orderItemListBg}>
-                <div className={styles.orderListHead}>
-                    <p>Найдено {orders.length} заказов</p>
-                    <Select
-                        options={options}
-                        value={selected}
-                        onChange={setSelected}
-                        label={'Сортировка'}
-                        placeholder="Сначала новые"/>
+    if(show){
+        return (
+            <div className={`${styles.orderList}`}>
+                <div className={styles.orderItemListBg}>
+                    <div className={styles.orderListHead}>
+                        <p>Найдено {orders.length} заказов</p>
+                        {/*<Select*/}
+                        {/*    options={options}*/}
+                        {/*    value={selected}*/}
+                        {/*    onChange={setSelected}*/}
+                        {/*    label={'Сортировка'}*/}
+                        {/*    placeholder="Сначала новые"/>*/}
+                    </div>
+                    <div className={styles.orderListWrap}>
+                        {orders.map((item: any) => (
+                            <OrderItem item={item}/>
+                        ))}
+                    </div>
                 </div>
-                <div className={styles.orderListWrap}>
-                    {orders.map((item: any) => (
-                        <OrderItem item={item}/>
-                    ))}
-                </div>
-            </div>
 
-        </div>
-    );
+            </div>
+        );
+    }else{
+        return null
+    }
+
 };
 
 export default OrderList;

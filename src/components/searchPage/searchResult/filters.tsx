@@ -41,7 +41,6 @@ const Filters = ({selectedFilters,allFilters,statistics}:any) => {
 
     const onChangeFilters = (key:string,value:string | boolean | number[])=>{
         if(key === 'price'){
-            console.log(key,value)
             let priceUpdate = {
                 ...filters,
                 ...selectedFilters,
@@ -58,16 +57,11 @@ const Filters = ({selectedFilters,allFilters,statistics}:any) => {
 
     }
 
-
     const instantConfirm = useMemo(()=>{
         if(allFilters?.instant_confirm){
             return allFilters?.instant_confirm.find(item=>item.selected).id
         }
     },[allFilters])
-
-
-
-
 
     return (
         <>
@@ -77,7 +71,7 @@ const Filters = ({selectedFilters,allFilters,statistics}:any) => {
             <div className={`${styles.filters} ${mobileModal && styles.activeModal}`}>
                 <div className={styles.mobileFilterHeader}>
                     <p>Фильтры</p>
-                    <p>Отменить</p>
+                    <p onClick={()=>setMobileModal(false)} >Отменить</p>
                 </div>
                 <ItemSwitch name={'filter_instant_confirm'} title={'Быстрое подтверждение'} setIsOn={onChangeFilters}
                             isOn={instantConfirm}/>

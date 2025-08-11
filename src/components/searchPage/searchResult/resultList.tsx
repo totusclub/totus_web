@@ -39,7 +39,7 @@ const ResultList = ({tickets,loading,data}:ResultListProps) => {
     ]);
     const [selected, setSelected] = useState(null);
     const [priceTrack, setPriceTrack] = useState(false);
-    const options = [{value:'RUB',name:'Российский рубль (₽)'},{value:'USD',name:'Доллар США ($)'}];
+    const options = [{value:'RUB',name:'По рекомендации'},{value:'USD',name:'Высокий рейтинг'},{value:'low',name:'Сначала дешёвые'},{value:'low',name:'Сначала дорогие'}];
 
     const handleFilterToggle = (id: number) => {
         setFilters(prev =>
@@ -80,12 +80,13 @@ const ResultList = ({tickets,loading,data}:ResultListProps) => {
                     )}
                 <div className={styles.resultListSorting}>
                     <p>Найдено {data?.hotels_count || 0} отеля</p>
-                    <Select
-                        options={options}
-                        value={selected}
-                        onChange={setSelected}
-                        label={'Сортировка'}
-                        placeholder="По рекомендации"/>
+                    {/*<Select*/}
+                    {/*    type={'designMob'}*/}
+                    {/*    options={options}*/}
+                    {/*    value={selected}*/}
+                    {/*    onChange={setSelected}*/}
+                    {/*    label={'Сортировка'}*/}
+                    {/*    placeholder="По рекомендации"/>*/}
                 </div>
             </div>
             {/*{tickets ? (*/}

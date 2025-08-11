@@ -14,8 +14,9 @@ interface AppModalProps {
     children: React.ReactNode;
     auth?: boolean;
     back?:boolean
+    scroll?:boolean
 }
-const AppModal: React.FC<AppModalProps> = ({ isOpen, onClose, title, width = '500px', children,subTitle,auth,back,onBack }:AppModalProps) => {
+const AppModal: React.FC<AppModalProps> = ({ isOpen, onClose, title, width = '500px', children,subTitle,auth,back,onBack,scroll }:AppModalProps) => {
     return (
         <Modal
             isOpen={isOpen}
@@ -30,7 +31,7 @@ const AppModal: React.FC<AppModalProps> = ({ isOpen, onClose, title, width = '50
         >
             <div className={styles.modalHeader}>
                 {back && (
-                    <div style={{height: '100%'}} onClick={() => onBack()}>
+                    <div style={{height: '100%',display:'flex',alignItems:'center'}} onClick={() => onBack()}>
                         <Icon name={'back'}/>
                     </div>
                 )}

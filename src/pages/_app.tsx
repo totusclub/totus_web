@@ -8,6 +8,7 @@ import Footer from '@/components/footer';
 import {decodeToken, loadToken} from "@/utils/auth";
 import {setAuth} from "@/store/slices/authSlice";
 import {useDispatch} from "react-redux";
+import MobileBottomBar from "@/components/mobileBottomBar";
 
 function getCookie(name: string): string | null {
     const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
@@ -23,23 +24,23 @@ function MyApp({ Component, pageProps }: AppProps) {
     const dispatch = useDispatch();
 
     useEffect(() => {
-        const loggedUser = getCookie('loggedInUser');
-        if (loggedUser) {
-            setLoggedIn(true);
-        } else {
-            const correctLogin = 'admin';
-            const correctPassword = '0wI?394ICMbq';
-            const login = prompt('Enter your login:');
-            const password = prompt('Enter your password:');
-            if (login === correctLogin && password === correctPassword) {
-                alert(`Login successful! Welcome, ${login}`);
-                setCookie('loggedInUser', login, 7);
-                setLoggedIn(true);
-            } else {
-                alert('Incorrect login or password. The page will reload.');
-                window.location.reload();
-            }
-        }
+        // const loggedUser = getCookie('loggedInUser');
+        // if (loggedUser) {
+        //     setLoggedIn(true);
+        // } else {
+        //     const correctLogin = 'admin';
+        //     const correctPassword = '0wI?394ICMbq';
+        //     const login = prompt('Enter your login:');
+        //     const password = prompt('Enter your password:');
+        //     if (login === correctLogin && password === correctPassword) {
+        //         alert(`Login successful! Welcome, ${login}`);
+        //         setCookie('loggedInUser', login, 7);
+        //         setLoggedIn(true);
+        //     } else {
+        //         alert('Incorrect login or password. The page will reload.');
+        //         window.location.reload();
+        //     }
+        // }
         const token = loadToken();
         if (token) {
             const user = decodeToken(token);
@@ -49,9 +50,9 @@ function MyApp({ Component, pageProps }: AppProps) {
         }
     }, []);
 
-    if (!loggedIn) {
-        return null;
-    }
+    // if (!loggedIn) {
+    //     return null;
+    // }
 
 
     return (
@@ -59,6 +60,7 @@ function MyApp({ Component, pageProps }: AppProps) {
             <Header />
             <Component {...pageProps} />
             <Footer />
+            <MobileBottomBar />
         </div>
     );
 }

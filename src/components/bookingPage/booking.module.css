@@ -299,3 +299,11 @@
     line-height: 18px;
     letter-spacing: -0.28px;
 }
+@media (max-width: 768px) {
+    .bookingScreen{
+        flex-direction: column;
+    }
+    .bookingCardWrap{
+        width: 100%;
+    }
+}

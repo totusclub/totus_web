@@ -8,7 +8,7 @@ const Search = () => {
         <div className={styles.search}>
             <div className={`content ${styles.searchContent}`}>
                 <h1 className={styles.searchTitle}>Путешествия начинаются здесь</h1>
-                <SearchForm />
+                <SearchForm pageName={'home'} />
             </div>
         </div>
     );

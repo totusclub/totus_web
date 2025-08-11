@@ -23,7 +23,7 @@ const CheckoutScreen = () => {
     },[router])
     return (
         <div className={'content'}>
-            <div className={styles.bookingScreen}>
+            <div className={`${styles.bookingScreen} ${styles.column}`}>
                 <CheckoutItems order={order}/>
                 <CheckoutCard order={order}/>
             </div>

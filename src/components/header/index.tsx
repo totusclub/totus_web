@@ -6,28 +6,63 @@ import Button from "@/components/UI/button";
 import SearchForm from "@/components/search/searchForm";
 import {usePathname} from "next/navigation";
 import {useMemo, useState} from "react";
-import TourModel from "@/components/modals/tourModal";
 import AuthModal from "@/components/auth";
 import useAuth from "@/hooks/useAuth";
-import {router} from "next/client";
+// import {router} from "next/client";
+import HotelDetails from "@/pages/hotel-details";
+import {useRouter} from "next/router";
 
 const Header = () => {
     const [authModalOpen, setAuthModalOpen] = useState(false);
     const {user,token} = useAuth()
     const pathname = usePathname();
+    const router = useRouter();
 
     const showSearch = useMemo(()=>{
         const segments = pathname.split('/').filter(Boolean); // removes empty strings
-        const pageName = segments[segments.length - 1] || 'home';
-        return pageName === 'search';
+        return segments[segments.length - 1] || 'home';
     },[pathname])
+
+
+    const headerMobileRender = useMemo(() => {
+        if(pathname){
+            const segments = pathname.split('/').filter(Boolean); // removes empty strings
+            const pageName =  segments[segments.length - 1] || 'home';
+            if(pageName === 'search' || pageName === 'tickets' || pageName === 'home'){
+                return <SearchForm pageName={pageName} header={true}/>
+            }else if(pageName === 'hotel-details'){
+                return <p className={styles.pageName}>Отель</p>
+            }else if(pageName === 'profile'){
+                return <p className={styles.pageName}>Профиль</p>
+            }else if(pageName === 'my-orders'){
+                return <p className={styles.pageName}>Мои заказы</p>
+            }else if(pageName === 'privacy-policy'){
+                return <p className={styles.pageName}>Политика конфиденциальности</p>
+            }
+        }
+
+    },[pathname])
+
+    const showHeader = useMemo(()=>{
+        const segments = pathname.split('/').filter(Boolean); // removes empty strings
+        return segments[segments.length - 1] || 'home';
+    },[pathname])
+
+    const handleGoBack = () => {
+        router.back();
+    };
+
     return (
         <>
             <Head>
                 <title>Арлекино тур</title>
-                <meta name="description" content="Лучшие туры с Арлекино тур – незабываемые путешествия и отдых." />
+                <meta
+                    name="viewport"
+                    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+                />
+                <meta name="description" content="Лучшие туры с Арлекино тур – незабываемые путешествия и отдых."/>
             </Head>
-            <header className={styles.header}>
+            <header className={`${styles.header} ${showHeader === 'home' ? styles.hide : ''}`}>
                 <div className={styles.headerRow}>
                     <div className={styles.logo}>
                         <Link href="/">
@@ -35,16 +70,25 @@ const Header = () => {
                         </Link>
                     </div>
                     <div className={styles.backM}>
-                        <Link href="/">
-                            <Icon name={showSearch?"back":"logo"} size={24} color="#000"/>
-                        </Link>
+                        <div onClick={()=>handleGoBack()}>
+                            <Icon name={"back"} size={24} color="#000"/>
+                        </div>
                     </div>
+                    {showSearch ==='hotel-details' && (
+                        <div className={styles.shareBtn}>
+                            <Icon name="share" size={24} color="#000"/>
+                        </div>
+                    )}
                 </div>
-                {showSearch && (
-                    <SearchForm header={true}/>
-                )}
+                {/*<h1>{showSearch}</h1>*/}
+                {/*/!*{showSearch && (*!/*/}
+                {/*/!*    <SearchForm header={true}/>*!/*/}
+                {/*/!*)}*!/*/}
+                {headerMobileRender}
+
+
                 <div className={`${styles.headerRow} ${styles.headerRowPc}`}>
-                    <div className={styles.favorite}>
+                <div className={styles.favorite}>
                         <Icon name="heart" size={24} color="#000"/>
                     </div>
                     {token ? (
@@ -54,9 +98,17 @@ const Header = () => {
                     ):(
                         <Button onClick={()=>setAuthModalOpen(true)} title={'Войти'}/>
                     ) }
+                </div>
+                <div className={styles.headerRowM}>
+                    {/*{token ? (*/}
+                    {/*    <div onClick={()=>router.push('/profile')} className={styles.profileButton}>*/}
+                    {/*        <p>{user.name} {user.l_name}</p>*/}
+                    {/*    </div>*/}
+                    {/*):(*/}
+                    {/*    <Button onClick={()=>setAuthModalOpen(true)} title={'Войти'}/>*/}
+                    {/*) }*/}
 
                 </div>
-                <div className={styles.headerRowM}></div>
             </header>
             <AuthModal open={authModalOpen} setOpen={setAuthModalOpen} />
         </>

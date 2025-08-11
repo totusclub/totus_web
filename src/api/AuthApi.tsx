@@ -21,9 +21,14 @@ export async function SignUpRequest(params: any) {
 }
 
 export async function verifyCodeRequest(params: any) {
-    if (!params) {
-        throw new Error('Missing package_id');
+    try {
+        if (!params) {
+            throw new Error('Missing package_id');
+        }
+        const response = await axios.post(`${BASE_URL}/api/auth/verify`, params);
+        return response.data;
+    }catch(error) {
+        return error;
     }
-    const response = await axios.post(`${BASE_URL}/api/auth/verify`, params);
-    return response.data;
+
 }

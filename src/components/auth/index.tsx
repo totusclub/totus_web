@@ -6,7 +6,7 @@ import Verification from "@/components/auth/verification";
 import SignUpForm from "@/components/auth/signup";
 
 
-const AuthModal: React.FC = ({open,setOpen}:any) => {
+const AuthModal: React.FC = ({open,setOpen}: { open:boolean,setOpen:any}) => {
     const [screen, setScreen] = React.useState('AUTH');
     const [email, setEmail] = React.useState('');
 
@@ -57,6 +57,7 @@ const AuthModal: React.FC = ({open,setOpen}:any) => {
             subTitle={headerContent?.subTitle}
             width="450px"
             onBack={handelBack}
+            scroll={false}
         >
             {renderScreen}
         </AppModal>

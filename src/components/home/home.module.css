@@ -574,7 +574,7 @@
     border-bottom-left-radius: 24px;
     border-bottom-right-radius: 24px;
 }
-.recomendDeslistItemInfo>p{
+.recomendDeslistItemInfo>a{
     color: var(--primary_b);
     /* Title S/Semibold */
     font-family: "Golos Text";
@@ -586,6 +586,7 @@
     display: flex;
     gap: 8px;
     align-items: center;
+    text-decoration: none;
 }
 .callRequest{
     background-color: var(--core_Orange);
@@ -734,7 +735,8 @@
         text-align: left;
     }
     .banners{
-        display: inline;
+        /*display: inline;*/
+        display: none;
         /*padding-bottom: 16px;*/
     }
     .bannerItem{
@@ -896,6 +898,8 @@
         background-size: cover;
         background-position: center;
     }
-
+    .contentFullHide{
+        display: none;
+    }
 
 }

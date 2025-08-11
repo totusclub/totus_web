@@ -19,7 +19,6 @@ const HotelDetailsInfo = ({images,rooms}:any) => {
 const handleBook =  async (id:any) => {
     setLoading(true)
     const res =  await createPackage({request_id:router.query.request_id,tour_id:id})
-    console.log('handleBook',res.package.id)
     setLoading(false)
     router.push(`/tickets?package=${res.package.id}`);
 };
@@ -73,26 +72,32 @@ useEffect(() => {
 
 
     return (
-        <div className={styles.HotelDetailsInfoRow}>
-            <VerticalSlider images={images}/>
-            <div className={styles.HotelDetailsInfo}>
-                <div className={styles.HotelDetailsInfoPrice}>
-                    <p className={styles.HotelDetailsInfoPriceText}>от {fisrtDate?.price.toString()?.replace(/\B(?=(\d{3})+(?!\d))/g, '\u202F')}₽</p>
-                    <div className={styles.HotelDetailsInfoDate}>
-                        <p className={styles.HotelDetailsInfoDateTitle}>Цена за тур с перелётом</p>
-                        <p className={styles.HotelDetailsInfoDateText}>{formatDate}, {fisrtDate?.nights_count} ночей</p>
+        <div className={'content'}>
+            <div className={styles.HotelDetailsInfoRow}>
+                <VerticalSlider images={images}/>
+                <div className={styles.HotelDetailsInfo}>
+                    <div className={styles.HotelDetailsInfoPrice}>
+                        <p className={styles.HotelDetailsInfoPriceText}>от {fisrtDate?.price.toString()?.replace(/\B(?=(\d{3})+(?!\d))/g, '\u202F')}₽</p>
+                        <div className={styles.HotelDetailsInfoDate}>
+                            <p className={styles.HotelDetailsInfoDateTitle}>Цена за тур с перелётом</p>
+                            <p className={styles.HotelDetailsInfoDateText}>{formatDate}, {fisrtDate?.nights_count} ночей</p>
+                        </div>
+                        <Button loading={loading} onClick={() => handleBook(fisrtDate?.id)} title={'Выбрать номер'}
+                                full={true}/>
                     </div>
-                    <Button loading={loading}  onClick={()=>handleBook(fisrtDate?.id)} title={'Выбрать номер'} full={true}/>
-                </div>
-                <div className={styles.HotelDetailsInfoMessage}>
-                    <div className={styles.HotelDetailsInfoMessageIcon}>
-                        <Icon name={'travel'} size={61} />
+                    <div className={styles.HotelDetailsInfoMessage}>
+                        <div className={styles.HotelDetailsInfoMessageIcon}>
+                            <Icon name={'travel'} size={61}/>
+                        </div>
+                        <p className={styles.HotelDetailsInfoMessageText}>Это место предлагает уникальный опыт, сочетая
+                            роскошь и природу. Мы здесь, чтобы помочь вам осуществить вашу мечту о путешествии!</p>
                     </div>
-                    <p className={styles.HotelDetailsInfoMessageText}>Это место предлагает уникальный опыт, сочетая роскошь и природу. Мы здесь, чтобы помочь вам осуществить вашу мечту о путешествии!</p>
+                    <TrackPrices text={'Автоматические оповещения \n при изменении цен.'} priceTrack={priceTrack}
+                                 setPriceTrack={setPriceTrack}/>
                 </div>
-                <TrackPrices text={'Автоматические оповещения \n при изменении цен.'} priceTrack={priceTrack} setPriceTrack={setPriceTrack}/>
             </div>
         </div>
+
     );
 };
 

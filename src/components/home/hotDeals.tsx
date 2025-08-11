@@ -114,7 +114,7 @@ export default function HotDealsSlide({slidesToShow,title}:{slidesToShow:number,
         ]
     };
     return (
-        <div className={styles.contentFull}>
+        <div className={`${styles.contentFull} ${styles.contentFullHide}`}>
             <p className={styles.hotProductTitle}>{title}</p>
             <div className={styles.recomendlist}>
                     {MOCK_DATA.map((item, index) => (

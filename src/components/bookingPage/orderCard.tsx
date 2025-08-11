@@ -8,7 +8,7 @@ import {useMemo} from "react";
 
 
 const BookingOrderCard = ({packageData,handleSubmit,loading}:any) => {
-    console.log('packageData',packageData)
+    // console.log('packageData',packageData)
 
     const formatDate = useMemo(() => {
         if(packageData?.dates_info?.start_date && packageData?.dates_info?.end_date){
@@ -56,7 +56,8 @@ const BookingOrderCard = ({packageData,handleSubmit,loading}:any) => {
                     <p>{packageData?.price.toString()?.replace(/\B(?=(\d{3})+(?!\d))/g, '\u202F')} ₽</p>
                 </div>
                 <div className={styles.bookingCardFooter}>
-                    <Button loading={loading} onClick={()=>handleSubmit()} title={'Перейти к оформлению'} full={true}/>
+                    {/*<Button loading={loading} onClick={()=>handleSubmit()} title={'Перейти к оформлению'} full={true}/>*/}
+                    <Button loading={loading} onClick={()=>handleSubmit()} title={'Отправить запрос'} full={true}/>
                     <div className={styles.bookingCardText}>
                         <p>Нажимая на кнопку, вы ознакомлены и соглашаетесь с <span>Политикой по перс. данным</span> и <span>Условиями продажи</span>, в т.ч. с потреб. свойствами Тура, указанными в Заказе</p>
                     </div>

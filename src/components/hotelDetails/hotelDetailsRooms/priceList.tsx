@@ -70,7 +70,7 @@ const HotelDetailsPriceList: React.FC<HotelDetailsPriceListProps> = ({ item,sele
                             <p>{room?.price?.toString()?.replace(/\B(?=(\d{3})+(?!\d))/g, '\u202F')}₽</p>
                             <p>тур с перелётом</p>
                         </div>
-                        <div>
+                        <div className={styles.mobButton}>
                             <Button
                                 onClick={()=>handleBook(room.id)}
                                 width="148px"

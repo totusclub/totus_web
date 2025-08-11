@@ -12,6 +12,7 @@ import {runFullSearchFlow} from "@/store/slices/searchSlice";
 
 interface SearchFormProps {
     header?: boolean;
+    pageName?: string;
 }
 
 interface SearchParams {
@@ -34,7 +35,7 @@ interface SearchParams {
 }
 
 
-const SearchForm = ({ header }: SearchFormProps) => {
+const SearchForm = ({ header,pageName}: SearchFormProps) => {
     const dispatch = useDispatch();
     const router = useRouter();
     const [params, setParams] = useState<SearchParams>({
@@ -48,8 +49,8 @@ const SearchForm = ({ header }: SearchFormProps) => {
         flex_dates:'2',
         start_date_from: "2025-07-21",
         end_date_till: "2025-08-06",
-        // kids: '2',
-        // kids_ages: [8, 11],
+        // kids: '1',
+        // kids_ages: ['8'],
         search_type: 'package',
     });
 
@@ -58,7 +59,6 @@ const SearchForm = ({ header }: SearchFormProps) => {
         const startDate = new Date(startDateStr);
         const endDate = new Date(startDate);
         endDate.setDate(startDate?.getDate() + nightCount);
-
         const formatDate = (date) => {
             const year = date.getFullYear();
             const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -74,29 +74,30 @@ const SearchForm = ({ header }: SearchFormProps) => {
     }
 
 
-
-
     useEffect(() => {
-        if (router.isReady) {
+        if (router.isReady && pageName === 'search' || pageName === 'home') {
             const parsed = parseSearchParams(router.query);
-            setParams({ ...params, ...parsed });
+
+            if (parsed?.to_city) {
+                setParams(prev => ({ ...prev, ...parsed }));
+            } else {
+                const { to_city, ...restParams } = params;
+                const { to_city: _, ...restParsed } = parsed || {};
+                setParams({ ...restParams, ...restParsed });
+            }
+
             if(Object.keys(parsed).length > 0){
                 startSearch(parsed)
-                console.log('router.isReady1',router.isReady)
             }else{
                 const today = new Date();
                 const plus7 = new Date();
                 plus7.setDate(today.getDate() + 7);
                 const dayPlus =  params?.nights?.split('..')?.[0] || params?.nights;
-                console.log('dayPlus',dayPlus)
-
                 const interval =  calculateStayDates(plus7,+dayPlus);
-                console.log('interval',interval)
                 setParams({...params, ...interval});
             }
-
         }
-    }, [router.isReady]);
+    }, [router.isReady,pageName]);
 
     const startSearch = async (data) => {
         dispatch(runFullSearchFlow({
@@ -106,6 +107,7 @@ const SearchForm = ({ header }: SearchFormProps) => {
     }
 
     const handleChange = (value: string | number | number[], key: keyof SearchParams) => {
+
         if(key === 'from_city'){
             setParams((prev) => ({
                 ...prev,
@@ -121,7 +123,6 @@ const SearchForm = ({ header }: SearchFormProps) => {
         }else if(key === 'form_date'){
             const dayPlus =  params?.nights?.split('..')?.[0] || params?.nights;
             console.log('dayPlus',dayPlus,value)
-
             const interval =  calculateStayDates(value,+dayPlus);
             console.log('interval',interval)
             setParams({...params, ...interval});
@@ -129,7 +130,17 @@ const SearchForm = ({ header }: SearchFormProps) => {
             const interval =  calculateStayDates(params?.start_date,+value);
             console.log('interval',interval)
             setParams({...params, ...interval,nights:value});
+        }else if(key === 'adults'){
+            setParams({...params, adults:value});
+        }else if(key === 'kids'){
+            let age = []
+            for(let i=0;i<value;i++){
+                age.push('8')
+            }
+            setParams({...params, kids:value,kids_ages});
         }
+
+        console.log('key',key)
 
     };
 
@@ -188,27 +199,31 @@ const SearchForm = ({ header }: SearchFormProps) => {
 
     return (
         <>
-        <div className={`${styles.searchForm} ${header && styles.searchFormM}`}>
-            <div className={styles.searchFields}>
-                <WhereFrom handleChange={handleChange} name={'from_city'} value={params.from_city} />
-                <WhereTo handleChange={handleChange} name={'to_city'} value={params.to_city} />
-                <div className={styles.searchGroup}>
-                    <SelectDate handleChange={handleChange} name={'form_date'} value={params.start_date} />
-                    <Nights handleChange={handleChange} name={'nights'} value={params.nights} />
+            {pageName === 'search' || pageName==='home' && (
+                <div className={`${styles.searchForm} ${header && styles.searchFormM}`}>
+                    <div className={styles.searchFields}>
+                        <WhereTo handleChange={handleChange} name={'to_city'} value={params.to_city}/>
+                        <div className={styles.searchGroup}>
+                            <SelectDate handleChange={handleChange} name={'form_date'} value={params.start_date}/>
+                            <Nights handleChange={handleChange} name={'nights'} value={params.nights}/>
+                        </div>
+                        <People handleChange={handleChange}
+                                value={{adults: params.adults, kids: params.kids, kids_ages: params.kids_ages}}/>
+                        <WhereFrom handleChange={handleChange} name={'from_city'} value={params.from_city}/>
+                    </div>
+                    <Button
+                        br={16}
+                        icon={'search'}
+                        title={header ? '' : 'Найти'}
+                        onClick={handleClick}
+                    />
                 </div>
-                <People handleChange={handleChange} value={{ adults: params.adults, kids: params.kids, kids_ages: params.kids_ages }} />
-            </div>
-            <Button
-                br={16}
-                icon={'search'}
-                title={header ? '' : 'Найти'}
-                onClick={handleClick}
-            />
-        </div>
+            )}
+
             {header && (
                 <div className={styles.selectdFormM}>
-                    <p>{params.to_city}</p>
-                    <p>{formatDateToRussian(params.start_date)} , {params.nights} ночей, {parseInt(params.adults || 0) + parseInt(params.kids || 0)} туриста</p>
+                    <p>{params?.to_city}</p>
+                    <p>{formatDateToRussian(params?.start_date)} , {params?.nights} ночей, {parseInt(params?.adults || 0) + parseInt(params?.kids || 0)} туриста</p>
                 </div>
             )}
         </>

@@ -12,18 +12,33 @@ const People = ({handleChange,value}) => {
 
     const handleAdults = (type: 'plus' | 'minus') => {
         setAdults(prev => {
-            if (type === 'plus') return prev + 1;
-            if (type === 'minus' && prev > 1) return prev - 1;
-            handleChange(adults,'adults')
-            return prev;
+            let newValue = prev;
+
+            if (type === 'plus') {
+                newValue = prev + 1;
+            } else if (type === 'minus' && prev > 1) {
+                newValue = prev - 1;
+            }
+
+            // Call with the updated value
+            handleChange(newValue, 'adults');
+
+            return newValue;
         });
     };
 
     const handleChildren = (type: 'plus' | 'minus') => {
         setChildren(prev => {
-            if (type === 'plus') return prev + 1;
-            if (type === 'minus' && prev > 0) return prev - 1;
-            return prev;
+            let newValue = prev;
+
+            if (type === 'plus') {
+                newValue = prev + 1;
+            } else if (type === 'minus' && prev > 0) {
+                newValue = prev - 1;
+            }
+
+            handleChange(newValue, 'kids'); // Pass updated value
+            return newValue;
         });
     };
 

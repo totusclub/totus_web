@@ -8,9 +8,9 @@ const Profile = ()=> {
         <main className={'searchContainer'}>
             <div className={'content row'}>
                 <MenuProfile/>
-                <OrderList/>
+                <OrderList show={false}/>
             </div>
         </main>
     );
 }
-export default withAuth(Profile)
+export default Profile
