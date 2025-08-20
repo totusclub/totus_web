@@ -160,4 +160,13 @@ body {
     #root{
         display: block;
     }
+    body::-webkit-scrollbar {
+        width: 0;
+        height: 0; /* for horizontal scrollbar */
+    }
+
+    /* For Firefox */
+    body {
+        scrollbar-width: none; /* hides scrollbar, still scrolls */
+    }
 }

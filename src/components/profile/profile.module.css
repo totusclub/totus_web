@@ -334,6 +334,80 @@
     .orderList{
         display: none;
     }
+    .deleteBlock{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 20px;
+        font-size: 14px;
+        color: red;
+    }
+    .modalDeleteAccount{
+        width: 100%;
+        position: fixed;
+        bottom: 0;
+        /*height: 300px;*/
+        z-index: 999999999;
+        background-color: #fff;
+        left: 0;
+        border-top-left-radius: 32px;
+        border-top-right-radius: 32px;
+    }
+.modalDeleteAccountLeyer{
+    position: fixed;
+    z-index: 999999;
+    width: 100%;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: #1F1F1F95;
 
+}
+    .modalDeleteAccountHead{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 40px;
+        border-bottom: 1px solid var(--bgSecondary);
+    }
+    .modalDeleteAccountBody{
+        padding: 15px;
+    }
+    .modalDeleteAccountBody>p:nth-child(1){
+        font-size: 16px;
+        text-align: center;
+        margin-bottom: 10px;
+    }
+    .modalDeleteAccountBody>p:nth-child(2){
+        font-size: 12px;
+        text-align: center;
+    }
+    .modalDeleteAccountFooter{
+        display: flex;
+        padding: 15px;
+        gap: 20px;
+    }
+    .cancelBtn{
+        height: 50px;
+        background-color: var(--primary_red);
+        display: flex;
+        flex: 1;
+        justify-content: center;
+        align-items: center;
+        border-radius: 15px;
+        color: #fff;
+    }
+    .applyBtn{
+        height: 50px;
+        background-color: var(--primary_green);
+        display: flex;
+        flex: 1;
+        justify-content: center;
+        align-items: center;
+        border-radius: 15px;
+        color: #fff;
+    }
 }
 

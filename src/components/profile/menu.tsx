@@ -5,10 +5,12 @@ import {useDispatch} from "react-redux";
 import {logout} from "@/store/slices/authSlice";
 import {deleteToken} from "@/utils/auth";
 import {router} from "next/client";
+import {useState} from "react";
 
 const MenuProfile = () => {
     const dispatch = useDispatch();
     const {user,token} = useAuth()
+    const [deleteModal, setDeleteModal] = useState<boolean>(false)
 
     const handleLogout = () => {
         deleteToken();
@@ -86,6 +88,32 @@ const MenuProfile = () => {
                     <Icon name={'logout'} size={24}/>
                 </div>
             </div>
+            <div className={styles.deleteBlock}>
+                <p onClick={()=>setDeleteModal(true)}>Удалить аккаунт</p>
+            </div>
+            {deleteModal && (
+                <>
+                    <div className={styles.modalDeleteAccountLeyer} onClick={()=>setDeleteModal(false)}></div>
+                    <div className={styles.modalDeleteAccount}>
+                        <div className={styles.modalDeleteAccountHead}>
+                            <p>Удаление аккаунта</p>
+                        </div>
+                        <div className={styles.modalDeleteAccountBody}>
+                            <p>Вы действительно хотите удалить аккаунт?</p>
+                            <p>Если вы не войдёте в систему в течение 30 дней, аккаунт будет автоматически удалён.</p>
+                        </div>
+                        <div className={styles.modalDeleteAccountFooter}>
+                            <div className={styles.cancelBtn} onClick={()=>setDeleteModal(false)}>
+                                <p>Отмена</p>
+                            </div>
+                            <div className={styles.applyBtn} onClick={()=>handleLogout()}>
+                                <p>Удалить</p>
+                            </div>
+                        </div>
+                    </div>
+                </>
+            )}
+
         </div>
     );
 };
