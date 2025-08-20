@@ -8,16 +8,15 @@ import {RootState} from "@/store";
 
 const WhereFrom = ({handleChange,value,name}) => {
     const dispatch = useDispatch();
+    const inputRef = useRef<HTMLInputElement | null>(null);
     const wrapperRef = useRef<HTMLDivElement>(null);
     const [isOpen, setIsOpen] = useState(false);
-    const inputRef = useRef<HTMLInputElement>(null);
     const [searchValue, setSearchValue] = useState("");
     // const { results, status, error,data } = useDestinationsSearch(searchValue,'Moscow');
     const { data, status, error } = useSelector((state: RootState) => state.destinations);
 
 
     useEffect(() => {
-        // if (!searchValue) return;
 
         const timeoutId = setTimeout(() => {
             console.log("searchValue", searchValue);
@@ -45,9 +44,6 @@ const WhereFrom = ({handleChange,value,name}) => {
         };
     }, []);
 
-    // useEffect(() => {
-    //     console.log('results',results)
-    // }, [results,status]);
 
     const handleToggle = () => {
         setIsOpen(prev => !prev);
@@ -56,15 +52,18 @@ const WhereFrom = ({handleChange,value,name}) => {
 
     const handleSelect = (type:string,item: string) => {
         setSearchValue(item.name);
-
-        // console.log('item1',item)
-        // console.log('name1',name)
-        // console.log('type1',type)
         handleChange(item,name,type);
         setIsOpen(false);
     };
 
-    // if (status === "loading") return <p>Loading...</p>;
+
+    useEffect(() => {
+        if (isOpen && inputRef.current) {
+            inputRef.current.focus();
+            inputRef.current.select();
+        }
+    }, [isOpen]);
+
     if (status === "failed") return <p>Error: {error}</p>;
 
 
@@ -111,10 +110,8 @@ const WhereFrom = ({handleChange,value,name}) => {
                             placeholder="Москва"
                         />
                     </div>
-                    {/*{searchValue.trim() === "" ? (*/}
                         <div className={styles.searchGroupTyping}>
                             <div className={styles.searchGroupList}>
-                            {/*<p className={styles?.searchGroupListText}>Популярные страны</p>*/}
                             {data
                                 ?.filter(item => item?.group_name === "countries" ) // only keep countries group
                                 .flatMap(item =>
@@ -146,7 +143,6 @@ const WhereFrom = ({handleChange,value,name}) => {
                                     )}
                             </div>
                             <div className={styles.searchGroupList}>
-                                {/*<p className={styles?.searchGroupListText}>мегарегионы</p>*/}
                             {data
                                 ?.filter(item => item?.group_name === "metaregions" ) // only keep countries group
                                 .flatMap(item =>
@@ -165,7 +161,6 @@ const WhereFrom = ({handleChange,value,name}) => {
                                 )}
                             </div>
                             <div className={styles.searchGroupList}>
-                                {/*<p className={styles?.searchGroupListText}>Отели</p>*/}
                             {data
                                 ?.filter(item => item?.group_name === "hotels" ) // only keep countries group
                                 .flatMap(item =>
@@ -186,23 +181,6 @@ const WhereFrom = ({handleChange,value,name}) => {
                                 )}
                             </div>
                         </div>
-                    {/*) : results.length > 0 ? (*/}
-                    {/*    results.map((item) => (*/}
-                    {/*        <div*/}
-                    {/*            key={item.id}*/}
-                    {/*            onClick={() => item?.icon === 'location' ? null : handleSelect(item)}*/}
-                    {/*            className={styles.locationItem}*/}
-                    {/*        >*/}
-                    {/*            <Icon name={item.icon} size={24} color="#000"/>*/}
-                    {/*            <div>*/}
-                    {/*                <p className={styles.locationItemName}>{item.name}</p>*/}
-                    {/*                <p className={styles.locationItemType}>{item.type}</p>*/}
-                    {/*            </div>*/}
-                    {/*        </div>*/}
-                    {/*    ))*/}
-                    {/*) : (*/}
-                    {/*    <p className={styles.noResults}>Ничего не найдено</p>*/}
-                    {/*)}*/}
                 </div>
             )}
         </div>

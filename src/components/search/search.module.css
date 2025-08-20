@@ -441,6 +441,7 @@
         margin-top:0px;
         border-radius: 0;
         padding: 0;
+        z-index: 9999999999;
     }
     .searchFieldInfoM{
         width: 100%;
@@ -500,6 +501,7 @@
         padding:15px;
         border-bottom-right-radius: 0;
         border-bottom-left-radius: 0;
+        z-index: 999999999;
     }
     .dateFooter{
         padding-top: 20px;
@@ -557,5 +559,9 @@
     .searchGroupListText{
         margin-top: 10px;
         color: var(--core_Orange);
+    }
+    .noResults{
+        margin-left: 15px;
+        margin-top: 15px;
     }
 }

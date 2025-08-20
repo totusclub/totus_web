@@ -37,7 +37,14 @@ const WhereFrom = ({handleChange,value,name}) => {
         setIsOpen(false);
     };
 
-    if (status === "loading") return <p>Loading...</p>;
+
+    useEffect(() => {
+        if (isOpen && inputRef.current) {
+            inputRef.current.focus();
+            inputRef.current.select();
+        }
+    }, [isOpen]);
+    // if (status === "loading") return <p>Loading...</p>;
     if (status === "failed") return <p>Error: {error}</p>;
 
     return (
@@ -83,7 +90,7 @@ const WhereFrom = ({handleChange,value,name}) => {
                     </div>
 
                     {searchValue.trim() === "" ? (
-                        <p className={styles.noResults}>Введите город или аэропорт</p>
+                        <p  className={styles.noResults}>Введите город или аэропорт</p>
                     ) : results.length > 0 ? (
                         results.map((item) => (
                             <div
