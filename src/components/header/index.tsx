@@ -28,7 +28,7 @@ const Header = () => {
         if(pathname){
             const segments = pathname.split('/').filter(Boolean); // removes empty strings
             const pageName =  segments[segments.length - 1] || 'home';
-            if(pageName === 'search' || pageName === 'tickets' || pageName === 'home'){
+            if(pageName === 'search' || pageName === 'tickets'){
                 return <SearchForm pageName={pageName} header={true}/>
             }else if(pageName === 'hotel-details'){
                 return <p className={styles.pageName}>Отель</p>

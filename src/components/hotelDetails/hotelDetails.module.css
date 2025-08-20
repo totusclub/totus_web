@@ -590,6 +590,87 @@
     display: none;
 }
 
+
+@media (max-width: 1024px) {
+    .HotelDetailsInfoRow{
+        flex-direction: column;
+    }
+    .HotelDetailsRoomsRow{
+        /*flex-direction: column;*/
+    }
+    .HotelDetailsRooms{
+        width: 100%;
+    }
+    .HotelDetailsRoom{
+        /*flex-direction: column;*/
+    }
+    .HotelDetailsDatePrices{
+        display: none;
+    }
+    .HotelDetailsDatePrice{
+        /*width: 120px*/
+    }
+    .HotelDetailsDatePricesMob{
+        display: block;
+        height: 80px;
+        width: 100%;
+        margin-top: 15px;
+        padding-left: 16px;
+    }
+    .HotelDetailsDatePricesMobRows{
+        display: flex;
+        overflow-x: auto;
+        overflow-y: hidden;
+        white-space: nowrap;
+        scroll-snap-type: x mandatory;
+        gap: 8px; /* Optional: space between items */
+        padding-bottom: 8px; /* Optional: space for scrollbar */
+        -webkit-overflow-scrolling: touch; /* Smooth scroll on iOS */
+
+        scrollbar-width: none; /* Firefox */
+        -ms-overflow-style: none; /* Internet Explorer 10+ */
+    }
+    .HotelDetailsDatePriceMob{
+        flex: 0 0 auto;
+        scroll-snap-align: start;
+        min-width: 120px; /* Or whatever fits best */
+        height: 60px;
+        border-radius: 8px;
+        /*align-items: center;*/
+        display: flex;
+        padding-left: 8px;
+        flex-direction: column;
+        justify-content: center;
+        background-color: #0D77D3;
+    }
+    .HotelDetailsInfoMessage{
+        display: none;
+    }
+    .trackPrices{
+        display: none
+    }
+    .HotelDetailsMap{
+        display: none;
+    }
+    .HotelDetailsPriceListItem{
+        /*flex-direction: column;*/
+        padding-top: 10px;
+        padding-bottom: 10px;
+        gap: 14px;
+    }
+    .HotelDetailsPriceListItem>div{
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+    .HotelDetailsPriceListItem > div:nth-child(3) {
+        flex: 1;
+        /*align-items: flex-start;*/
+    }
+    .HotelDetailsPriceListItem > div:nth-child(3) >div {
+        /*width: 100% !important;*/
+    }
+}
+
 @media (max-width: 768px) {
     .HotelDetailsInfoRow{
         flex-direction: column;

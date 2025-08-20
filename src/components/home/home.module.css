@@ -721,7 +721,7 @@
 .recomendDeslistMob{
     display: none;
 }
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
    .faqRow{
        flex-direction: column;
        gap: 0px;
@@ -765,6 +765,9 @@
     .callRequestInfo{
         padding-left: 16px;
         padding-right: 16px;
+        display: flex;
+        justify-content: center;
+
     }
     .formRequestCallText > p{
         font-size: 12px;

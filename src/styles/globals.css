@@ -5,7 +5,7 @@
 
 }
 #root{
-    display: none;
+    /*display: none;*/
 }
 :root {
     --primary_a: #1F1F1F;
@@ -113,6 +113,26 @@ body {
     display: flex;
     flex-direction: row;
     gap: 20px;
+}
+
+@media (max-width: 1024px)  {
+    #root{
+        display: block;
+    }
+    .content{
+        width: 100%;
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+    .content{
+        width: 100%;
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+    .slick-slider{
+        padding-bottom: 16px!important;
+        margin-bottom: 0px!important;
+    }
 }
 
 

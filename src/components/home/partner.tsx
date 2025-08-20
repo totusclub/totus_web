@@ -17,12 +17,12 @@ export default function Partner() {
         initialSlide: 0,
         responsive: [
             {
-                breakpoint: 1024,
+                breakpoint: 1026,
                 settings: {
-                    slidesToShow: 3,
+                    slidesToShow: 5,
                     slidesToScroll: 3,
                     infinite: true,
-                    dots: true
+                    dots: false
                 }
             },
             {

@@ -41,7 +41,7 @@ const SearchForm = ({ header,pageName}: SearchFormProps) => {
     const [params, setParams] = useState<SearchParams>({
         from_city: 'Moscow',
         from_country: 'RU',
-        to_city: 'Kemer',
+        // to_city: 'Kemer',
         to_country: 'TR',
         adults: '2',
         start_date: '2025-07-21',
@@ -52,8 +52,20 @@ const SearchForm = ({ header,pageName}: SearchFormProps) => {
         // kids: '1',
         // kids_ages: ['8'],
         search_type: 'package',
+        // hotel_ids:[9069464]
     });
 
+
+
+    useEffect(()=>{
+        const today = new Date();
+        const plus7 = new Date();
+        plus7.setDate(today.getDate() + 7);
+        const dayPlus =  params?.nights?.split('..')?.[0] || params?.nights;
+        const interval =  calculateStayDates(plus7,+dayPlus);
+        setParams({...params, ...interval});
+        console.log('interval',interval);
+    },[])
 
     function calculateStayDates(startDateStr, nightCount) {
         const startDate = new Date(startDateStr);
@@ -106,8 +118,7 @@ const SearchForm = ({ header,pageName}: SearchFormProps) => {
         }));
     }
 
-    const handleChange = (value: string | number | number[], key: keyof SearchParams) => {
-
+    const handleChange = (value: string | number | number[], key: keyof SearchParams,type:string) => {
         if(key === 'from_city'){
             setParams((prev) => ({
                 ...prev,
@@ -115,11 +126,34 @@ const SearchForm = ({ header,pageName}: SearchFormProps) => {
                 from_country:value?.iso2
             }));
         }else if(key === 'to_city'){
-            setParams((prev) => ({
-                ...prev,
-                to_city: value?.name_en,
-                to_country:value?.iso2
-            }));
+            console.log('type',type)
+            console.log('value',value)
+            console.log('key',key)
+            if(type === 'countries'){
+                delete params.hotel_ids
+                setParams((prev) => ({
+                    ...prev,
+                    // to_city: value?.name_en,
+                    to_country:value?.iso2
+                }));
+            }
+            if(type === 'regions' || type === 'metaregions'){
+                delete params.hotel_ids
+                setParams((prev) => ({
+                    ...prev,
+                    to_city: value?.name_en,
+                    to_country:value?.iso2
+                }));
+            }
+            if(type === 'hotels'){
+                setParams((prev) => ({
+                    ...prev,
+                    to_city: value?.name_en,
+                    to_country:value?.iso2,
+                    hotel_ids:[value.id]
+                }));
+            }
+
         }else if(key === 'form_date'){
             const dayPlus =  params?.nights?.split('..')?.[0] || params?.nights;
             console.log('dayPlus',dayPlus,value)
@@ -137,7 +171,11 @@ const SearchForm = ({ header,pageName}: SearchFormProps) => {
             for(let i=0;i<value;i++){
                 age.push('8')
             }
-            setParams({...params, kids:value,kids_ages});
+            let kids_ages = []
+            for (let i=0;i<value;i++){
+                kids_ages.push(9);
+            }
+            setParams({...params, kids:value,kids_ages:kids_ages});
         }
 
         console.log('key',key)

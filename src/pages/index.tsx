@@ -1,7 +1,3 @@
-// pages/index.tsx
-// import { useSelector } from 'react-redux';
-// import { RootState, wrapper } from '../store';
-// import { increment } from '../store/slices/counterSlice';
 import Search from "@/components/search";
 import HotDealsSlide from "@/components/home/hotDeals";
 import Services from "@/components/home/services";
@@ -12,10 +8,15 @@ import Partner from "@/components/home/partner";
 import PopularDestinations from "@/components/home/popularDestinations";
 import CallRequest from "@/components/home/callRequest";
 import Faq from "@/components/home/faq";
-
+import SplashScreen from "@/components/splashScreen";
+import {useState} from "react";
 
 export default function Home() {
-    // const count = useSelector((state: RootState) => state.counter.value);
+    const [active, setActive] = useState(true);
+
+    const onFinish =()=>{
+        setActive(false)
+    }
 
     return (
         <main>
@@ -26,7 +27,10 @@ export default function Home() {
             <PopularDestinations/>
             <Partner/>
             <CallRequest/>
-            {/*<Faq/>*/}
+            <Faq/>
+            {/*{active && (*/}
+            {/*    <SplashScreen onFinish={onFinish}/>*/}
+            {/*)}*/}
         </main>
     );
 }

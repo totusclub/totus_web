@@ -57,15 +57,7 @@ export default function PopularDestinations() {
         slidesToScroll: 1,
         initialSlide: 0,
         responsive: [
-            {
-                breakpoint: 1024,
-                settings: {
-                    slidesToShow: 3,
-                    slidesToScroll: 3,
-                    infinite: true,
-                    dots: true
-                }
-            },
+
             {
                 breakpoint: 600,
                 settings: {
@@ -82,7 +74,16 @@ export default function PopularDestinations() {
                     dots: false,
                     arrows:false
                 }
-            }
+            },
+            {
+                breakpoint: 1026,
+                settings: {
+                    slidesToShow: 2.3,
+                    slidesToScroll: 2,
+                    infinite: false,
+                    dots: false
+                }
+            },
 
         ]
     };

@@ -11,6 +11,10 @@ const SelectDate = ({handleChange,value,name}) => {
     const wrapperRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
+        setSelectedDate(new Date(value));
+    }, [value]);
+
+    useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
                 setIsOpen(false);

@@ -356,7 +356,26 @@
 .selectdFormM{
     display: none;
 }
-@media (max-width: 768px) {
+.searchGroup{
+    width: 100%;
+}
+.searchGroupListText{
+    font-size: 14px;
+    color: var(--textPrimary);
+}
+.searchGroupListItem{
+    /*border: 1px solid var(--borderTertiary);*/
+    width: 100%;
+    margin-top: 6px;
+}
+.searchGroupListItem>p:nth-child(1){
+    font-size: 16px;
+}
+.searchGroupListItem>p:nth-child(2){
+    font-size: 10px;
+}
+
+@media (max-width: 1024px) {
     .search{
         padding: 0;
     }
@@ -378,6 +397,7 @@
     .searchContent{
         gap: 0;
         padding-bottom: 20px;
+        width: 65%;
     }
     .whereFrom,.searchField{
         border-left: none;
@@ -515,4 +535,19 @@
 
     }
 
+}
+@media (width <= 768px) {
+    .searchContent {
+        gap: 0;
+        padding-bottom: 20px;
+        width: 100%;
+    }
+    .searchGroupTyping{
+        padding: 15px;
+
+    }
+    .searchGroupListText{
+        margin-top: 10px;
+        color: var(--core_Orange);
+    }
 }

@@ -1,4 +1,4 @@
-import React, {CSSProperties, useEffect, useState} from 'react';
+import React, { CSSProperties, useEffect, useState } from 'react';
 import Slider from 'react-slick';
 import styles from './verticalSlide.module.css';
 import 'slick-carousel/slick/slick.css';
@@ -11,31 +11,29 @@ interface ArrowProps {
     style?: CSSProperties;
 }
 
-const ArrowBottom = ({ onClick }: ArrowProps) => {
-    return (
-        <div className={styles.arrowBottom} onClick={onClick}>
-            <Icon name="downArrow" size={24} color="#000" />
-        </div>
-    );
-};
+const ArrowBottom = ({ onClick }: ArrowProps) => (
+    <div className={styles.arrowBottom} onClick={onClick}>
+        <Icon name="downArrow" size={24} color="#000" />
+    </div>
+);
 
-const ArrowTop = ({ onClick }: ArrowProps) => {
-    return (
-        <div className={styles.arrowTop} onClick={onClick}>
-            <Icon name="upArrow" size={24} color="#000" />
-        </div>
-    );
-};
+const ArrowTop = ({ onClick }: ArrowProps) => (
+    <div className={styles.arrowTop} onClick={onClick}>
+        <Icon name="upArrow" size={24} color="#000" />
+    </div>
+);
 
-const VerticalSlider = ({images}:any) => {
-    const [selectedImage, setSelectedImage] = useState(0);
-
+const VerticalSlider = ({ images }: any) => {
+    const [selectedImage, setSelectedImage] = useState<string>("");
+    const [currentSlide, setCurrentSlide] = useState(0);
 
     useEffect(() => {
-        if(images?.length> 0){
-            setSelectedImage(`https://img.cdn.level.travel/${images?.[0]['x500']}`);
+        if (images?.length > 0) {
+            setSelectedImage(`https://img.cdn.level.travel/${images[0]['x500']}`);
         }
-    },[images])
+    }, [images]);
+
+    const maxDots = 10;
 
     const settings = {
         vertical: true,
@@ -43,53 +41,91 @@ const VerticalSlider = ({images}:any) => {
         slidesToScroll: 1,
         infinite: true,
         arrows: true,
+        dots: false,
         nextArrow: <ArrowBottom />,
         prevArrow: <ArrowTop />,
+        beforeChange: (_: number, next: number) => setCurrentSlide(next),
+        appendDots: (dots: React.ReactNode) => {
+            // Only show a "window" of max 10 dots around current
+            const dotsArray = React.Children.toArray(dots);
+            const total = dotsArray.length;
+
+            let start = Math.max(0, currentSlide - Math.floor(maxDots / 2));
+            let end = start + maxDots;
+
+            if (end > total) {
+                end = total;
+                start = Math.max(0, end - maxDots);
+            }
+
+            const visibleDots = dotsArray.slice(start, end);
+
+            return (
+                <ul style={{ display: "flex", overflowX: "auto" }}>{visibleDots}</ul>
+            );
+        },
+        customPaging: () => (
+            <div
+                style={{
+                    width: "8px",
+                    height: "8px",
+                    borderRadius: "50%",
+                    background: "#999",
+                }}
+            />
+        ),
         responsive: [
             {
-                breakpoint: 1024,
+                breakpoint: 1026,
                 settings: {
-                    slidesToShow: 3,
-                    slidesToScroll: 3,
-                    infinite: true,
-                    dots: true
-                }
+                    vertical: false,
+                    slidesToShow: 2.2,
+                    slidesToScroll: 2,
+                    arrows: false,
+                    dots: true,
+                },
             },
             {
                 breakpoint: 600,
                 settings: {
                     slidesToShow: 2,
                     slidesToScroll: 2,
-                    initialSlide: 2
-                }
+                    initialSlide: 2,
+                    dots: true,
+                },
             },
             {
                 breakpoint: 480,
                 settings: {
-                    vertical:false,
+                    vertical: false,
                     slidesToShow: 1,
                     slidesToScroll: 1,
-                    dots: false,
-                    arrows:false
-                }
-            }
-
-        ]
+                    dots: true,
+                    arrows: false,
+                },
+            },
+        ],
     };
-
-
 
     return (
         <div className={styles.container}>
             <div className={styles.sliderWrapper}>
                 <Slider {...settings}>
-                    {images.map((img, index) => (
-                        <div key={index} onClick={() => setSelectedImage(`https://img.cdn.level.travel/${img['x500']}`)}>
+                    {images.map((img: any, index: number) => (
+                        <div
+                            key={index}
+                            onClick={() =>
+                                setSelectedImage(`https://img.cdn.level.travel/${img['x500']}`)
+                            }
+                        >
                             <img
                                 src={`https://img.cdn.level.travel/${img['x500']}`}
                                 alt={`Thumb ${index}`}
                                 className={`${styles.thumbnail} ${
-                                    selectedImage === `https://img.cdn.level.travel/${img['x500']}` ? styles.selectedThumbnail : ''
+                                    selectedImage ===
+                                    `https://img.cdn.level.travel/${img['x500']}`
+                                        ? styles.selectedThumbnail
+                                        : ''
                                 }`}
                                 tabIndex={index}
                             />
@@ -98,7 +134,11 @@ const VerticalSlider = ({images}:any) => {
                 </Slider>
             </div>
             <div>
-                <img src={selectedImage} alt="Selected" className={styles.selectedImage}/>
+                <img
+                    src={selectedImage}
+                    alt="Selected"
+                    className={styles.selectedImage}
+                />
             </div>
         </div>
     );
