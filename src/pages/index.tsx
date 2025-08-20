@@ -27,7 +27,7 @@ export default function Home() {
             <PopularDestinations/>
             <Partner/>
             <CallRequest/>
-            <Faq/>
+            {/*<Faq/>*/}
             {/*{active && (*/}
             {/*    <SplashScreen onFinish={onFinish}/>*/}
             {/*)}*/}
