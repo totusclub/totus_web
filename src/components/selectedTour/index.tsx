@@ -103,7 +103,7 @@ const SelectedTour = ({packages}:any) => {
                     </div>
                 </div>
             </div>
-            <TourModel open={open} setOpen={setOpen}/>
+            <TourModel packages={packages} open={open} setOpen={setOpen}/>
         </>
 
 

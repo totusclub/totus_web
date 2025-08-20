@@ -133,6 +133,14 @@ body {
         padding-bottom: 16px!important;
         margin-bottom: 0px!important;
     }
+    .slick-dots{
+        bottom: -2px!important;
+        justify-content: center;
+    }
+    .slick-dots li{
+        width: auto!important;
+        height: auto!important;
+    }
 }
 
 
@@ -168,5 +176,13 @@ body {
     /* For Firefox */
     body {
         scrollbar-width: none; /* hides scrollbar, still scrolls */
+    }
+    .slick-dots{
+        bottom: -2px!important;
+        justify-content: center;
+    }
+    .slick-dots li{
+        width: auto!important;
+        height: auto!important;
     }
 }

@@ -163,7 +163,7 @@
     }
     .resultListSelectedFilter{
         display: flex;
-        margin-top: 32px;
+        margin-top: 10px;
     }
     .resultList{
         width: 100%;

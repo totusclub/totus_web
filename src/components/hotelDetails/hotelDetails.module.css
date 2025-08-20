@@ -669,6 +669,9 @@
     .HotelDetailsPriceListItem > div:nth-child(3) >div {
         /*width: 100% !important;*/
     }
+    .HotelDetailsInfoPrice{
+        margin-top: 10px;
+    }
 }
 
 @media (max-width: 768px) {

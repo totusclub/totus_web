@@ -215,6 +215,7 @@
     .ticketItemPriceInfo{
         width: 100%;
         border-left: none;
+        padding-left: 0;
     }
     .ticketItem{
         flex-direction: column;

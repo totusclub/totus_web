@@ -46,11 +46,10 @@ const VerticalSlider = ({ images }: any) => {
         prevArrow: <ArrowTop />,
         beforeChange: (_: number, next: number) => setCurrentSlide(next),
         appendDots: (dots: React.ReactNode) => {
-            // Only show a "window" of max 10 dots around current
             const dotsArray = React.Children.toArray(dots);
             const total = dotsArray.length;
 
-            let start = Math.max(0, currentSlide - Math.floor(maxDots / 2));
+            let start = Math.max(0, currentSlide - Math.floor(maxDots - 2));
             let end = start + maxDots;
 
             if (end > total) {
@@ -61,16 +60,19 @@ const VerticalSlider = ({ images }: any) => {
             const visibleDots = dotsArray.slice(start, end);
 
             return (
-                <ul style={{ display: "flex", overflowX: "auto" }}>{visibleDots}</ul>
+                <ul className={styles.cutomDoth} style={{ display: "flex", overflowX: "auto", gap: "1px" }}>
+                    {visibleDots}
+                </ul>
             );
         },
-        customPaging: () => (
+        customPaging: (i: number) => (
             <div
                 style={{
                     width: "8px",
                     height: "8px",
                     borderRadius: "50%",
-                    background: "#999",
+                    background: i === currentSlide ? "#FE732E" : "#8080804D", // Active dot = black
+                    transition: "background 0.3s ease",
                 }}
             />
         ),
@@ -106,6 +108,7 @@ const VerticalSlider = ({ images }: any) => {
             },
         ],
     };
+
 
     return (
         <div className={styles.container}>

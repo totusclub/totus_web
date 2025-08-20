@@ -85,9 +85,9 @@ const TicketItem: FC<TicketItemProps> = ({ green,item ,price}) => {
 
                         <div className={styles.ticketItemLine}>
                             <div className={styles.ticketItemLineItem}>
-                                {/*<div className={styles.ticketItemLogo}>*/}
-                                {/*    <img src={item?.to?.airline?.logo?.src} alt={item?.to?.airline?.name}/>*/}
-                                {/*</div>*/}
+                                <div className={styles.ticketItemLogo}>
+                                    <img src={item?.to?.airline?.logo?.src} alt={item?.to?.airline?.name}/>
+                                </div>
                                 <div className={styles.ticketItemDate}>
                                     <p>{formatRussianDateTime(item?.to?.departure)} - {formatRussianDateTime(item?.to?.arrival)}</p>
                                     <p>{formatRussianDate(item?.to?.departure)}</p>
