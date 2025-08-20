@@ -151,7 +151,7 @@ const Filters = ({selectedFilters,allFilters,statistics}:any) => {
                     </Collapse>
                 )}
                 <div className={styles.mobileFilterFooter}>
-                    <Button title={'Закрыть'} full={true} onClick={()=>setMobileModal(false)} />
+                    <Button title={'Применять'} full={true} onClick={()=>setMobileModal(false)} />
                 </div>
             </div>
         </>
