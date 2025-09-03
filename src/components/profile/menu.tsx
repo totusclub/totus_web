@@ -55,6 +55,10 @@ const MenuProfile = () => {
                 {/*    <Icon name={'profile'} size={24}/>*/}
                 {/*    <p>Моя учетная запись</p>*/}
                 {/*</div>*/}
+                {/*<div onClick={()=>window.ReactNativeWebView.postMessage("openModal")} className={styles.profileMenuItem}>*/}
+                {/*    <Icon name={'order'} size={24}/>*/}
+                {/*    <p>Call Support</p>*/}
+                {/*</div>*/}
                 <div onClick={()=>router.push('profile/my-orders')} className={styles.profileMenuItem}>
                     <Icon name={'order'} size={24}/>
                     <p>Мои заказы</p>

@@ -141,6 +141,11 @@ body {
         width: auto!important;
         height: auto!important;
     }
+    #chat-container{
+        position: fixed;
+        top: 0;
+        left: 0;
+    }
 }
 
 

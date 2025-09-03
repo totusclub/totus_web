@@ -364,9 +364,13 @@
     color: var(--textPrimary);
 }
 .searchGroupListItem{
-    /*border: 1px solid var(--borderTertiary);*/
+    /*border-bottom: 1px solid var(--borderTertiary);*/
     width: 100%;
-    margin-top: 6px;
+    min-height: 48px;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    /*margin-top: 10px;*/
 }
 .searchGroupListItem>p:nth-child(1){
     font-size: 16px;

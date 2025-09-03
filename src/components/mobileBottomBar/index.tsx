@@ -6,6 +6,7 @@ import Link from "next/link";
 import AuthModal from "@/components/auth";
 import useAuth from "@/hooks/useAuth";
 import {useRouter} from "next/router";
+import Support from "@/components/support";
 
 
 const MobileBottomBar = () => {
@@ -32,6 +33,9 @@ const MobileBottomBar = () => {
                 <div className={styles.itemTabNav} onClick={()=>{token? router.push('/profile'):setAuthModalOpen(true)}}>
                     <Icon color={['profile'].includes(pageName) ? '#fe732e' : "#000"} name={'user'} size={28}/>
                 </div>
+                {/*<div className={styles.itemTabNav}>*/}
+                {/*    <Support/>*/}
+                {/*</div>*/}
             </div>
             <AuthModal open={authModalOpen} setOpen={setAuthModalOpen}/>
         </>

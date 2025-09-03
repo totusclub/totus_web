@@ -17,9 +17,7 @@ const WhereFrom = ({handleChange,value,name}) => {
 
 
     useEffect(() => {
-
         const timeoutId = setTimeout(() => {
-            console.log("searchValue", searchValue);
             dispatch(
                 fetchDestinations({
                     query: searchValue,
@@ -64,10 +62,10 @@ const WhereFrom = ({handleChange,value,name}) => {
         }
     }, [isOpen]);
 
-    if (status === "failed") return <p>Error: {error}</p>;
+    // if (status === "failed") return <p>Error: {error}</p>;
 
 
-
+const ignorName = ['Крым', 'Донецк', 'Луганск', 'Ялта','Yalta']
 
     return (
         <div className={`${styles.searchField} ${styles.radioFrom}`} ref={wrapperRef} onClick={handleToggle}>
@@ -128,57 +126,66 @@ const WhereFrom = ({handleChange,value,name}) => {
                                     ))
                                 )}
                                 {data
-                                    ?.filter(item => item?.group_name === "regions" ) // only keep countries group
+                                    ?.filter(item => item?.group_name === "regions") // only keep regions group
                                     .flatMap(item =>
-                                        item?.results?.map((c,i) => (
-                                            <>
-
-                                                <div className={styles?.searchGroupListItem}
-                                                     onClick={() => handleSelect('regions', c)}>
-                                                    <p key={c?.id}>{c?.name}</p>
-                                                    <p>{c.visa_type}</p>
+                                        item?.results
+                                            ?.filter(c => !ignorName.some(name => c.active_regions?.includes(name))) // filter out ignored regions
+                                            .map((c, i) => (
+                                                <div
+                                                    key={c?.id}
+                                                    className={styles?.searchGroupListItem}
+                                                    onClick={() => handleSelect('regions', c)}
+                                                >
+                                                    <p>{c?.name}</p>
+                                                    <p>{c?.active_regions}</p>
                                                 </div>
-                                            </>
-                                        ))
+                                            ))
                                     )}
                             </div>
                             <div className={styles.searchGroupList}>
-                            {data
-                                ?.filter(item => item?.group_name === "metaregions" ) // only keep countries group
-                                .flatMap(item =>
-                                    item?.results?.map((m,i) => (
-                                        <>
-                                            {i === 0 && (
-                                                <p className={styles?.searchGroupListText}>мегарегионы</p>
-                                            )}
-                                            <div className={styles?.searchGroupListItem}
-                                                 onClick={() => handleSelect('metaregions', m)}>
-                                                <p key={m?.id}>{m?.name}</p>
-                                                <p>{m.country_name_ru}</p>
-                                            </div>
-                                        </>
-                                    ))
-                                )}
+                                {data
+                                    ?.filter(item => item?.group_name === "metaregions") // only keep metaregions group
+                                    .flatMap(item =>
+                                        item?.results
+                                            ?.filter(m => !ignorName.some(name => m.description?.includes(name))) // skip ignored countries
+                                            .map((m, i) => (
+                                                <>
+                                                    {i === 0 && (
+                                                        <p className={styles?.searchGroupListText}>мегарегионы</p>
+                                                    )}
+                                                    <div
+                                                        className={styles?.searchGroupListItem}
+                                                        onClick={() => handleSelect('metaregions', m)}
+                                                    >
+                                                        <p key={m?.id}>{m?.name}</p>
+                                                        <p>{m.country_name_ru}</p>
+                                                    </div>
+                                                </>
+                                            ))
+                                    )}
                             </div>
                             <div className={styles.searchGroupList}>
-                            {data
-                                ?.filter(item => item?.group_name === "hotels" ) // only keep countries group
-                                .flatMap(item =>
-                                    item?.results?.map((m,i) => (
-                                        <>
-                                            {i === 0 && (
-                                                <p className={styles?.searchGroupListText}>Отели</p>
-                                            )}
-                                            <div className={styles?.searchGroupListItem}
-                                                 onClick={() => handleSelect('hotels', m)}>
-                                                <p key={m?.id}>{m?.name}</p>
-                                                <p>{m.country_name_ru}</p>
-                                            </div>
-                                        </>
+                                {data
+                                    ?.filter(item => item?.group_name === "hotels") // only keep hotels group
+                                    .flatMap(item =>
+                                        item?.results
+                                            ?.filter(m => !ignorName.some(name => m.city_name?.includes(name)) && !ignorName.some(name => m.name?.includes(name)) ) // skip ignored cities
+                                            .map((m, i) => (
+                                                <>
+                                                    {i === 0 && (
+                                                        <p className={styles?.searchGroupListText}>Отели</p>
+                                                    )}
+                                                    <div
+                                                        className={styles?.searchGroupListItem}
+                                                        onClick={() => handleSelect('hotels', m)}
+                                                    >
+                                                        <p key={m?.id}>{m?.name}</p>
+                                                        <p>{m.city_name}</p>
+                                                    </div>
+                                                </>
+                                            ))
+                                    )}
 
-
-                                    ))
-                                )}
                             </div>
                         </div>
                 </div>
