@@ -7,7 +7,7 @@ import Icon from "@/components/icons/Icon";
 interface AppModalProps {
     title: string;
     isOpen: boolean;
-    onClose: () => void;
+    onClose?: () => void;
     onBack: () => void;
     width?: string | number;
     subTitle?: string;
@@ -39,9 +39,12 @@ const AppModal: React.FC<AppModalProps> = ({ isOpen, onClose, title, width = '50
                     <p>{title}</p>
                     {subTitle && (<p>{subTitle}</p>)}
                 </div>
-                <div className={auth?styles.modalCloseBtnAuth:styles.modalCloseBtn} onClick={onClose}>
-                    <Icon name={'closeLine'}/>
-                </div>
+                {onClose && (
+                    <div className={auth ? styles.modalCloseBtnAuth : styles.modalCloseBtn} onClick={onClose}>
+                        <Icon name={'closeLine'}/>
+                    </div>
+                )}
+
             </div>
             {!auth && (
                 <div className={styles.appModalLine}></div>

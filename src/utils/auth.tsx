@@ -12,6 +12,12 @@ export const loadToken = () => {
 export const deleteToken = () => {
     localStorage.removeItem('auth_token');
 };
+export const savePin = () => {
+    localStorage.setItem('pin_code', 'YES');
+};
+export const getPin = () => {
+   return  localStorage.getItem('pin_code');
+};
 
 export const decodeToken = (token) => {
     try {
