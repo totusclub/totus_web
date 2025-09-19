@@ -25,7 +25,7 @@ export const useDepartureSearch = (searchValue: string) => {
     }, [dispatch, status]);
 
     useEffect(() => {
-        if (status === "succeeded" && data.departures.length > 0 && searchValue.trim() !== "") {
+        if (status === "succeeded" && data.departures.length > 0) {
             const citiesWithAirports = data.departures.flatMap(city => {
                 const cityEntry = {
                     ...city,
@@ -39,7 +39,8 @@ export const useDepartureSearch = (searchValue: string) => {
                     icon: "plane",
                     type: "Аэропорт",
                 }));
-                return [cityEntry, ...airportEntries];
+                // return [cityEntry, ...airportEntries];
+                return [cityEntry];
             });
 
             const filtered = citiesWithAirports.filter(item => {

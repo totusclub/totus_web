@@ -9,7 +9,7 @@ import {createPackage} from "@/api/levelTravelApi";
 import {useRouter} from "next/router";
 
 
-const HotelDetailsInfo = ({images,rooms}:any) => {
+const HotelDetailsInfo = ({images,rooms,panding}:any) => {
     const router = useRouter();
     const [priceTrack, setPriceTrack] = useState<boolean>(false);
     const [fisrtDate, setFisrtDate] = useState(null);
@@ -70,35 +70,52 @@ useEffect(() => {
         }
     },[fisrtDate?.start_date])
 
-
-    return (
-        <div className={'content'}>
-            <div className={styles.HotelDetailsInfoRow}>
-                <VerticalSlider images={images}/>
-                <div className={styles.HotelDetailsInfo}>
-                    <div className={styles.HotelDetailsInfoPrice}>
-                        <p className={styles.HotelDetailsInfoPriceText}>от {fisrtDate?.price.toString()?.replace(/\B(?=(\d{3})+(?!\d))/g, '\u202F')}₽</p>
-                        <div className={styles.HotelDetailsInfoDate}>
-                            <p className={styles.HotelDetailsInfoDateTitle}>Цена за тур с перелётом</p>
-                            <p className={styles.HotelDetailsInfoDateText}>{formatDate}, {fisrtDate?.nights_count} ночей</p>
+    if(!panding){
+        return (
+            <div className={'content'}>
+                <div className={styles.HotelDetailsInfoRow}>
+                    <VerticalSlider loading={!panding} images={images}/>
+                    <div className={styles.HotelDetailsInfo}>
+                        <div className={styles.HotelDetailsInfoPrice}>
+                            <p className={styles.HotelDetailsInfoPriceText}>от {fisrtDate?.price.toString()?.replace(/\B(?=(\d{3})+(?!\d))/g, '\u202F')}₽</p>
+                            <div className={styles.HotelDetailsInfoDate}>
+                                <p className={styles.HotelDetailsInfoDateTitle}>Цена за тур с перелётом</p>
+                                <p className={styles.HotelDetailsInfoDateText}>{formatDate}, {fisrtDate?.nights_count} ночей</p>
+                            </div>
+                            <Button loading={loading} onClick={() => handleBook(fisrtDate?.id)} title={'Выбрать номер'}
+                                    full={true}/>
                         </div>
-                        <Button loading={loading} onClick={() => handleBook(fisrtDate?.id)} title={'Выбрать номер'}
-                                full={true}/>
-                    </div>
-                    <div className={styles.HotelDetailsInfoMessage}>
-                        <div className={styles.HotelDetailsInfoMessageIcon}>
-                            <Icon name={'travel'} size={61}/>
+                        <div className={styles.HotelDetailsInfoMessage}>
+                            <div className={styles.HotelDetailsInfoMessageIcon}>
+                                <Icon name={'travel'} size={61}/>
+                            </div>
+                            <p className={styles.HotelDetailsInfoMessageText}>Это место предлагает уникальный опыт, сочетая
+                                роскошь и природу. Мы здесь, чтобы помочь вам осуществить вашу мечту о путешествии!</p>
                         </div>
-                        <p className={styles.HotelDetailsInfoMessageText}>Это место предлагает уникальный опыт, сочетая
-                            роскошь и природу. Мы здесь, чтобы помочь вам осуществить вашу мечту о путешествии!</p>
+                        <TrackPrices text={'Автоматические оповещения \n при изменении цен.'} priceTrack={priceTrack}
+                                     setPriceTrack={setPriceTrack}/>
                     </div>
-                    <TrackPrices text={'Автоматические оповещения \n при изменении цен.'} priceTrack={priceTrack}
-                                 setPriceTrack={setPriceTrack}/>
                 </div>
             </div>
-        </div>
 
-    );
+        );
+    }else{
+        return (
+            <div className={'content'}>
+                <div className={styles.HotelDetailsInfoRow}>
+                    <VerticalSlider loading={!panding} images={images}/>
+                    <div className={styles.HotelDetailsInfo}>
+                        <div className={styles.HotelDetailsInfoPrice}>
+                            <div className={styles.animationTextlazy1}></div>
+                            <div className={styles.animationTextlazy2}></div>
+                            <div className={styles.animationButtonLazy}></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
 };
 
 export default HotelDetailsInfo;

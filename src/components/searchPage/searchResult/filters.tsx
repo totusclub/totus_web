@@ -40,6 +40,8 @@ const Filters = ({selectedFilters,allFilters,statistics}:any) => {
 
 
     const onChangeFilters = (key:string,value:string | boolean | number[])=>{
+
+        console.log('key',key,'value',value);
         if(key === 'price'){
             let priceUpdate = {
                 ...filters,
@@ -95,7 +97,7 @@ const Filters = ({selectedFilters,allFilters,statistics}:any) => {
                         <CheckboxGroup
                             name={'filter_hotel_type'}
                             options={[...allFilters?.hotel_type] || []}
-                            // selected={selectedIds}
+                            selected={filters?.filter_hotel_type}
                             onChange={onChangeFilters}
                         />
                     </Collapse>

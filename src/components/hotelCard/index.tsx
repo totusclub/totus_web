@@ -17,21 +17,27 @@ interface HotelCardItemProps {
 }
 interface HotelCardState {
     item: HotelCardItemProps
-    request_id:string
+    request_id:string,
+    lazy?:boolean
 }
 
 
-const HotelCard = ({item,request_id}: HotelCardState) => {
+const HotelCard = ({item,request_id,lazy}: HotelCardState) => {
     const handleClick = () => {
         router.push(`/hotel-details?request_id=${request_id}&hotel_id=${item?.hotel?.id}`); // Navigate to /about
     };
     // console.log(item);
-    const {hotel,analytics_min_price,min_price_nights,dates} = item;
+
+
+    const { hotel,analytics_min_price,min_price_nights,dates } = item ?? {};
+
 
     const formattedDate = useMemo(() => {
-        const dateKey = Object.keys(dates)[0];
-        const date = new Date(dateKey);
-        return date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
+        if(dates){
+            const dateKey = Object.keys(dates)[0];
+            const date = new Date(dateKey);
+            return date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
+        }
     }, [dates]);
 
 
@@ -117,7 +123,6 @@ const HotelCard = ({item,request_id}: HotelCardState) => {
                     }else{
                         return `${value}-${key}`;
                     }
-
                 }
 
                 const unit = units[key] || '';
@@ -128,90 +133,100 @@ const HotelCard = ({item,request_id}: HotelCardState) => {
 
 
     const TAGS = useMemo(() => {
-        if(hotel.features){
+        if(hotel?.features){
             const result = formatHotelInfoToRussian(hotel.features);
-            // console.log('result',result);
             return result
         }else{
             return [];
         }
-    }, [hotel.features]);
+    }, [hotel?.features]);
 
 
-    // const imageShow = useMemo(()=>(){
-    //     if(hotel?.images.length > 0){}
-    // },[hotel])
     const showImage = useMemo(() => {
         if(hotel?.images.length > 0){
            return  hotel?.images?.[0]['x500'];
         }
     },[hotel])
 
+    if(!lazy){
+        return (
+            <div onClick={()=>handleClick()} className={styles.hotelCard}>
+                <div className={styles.hotelCardImage} style={{backgroundImage: `url(${showImage})`}}/>
 
-    return (
-        <div onClick={()=>handleClick()} className={styles.hotelCard}>
-            <div className={styles.hotelCardImage} style={{backgroundImage: `url(${showImage})`}}/>
+                <div className={styles.hotelCardInfo}>
+                    <div className={styles.hotelCardHead}>
+                        <div className={styles.hotelStart}>
+                            <Icon name={'star'} size={18}
+                                  color={hotel?.stars >= 1 ? 'var(--core_Orange)' : 'var(--bgSecondary)'}/>
+                            <Icon name={'star'} size={18}
+                                  color={hotel?.stars >= 2 ? 'var(--core_Orange)' : 'var(--bgSecondary)'}/>
+                            <Icon name={'star'} size={18}
+                                  color={hotel?.stars >= 3 ? 'var(--core_Orange)' : 'var(--bgSecondary)'}/>
+                            <Icon name={'star'} size={18}
+                                  color={hotel?.stars >= 4 ? 'var(--core_Orange)' : 'var(--bgSecondary)'}/>
+                            <Icon name={'star'} size={18}
+                                  color={hotel?.stars >= 5 ? 'var(--core_Orange)' : 'var(--bgSecondary)'}/>
+                        </div>
+                        <div className={styles.hotelCardName}>
+                            <p>{hotel?.name}</p>
+                        </div>
+                        <div className={styles.hotelCardImageInfoM}>
+                            <p><Icon name={'message'} size={14}
+                                     color="#000"/> {hotel.reviews_count > 0 ? `${hotel.reviews_count} отзывов` : 'нет отзывов'}
+                            </p>
+                            {hotel?.rating > 0 && (
+                                <p>{hotel.rating}</p>
+                            )}
+                        </div>
 
-            <div className={styles.hotelCardInfo}>
-                <div className={styles.hotelCardHead}>
-                    <div className={styles.hotelStart}>
-                        <Icon name={'star'} size={18}
-                              color={hotel?.stars >= 1 ? 'var(--core_Orange)' : 'var(--bgSecondary)'}/>
-                        <Icon name={'star'} size={18}
-                              color={hotel?.stars >= 2 ? 'var(--core_Orange)' : 'var(--bgSecondary)'}/>
-                        <Icon name={'star'} size={18}
-                              color={hotel?.stars >= 3 ? 'var(--core_Orange)' : 'var(--bgSecondary)'}/>
-                        <Icon name={'star'} size={18}
-                              color={hotel?.stars >= 4 ? 'var(--core_Orange)' : 'var(--bgSecondary)'}/>
-                        <Icon name={'star'} size={18}
-                              color={hotel?.stars >= 5 ? 'var(--core_Orange)' : 'var(--bgSecondary)'}/>
                     </div>
-                    <div className={styles.hotelCardName}>
-                        <p>{hotel?.name}</p>
+                    <div className={styles.hotelCardTags}>
+                        {TAGS?.map(tag => (
+                            <div className={styles.hotelCardTagItem} key={tag}>
+                                <p>{tag}</p>
+                            </div>
+                        ))}
                     </div>
-                    <div className={styles.hotelCardImageInfoM}>
-                        <p><Icon name={'message'} size={14}
-                                 color="#000"/> {hotel.reviews_count > 0 ? `${hotel.reviews_count} отзывов` : 'нет отзывов'}
-                        </p>
-                        {hotel?.rating > 0 && (
+                    <div className={styles.hotelCardPriceM}>
+                        <p>{analytics_min_price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '\u202F')}₽</p>
+                        <p>от {formattedDate}, на {min_price_nights} ночей</p>
+                    </div>
+
+                </div>
+                <div className={styles.hotelCardPrice}>
+                    <div className={styles.hotelCardImageInfo}>
+                        <p><Icon name={'message'} size={14} color="#000" /> {hotel.reviews_count > 0 ? `${hotel.reviews_count} отзывов`:'нет отзывов'}</p>
+                        {hotel?.rating > 0 &&(
                             <p>{hotel.rating}</p>
                         )}
                     </div>
-
-                </div>
-                <div className={styles.hotelCardTags}>
-                    {TAGS?.map(tag => (
-                        <div className={styles.hotelCardTagItem} key={tag}>
-                            <p>{tag}</p>
+                    <div className={styles.hotelCardCheckout}>
+                        <p>{analytics_min_price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '\u202F')}₽</p>
+                        <Button onClick={() => handleClick()} full={true} title={'Выбрать'}/>
+                        <div className={styles.hotelCardDate}>
+                            <p>c {formattedDate}, на {min_price_nights} ночей</p>
                         </div>
-                    ))}
-                </div>
-                <div className={styles.hotelCardPriceM}>
-                    <p>{analytics_min_price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '\u202F')}₽</p>
-                    <p>от {formattedDate}, на {min_price_nights} ночей</p>
-                </div>
-
-            </div>
-            <div className={styles.hotelCardPrice}>
-            <div className={styles.hotelCardImageInfo}>
-                    <p><Icon name={'message'} size={14} color="#000" /> {hotel.reviews_count > 0 ? `${hotel.reviews_count} отзывов`:'нет отзывов'}</p>
-                    {hotel?.rating > 0 &&(
-                        <p>{hotel.rating}</p>
-                    )}
-
-                </div>
-                <div className={styles.hotelCardCheckout}>
-                    <p>{analytics_min_price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '\u202F')}₽</p>
-                    <Button onClick={() => handleClick()} full={true} title={'Выбрать'}/>
-                    <div className={styles.hotelCardDate}>
-                        <p>c {formattedDate}, на {min_price_nights} ночей</p>
                     </div>
                 </div>
-
             </div>
-
-        </div>
-    );
+        );
+    }else{
+       return (
+           <div  className={styles.hotelCard}>
+               <div className={styles.image_placeholder}>
+               </div>
+               <div className={styles.hotelStart}>
+                   <Icon name={'star'} size={18} color={'var(--bgSecondary)'}/>
+                   <Icon name={'star'} size={18} color={'var(--bgSecondary)'}/>
+                   <Icon name={'star'} size={18} color={'var(--bgSecondary)'}/>
+                   <Icon name={'star'} size={18} color={'var(--bgSecondary)'}/>
+                   <Icon name={'star'} size={18} color={'var(--bgSecondary)'}/>
+               </div>
+               <div className={styles.animationTextlazy}></div>
+               <div className={styles.animationTextlazy2}></div>
+           </div>
+       )
+    }
 };
 
 export default HotelCard;

@@ -1,41 +1,12 @@
 import styles from '../searchPage.module.css';
-import Tag from "@/components/UI/tag";
 import { useState } from "react";
-import Select from "@/components/UI/select";
 import TrackPrices from "@/components/UI/trackPrices";
 import TicketItem from "@/components/ticketItem";
 import SelectedTour from "@/components/selectedTour";
 
-interface FilterItem {
-    id: number;
-    name: string;
-    active: boolean;
-    packages: any;
-
-}
 
 const ResultTicketList = ({flights,packages}:any) => {
-    const [filters, setFilters] = useState<FilterItem[]>([
-        { id: 1, name: 'Регулярный', active: true },
-        { id: 2, name: 'Без пересадок', active: false },
-    ]);
-    const [selected, setSelected] = useState(null);
     const [priceTrack, setPriceTrack] = useState(false);
-    const options = [{value:'RUB',name:'Российский рубль (₽)'},{value:'USD',name:'Доллар США ($)'}];
-
-    const handleFilterToggle = (id: number) => {
-        setFilters(prev =>
-            prev.map(filter =>
-                filter.id === id ? { ...filter, active: !filter.active } : filter
-            )
-        );
-    };
-
-    const removeAll =()=>{
-
-    }
-
-    console.log('packages',packages)
 
     return (
         <div className={styles.resultList}>
@@ -58,27 +29,35 @@ const ResultTicketList = ({flights,packages}:any) => {
                 {/*        icon={'trash'}*/}
                 {/*    />*/}
                 {/*</div>*/}
-                <div className={styles.resultListSorting}>
-                    <p>Найдено {flights?.length}</p>
-                    {/*<Select*/}
-                    {/*    options={options}*/}
-                    {/*    value={selected}*/}
-                    {/*    onChange={setSelected}*/}
-                    {/*    label={'Сортировка'}*/}
-                    {/*    placeholder="По рекомендации"/>*/}
-                </div>
-            </div>
+                {flights && flights.length > 0 ? (
+                    <div className={styles.resultListSorting}>
+                        <p>Найдено {flights?.length}</p>
+                    </div>
+                ): (
+                    <div className={styles.resultListSorting}>
+                        <div className={styles.animationTextlazy} style={{width:'30%'}}></div>
+                    </div>
+                )}
 
+            </div>
+            {flights && flights.length > 0 ? (
                 <div className={styles.resultListItems}>
-                    {flights.map((item,index) => (
+                    {flights.map((item, index) => (
                         <>
-                            <TicketItem price={packages.price} item={item} green={index===0}/>
+                            <TicketItem lazy={false} price={packages.price} item={item} green={index === 0}/>
                             {index === 4 && (
-                                <TrackPrices text={'Получайте автоматические оповещения при изменении цен.'} priceTrack={priceTrack} setPriceTrack={setPriceTrack}/>
+                                <TrackPrices text={'Получайте автоматические оповещения при изменении цен.'}
+                                             priceTrack={priceTrack} setPriceTrack={setPriceTrack}/>
                             )}
                         </>
                     ))}
                 </div>
+            ):(
+                <div className={styles.resultListItems}>
+                    <TicketItem lazy={true} price={0} item={null}/>
+                </div>
+            )}
+
         </div>
     );
 };

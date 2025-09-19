@@ -23,7 +23,7 @@ const ArrowTop = ({ onClick }: ArrowProps) => (
     </div>
 );
 
-const VerticalSlider = ({ images }: any) => {
+const VerticalSlider = ({ images ,loading}: any) => {
     const [selectedImage, setSelectedImage] = useState<string>("");
     const [currentSlide, setCurrentSlide] = useState(0);
 
@@ -109,7 +109,7 @@ const VerticalSlider = ({ images }: any) => {
         ],
     };
 
-
+if(loading){
     return (
         <div className={styles.container}>
             <div className={styles.sliderWrapper}>
@@ -145,6 +145,12 @@ const VerticalSlider = ({ images }: any) => {
             </div>
         </div>
     );
+}else{
+    return (
+        <div className={styles.image_placeholder}></div>
+    )
+}
+
 };
 
 export default VerticalSlider;

@@ -1,6 +1,7 @@
-import React, {useMemo} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import styles from './checkboxGroup.module.css';
 import Icon from "@/components/icons/Icon";
+import Checkbox from '@/components/UI/checkboxGroup/checkBox';
 
 interface Option {
     id: number | string;
@@ -16,7 +17,17 @@ interface CheckboxGroupProps {
     netPrice:number,
 }
 
+
 export default function CheckboxGroup({options, selected, onChange,name,pk,netPrice}: CheckboxGroupProps) {
+    useEffect(() => {
+        if(selected){
+            const values = Array.isArray(selected)
+                ? selected
+                : typeof selected === 'string'
+                    ? selected.split(',')
+                    : [];
+        }
+    }, [selected]);
 
     const handleToggle = (id: number | string) => {
         const selectedIds = options
@@ -28,6 +39,12 @@ export default function CheckboxGroup({options, selected, onChange,name,pk,netPr
             onChange(name,[...selectedIds, id].join(','));
         }
     };
+
+    const loacalActive = useMemo(() => {
+        if (selected && name === 'filter_hotel_type') {
+            return true
+        }
+    },[selected,name])
 
 
     const renderName =(item)=>{
@@ -89,8 +106,9 @@ export default function CheckboxGroup({options, selected, onChange,name,pk,netPr
     return (
         <div className={styles.wrapperGroupCheckbox}>
             {allOptions?.map((option) => !option.disabled && (
-                <div key={option.id} className={styles.checkboxItem}  >
-                    <Icon name={option.selected? 'checkBoxActive':'checkBox'} size={24} onClick={() => handleToggle(option.id || option.luggage_type || option.flight_class || option.number || option.flight_type)} />
+                <div key={option.id} className={styles.checkboxItem} >
+                    <Checkbox option={option} handleToggle={handleToggle} />
+                    {/*<Icon name={option.selected? 'checkBoxActive':'checkBox'} size={24} onClick={() => handleToggle(option.id || option.luggage_type || option.flight_class || option.number || option.flight_type)} />*/}
                     <div>
                         <p onClick={() => handleToggle(option.id || option.luggage_type || option.flight_class || option.number || option.flight_type)}>{renderName(option)}</p>
                         {!pk && (
@@ -103,6 +121,5 @@ export default function CheckboxGroup({options, selected, onChange,name,pk,netPr
                 </div>
             ))}
         </div>
-    )
-        ;
+    );
 }

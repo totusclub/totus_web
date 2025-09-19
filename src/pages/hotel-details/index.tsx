@@ -20,8 +20,6 @@ export default function HotelDetails() {
            const hotelInfo = await getHotelInfo(roomParans)
             setHotel(hotelInfo)
             setRooms(allRooms?.result)
-            console.log('hotelInfo',hotelInfo)
-            console.log('allRooms',allRooms)
         } catch (err) {
             console.error('Search failed:', err);
         } finally {
@@ -44,10 +42,11 @@ export default function HotelDetails() {
         <main className={'searchContainer'}>
             <Steps active={2}/>
             {/*<div className={'content'}>*/}
-                 <HotelDetailsHeader info={hotel}/>
-                 <HotelDetailsInfo rooms={rooms} images={hotel?.images || []} />
-                 <HotelDetailsDesc info={hotel} />
-                 <HotelDetailsRooms  rooms={rooms}/>
+                 <HotelDetailsHeader info={hotel} loading={loading}/>
+                 <HotelDetailsInfo rooms={rooms} panding={loading} images={hotel?.images || []} />
+                 <HotelDetailsDesc loading={loading} info={hotel} />
+                {!loading && (<HotelDetailsRooms  rooms={rooms}/>)}
+
                  {/*<HotelDetailsServices info={hotel}/>*/}
             {/*</div>*/}
         </main>

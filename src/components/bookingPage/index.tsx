@@ -47,8 +47,6 @@ const BookingCard = () => {
 
     useEffect(() => {
         if(packageData){
-            console.log('packageData',packageData.adults_count)
-            console.log('packageData',packageData.kids_count)
             let allTourist = [];
             for(let i=0; i<packageData?.adults_count; i++){
                     allTourist.push({

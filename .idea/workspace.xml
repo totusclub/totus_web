@@ -4,9 +4,36 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9b054eca-f19d-4e8b-ba86-c2382a8c8a86" name="Changes" comment="change baseurl">
+    <list default="true" id="9b054eca-f19d-4e8b-ba86-c2382a8c8a86" name="Changes" comment="delete account modal">
+      <change afterPath="$PROJECT_DIR$/src/components/UI/checkboxGroup/checkBox.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/styles/globals.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/styles/globals.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/UI/checkboxGroup/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/UI/checkboxGroup/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/UI/verticalSlide/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/UI/verticalSlide/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/UI/verticalSlide/verticalSlide.module.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/UI/verticalSlide/verticalSlide.module.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/bookingPage/booking.module.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/bookingPage/booking.module.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/bookingPage/bookingForm.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/bookingPage/bookingForm.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/bookingPage/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/bookingPage/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/bookingPage/orderCard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/bookingPage/orderCard.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/checkoutPage/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/checkoutPage/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/hotelCard/hotelCard.module.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/hotelCard/hotelCard.module.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/hotelCard/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/hotelCard/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/hotelDetails/hotelDetails.module.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/hotelDetails/hotelDetails.module.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/hotelDetails/hotelDetailsDesc/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/hotelDetails/hotelDetailsDesc/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/hotelDetails/hotelDetailsHeader/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/hotelDetails/hotelDetailsHeader/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/hotelDetails/hotelDetailsInfo/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/hotelDetails/hotelDetailsInfo/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/search/searchForm.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/search/searchForm.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/search/whereFrom.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/search/whereFrom.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/searchPage/searchPage.module.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/searchPage/searchPage.module.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/searchPage/searchResult/filters.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/searchPage/searchResult/filters.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/searchPage/searchResult/resultList.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/searchPage/searchResult/resultList.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/searchPage/searchResult/searchTicketList.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/searchPage/searchResult/searchTicketList.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/selectedTour/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/selectedTour/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/selectedTour/selectedtour.module.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/selectedTour/selectedtour.module.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/ticketItem/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/ticketItem/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/ticketItem/ticketItem.module.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/ticketItem/ticketItem.module.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hooks/useDepartureSearch.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/useDepartureSearch.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/hotel-details/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/hotel-details/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/departuresSlice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/departuresSlice.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -16,10 +43,10 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="JavaScript File" />
         <option value="tsconfig.json" />
         <option value="TypeScript File" />
         <option value="CSS File" />
+        <option value="JavaScript File" />
         <option value="TypeScript JSX File" />
       </list>
     </option>
@@ -50,24 +77,24 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "main",
-    "last_opened_file_path": "/Users/haykmaruqyan/Desktop/KEDAM/web/src/pages/profile/my-orders",
-    "list.type.of.created.stylesheet": "CSS",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "npm.build.executor": "Run",
-    "npm.dev.executor": "Run",
-    "ts.external.directory.path": "/Users/haykmaruqyan/Desktop/KEDAM/web/node_modules/typescript/lib",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/haykmaruqyan/Desktop/KEDAM/web&quot;,
+    &quot;list.type.of.created.stylesheet&quot;: &quot;CSS&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;npm.build.executor&quot;: &quot;Run&quot;,
+    &quot;npm.dev.executor&quot;: &quot;Run&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;/Users/haykmaruqyan/Desktop/KEDAM/web/node_modules/typescript/lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/src/pages/profile/my-orders" />
@@ -175,7 +202,19 @@
       <workItem from="1754123523616" duration="4566000" />
       <workItem from="1754582384084" duration="7847000" />
       <workItem from="1754635650327" duration="136000" />
-      <workItem from="1754898771917" duration="21557000" />
+      <workItem from="1754898771917" duration="22323000" />
+      <workItem from="1755271497192" duration="8352000" />
+      <workItem from="1755353557342" duration="715000" />
+      <workItem from="1755547029855" duration="15497000" />
+      <workItem from="1755804332687" duration="11841000" />
+      <workItem from="1756376865052" duration="1409000" />
+      <workItem from="1756472712204" duration="2441000" />
+      <workItem from="1756907576134" duration="6582000" />
+      <workItem from="1757347281332" duration="4288000" />
+      <workItem from="1757762069516" duration="7863000" />
+      <workItem from="1757789570353" duration="474000" />
+      <workItem from="1758127578549" duration="1590000" />
+      <workItem from="1758284097489" duration="15805000" />
     </task>
     <task id="LOCAL-00001" summary="added font">
       <option name="closed" value="true" />
@@ -249,7 +288,87 @@
       <option name="project" value="LOCAL" />
       <updated>1754948639381</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="change baseurl">
+      <option name="closed" value="true" />
+      <created>1754948753620</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1754948753620</updated>
+    </task>
+    <task id="LOCAL-00011" summary="change baseurl">
+      <option name="closed" value="true" />
+      <created>1755693860596</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1755693860596</updated>
+    </task>
+    <task id="LOCAL-00012" summary="change baseurl">
+      <option name="closed" value="true" />
+      <created>1755694369062</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1755694369062</updated>
+    </task>
+    <task id="LOCAL-00013" summary="change baseurl">
+      <option name="closed" value="true" />
+      <created>1755694398244</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1755694398244</updated>
+    </task>
+    <task id="LOCAL-00014" summary="change baseurl">
+      <option name="closed" value="true" />
+      <created>1755694588363</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1755694588363</updated>
+    </task>
+    <task id="LOCAL-00015" summary="change baseurl">
+      <option name="closed" value="true" />
+      <created>1755695478138</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1755695478138</updated>
+    </task>
+    <task id="LOCAL-00016" summary="delete account modal">
+      <option name="closed" value="true" />
+      <created>1755718373836</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1755718373836</updated>
+    </task>
+    <task id="LOCAL-00017" summary="delete account modal">
+      <option name="closed" value="true" />
+      <created>1755727176313</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1755727176313</updated>
+    </task>
+    <task id="LOCAL-00018" summary="delete account modal">
+      <option name="closed" value="true" />
+      <created>1756911082659</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1756911082659</updated>
+    </task>
+    <task id="LOCAL-00019" summary="delete account modal">
+      <option name="closed" value="true" />
+      <created>1757352183714</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1757352183714</updated>
+    </task>
+    <option name="localTasksCounter" value="20" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -261,6 +380,7 @@
     <MESSAGE value="meta desc" />
     <MESSAGE value="conected api" />
     <MESSAGE value="change baseurl" />
-    <option name="LAST_COMMIT_MESSAGE" value="change baseurl" />
+    <MESSAGE value="delete account modal" />
+    <option name="LAST_COMMIT_MESSAGE" value="delete account modal" />
   </component>
 </project>

@@ -39,6 +39,7 @@ const ResultList = ({tickets,loading,data}:ResultListProps) => {
     ]);
     const [selected, setSelected] = useState(null);
     const [priceTrack, setPriceTrack] = useState(false);
+
     const options = [{value:'RUB',name:'По рекомендации'},{value:'USD',name:'Высокий рейтинг'},{value:'low',name:'Сначала дешёвые'},{value:'low',name:'Сначала дорогие'}];
 
     const handleFilterToggle = (id: number) => {
@@ -56,46 +57,59 @@ const ResultList = ({tickets,loading,data}:ResultListProps) => {
     return (
         <div className={styles.resultList}>
             <Progress title={'Ищем подходящие туры'} loading={loading} />
+            {!loading  && (
             <div className={styles.resultListSelectedFilter}>
-                {filters.length > 0 &&(
-                <div className={styles.selectedFiltersList}>
-                    {filters.map((item) => (
-                        <Tag
-                            key={item.id}
-                            title={item.name}
-                            active={item.active}
-                            onClick={() => handleFilterToggle(item.id)}
-                        />
-                    ))}
+                {/*{filters.length > 0 &&(*/}
+                {/*<div className={styles.selectedFiltersList}>*/}
+                {/*    {filters.map((item) => (*/}
+                {/*        <Tag*/}
+                {/*            key={item.id}*/}
+                {/*            title={item.name}*/}
+                {/*            active={item.active}*/}
+                {/*            onClick={() => handleFilterToggle(item.id)}*/}
+                {/*        />*/}
+                {/*    ))}*/}
 
-                        <Tag
-                            key={12345}
-                            title={'Очистить все'}
-                            active={false}
-                            onClick={() => removeAll()}
-                            icon={'trash'}
-                        />
+                {/*        <Tag*/}
+                {/*            key={12345}*/}
+                {/*            title={'Очистить все'}*/}
+                {/*            active={false}*/}
+                {/*            onClick={() => removeAll()}*/}
+                {/*            icon={'trash'}*/}
+                {/*        />*/}
 
-                </div>
-                    )}
-                <div className={styles.resultListSorting}>
-                    <p>Найдено {data?.hotels_count || 0} отеля</p>
-                    {/*<Select*/}
-                    {/*    type={'designMob'}*/}
-                    {/*    options={options}*/}
-                    {/*    value={selected}*/}
-                    {/*    onChange={setSelected}*/}
-                    {/*    label={'Сортировка'}*/}
-                    {/*    placeholder="По рекомендации"/>*/}
-                </div>
+                {/*</div>*/}
+                {/*    )}*/}
+
+                    <div className={styles.resultListSorting}>
+                        <p>Найдено {data?.hotels_count || 0} отеля</p>
+                        {/*<Select*/}
+                        {/*    type={'designMob'}*/}
+                        {/*    options={options}*/}
+                        {/*    value={selected}*/}
+                        {/*    onChange={setSelected}*/}
+                        {/*    label={'Сортировка'}*/}
+                        {/*    placeholder="По рекомендации"/>*/}
+                    </div>
+
             </div>
+                    )}
             {/*{tickets ? (*/}
-                <div className={styles.resultListItems}>
-                    {resultData.map((item,index) => (
-                        <>
-                            <HotelCard key={item.id} request_id={data?.request_id} item={item} />
-                            {index === 4 && (
-                                <TrackPrices text={'Получайте автоматические оповещения при изменении цен.'} priceTrack={priceTrack} setPriceTrack={setPriceTrack}/>
+            <div className={styles.resultListItems}>
+                {loading && (
+                    <>
+                        <HotelCard lazy={true}  request_id={data?.request_id} item={null}/>
+                        <HotelCard lazy={true}  request_id={data?.request_id} item={null}/>
+                        <HotelCard lazy={true}  request_id={data?.request_id} item={null}/>
+                    </>
+                )}
+
+                {!loading && resultData.map((item, index) => (
+                    <>
+                        <HotelCard  key={item.id} request_id={data?.request_id} item={item}/>
+                        {index === 4 && (
+                            <TrackPrices text={'Получайте автоматические оповещения при изменении цен.'}
+                                         priceTrack={priceTrack} setPriceTrack={setPriceTrack}/>
                             )}
                         </>
                     ))}

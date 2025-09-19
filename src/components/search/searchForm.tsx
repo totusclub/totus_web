@@ -120,15 +120,16 @@ const SearchForm = ({ header,pageName}: SearchFormProps) => {
 
     const handleChange = (value: string | number | number[], key: keyof SearchParams,type:string) => {
         if(key === 'from_city'){
+            console.log('value',value)
             setParams((prev) => ({
                 ...prev,
-                from_city: value?.name_en,
+                // from_city: value?.name_en,
                 from_country:value?.iso2
             }));
         }else if(key === 'to_city'){
-            console.log('type',type)
-            console.log('value',value)
-            console.log('key',key)
+            // console.log('type',type)
+            // console.log('value',value)
+            // console.log('key',key)
             if(type === 'countries'){
                 delete params.hotel_ids
                 setParams((prev) => ({

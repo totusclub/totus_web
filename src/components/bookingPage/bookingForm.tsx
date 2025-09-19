@@ -91,6 +91,7 @@ const BookingOrderForm = ({params,handleChangeTourist,handleChange}) => {
             <div className={styles.bookingFormCard}>
                 <p className={styles.bookingFormCardTitle}>Контакты покупателя</p>
                 <p className={styles.bookingFormCardSubTitle}>Для получения документов к туру</p>
+                {params && params?.tourist.length > 0 ? (
                 <div className={styles.bookingFormInputs}>
                     <Input
                         placeholder={'Электронная почта'}
@@ -103,6 +104,12 @@ const BookingOrderForm = ({params,handleChangeTourist,handleChange}) => {
                         onChange={(e: string | number) => handleChange(e, 'phone')}
                     />
                 </div>
+               ): (
+                    <div className={styles.bookingFormInputs}>
+                        <div className={styles.fildeLazy}></div>
+                        <div className={styles.fildeLazy}></div>
+                    </div>
+                )}
             </div>
 
             <div className={styles.bookingFormCard}>
@@ -110,83 +117,104 @@ const BookingOrderForm = ({params,handleChangeTourist,handleChange}) => {
                 <p className={styles.bookingFormCardSubTitle}>
                     Заполните данные в точности так, как в документе, по которому полетите
                 </p>
-                <div className={styles.bookingLineForm} />
+                <div className={styles.bookingLineForm}/>
+                {params && params?.tourist.length > 0 ? (
+                    <>
+                        {params.tourist.map((_, index) => (
+                            <div key={index} className={styles.bookingFormInputsList}>
+                                <div className={styles.bookingFormTourist}>
+                                    <div className={styles.bookingFormTouristInfo}>
+                                        <p>Взрослый</p>
+                                        <p>старше 17 лет</p>
+                                    </div>
+                                </div>
 
-                {params.tourist.map((_, index) => (
-                    <div key={index} className={styles.bookingFormInputsList}>
-                        <div className={styles.bookingFormTourist}>
-                            <div className={styles.bookingFormTouristInfo}>
-                                <p>Взрослый</p>
-                                <p>старше 17 лет</p>
+                                <div className={styles.bookingFormInputs}>
+                                    <Input
+                                        placeholder={'Фамилия латиницей'}
+                                        value={params.tourist[index].surname}
+                                        onChange={(e: string | number) => handleChangeTourist(e, 'surname', index)}
+                                    />
+                                    <Input
+                                        placeholder={'Имя латиницей'}
+                                        value={params.tourist[index].name}
+                                        onChange={(e: string | number) => handleChangeTourist(e, 'name', index)}
+                                    />
+                                    <Input
+                                        placeholder={'Отчество латиницей'}
+                                        value={params.tourist[index].patronymic}
+                                        onChange={(e: string | number) => handleChangeTourist(e, 'patronymic', index)}
+                                    />
+                                </div>
+                                <div className={styles.bookingFormInputs}>
+                                    <Input
+                                        placeholder={'Дата рождения (01.07.2030)'}
+                                        value={params.tourist[index].birthday}
+                                        onChange={(e: string | number) => handleChangeTourist(e, 'birthday', index)}
+                                    />
+                                    <Options
+                                        title={'Пол:'}
+                                        defoultValue={params.tourist[index].gender}
+                                        options={genderOptions}
+                                        onSelect={(option) => handleChangeTourist(option.id, 'gender', index)}
+                                    />
+
+                                </div>
+
+                                <div className={styles.bookingFormInputs}>
+                                    <Select
+                                        isFull
+                                        options={options}
+                                        value={selected}
+                                        onChange={setSelected}
+                                        label="Гражданство"
+                                        placeholder="Россия"
+                                    />
+                                    <Select
+                                        isFull={true}
+                                        options={options}
+                                        value={selected}
+                                        onChange={setSelected}
+                                        label={'Документ'}
+                                        placeholder="Заграничный паспорт РФ"
+                                    />
+                                </div>
+
+                                <div className={styles.bookingFormInputs}>
+                                    <Input
+                                        placeholder={'Серия и номер документа'}
+                                        value={params.tourist[index].passport_number}
+                                        type={'number'}
+                                        onChange={(e: string | number) => handleChangeTourist(e, 'passport_number', index)}
+                                    />
+                                    <Input
+                                        placeholder={'Срок действия'}
+                                        value={params.tourist[index].passport_expires_on}
+                                        onChange={(e: string | number) => handleChangeTourist(e, 'passport_expires_on', index)}
+                                    />
+                                </div>
+                            </div>
+                        ))}
+                    </>
+
+                ):(
+                    <div className={styles.bookingFormInputsList}>
+                        <div className={styles.bookingFormTouristLazy}>
+                            <div style={{width:'100%'}}>
+                                <div className={styles.animationTextLazy} style={{width:'20%'}}></div>
+                                <div className={styles.animationTextLazy} style={{width:'30%'}}> </div>
+                            </div>
+                            <div className={styles.bookingFormInputs} style={{width:'100%'}}>
+                                <div className={styles.fildeLazy}></div>
+                                <div className={styles.fildeLazy}></div>
+                                <div className={styles.fildeLazy}></div>
+                                <div className={styles.fildeLazy}></div>
+                                <div className={styles.fildeLazy}></div>
+                                <div className={styles.fildeLazy}></div>
                             </div>
                         </div>
-
-                        <div className={styles.bookingFormInputs}>
-                            <Input
-                                placeholder={'Фамилия латиницей'}
-                                value={params.tourist[index].surname}
-                                onChange={(e: string | number) => handleChangeTourist(e, 'surname', index)}
-                            />
-                            <Input
-                                placeholder={'Имя латиницей'}
-                                value={params.tourist[index].name}
-                                onChange={(e: string | number) => handleChangeTourist(e, 'name', index)}
-                            />
-                            <Input
-                                placeholder={'Отчество латиницей'}
-                                value={params.tourist[index].patronymic}
-                                onChange={(e: string | number) => handleChangeTourist(e, 'patronymic', index)}
-                            />
-                        </div>
-                        <div className={styles.bookingFormInputs}>
-                            <Input
-                                placeholder={'Дата рождения (01.07.2030)'}
-                                value={params.tourist[index].birthday}
-                                onChange={(e: string | number) => handleChangeTourist(e, 'birthday', index)}
-                            />
-                            <Options
-                                title={'Пол:'}
-                                defoultValue={params.tourist[index].gender}
-                                options={genderOptions}
-                                onSelect={(option) => handleChangeTourist(option.id, 'gender', index)}
-                            />
-
-                        </div>
-
-                        <div className={styles.bookingFormInputs}>
-                            <Select
-                                isFull
-                                options={options}
-                                value={selected}
-                                onChange={setSelected}
-                                label="Гражданство"
-                                placeholder="Россия"
-                            />
-                            <Select
-                                isFull={true}
-                                options={options}
-                                value={selected}
-                                onChange={setSelected}
-                                label={'Документ'}
-                                placeholder="Заграничный паспорт РФ"
-                            />
-                        </div>
-
-                        <div className={styles.bookingFormInputs}>
-                            <Input
-                                placeholder={'Серия и номер документа'}
-                                value={params.tourist[index].passport_number}
-                                type={'number'}
-                                onChange={(e: string | number) => handleChangeTourist(e, 'passport_number', index)}
-                            />
-                            <Input
-                                placeholder={'Срок действия'}
-                                value={params.tourist[index].passport_expires_on}
-                                onChange={(e: string | number) => handleChangeTourist(e, 'passport_expires_on', index)}
-                            />
-                        </div>
                     </div>
-                ))}
+                )}
             </div>
         </div>
     );

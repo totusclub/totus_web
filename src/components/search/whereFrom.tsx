@@ -45,8 +45,8 @@ const WhereFrom = ({handleChange,value,name}) => {
         }
     }, [isOpen]);
     // if (status === "loading") return <p>Loading...</p>;
-    if (status === "failed") return <p>Error: {error}</p>;
-
+    // if (status === "failed") return <p>Error: {error}</p>;
+    console.log('results',results)
     return (
         <div className={`${styles.searchField} ${styles.whereFrom}`} ref={wrapperRef} onClick={handleToggle}>
             <Icon name="from" size={24} color="#000" />
@@ -90,7 +90,24 @@ const WhereFrom = ({handleChange,value,name}) => {
                     </div>
 
                     {searchValue.trim() === "" ? (
-                        <p  className={styles.noResults}>Введите город или аэропорт</p>
+                        // <p  className={styles.noResults}>Введите город или аэропорт</p>
+                        results.map((item) => {
+                            if (item.prioritized) {
+                                return (
+                                    <div
+                                        key={item.id}
+                                        onClick={() => handleSelect(item)}
+                                        className={styles.locationItem}
+                                    >
+                                        <Icon name={item.icon} size={24} color="#000" />
+                                        <div>
+                                            <p className={styles.locationItemName}>{item.name}</p>
+                                            <p className={styles.locationItemType}>{item.type}</p>
+                                        </div>
+                                    </div>
+                                );
+                            }
+                        })
                     ) : results.length > 0 ? (
                         results.map((item) => (
                             <div

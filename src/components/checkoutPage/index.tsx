@@ -13,13 +13,10 @@ const CheckoutScreen = () => {
     const [order, setOrder] = useState(null);
     useEffect(() => {
         if(router.query.order_id){
-            console.log(router.query.order_id)
             getOrder(router.query.order_id).then(e=>{
-                console.log('getOrder',e?.package);
                 setOrder(e?.package);
             })
         }
-
     },[router])
     return (
         <div className={'content'}>

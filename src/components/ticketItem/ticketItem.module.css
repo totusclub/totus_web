@@ -72,20 +72,22 @@
     justify-content: flex-end;
 }
 .ticketItemLogo{
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    /*border-radius: 50%;*/
+    /*border:1px solid red;*/
+
     /*background: var(--secondary_yellow);*/
 }
 .ticketItemLogo>img{
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
 }
 .ticketItemDate>p:nth-child(1){
     color: var(--textPrimary);
     /*font-family: "Golos Text";*/
-    font-size: 16px;
+    font-size: 13px;
     font-style: normal;
     font-weight: 500;
     line-height: 20px; /* 125% */
@@ -94,7 +96,7 @@
 .ticketItemDate>p:nth-child(2){
     color: var(--textTertiary);
     /*font-family: "Golos Text";*/
-    font-size: 14px;
+    font-size: 12px;
     font-style: normal;
     font-weight: 400;
     line-height: 18px; /* 128.571% */
@@ -223,5 +225,82 @@
     .ticketItemDetails{
         display: none;
     }
+    .animationImagelazy{
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(
+                90deg,
+                #f0f0f0 25%,
+                #e0e0e0 37%,
+                #f0f0f0 63%
+        );
+        background-size: 400% 100%; /* Important for shimmer effect */
+        animation: placeholderShimmer 1.5s ease-in-out infinite;
+        border-radius: 8px;
+        margin-top: 12px;
+    }
+    .animationTextlazy{
+        /*width: 40%;*/
+        height: 8px;
+        background: linear-gradient(
+                90deg,
+                #f0f0f0 25%,
+                #e0e0e0 37%,
+                #f0f0f0 63%
+        );
+        background-size: 400% 100%; /* Important for shimmer effect */
+        animation: placeholderShimmer 1.5s ease-in-out infinite;
+        border-radius: 8px;
+        margin-top: 12px;
+    }
+    .leazyButton{
+        width: 100%;
+        height: 50px;
+        background: linear-gradient(
+                90deg,
+                #f0f0f0 25%,
+                #e0e0e0 37%,
+                #f0f0f0 63%
+        );
+        background-size: 400% 100%; /* Important for shimmer effect */
+        animation: placeholderShimmer 1.5s ease-in-out infinite;
+        border-radius: 30px;
+        margin-top: 12px;
+    }
+    .animationTaglazy{
+        height: 20px;
+        background: linear-gradient(
+                90deg,
+                #f0f0f0 25%,
+                #e0e0e0 37%,
+                #f0f0f0 63%
+        );
+        background-size: 400% 100%; /* Important for shimmer effect */
+        animation: placeholderShimmer 1.5s ease-in-out infinite;
+        border-radius: 8px;
+        margin-top: 12px;
+    }
+    .animationRow{
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        margin-top: 8px;
+    }
+    .ticketItemPriceLoad{
+        align-items: flex-end;
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+    }
+}
 
+
+
+@keyframes placeholderShimmer {
+    0% {
+        background-position: -100% 0;
+    }
+    100% {
+        background-position: 100% 0;
+    }
 }
