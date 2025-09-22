@@ -143,15 +143,19 @@ const HotelCard = ({item,request_id,lazy}: HotelCardState) => {
 
 
     const showImage = useMemo(() => {
-        if(hotel?.images.length > 0){
-           return  hotel?.images?.[0]['x500'];
+        if (hotel?.images?.length > 0) {
+            let path = hotel.images[0]?.x500 || "";
+            // Remove the prefix
+            // console.log('path.replace("https://img.cdn.level.travel/", "")',path.replace("https://img.cdn.level.travel/", ""));
+            return path.replace("https://img.cdn.level.travel/", "");
         }
-    },[hotel])
+        return "";
+    }, [hotel]);
 
     if(!lazy){
         return (
             <div onClick={()=>handleClick()} className={styles.hotelCard}>
-                <div className={styles.hotelCardImage} style={{backgroundImage: `url(${showImage})`}}/>
+                <div className={styles.hotelCardImage} style={{backgroundImage: `url(https://image.totus.club/imagePath?directory=${showImage})`}}/>
 
                 <div className={styles.hotelCardInfo}>
                     <div className={styles.hotelCardHead}>

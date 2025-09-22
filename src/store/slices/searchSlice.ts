@@ -48,7 +48,7 @@ export const runFullSearchFlow = createAsyncThunk(
                                 filters = { ...filters, ...filterParams };
                             }
 
-                            const hotels = await getGroupedHotels(filters);
+                            const hotels = await getGroupedHotels({...filters});
                             resolve({...hotels,...filters});
                         }
                     } catch (err) {

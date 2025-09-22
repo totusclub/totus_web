@@ -32,6 +32,8 @@ interface SearchParams {
     kids_ages: number[];
     search_type: string;
     hotel_ids: number[];
+    page_number:number;
+    page_limit:number;
 }
 
 
@@ -52,6 +54,8 @@ const SearchForm = ({ header,pageName}: SearchFormProps) => {
         // kids: '1',
         // kids_ages: ['8'],
         search_type: 'package',
+        page_limit:20,
+        page_number:1
         // hotel_ids:[9069464]
     });
 
@@ -64,7 +68,6 @@ const SearchForm = ({ header,pageName}: SearchFormProps) => {
         const dayPlus =  params?.nights?.split('..')?.[0] || params?.nights;
         const interval =  calculateStayDates(plus7,+dayPlus);
         setParams({...params, ...interval});
-        console.log('interval',interval);
     },[])
 
     function calculateStayDates(startDateStr, nightCount) {
@@ -89,7 +92,6 @@ const SearchForm = ({ header,pageName}: SearchFormProps) => {
     useEffect(() => {
         if (router.isReady && pageName === 'search' || pageName === 'home') {
             const parsed = parseSearchParams(router.query);
-
             if (parsed?.to_city) {
                 setParams(prev => ({ ...prev, ...parsed }));
             } else {
@@ -97,7 +99,7 @@ const SearchForm = ({ header,pageName}: SearchFormProps) => {
                 const { to_city: _, ...restParsed } = parsed || {};
                 setParams({ ...restParams, ...restParsed });
             }
-
+            console.log('parsed',parsed);
             if(Object.keys(parsed).length > 0){
                 startSearch(parsed)
             }else{
@@ -111,30 +113,28 @@ const SearchForm = ({ header,pageName}: SearchFormProps) => {
         }
     }, [router.isReady,pageName]);
 
-    const startSearch = async (data) => {
+    const startSearch = async (data: SearchParams) => {
         dispatch(runFullSearchFlow({
             searchParams: data,
-            filterParams: { filter_instant_confirm: false }
+            filterParams: {
+                filter_instant_confirm: false,
+                page_number: data.page_number,
+                page_limit: data.page_limit
+            }
         }));
     }
 
     const handleChange = (value: string | number | number[], key: keyof SearchParams,type:string) => {
         if(key === 'from_city'){
-            console.log('value',value)
             setParams((prev) => ({
                 ...prev,
-                // from_city: value?.name_en,
                 from_country:value?.iso2
             }));
         }else if(key === 'to_city'){
-            // console.log('type',type)
-            // console.log('value',value)
-            // console.log('key',key)
             if(type === 'countries'){
                 delete params.hotel_ids
                 setParams((prev) => ({
                     ...prev,
-                    // to_city: value?.name_en,
                     to_country:value?.iso2
                 }));
             }
@@ -154,16 +154,12 @@ const SearchForm = ({ header,pageName}: SearchFormProps) => {
                     hotel_ids:[value.id]
                 }));
             }
-
         }else if(key === 'form_date'){
             const dayPlus =  params?.nights?.split('..')?.[0] || params?.nights;
-            console.log('dayPlus',dayPlus,value)
             const interval =  calculateStayDates(value,+dayPlus);
-            console.log('interval',interval)
             setParams({...params, ...interval});
         }else if(key === 'nights'){
             const interval =  calculateStayDates(params?.start_date,+value);
-            console.log('interval',interval)
             setParams({...params, ...interval,nights:value});
         }else if(key === 'adults'){
             setParams({...params, adults:value});
@@ -178,9 +174,6 @@ const SearchForm = ({ header,pageName}: SearchFormProps) => {
             }
             setParams({...params, kids:value,kids_ages:kids_ages});
         }
-
-        console.log('key',key)
-
     };
 
     const handleClick = () => {

@@ -8,8 +8,10 @@ import {searchFilters} from "@/store/slices/searchSlice";
 import {useDispatch} from "react-redux";
 import Icon from "@/components/icons/Icon";
 import Button from "@/components/UI/button";
+import {useRouter} from 'next/router';
 
 const Filters = ({selectedFilters,allFilters,statistics}:any) => {
+    const router = useRouter();
     const dispatch = useDispatch();
     const [mobileModal,setMobileModal]=useState(false);
     const [price, setPrice] = useState([20,100]);
@@ -40,22 +42,35 @@ const Filters = ({selectedFilters,allFilters,statistics}:any) => {
 
 
     const onChangeFilters = (key:string,value:string | boolean | number[])=>{
-
-        console.log('key',key,'value',value);
         if(key === 'price'){
             let priceUpdate = {
                 ...filters,
                 ...selectedFilters,
                 filter_price_min:value[0],
-                filter_price_max:value[1]
+                filter_price_max:value[1],
+                page_limit:20,
+                page_number:1
             }
             setFilters(priceUpdate)
             dispatch(searchFilters(priceUpdate))
         }else{
-            let paramsFilter = {...filters,...selectedFilters,[key]:value}
+            let paramsFilter = {...filters,...selectedFilters,[key]:value, page_limit:20, page_number:1}
             setFilters(paramsFilter)
             dispatch(searchFilters(paramsFilter))
         }
+        const newQuery = {
+            ...router.query,
+            page_number: 1,
+        };
+
+        router.push(
+            {
+                pathname: router.pathname,
+                query: newQuery,
+            },
+            undefined,
+            { scroll: false }
+        );
 
     }
 
@@ -64,6 +79,31 @@ const Filters = ({selectedFilters,allFilters,statistics}:any) => {
             return allFilters?.instant_confirm.find(item=>item.selected).id
         }
     },[allFilters])
+
+
+    useEffect(() => {
+        if (!router.isReady) return;
+
+        const pageNumber = parseInt((router.query.page_number as string) || "1", 10);
+        if(pageNumber > 1){
+            console.log('loadmore');
+            let paramsFilter = {...filters,...selectedFilters, page_limit:20, page_number:pageNumber}
+            setFilters(paramsFilter)
+            dispatch(searchFilters(paramsFilter))
+        }
+
+
+        // When page_number changes, trigger search again
+        // dispatch(runFullSearchFlow({
+        //     searchParams: params,
+        //     filterParams: {
+        //         filter_instant_confirm: false,
+        //         page_number: pageNumber,
+        //         page_limit: pageLimit
+        //     }
+        // }));
+    }, [router.query.page_number]);
+
 
     return (
         <>

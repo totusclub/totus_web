@@ -29,7 +29,7 @@ const VerticalSlider = ({ images ,loading}: any) => {
 
     useEffect(() => {
         if (images?.length > 0) {
-            setSelectedImage(`https://img.cdn.level.travel/${images[0]['x500']}`);
+            setSelectedImage(`https://image.totus.club/imagePath?directory=${images[0]['x500']}`);
         }
     }, [images]);
 
@@ -118,15 +118,15 @@ if(loading){
                         <div
                             key={index}
                             onClick={() =>
-                                setSelectedImage(`https://img.cdn.level.travel/${img['x500']}`)
+                                setSelectedImage(`https://image.totus.club/imagePath?directory=${img['x500']}`)
                             }
                         >
                             <img
-                                src={`https://img.cdn.level.travel/${img['x500']}`}
+                                src={`https://image.totus.club/imagePath?directory=${img['x500']}`}
                                 alt={`Thumb ${index}`}
                                 className={`${styles.thumbnail} ${
                                     selectedImage ===
-                                    `https://img.cdn.level.travel/${img['x500']}`
+                                    `https://image.totus.club/imagePath?directory=${img['x500']}`
                                         ? styles.selectedThumbnail
                                         : ''
                                 }`}
