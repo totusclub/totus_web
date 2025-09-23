@@ -5,12 +5,14 @@ import Collapse from "@/components/UI/collapse";
 import CheckboxGroup from "@/components/UI/checkboxGroup";
 import RangeInput from "@/components/UI/rangeInput";
 import {searchFilters} from "@/store/slices/searchSlice";
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from 'react-redux';
 import Icon from "@/components/icons/Icon";
 import Button from "@/components/UI/button";
 import {useRouter} from 'next/router';
+import {RootState} from '@/store';
 
 const Filters = ({selectedFilters,allFilters,statistics}:any) => {
+    const { hotels, loading} = useSelector((state: RootState) => state.search);
     const router = useRouter();
     const dispatch = useDispatch();
     const [mobileModal,setMobileModal]=useState(false);
@@ -18,7 +20,8 @@ const Filters = ({selectedFilters,allFilters,statistics}:any) => {
     const [km, setKm] = useState([20,60]);
     const [meter, setMeter] = useState([20,60]);
     const [filters,setFilters] = useState({
-        filter_instant_confirm:false
+        filter_instant_confirm:false,
+        filter_stars:'3,4,5'
     })
 
 
@@ -85,7 +88,7 @@ const Filters = ({selectedFilters,allFilters,statistics}:any) => {
         if (!router.isReady) return;
 
         const pageNumber = parseInt((router.query.page_number as string) || "1", 10);
-        if(pageNumber > 1){
+        if(pageNumber > 1 && hotels?.length/20 < pageNumber ){
             console.log('loadmore');
             let paramsFilter = {...filters,...selectedFilters, page_limit:20, page_number:pageNumber}
             setFilters(paramsFilter)

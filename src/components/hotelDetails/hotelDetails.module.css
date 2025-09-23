@@ -418,13 +418,25 @@
     align-items: center;
     gap: 4px;
 }
+.HotelDetailsRoomfacilities{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.HotelDetailsRoomfacilitiesItem{
+    padding: 4px 8px;
+    background: var(--bgSecondary);
+    font-size: 11px;
+    color: var(--textSecondary);
+    border-radius: 8px;
+}
 .HotelDetailsRoomOption>p{
     color: var(--textSecondary);
     /*font-family: "Golos Text";*/
-    font-size: 16px;
+    font-size: 14px;
     font-style: normal;
     font-weight: 400;
-    line-height: 20px; /* 125% */
+    line-height: 17px; /* 125% */
     letter-spacing: -0.32px;
 
 }

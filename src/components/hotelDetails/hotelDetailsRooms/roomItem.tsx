@@ -4,7 +4,7 @@ import Icon from "@/components/icons/Icon";
 import HotelDetailsPriceList from "@/components/hotelDetails/hotelDetailsRooms/priceList";
 import SmallSlider from "@/components/UI/smallSlide";
 import Image from "next/image";
-import {useEffect, useMemo, useState} from "react";
+import React, {useEffect, useMemo, useState} from "react";
 
 const HotelDetailsRoomItem = ({item,selectedDate}:any) => {
     const [selectedOperator, setSelectedOperator] = useState<number | null>(null);
@@ -46,28 +46,36 @@ const HotelDetailsRoomItem = ({item,selectedDate}:any) => {
                     <SmallSlider images={item?.room?.images}/>
                 ) : (
                     <div className={styles.HotelDetailsRoomImage}>
-                        <img alt={'imag'}
-                             src={'https://www.staysomedays.com/wp-content/uploads/2021/12/hotel-grof-800x800.jpg'}/>
+                        <img
+                            src={`https://image.totus.club/imagePath?directory=${item?.room?.images?.[0]?.['x900']?.replace('https://img.cdn.level.travel/', '')}`}
+                            alt={`No Image`}/>
                     </div>
                 )}
 
                 <div className={styles.HotelDetailsRoomInforamation}>
                     <p>{item?.room?.name_ru}</p>
                     <div className={styles.HotelDetailsRoomOptions}>
+                        {/*<div className={styles.HotelDetailsRoomOption}>*/}
+                        {/* */}
+                        {/*</div>*/}
                         <div className={styles.HotelDetailsRoomOption}>
-                            <Icon name={'verify'}/>
-                            <p>Без питания, завтрак, завтрак и обед или ужин</p>
+                            {/*<Icon name={'light'}/>*/}
+                            <p>{item?.room?.description}</p>
                         </div>
-                        <div className={styles.HotelDetailsRoomOption}>
-                            <Icon name={'light'}/>
-                            <p>Быстрое подтверждение</p>
+                        <div className={styles.HotelDetailsRoomfacilities}>
+                            {item?.room?.facilities?.map((f, i) => (
+                                <div key={i} className={styles.HotelDetailsRoomfacilitiesItem}>
+                                    <p >{f.name}</p>
+                                </div>
+                            ))}
                         </div>
                     </div>
 
                 </div>
             </div>
 
-            <TourAgents agents={roomItems?.operators} selectedOperator={selectedOperator} setSelectedOperator={setSelectedOperator}/>
+            <TourAgents agents={roomItems?.operators} selectedOperator={selectedOperator}
+                        setSelectedOperator={setSelectedOperator}/>
 
             {Object.entries(item?.offers)?.map(([type, offer], index) =>
                     <HotelDetailsPriceList key={index} selectedOperator={selectedOperator} selectedDate={selectedDate} item={roomItems?.offersRoom} type={type}  />

@@ -45,7 +45,7 @@ export default function AppImage({ imageUrl }: Props) {
     }, [imageUrl]);
 
     return (
-        <div style={{ width: "100%", position: "relative" }}>
+        <div className={'mobHide'} style={{ width: "100%", position: "relative" }}>
             <div
                 style={{
                     width: "100%",
@@ -54,18 +54,27 @@ export default function AppImage({ imageUrl }: Props) {
                     borderRadius:12
                 }}
             >
-                <canvas
-                    ref={canvasRef}
-                    style={{
-                        position: "absolute",
-                        top: 0,
-                        left: 0,
-                        width: "100%",
-                        height: "100%",
-                        display: "block",
-                        borderRadius:12
-                    }}
-                />
+                <img src={imageUrl} alt=""   style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    width: "100%",
+                    height: "100%",
+                    display: "block",
+                    borderRadius:12
+                }}/>
+                {/*<canvas*/}
+                {/*    ref={canvasRef}*/}
+                {/*    style={{*/}
+                {/*        position: "absolute",*/}
+                {/*        top: 0,*/}
+                {/*        left: 0,*/}
+                {/*        width: "100%",*/}
+                {/*        height: "100%",*/}
+                {/*        display: "block",*/}
+                {/*        borderRadius:12*/}
+                {/*    }}*/}
+                {/*/>*/}
             </div>
         </div>
     );

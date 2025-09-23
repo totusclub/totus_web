@@ -7,8 +7,9 @@ import WhereFrom from "@/components/search/whereFrom";
 import SelectDate from "@/components/search/date";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from 'react-redux';
 import {runFullSearchFlow} from "@/store/slices/searchSlice";
+import {RootState} from '@/store';
 
 interface SearchFormProps {
     header?: boolean;
@@ -38,6 +39,7 @@ interface SearchParams {
 
 
 const SearchForm = ({ header,pageName}: SearchFormProps) => {
+    const { hotels, loading} = useSelector((state: RootState) => state.search);
     const dispatch = useDispatch();
     const router = useRouter();
     const [params, setParams] = useState<SearchParams>({
@@ -114,14 +116,20 @@ const SearchForm = ({ header,pageName}: SearchFormProps) => {
     }, [router.isReady,pageName]);
 
     const startSearch = async (data: SearchParams) => {
-        dispatch(runFullSearchFlow({
-            searchParams: data,
-            filterParams: {
-                filter_instant_confirm: false,
-                page_number: data.page_number,
-                page_limit: data.page_limit
-            }
-        }));
+        console.log('hotels',hotels);
+        if(+data?.page_number === 1 && !hotels){
+            dispatch(runFullSearchFlow({
+                searchParams: data,
+                filterParams: {
+                    filter_instant_confirm: false,
+                    page_number: data.page_number,
+                    page_limit: data.page_limit,
+                    filter_stars:'3,4,5',
+                    filter_meals:'AI'
+                }
+            }));
+        }
+
     }
 
     const handleChange = (value: string | number | number[], key: keyof SearchParams,type:string) => {

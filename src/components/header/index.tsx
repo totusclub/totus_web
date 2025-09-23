@@ -49,7 +49,14 @@ const Header = () => {
     },[pathname])
 
     const handleGoBack = () => {
-        router.back();
+        const segments = pathname.split('/').filter(Boolean); // removes empty strings
+        const pageName =  segments[segments.length - 1] || 'home';
+        if(pageName === 'search'){
+            router.push('/');
+        }else{
+            router.back();
+        }
+
     };
 
     return (

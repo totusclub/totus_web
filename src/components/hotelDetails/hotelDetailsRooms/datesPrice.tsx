@@ -15,7 +15,7 @@ interface DatesPriceProps {
 function formatDateToRussian(date: Date): string {
     const day = date.getDate();
 
-    const monthFormatter = new Intl.DateTimeFormat('ru-RU', { month: 'long' });
+    const monthFormatter = new Intl.DateTimeFormat('ru-RU', { month: 'short' });
     const weekdayFormatter = new Intl.DateTimeFormat('ru-RU', { weekday: 'short' });
 
     const month = monthFormatter.format(date); // e.g., "мая"

@@ -20,7 +20,7 @@
     border-radius: 8px;
     cursor: pointer;
     transition: border-color 0.3s;
-    height: 88px;
+    height: 200px;
 }
 
 .slideItem:hover {

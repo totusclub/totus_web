@@ -2,7 +2,7 @@ import styles from '../searchPage.module.css';
 import Progress from "@/components/UI/progress";
 import HotelCard from "@/components/hotelCard";
 import TrackPrices from "@/components/UI/trackPrices";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from 'next/router';
 
 interface ResultListProps {
@@ -18,9 +18,32 @@ const ResultList = ({ tickets, loading, data }: ResultListProps) => {
     const [loadingMore, setLoadingMore] = useState(false);
     const [priceTrack, setPriceTrack] = useState(false);
 
+    // Track if user came via back button
+    const cameFromBack = useRef(false);
+    const scrollPosition = useRef(0);
+
+    // Detect back button
+    useEffect(() => {
+        const handlePopState = () => {
+            cameFromBack.current = true;
+            scrollPosition.current = window.scrollY;
+        };
+        window.addEventListener("popstate", handlePopState);
+        return () => window.removeEventListener("popstate", handlePopState);
+    }, []);
+
     // Update hotels when new data arrives
     useEffect(() => {
         const currentPage = parseInt((router.query.page_number as string) || "1", 10);
+
+        // եթե back button-ով է եկել, չփոխել allHotels
+        if (cameFromBack.current) {
+            cameFromBack.current = false;
+            setTimeout(() => {
+                window.scrollTo({ top: scrollPosition.current, behavior: 'auto' });
+            }, 50);
+            return;
+        }
 
         if (data?.hotels?.length) {
             if (currentPage > 1) {
@@ -112,6 +135,7 @@ const ResultList = ({ tickets, loading, data }: ResultListProps) => {
 };
 
 export default ResultList;
+
 
 
 

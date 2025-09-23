@@ -31,24 +31,99 @@ const PrevArrow = ({ onClick }: ArrowProps) => {
 };
 
 const SmallSlider = ({images}) => {
-    const [selectedIndex, setSelectedIndex] = useState(null);
+    const [selectedIndex, setSelectedIndex] = useState<string>('');
+
+    // const [selectedImage, setSelectedImage] = useState<string>("");
+    const [currentSlide, setCurrentSlide] = useState(0);
+
+    // useEffect(() => {
+    //     if (images?.length > 0) {
+    //         setSelectedIndex(`https://image.totus.club/imagePath?directory=${images[0]['x500']}`);
+    //     }
+    // }, [images]);
+
+    const maxDots = 10;
 
     useEffect(() => {
         if(images?.length > 0){
             console.log(images[0]['x900'])
-            setSelectedIndex(images[0]['x900']);
+            setSelectedIndex(`https://image.totus.club/imagePath?directory=${images[0]['x900']}`);
         }
 
     },[images])
 
     const settings = {
-        dots: false,
-        infinite: true,
-        speed: 500,
-        slidesToShow: 3,
+        vertical: true,
+        slidesToShow: 6,
         slidesToScroll: 1,
+        infinite: true,
+        arrows: true,
+        dots: false,
         nextArrow: <NextArrow />,
         prevArrow: <PrevArrow />,
+        beforeChange: (_: number, next: number) => setCurrentSlide(next),
+        appendDots: (dots: React.ReactNode) => {
+            const dotsArray = React.Children.toArray(dots);
+            const total = dotsArray.length;
+
+            let start = Math.max(0, currentSlide - Math.floor(maxDots - 2));
+            let end = start + maxDots;
+
+            if (end > total) {
+                end = total;
+                start = Math.max(0, end - maxDots);
+            }
+
+            const visibleDots = dotsArray.slice(start, end);
+
+            return (
+                <ul className={styles.cutomDoth} style={{ display: "flex", overflowX: "auto", gap: "1px" }}>
+                    {visibleDots}
+                </ul>
+            );
+        },
+        customPaging: (i: number) => (
+            <div
+                style={{
+                    width: "8px",
+                    height: "8px",
+                    borderRadius: "50%",
+                    background: i === currentSlide ? "#FE732E" : "#8080804D", // Active dot = black
+                    transition: "background 0.3s ease",
+                }}
+            />
+        ),
+        responsive: [
+            {
+                breakpoint: 1026,
+                settings: {
+                    vertical: false,
+                    slidesToShow: 2.2,
+                    slidesToScroll: 2,
+                    arrows: false,
+                    dots: true,
+                },
+            },
+            {
+                breakpoint: 600,
+                settings: {
+                    slidesToShow: 2,
+                    slidesToScroll: 2,
+                    initialSlide: 2,
+                    dots: true,
+                },
+            },
+            {
+                breakpoint: 480,
+                settings: {
+                    vertical: false,
+                    slidesToShow: 1,
+                    slidesToScroll: 1,
+                    dots: true,
+                    arrows: false,
+                },
+            },
+        ],
     };
 
     return (
@@ -70,7 +145,7 @@ const SmallSlider = ({images}) => {
                                 selectedIndex === img['x900'] ? styles.selected : ''
                             }`}
                         >
-                            <img  src={img['x900']} alt={`No Image`} className={styles.thumbnail} />
+                            <img  src={`https://image.totus.club/imagePath?directory=${img['x900'].replace("https://img.cdn.level.travel/", "")}`} alt={`No Image`} className={styles.thumbnail} />
                         </div>
                     </div>
                 ))}
