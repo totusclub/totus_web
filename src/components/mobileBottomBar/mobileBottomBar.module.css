@@ -19,6 +19,9 @@
         align-items: center;
         justify-content: space-between;
 
+        padding-bottom: calc(16px + env(safe-area-inset-bottom));
+
+
     }
     .itemTabNav{
         width: 40px;
