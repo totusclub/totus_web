@@ -5,7 +5,7 @@
 
 }
 #root{
-    /*display: none;*/
+    display: none;
 }
 :root {
     --primary_a: #1F1F1F;

@@ -44,13 +44,13 @@ const SmallSlider = ({images}) => {
 
     const maxDots = 10;
 
-    useEffect(() => {
-        if(images?.length > 0){
-            console.log(images[0]['x900'])
-            setSelectedIndex(`https://image.totus.club/imagePath?directory=${images[0]['x900']}`);
-        }
-
-    },[images])
+    // useEffect(() => {
+    //     if(images?.length > 0){
+    //         console.log(images[0]['x900'])
+    //         setSelectedIndex(`https://image.totus.club/imagePath?directory=${images[0]['x900']}`);
+    //     }
+    //
+    // },[images])
 
     const settings = {
         vertical: true,

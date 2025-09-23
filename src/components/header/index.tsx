@@ -11,8 +11,11 @@ import useAuth from "@/hooks/useAuth";
 // import {router} from "next/client";
 import HotelDetails from "@/pages/hotel-details";
 import {useRouter} from "next/router";
+import {clearSearch} from '@/store/slices/searchSlice';
+import {useDispatch} from 'react-redux';
 
 const Header = () => {
+    const dispatch = useDispatch();
     const [authModalOpen, setAuthModalOpen] = useState(false);
     const {user,token} = useAuth()
     const pathname = usePathname();
@@ -52,6 +55,7 @@ const Header = () => {
         const segments = pathname.split('/').filter(Boolean); // removes empty strings
         const pageName =  segments[segments.length - 1] || 'home';
         if(pageName === 'search'){
+            dispatch(clearSearch())
             router.push('/');
         }else{
             router.back();
