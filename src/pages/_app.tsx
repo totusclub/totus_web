@@ -9,6 +9,7 @@ import {decodeToken, loadToken} from "@/utils/auth";
 import {setAuth} from "@/store/slices/authSlice";
 import {useDispatch} from "react-redux";
 import MobileBottomBar from "@/components/mobileBottomBar";
+import ScrollRestoration from '@/components/ScrollRestoration';
 
 function getCookie(name: string): string | null {
     const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
@@ -57,6 +58,7 @@ function MyApp({ Component, pageProps }: AppProps) {
 
     return (
         <div id="root">
+            <ScrollRestoration />
             <Header />
             <Component {...pageProps} />
             <Footer />

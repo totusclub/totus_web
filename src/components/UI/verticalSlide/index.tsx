@@ -100,6 +100,7 @@ const VerticalSlider = ({ images ,loading}: any) => {
                 breakpoint: 480,
                 settings: {
                     vertical: false,
+                    infinite: false,
                     slidesToShow: 1,
                     slidesToScroll: 1,
                     dots: true,
