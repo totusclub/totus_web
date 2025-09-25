@@ -124,8 +124,8 @@ const SearchForm = ({ header,pageName}: SearchFormProps) => {
                     filter_instant_confirm: false,
                     page_number: data.page_number,
                     page_limit: data.page_limit,
-                    filter_stars:'3,4,5',
-                    filter_meals:'AI'
+                    // filter_stars:'3,4,5',
+                    // filter_meals:'AI'
                 }
             }));
         }

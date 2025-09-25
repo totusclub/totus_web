@@ -144,7 +144,7 @@ const HotelCard = ({item,request_id,lazy}: HotelCardState) => {
 
     const showImage = useMemo(() => {
         if (hotel?.images?.length > 0) {
-            let path = hotel.images[0]?.x500 || "";
+            let path = hotel.images[0]?.webp_x620 || "";
             // Remove the prefix
             // console.log('path.replace("https://img.cdn.level.travel/", "")',path.replace("https://img.cdn.level.travel/", ""));
             return path.replace("https://img.cdn.level.travel/", "");

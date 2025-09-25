@@ -58,7 +58,7 @@ function MyApp({ Component, pageProps }: AppProps) {
 
     return (
         <div id="root">
-            <ScrollRestoration />
+            {/*<ScrollRestoration />*/}
             <Header />
             <Component {...pageProps} />
             <Footer />

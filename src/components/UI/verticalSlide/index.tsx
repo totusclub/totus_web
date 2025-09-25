@@ -29,7 +29,7 @@ const VerticalSlider = ({ images ,loading}: any) => {
 
     useEffect(() => {
         if (images?.length > 0) {
-            setSelectedImage(`https://image.totus.club/imagePath?directory=${images[0]['x500']}`);
+            setSelectedImage(`https://image.totus.club/imagePath?directory=${images[0]['x900']}`);
         }
     }, [images]);
 
