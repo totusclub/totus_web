@@ -85,10 +85,12 @@ const Filters = ({selectedFilters,allFilters,statistics}:any) => {
 
 
     useEffect(() => {
+        console.log('router.isReady)',router.query.page_number);
         if (!router.isReady) return;
 
         const pageNumber = parseInt((router.query.page_number as string) || "1", 10);
-        if(pageNumber > 1 && hotels?.length/20 < pageNumber ){
+        console.log('router.isReady)',hotels?.length);
+        if(pageNumber > 1){
             console.log('loadmore');
             let paramsFilter = {...filters,...selectedFilters, page_limit:20, page_number:pageNumber}
             setFilters(paramsFilter)

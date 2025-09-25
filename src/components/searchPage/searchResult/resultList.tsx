@@ -47,7 +47,8 @@ const ResultList = ({ tickets, loading, data }: ResultListProps) => {
 
         if (data?.hotels?.length) {
             if (currentPage > 1) {
-                setAllHotels((prev) => [...prev, ...data.hotels]);
+                const mew = allHotels.concat(data.hotels)
+                setAllHotels([...mew]);
             } else {
                 setAllHotels(data.hotels);
             }
@@ -59,7 +60,7 @@ const ResultList = ({ tickets, loading, data }: ResultListProps) => {
         setLoadingMore(false);
     }, [data, router.query.page_number]);
 
-    const resultData = useMemo(() => allHotels, [allHotels]);
+    // const resultData = useMemo(() => allHotels, [allHotels]);
 
     // Scroll listener for infinite load
     useEffect(() => {
@@ -80,6 +81,7 @@ const ResultList = ({ tickets, loading, data }: ResultListProps) => {
     }, [loadingMore, hasMore, router.query]);
 
     const loadNextPage = () => {
+        console.log('next',loadingMore,!hasMore);
         if (loadingMore || !hasMore) return;
 
         const currentPage = parseInt((router.query.page_number as string) || "1", 10);
@@ -115,7 +117,7 @@ const ResultList = ({ tickets, loading, data }: ResultListProps) => {
                     </>
                 )}
 
-                {resultData.map((item, index) => (
+                {allHotels?.map((item, index) => (
                     <div key={item.id}>
                         <HotelCard request_id={data?.request_id} item={item} />
                         {index === 4 && (

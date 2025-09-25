@@ -119,15 +119,16 @@ if(loading){
                         <div
                             key={index}
                             onClick={() =>
-                                setSelectedImage(`https://image.totus.club/imagePath?directory=${img['x500']}`)
+                                // setSelectedImage(`https://image.totus.club/imagePath?directory=${img['x500']}`)
+                                setSelectedImage(`https://img.cdn.level.travel/${img['x500']}`)
                             }
                         >
                             <img
-                                src={`https://image.totus.club/imagePath?directory=${img['x500']}`}
+                                src={`https://img.cdn.level.travel/${img['x500']}`}
                                 alt={`Thumb ${index}`}
                                 className={`${styles.thumbnail} ${
                                     selectedImage ===
-                                    `https://image.totus.club/imagePath?directory=${img['x500']}`
+                                    `https://img.cdn.level.travel/${img['x500']}`
                                         ? styles.selectedThumbnail
                                         : ''
                                 }`}

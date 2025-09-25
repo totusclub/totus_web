@@ -47,7 +47,8 @@ const HotelDetailsRoomItem = ({item,selectedDate}:any) => {
                 ) : (
                     <div className={styles.HotelDetailsRoomImage}>
                         <img
-                            src={`https://image.totus.club/imagePath?directory=${item?.room?.images?.[0]?.['x900']?.replace('https://img.cdn.level.travel/', '')}`}
+                            // src={`https://image.totus.club/imagePath?directory=${item?.room?.images?.[0]?.['x900']?.replace('https://img.cdn.level.travel/', '')}`}
+                            src={item?.room?.images?.[0]?.['x900']}
                             alt={`No Image`}/>
                     </div>
                 )}

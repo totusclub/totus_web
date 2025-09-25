@@ -25,6 +25,7 @@ const SearchResult = ({tickets,flights,packages,flightsFilter,setFiltersRequest}
                 request_id:hotels?.request_id,
                 readyOperators:hotels?.readyOperators,
             };
+            console.log('hotels',hotels);
         }
     }, [hotels]);
 
