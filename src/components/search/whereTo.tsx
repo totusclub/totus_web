@@ -5,6 +5,7 @@ import {useDestinationsSearch} from "@/hooks/useDestinationsSearch";
 import {fetchDestinations} from "@/store/slices/destinationsSlice";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "@/store";
+import {setHeaderName} from '@/store/slices/searchSlice';
 
 const WhereFrom = ({handleChange,value,name}) => {
     const dispatch = useDispatch();
@@ -50,6 +51,7 @@ const WhereFrom = ({handleChange,value,name}) => {
 
     const handleSelect = (type:string,item: string) => {
         setSearchValue(item.name);
+        dispatch(setHeaderName(item.name))
         handleChange(item,name,type);
         setIsOpen(false);
     };

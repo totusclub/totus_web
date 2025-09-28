@@ -9,13 +9,14 @@ interface ProductCardProps {
     city:string,
     price:number,
     review:number,
-    image:string
+    image:string,
+    url:string,
 }
 
 
-const HotelBoxCard = ({id,name,rate,city,price,review,image }: ProductCardProps) => {
+const HotelBoxCard = ({id,name,rate,city,price,review,image,url }: ProductCardProps) => {
     return (
-        <div onClick={()=>router.push("/hotel-details")} className={styles.hotelBoxCard} key={id}>
+        <div onClick={()=>router.push(`${url}`)} className={styles.hotelBoxCard} key={id}>
             <div className={styles.hotelBoxCardImage} style={{backgroundImage: `url(${image})`}}>
                 <div className={styles.hotelBoxCardImageInfo}>
                     <div className={styles.hotelBoxCardStatus}>

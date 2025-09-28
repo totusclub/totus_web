@@ -27,10 +27,8 @@ const handleBook =  async (id:any) => {
 
 
 useEffect(() => {
-
     const closestOffer = (() => {
         let earliest = null;
-
         rooms?.forEach(room => {
             const offers = room?.offers || {};
             Object.values(offers).forEach(offerList => {

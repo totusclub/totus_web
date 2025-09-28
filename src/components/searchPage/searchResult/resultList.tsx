@@ -2,8 +2,11 @@ import styles from '../searchPage.module.css';
 import Progress from "@/components/UI/progress";
 import HotelCard from "@/components/hotelCard";
 import TrackPrices from "@/components/UI/trackPrices";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from 'next/router';
+import {useDispatch, useSelector} from 'react-redux';
+import { setLoadMore } from '@/store/slices/searchSlice';
+import {RootState} from '@/store';
 
 interface ResultListProps {
     tickets?: boolean;
@@ -12,57 +15,35 @@ interface ResultListProps {
 }
 
 const ResultList = ({ tickets, loading, data }: ResultListProps) => {
+    const dispatch = useDispatch();
     const router = useRouter();
+    const {allMyHotels} = useSelector((state: RootState) => state.search);
     const [allHotels, setAllHotels] = useState<any[]>([]);
     const [hasMore, setHasMore] = useState(true);
     const [loadingMore, setLoadingMore] = useState(false);
     const [priceTrack, setPriceTrack] = useState(false);
 
-    // Track if user came via back button
-    const cameFromBack = useRef(false);
-    const scrollPosition = useRef(0);
-
-    // Detect back button
+    // ✅ Handle incoming data and merge into state
     useEffect(() => {
-        const handlePopState = () => {
-            cameFromBack.current = true;
-            scrollPosition.current = window.scrollY;
-        };
-        window.addEventListener("popstate", handlePopState);
-        return () => window.removeEventListener("popstate", handlePopState);
-    }, []);
+        if (!data?.hotels || data?.hotels.length === 0) return;
 
-    // Update hotels when new data arrives
-    useEffect(() => {
         const currentPage = parseInt((router.query.page_number as string) || "1", 10);
+        const pageLimit = parseInt((router.query.page_limit as string) || "20", 10);
 
-        // եթե back button-ով է եկել, չփոխել allHotels
-        if (cameFromBack.current) {
-            cameFromBack.current = false;
-            setTimeout(() => {
-                window.scrollTo({ top: scrollPosition.current, behavior: 'auto' });
-            }, 50);
-            return;
+        let updatedHotels: any[] = [];
+
+        if (currentPage === 1) {
+            updatedHotels = data.hotels;
+        } else {
+            updatedHotels = [...allHotels, ...data.hotels];
         }
 
-        if (data?.hotels?.length) {
-            if (currentPage > 1) {
-                const mew = allHotels.concat(data.hotels)
-                setAllHotels([...mew]);
-            } else {
-                setAllHotels(data.hotels);
-            }
-
-            const pageLimit = parseInt((router.query.page_limit as string) || "20", 10);
-            setHasMore(data.hotels.length === pageLimit);
-        }
-
+        setAllHotels(updatedHotels);
+        setHasMore(data.hotels.length === pageLimit);
         setLoadingMore(false);
-    }, [data, router.query.page_number]);
+    }, [data]);
 
-    // const resultData = useMemo(() => allHotels, [allHotels]);
-
-    // Scroll listener for infinite load
+    // ✅ Infinite scroll handler
     useEffect(() => {
         const handleScroll = () => {
             if (loadingMore || !hasMore) return;
@@ -81,13 +62,14 @@ const ResultList = ({ tickets, loading, data }: ResultListProps) => {
     }, [loadingMore, hasMore, router.query]);
 
     const loadNextPage = () => {
-        console.log('next',loadingMore,!hasMore);
         if (loadingMore || !hasMore) return;
 
         const currentPage = parseInt((router.query.page_number as string) || "1", 10);
         const nextPage = currentPage + 1;
 
         setLoadingMore(true);
+        dispatch(setLoadMore(true));
+
         router.push(
             {
                 pathname: router.pathname,
@@ -117,7 +99,7 @@ const ResultList = ({ tickets, loading, data }: ResultListProps) => {
                     </>
                 )}
 
-                {allHotels?.map((item, index) => (
+                {allMyHotels?.map((item, index) => (
                     <div key={item.id}>
                         <HotelCard request_id={data?.request_id} item={item} />
                         {index === 4 && (
@@ -131,12 +113,19 @@ const ResultList = ({ tickets, loading, data }: ResultListProps) => {
                 ))}
             </div>
 
-            {loadingMore && <p style={{ textAlign: 'center', padding: '10px' }}>Загрузка...</p>}
+            {loadingMore && (
+                <p style={{ textAlign: 'center', padding: '10px' }}>
+                    Загрузка...
+                </p>
+            )}
         </div>
     );
 };
 
 export default ResultList;
+
+
+
 
 
 

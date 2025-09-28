@@ -12,37 +12,37 @@ const MOCK_DATA= [
         id:1,
         name:'Египет',
         image:'/images/egypt.png',
-        url:`/search?from_city=Moscow&from_country=RU&to_country=EG&adults=2&start_date=2025-08-19&nights=7..9&flex_dates=2&start_date_from=2025-08-19&end_date_till=2025-08-26&search_type=package`,
+        url:`/search?from_city=Moscow&from_country=RU&to_country=EG&adults=2&start_date=2025-10-05&nights=7..9&flex_dates=2&start_date_from=2025-10-05&end_date_till=2025-10-12&search_type=package&page_limit=20&page_number=1`,
     },
     {
         id:2,
         name:'Турция',
         image:'/images/turky.png',
-        url:'/search?from_city=Moscow&from_country=RU&to_country=TR&adults=2&start_date=2025-08-19&nights=7..9&flex_dates=2&start_date_from=2025-08-19&end_date_till=2025-08-26&search_type=package'
+        url:'/search?from_city=Moscow&from_country=RU&to_country=TR&adults=2&start_date=2025-10-05&nights=7..9&flex_dates=2&start_date_from=2025-10-05&end_date_till=2025-10-12&search_type=package&page_limit=20&page_number=1'
     },
     {
         id:2,
         name:'Россия',
         image:'/images/russon.png',
-        url:'/search?from_city=Moscow&from_country=RU&to_country=RU&adults=2&start_date=2025-08-19&nights=7..9&flex_dates=2&start_date_from=2025-08-19&end_date_till=2025-08-26&search_type=package'
+        url:'/search?from_city=Moscow&from_country=RU&to_country=RU&adults=2&start_date=2025-10-05&nights=7..9&flex_dates=2&start_date_from=2025-10-05&end_date_till=2025-10-12&search_type=package&page_limit=20&page_number=1'
     },
     {
         id:2,
         name:'Мальдивы',
         image:'/images/maldiv.png',
-        url:'/search?from_city=Moscow&from_country=RU&to_country=MV&adults=2&start_date=2025-08-19&nights=7..9&flex_dates=2&start_date_from=2025-08-19&end_date_till=2025-08-26&search_type=package',
+        url:'/search?from_city=Moscow&from_country=RU&to_country=MV&adults=2&start_date=2025-10-05&nights=7..9&flex_dates=2&start_date_from=2025-10-05&end_date_till=2025-10-12&search_type=package&page_limit=20&page_number=1',
     },
     {
         id:2,
         name:'ОАЭ',
         image:'/images/oae.png',
-        url:'/search?from_city=Moscow&from_country=RU&to_country=AE&adults=2&start_date=2025-08-19&nights=7..9&flex_dates=2&start_date_from=2025-08-19&end_date_till=2025-08-26&search_type=package',
+        url:'/search?from_city=Moscow&from_country=RU&to_country=AE&adults=2&start_date=2025-10-05&nights=7..9&flex_dates=2&start_date_from=2025-10-05&end_date_till=2025-10-12&search_type=package&page_limit=20&page_number=1',
     },
     {
         id:2,
         name:'Индонезия',
         image:'/images/indonezia.png',
-        url:'/search?from_city=Moscow&from_country=RU&to_country=ID&adults=2&start_date=2025-08-19&nights=7..9&flex_dates=2&start_date_from=2025-08-19&end_date_till=2025-08-26&search_type=package',
+        url:'/search?from_city=Moscow&from_country=RU&to_country=ID&adults=2&start_date=2025-10-05&nights=7..9&flex_dates=2&start_date_from=2025-10-05&end_date_till=2025-10-12&search_type=package&page_limit=20&page_number=1',
     },
 ]
 

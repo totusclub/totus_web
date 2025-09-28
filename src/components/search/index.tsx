@@ -9,7 +9,7 @@ const Search = () => {
         <div className={styles.search}>
             <div className={`content ${styles.searchContent}`}>
                 <div className={styles.logoHomeM}>
-                    <Icon name={"logo"}/>
+                    <Icon name={"logo"} color={'white'} size={100} />
                 </div>
                 <h1 className={styles.searchTitle}>Путешествия начинаются здесь</h1>
                 <SearchForm pageName={'home'} />

@@ -8,7 +8,7 @@ import SelectDate from "@/components/search/date";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import {useDispatch, useSelector} from 'react-redux';
-import {runFullSearchFlow} from "@/store/slices/searchSlice";
+import {runFullSearchFlow, setStartSearch} from '@/store/slices/searchSlice';
 import {RootState} from '@/store';
 
 interface SearchFormProps {
@@ -39,7 +39,9 @@ interface SearchParams {
 
 
 const SearchForm = ({ header,pageName}: SearchFormProps) => {
-    const { hotels, loading} = useSelector((state: RootState) => state.search);
+    const { hotels, loading,headerName,startSearchValid} = useSelector((state: RootState) => state.search);
+
+
     const dispatch = useDispatch();
     const router = useRouter();
     const [params, setParams] = useState<SearchParams>({
@@ -101,7 +103,10 @@ const SearchForm = ({ header,pageName}: SearchFormProps) => {
                 const { to_city: _, ...restParsed } = parsed || {};
                 setParams({ ...restParams, ...restParsed });
             }
-            console.log('parsed',parsed);
+            if(parsed?.hotel_ids){
+                console.log(parsed?.hotel_ids);
+                setParams({...params,hotel_ids:parsed?.hotel_ids});
+            }
             if(Object.keys(parsed).length > 0){
                 startSearch(parsed)
             }else{
@@ -116,21 +121,38 @@ const SearchForm = ({ header,pageName}: SearchFormProps) => {
     }, [router.isReady,pageName]);
 
     const startSearch = async (data: SearchParams) => {
-        console.log('hotels',hotels);
-        if(+data?.page_number === 1 && !hotels){
-            dispatch(runFullSearchFlow({
-                searchParams: data,
-                filterParams: {
-                    filter_instant_confirm: false,
-                    page_number: data.page_number,
-                    page_limit: data.page_limit,
-                    // filter_stars:'3,4,5',
-                    // filter_meals:'AI'
-                }
-            }));
+        // console.log('data',data,params?.hotel_ids?.length> 0);
+        if(+data?.page_number === 1 && startSearchValid){
+            if(data?.hotel_ids?.length> 0){
+                dispatch(runFullSearchFlow({
+                    searchParams: data,
+                    filterParams: {
+                        filter_instant_confirm: false,
+                        page_number: data.page_number,
+                        page_limit: data.page_limit,
+                    }
+                }));
+            }else{
+                dispatch(runFullSearchFlow({
+                    searchParams: data,
+                    filterParams: {
+                        filter_instant_confirm: false,
+                        page_number: data.page_number,
+                        page_limit: data.page_limit,
+                        filter_stars:'3,4,5',
+                        filter_meals:'AI'
+                    }
+                }));
+            }
+            dispatch(setStartSearch(false))
         }
 
     }
+
+
+    useEffect(() => {
+        console.log('headerName',headerName);
+    }, [headerName]);
 
     const handleChange = (value: string | number | number[], key: keyof SearchParams,type:string) => {
         if(key === 'from_city'){
@@ -237,12 +259,17 @@ const SearchForm = ({ header,pageName}: SearchFormProps) => {
         return `${parseInt(day, 10)} ${monthName}`;
     }
 
+    // useEffect(() => {
+    //     console.log('searchValue',searchValue);
+    //     setHeaderName(searchValue)
+    // }, [searchValue]);
+
     return (
         <>
             {pageName === 'search' || pageName==='home' && (
                 <div className={`${styles.searchForm} ${header && styles.searchFormM}`}>
                     <div className={styles.searchFields}>
-                        <WhereTo handleChange={handleChange} name={'to_city'} value={params.to_city}/>
+                        <WhereTo handleChange={handleChange} name={'to_city'} value={params.to_city} />
                         <div className={styles.searchGroup}>
                             <SelectDate handleChange={handleChange} name={'form_date'} value={params.start_date}/>
                             <Nights handleChange={handleChange} name={'nights'} value={params.nights}/>
@@ -262,7 +289,7 @@ const SearchForm = ({ header,pageName}: SearchFormProps) => {
 
             {header && (
                 <div className={styles.selectdFormM}>
-                    <p>{params?.to_city}</p>
+                    <p className={styles.mytextHeader}>{headerName || ''}</p>
                     <p>{formatDateToRussian(params?.start_date)} , {params?.nights} ночей, {parseInt(params?.adults || 0) + parseInt(params?.kids || 0)} туриста</p>
                 </div>
             )}

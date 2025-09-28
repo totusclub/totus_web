@@ -386,12 +386,13 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        margin-top: 15px;
+        /*margin-top: 15px;*/
     }
     .search{
         padding: 0;
     }
     .searchTitle{
+        margin-top: -30px;
         font-size: 16px;
     }
     .searchForm{
@@ -527,8 +528,9 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        width: 100%;
+        width: calc(100% - 50px);
         margin-left: 40px;
+        /*border: 1px solid red;*/
     }
     .selectdFormM>p:nth-child(2){
         color: var(--textTertiary);
@@ -567,5 +569,12 @@
     .noResults{
         margin-left: 15px;
         margin-top: 15px;
+    }
+    .mytextHeader{
+        white-space: nowrap;      /* Keep text in one line */
+        overflow: hidden;         /* Hide the extra text */
+        text-overflow: ellipsis;
+        width: 60%;
+        text-align: center;
     }
 }

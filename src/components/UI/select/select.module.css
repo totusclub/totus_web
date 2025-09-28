@@ -81,10 +81,12 @@
 @media (max-width: 768px) {
     .customSelect{
         flex: 1!important;
+        width: 100%;
+
     }
     .selectButton{
-        border-radius: 6px;
-        height: 40px;
+        border-radius: 16px;
+        height: 56px;
     }
     .selectLabel{
         font-size: 11px;

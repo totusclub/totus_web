@@ -25,6 +25,7 @@ interface HotelCardState {
 
 const HotelCard = ({item,request_id,lazy}: HotelCardState) => {
     const handleClick = () => {
+        sessionStorage.setItem("searchScroll", window.scrollY.toString());
         router.push(`/hotel-details?request_id=${request_id}&hotel_id=${item?.hotel?.id}`); // Navigate to /about
     };
     // console.log(item);
@@ -179,7 +180,7 @@ const HotelCard = ({item,request_id,lazy}: HotelCardState) => {
                         </div>
                         <div className={styles.hotelCardImageInfoM}>
                             <p><Icon name={'message'} size={14}
-                                     color="#000"/> {hotel.reviews_count > 0 ? `${hotel.reviews_count} отзывов` : 'нет отзывов'}
+                                     color="#000"/> {hotel?.reviews_count > 0 ? `${hotel?.reviews_count} отзывов` : 'нет отзывов'}
                             </p>
                             {hotel?.rating > 0 && (
                                 <p>{hotel.rating}</p>
@@ -195,20 +196,20 @@ const HotelCard = ({item,request_id,lazy}: HotelCardState) => {
                         ))}
                     </div>
                     <div className={styles.hotelCardPriceM}>
-                        <p>{analytics_min_price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '\u202F')}₽</p>
+                        <p>{analytics_min_price?.toString()?.replace(/\B(?=(\d{3})+(?!\d))/g, '\u202F')}₽</p>
                         <p>от {formattedDate}, на {min_price_nights} ночей</p>
                     </div>
 
                 </div>
                 <div className={styles.hotelCardPrice}>
                     <div className={styles.hotelCardImageInfo}>
-                        <p><Icon name={'message'} size={14} color="#000" /> {hotel.reviews_count > 0 ? `${hotel.reviews_count} отзывов`:'нет отзывов'}</p>
+                        <p><Icon name={'message'} size={14} color="#000" /> {hotel?.reviews_count > 0 ? `${hotel?.reviews_count} отзывов`:'нет отзывов'}</p>
                         {hotel?.rating > 0 &&(
                             <p>{hotel.rating}</p>
                         )}
                     </div>
                     <div className={styles.hotelCardCheckout}>
-                        <p>{analytics_min_price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '\u202F')}₽</p>
+                        <p>{analytics_min_price?.toString()?.replace(/\B(?=(\d{3})+(?!\d))/g, '\u202F')}₽</p>
                         <Button onClick={() => handleClick()} full={true} title={'Выбрать'}/>
                         <div className={styles.hotelCardDate}>
                             <p>c {formattedDate}, на {min_price_nights} ночей</p>

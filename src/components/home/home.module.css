@@ -902,7 +902,7 @@
         background-position: center;
     }
     .contentFullHide{
-        display: none;
+        /*display: none;*/
     }
 
 }

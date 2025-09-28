@@ -34,8 +34,10 @@ const genderOptions: GenderOption[] = [
 
 const BookingOrderForm = ({params,handleChangeTourist,handleChange}) => {
     const [selected, setSelected] = useState<string>('');
+    const [selected2, setSelected2] = useState<string>('');
 
-    const options = [{ value: 'RUB', name: 'Россия' }];
+    const options = [{ value: '225', name: 'Россия' }];
+    const options2 = [{ value: 'international_passport', name: 'Заграничный паспорт РФ' }];
 
     // const [params, setParams] = useState<Params>({
     //     email: "",
@@ -172,9 +174,9 @@ const BookingOrderForm = ({params,handleChangeTourist,handleChange}) => {
                                     />
                                     <Select
                                         isFull={true}
-                                        options={options}
-                                        value={selected}
-                                        onChange={setSelected}
+                                        options={options2}
+                                        value={selected2}
+                                        onChange={setSelected2}
                                         label={'Документ'}
                                         placeholder="Заграничный паспорт РФ"
                                     />
