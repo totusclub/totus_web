@@ -12,7 +12,7 @@ const HotelDetailsDesc = ({info,loading}:any) => {
                            <p>Описание</p>
                        </div>
                        <div className={styles.HotelDetailsDescText}>
-                           <p>{`${info?.hotel_info}`}</p>
+                           <p>{`${info?.short_info}`}</p>
                        </div>
                    </div>
                    {info?.attractions?.length > 1 && (
