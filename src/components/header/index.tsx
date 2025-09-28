@@ -55,8 +55,9 @@ const Header = () => {
         const segments = pathname.split('/').filter(Boolean); // removes empty strings
         const pageName =  segments[segments.length - 1] || 'home';
         if(pageName === 'search'){
-            dispatch(clearSearch())
+            // dispatch(clearSearch())
             router.push('/');
+            dispatch(clearSearch())
         }else{
             router.back();
         }

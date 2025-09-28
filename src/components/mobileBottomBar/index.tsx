@@ -9,11 +9,13 @@ import {useRouter} from "next/router";
 import Support from "@/components/support";
 import ModalPin from "@/components/UI/modalPin";
 import {getPin} from "@/utils/auth";
+import {clearSearch} from '@/store/slices/searchSlice';
+import {useDispatch} from 'react-redux';
 
 
 const MobileBottomBar = () => {
     const router = useRouter();
-
+    const dispatch = useDispatch();
     const [pinModalOpen, setPinModalOpen] = useState(true);
     const [authModalOpen, setAuthModalOpen] = useState(false);
 
@@ -35,12 +37,18 @@ const MobileBottomBar = () => {
         console.log(checkPin)
     },[])
 
+    const handleHome = () => {
+        router.push('/')
+        dispatch(clearSearch())
+
+    }
+
     return (
         <>
             <div className={styles.mobileTab}>
-                <Link href={'/'} className={styles.itemTabNav}>
+                <div onClick={()=>handleHome()} className={styles.itemTabNav}>
                     <Icon name={'search'} color={['home', 'search', 'tickets', 'hotel-details'].includes(pageName) ? '#fe732e' : "#000"} size={28}/>
-                </Link>
+                </div>
                 <div className={styles.itemTabNav} onClick={()=>{token? router.push('/profile/my-orders'):setAuthModalOpen(true)}}>
                     <Icon color={['my-orders'].includes(pageName) ? '#fe732e' : "#000"} name={'order'} size={28}/>
                 </div>
