@@ -4,14 +4,34 @@ import styles from './phoneInput.module.css';
 
 const countries = [
     { name: 'Россия', code: '+7' },
-    { name: 'Армения', code: '+374' },
-    { name: 'Грузия', code: '+995' },
+    // { name: 'Армения', code: '+374' },
+    // { name: 'Грузия', code: '+995' },
 ];
 
-export default function PhoneInput() {
+export default function PhoneInput({setError}) {
     const [selectedCountry, setSelectedCountry] = useState(countries[0]);
     const [showDropdown, setShowDropdown] = useState(false);
     const [phone, setPhone] = useState('');
+
+
+    const validatePhone = (value: string) => {
+        const cleaned = value.replace(/\D/g, ''); // remove non-digit characters
+        if (selectedCountry.code === '+7') {
+            if (!/^7\d{10}$/.test(cleaned)) {
+                setError(false);
+            } else {
+                setError(true);
+            }
+        } else {
+            setError(true);
+        }
+    };
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        setPhone(value);
+        validatePhone(value);
+    };
 
     return (
         <div className={styles.container}>
@@ -33,6 +53,8 @@ export default function PhoneInput() {
                                     onClick={() => {
                                         setSelectedCountry(country);
                                         setShowDropdown(false);
+                                        setPhone('');
+                                        setError('');
                                     }}
                                     className={styles.dropdownItem}
                                 >
@@ -43,14 +65,14 @@ export default function PhoneInput() {
                     )}
                 </div>
                 <div className={styles.inputSection}>
-                    {/*<label className={styles.label}>Номер телефона</label>*/}
                     <input
                         type="tel"
                         className={styles.inputField}
                         placeholder="Номер телефона"
                         value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
+                        onChange={handleChange}
                     />
+                    {/*{error && <span className={styles.error}>{error}</span>}*/}
                 </div>
             </div>
         </div>

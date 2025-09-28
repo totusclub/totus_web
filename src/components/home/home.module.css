@@ -657,6 +657,19 @@
     cursor: pointer;
     margin-top: 19px;
 }
+.formRequestCallBtnDisable{
+    display: flex;
+    height: 56px;
+    padding: 16px 32px;
+    justify-content: center;
+    align-items: center;
+    align-self: stretch;
+    border-radius: 200px;
+    background: var(--core_Orange);
+    cursor: pointer;
+    margin-top: 19px;
+    color: var(--textPrimaryB);
+}
 .formRequestCallBtn>p{
     color: var(--primary_a);
     font-family: "Golos Text";

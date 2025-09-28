@@ -1,9 +1,10 @@
-import React from "react";
+import React, {useState} from 'react';
 import styles from "./home.module.css";
 import PhoneInput from "@/components/UI/phoneInput";
 
 
 export default function CallRequest(): JSX.Element {
+    const [error, setError] = useState(true);
     return (
         <div className={'content'}>
             <div className={styles.callRequest}>
@@ -16,8 +17,8 @@ export default function CallRequest(): JSX.Element {
                             <p>и наши специалисты свяжутся с вами в</p>
                             <p>ближайшее время</p>
                         </div>
-                        <PhoneInput/>
-                        <div className={styles.formRequestCallBtn}>
+                        <PhoneInput setError={setError}/>
+                        <div className={ error ? styles.formRequestCallBtnDisable:styles.formRequestCallBtn} onClick={()=>error ? alert('Запрос отправлен') : alert('Введите корректный российский номер (+7XXXXXXXXXX)')}>
                             <p>Перезвоните мне</p>
                         </div>
                         <div className={styles.formRequestCallText}>
