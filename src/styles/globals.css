@@ -5,7 +5,7 @@
 
 }
 #root{
-    /*display: none;*/
+    display: none;
 }
 html, body {
     /*scroll-behavior: smooth;*/
