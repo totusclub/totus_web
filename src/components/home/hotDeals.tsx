@@ -24,7 +24,7 @@ const MOCK_DATA= [
         price:55723,
         review:10,
         image:'https://img.cdn.level.travel/hotels/9149847/def8891aa911a636e350e8438d9437ba_webp_x620.webp',
-        url:'/search?from_city=Moscow&from_country=RU&to_country=EG&adults=2&start_date=2025-10-05&nights=7..9&flex_dates=2&start_date_from=2025-10-05&end_date_till=2025-10-12&search_type=package&page_limit=20&page_number=1&to_city=null&hotel_ids=9149847'
+        url:'/search?from_city=Moscow&from_country=RU&to_country=EG&adults=2&start_date=2025-10-23&nights=7..9&flex_dates=2&start_date_from=2025-10-23&end_date_till=2025-10-30&search_type=package&page_limit=20&page_number=1&to_city=null&hotel_ids=9149847'
     },
     {
         id:2,
@@ -38,13 +38,13 @@ const MOCK_DATA= [
     },
     {
         id:3,
-        name:'Swissotel Sharm El Sheikh Managed By Rixos',
+        name:'Rixos Premium Seagate',
         rate:5,
-        city:'Египет',
+        city:'Шарм-эль-Шейх',
         price:55723,
         review:10,
-        image:'https://img.cdn.level.travel/hotels/9149847/def8891aa911a636e350e8438d9437ba_webp_x620.webp',
-        url:'/search?from_city=Moscow&from_country=RU&to_country=EG&adults=2&start_date=2025-10-05&nights=7..9&flex_dates=2&start_date_from=2025-10-05&end_date_till=2025-10-12&search_type=package&page_limit=20&page_number=1&to_city=null&hotel_ids=9149847'
+        image:'https://img.cdn.level.travel/hotels/9022465/2bc6112958c15dd0d888b039bf10c3ee_webp_x620.webp',
+        url:'/search?from_city=Moscow&from_country=RU&to_country=EG&adults=2&start_date=2025-10-23&nights=7..9&flex_dates=2&start_date_from=2025-10-23&end_date_till=2025-10-30&search_type=package&page_limit=20&page_number=1&to_city=null&hotel_ids=9022465'
     },
 
 ]
