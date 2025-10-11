@@ -4,6 +4,7 @@ import AppModal from "@/components/UI/modal";
 import Input from "@/components/UI/input";
 import Button from "@/components/UI/button";
 import {SignInRequest} from "@/api/AuthApi";
+import auth from '@/components/auth/index';
 
 
 const SignInForm: React.FC = ({setScreen,setEmail}:any) => {
@@ -14,6 +15,7 @@ const SignInForm: React.FC = ({setScreen,setEmail}:any) => {
         //setScreen('SIGNUP')//VERIFICATION
        const res =  await SignInRequest({email: login})
         console.log('res',res.screen)
+
         setEmail(login)
         setScreen(res.screen)
 

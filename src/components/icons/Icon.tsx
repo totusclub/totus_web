@@ -68,6 +68,8 @@ import FilterIcon from "@/components/icons/filter";
 import TimeIcon from "@/components/icons/time";
 import ShareIcon from "@/components/icons/share";
 import OrderIcon from "@/components/icons/orders";
+import SupportIcon from '@/components/icons/support';
+import PhoneIcon from '@/components/icons/phone';
 
 
 const icons = {
@@ -141,6 +143,8 @@ const icons = {
     time: TimeIcon,
     share: ShareIcon,
     order: OrderIcon,
+    support: SupportIcon,
+    phone: PhoneIcon,
 }
 
 type IconName = keyof typeof icons;

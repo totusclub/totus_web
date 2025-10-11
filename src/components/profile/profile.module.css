@@ -119,6 +119,35 @@
     flex: 1 0 0;
     cursor: pointer;
 }
+.profileSupport{
+    display: flex;
+    align-items: center;
+    height: 48px;
+    padding: 16px 16px;
+    gap: 8px;
+    flex: 1 0 0;
+    cursor: pointer;
+    background: #fff;
+    border-radius: 16px;
+}
+.indicatorSupport{
+    width: 12px;
+    height: 12px;
+    border-radius: 6px;
+    border: 4px solid #39BF87;
+    position: absolute;
+    right: 0px;
+    background: #fff;
+}
+.profileSupport>p{
+    color: var(--textPrimary);
+    font-family: "Golos Text";
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 20px; /* 125% */
+    letter-spacing: -0.32px;
+}
 .profileMenuItem>p{
     color: var(--textPrimary);
     font-family: "Golos Text";

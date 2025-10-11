@@ -16,6 +16,7 @@ const MenuProfile = () => {
         deleteToken();
         dispatch(logout());
         router.push('/');
+        window.ReactNativeWebView.postMessage('logout')
     }
     return (
         <div className={styles.profileMenuCol}>
@@ -46,6 +47,16 @@ const MenuProfile = () => {
             {/*        <p>Туристы</p>*/}
             {/*    </div>*/}
             {/*</div>*/}
+            <div onClick={() => window.ReactNativeWebView.postMessage("openModal")} className={styles.profileSupport}>
+                <div className={styles.profileSupport}>
+                    <div style={{position:'relative'}}>
+                        <div className={styles.indicatorSupport}/>
+                        <Icon name={'support'} size={24}/>
+                    </div>
+                    <p>Звонок в поддержку </p>
+                </div>
+                <Icon name={'phone'} size={18}/>
+            </div>
             <div className={styles.profileMenu}>
 
                 {/*<div className={styles.profileMenuHead}>*/}
@@ -55,11 +66,8 @@ const MenuProfile = () => {
                 {/*    <Icon name={'profile'} size={24}/>*/}
                 {/*    <p>Моя учетная запись</p>*/}
                 {/*</div>*/}
-                {/*<div onClick={()=>window.ReactNativeWebView.postMessage("openModal")} className={styles.profileMenuItem}>*/}
-                {/*    <Icon name={'order'} size={24}/>*/}
-                {/*    <p>Call Support</p>*/}
-                {/*</div>*/}
-                <div onClick={()=>router.push('profile/my-orders')} className={styles.profileMenuItem}>
+
+                <div onClick={() => router.push('profile/my-orders')} className={styles.profileMenuItem}>
                     <Icon name={'order'} size={24}/>
                     <p>Мои заказы</p>
                 </div>
@@ -67,7 +75,7 @@ const MenuProfile = () => {
                 {/*    <Icon name={'favorite'} size={24}/>*/}
                 {/*    <p>Избранное</p>*/}
                 {/*</div>*/}
-                <div onClick={()=>router.push('privacy-policy')}  className={styles.profileMenuItem}>
+                <div onClick={() => router.push('privacy-policy')} className={styles.profileMenuItem}>
                     <Icon name={'faq'} size={24}/>
                     <p>Политика конфиденциальности</p>
                 </div>
@@ -87,17 +95,17 @@ const MenuProfile = () => {
             {/*    </div>*/}
             {/*</div>*/}
             <div className={styles.profileMenu}>
-                <div onClick={()=>handleLogout()} className={styles.profileMenuLogout}>
+                <div onClick={() => handleLogout()} className={styles.profileMenuLogout}>
                     <p>Выйти</p>
                     <Icon name={'logout'} size={24}/>
                 </div>
             </div>
             <div className={styles.deleteBlock}>
-                <p onClick={()=>setDeleteModal(true)}>Удалить аккаунт</p>
+                <p onClick={() => setDeleteModal(true)}>Удалить аккаунт</p>
             </div>
             {deleteModal && (
                 <>
-                    <div className={styles.modalDeleteAccountLeyer} onClick={()=>setDeleteModal(false)}></div>
+                    <div className={styles.modalDeleteAccountLeyer} onClick={() => setDeleteModal(false)}></div>
                     <div className={styles.modalDeleteAccount}>
                         <div className={styles.modalDeleteAccountHead}>
                             <p>Удаление аккаунта</p>
@@ -107,10 +115,10 @@ const MenuProfile = () => {
                             <p>Если вы не войдёте в систему в течение 30 дней, аккаунт будет автоматически удалён.</p>
                         </div>
                         <div className={styles.modalDeleteAccountFooter}>
-                            <div className={styles.cancelBtn} onClick={()=>setDeleteModal(false)}>
+                            <div className={styles.cancelBtn} onClick={() => setDeleteModal(false)}>
                                 <p>Отмена</p>
                             </div>
-                            <div className={styles.applyBtn} onClick={()=>handleLogout()}>
+                            <div className={styles.applyBtn} onClick={() => handleLogout()}>
                                 <p>Удалить</p>
                             </div>
                         </div>
