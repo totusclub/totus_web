@@ -34,7 +34,7 @@ const MOCK_DATA= [
         price:55723,
         review:12,
         image:'https://img.cdn.level.travel/hotels/9085039/f58b3c014000931c90910baa6298598d_webp_x620.webp',
-        url:'/search?from_city=Moscow&from_country=RU&to_country=RU&adults=2&start_date=2025-10-05&nights=7..9&flex_dates=2&start_date_from=2025-10-05&end_date_till=2025-10-12&search_type=package&page_limit=20&page_number=1&to_city=null&hotel_ids=9085039'
+        url:'/search?from_city=Moscow&from_country=RU&to_country=RU&adults=2&start_date=2025-10-21&nights=7..9&flex_dates=2&start_date_from=2025-10-21&end_date_till=2025-10-28&search_type=package&page_limit=20&page_number=1&to_city=null&hotel_ids=9085039'
     },
     {
         id:2,
