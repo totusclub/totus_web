@@ -16,7 +16,16 @@ const MenuProfile = () => {
         deleteToken();
         dispatch(logout());
         router.push('/');
-        window.ReactNativeWebView.postMessage('logout')
+        if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
+            window.ReactNativeWebView.postMessage('logout');
+        }
+    }
+
+    const handelCall = ()=>{
+        if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
+            window.ReactNativeWebView.postMessage("openModal")
+        }
+
     }
     return (
         <div className={styles.profileMenuCol}>
@@ -47,7 +56,7 @@ const MenuProfile = () => {
             {/*        <p>Туристы</p>*/}
             {/*    </div>*/}
             {/*</div>*/}
-            <div onClick={() => window.ReactNativeWebView.postMessage("openModal")} className={styles.profileSupport}>
+            <div onClick={() => handelCall()} className={styles.profileSupport}>
                 <div className={styles.profileSupport}>
                     <div style={{position:'relative'}}>
                         <div className={styles.indicatorSupport}/>
@@ -58,7 +67,6 @@ const MenuProfile = () => {
                 <Icon name={'phone'} size={18}/>
             </div>
             <div className={styles.profileMenu}>
-
                 {/*<div className={styles.profileMenuHead}>*/}
                 {/*    <p>Личная информация</p>*/}
                 {/*</div>*/}

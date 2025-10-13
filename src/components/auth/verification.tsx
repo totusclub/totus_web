@@ -20,7 +20,9 @@ export default function Verification({email,setOpen}:any) {
               token: data.authToken,
               user,
           }));
-          window.ReactNativeWebView.postMessage(JSON.stringify({screen:'auth',user}))
+          if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
+              window.ReactNativeWebView.postMessage(JSON.stringify({ screen: 'auth', user }));
+          }
           setOpen(false)
       }else{
           console.log('data',data)

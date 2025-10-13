@@ -6,18 +6,18 @@ import styles from './home.module.css'
 import HotelBoxCard from "@/components/hotelBox/hotelBoxCard";
 import Icon from "@/components/icons/Icon";
 const MOCK_DATA= [
+    // {
+    //     id:0,
+    //     name:'Movenpick Resort Antalya Tekirova (Ex Royal Diwa Tekirova)',
+    //     rate:5,
+    //     city:'Текирова, Кемер',
+    //     price:55723,
+    //     review:196,
+    //     image:'https://img.cdn.level.travel/hotels/36165/4d83acd7ab74c9d4fa1adca71d875c35_webp_x620.webp',
+    //     url:'/search?from_city=Moscow&from_country=RU&to_country=TR&adults=2&start_date=2025-10-15&nights=7..9&flex_dates=2&start_date_from=2025-10-15&end_date_till=2025-10-22&search_type=package&page_limit=20&page_number=1&to_city=null&hotel_ids=36165'
+    // },
     {
         id:0,
-        name:'Movenpick Resort Antalya Tekirova (Ex Royal Diwa Tekirova)',
-        rate:5,
-        city:'Текирова, Кемер',
-        price:55723,
-        review:196,
-        image:'https://img.cdn.level.travel/hotels/36165/4d83acd7ab74c9d4fa1adca71d875c35_webp_x620.webp',
-        url:'/search?from_city=Moscow&from_country=RU&to_country=TR&adults=2&start_date=2025-10-15&nights=7..9&flex_dates=2&start_date_from=2025-10-15&end_date_till=2025-10-22&search_type=package&page_limit=20&page_number=1&to_city=null&hotel_ids=36165'
-    },
-    {
-        id:1,
         name:'Swissotel Sharm El Sheikh Managed By Rixos',
         rate:5,
         city:'Наама Бэй, Шарм-эль-Шейх',
@@ -27,7 +27,7 @@ const MOCK_DATA= [
         url:'/search?from_city=Moscow&from_country=RU&to_country=EG&adults=2&start_date=2025-10-23&nights=7..9&flex_dates=2&start_date_from=2025-10-23&end_date_till=2025-10-30&search_type=package&page_limit=20&page_number=1&to_city=null&hotel_ids=9149847'
     },
     {
-        id:2,
+        id:1,
         name:'Cosmos Collection Altay Resort',
         rate:5,
         city:'Урлу-Аспак, Майминский район',
@@ -37,7 +37,7 @@ const MOCK_DATA= [
         url:'/search?from_city=Moscow&from_country=RU&to_country=RU&adults=2&start_date=2025-10-05&nights=7..9&flex_dates=2&start_date_from=2025-10-05&end_date_till=2025-10-12&search_type=package&page_limit=20&page_number=1&to_city=null&hotel_ids=9085039'
     },
     {
-        id:3,
+        id:2,
         name:'Rixos Premium Seagate',
         rate:5,
         city:'Шарм-эль-Шейх',
