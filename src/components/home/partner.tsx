@@ -72,11 +72,6 @@ export default function Partner() {
                 <Slider {...settings}>
                     <div className={styles.partnerItemMob}>
                         <div className={styles.partnerItem}>
-                            <Icon name={'tezTour'} size={'100%'}/>
-                        </div>
-                    </div>
-                    <div className={styles.partnerItemMob}>
-                        <div className={styles.partnerItem}>
                             <Icon name={'onexTour'} size={'100%'}/>
                         </div>
                     </div>
