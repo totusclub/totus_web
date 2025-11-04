@@ -1,0 +1,442 @@
+.profileMenuCol{
+    width: 413px;
+    display: flex;
+    flex-direction: column;
+    gap:16px
+}
+.profileCard{
+    display: flex;
+    padding: 40px 24px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    max-height: 260px;
+    flex: 1 0 0;
+    align-self: stretch;
+    border-radius:20px;
+    background: var(--bgPrimary);
+    margin-top: 40px;
+}
+.profileName{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    color: var(--textPrimary);
+    text-align: center;
+    font-family: "Golos Text";
+    font-size: 24px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 32px;
+    letter-spacing: -0.48px;
+}
+.editProfile{
+    color: var(--core_Orange);
+    font-family: "Golos Text";
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 18px; /* 128.571% */
+    letter-spacing: -0.28px;
+    text-decoration-line: underline;
+    text-decoration-style: solid;
+    text-decoration-skip-ink: none;
+    text-decoration-thickness: auto;
+    text-underline-offset: auto;
+    text-underline-position: from-font;
+    margin-top: 8px;
+}
+.profilePicture{
+    width: 80px;
+    height: 80px;
+    border-radius: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: var(--bgSecondary);
+}
+.profilePicture>p{
+    color: var(--textTertiary);
+    text-align: center;
+    font-family: "Golos Text";
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 24px; /* 120% */
+    letter-spacing: -0.4px;
+}
+.profileMenu{
+    width: 100%;
+    display: flex;
+    /*padding: 16px 0px;*/
+    padding: 16px;
+    flex-direction: column;
+    align-items: flex-start;
+    align-self: stretch;
+    border-radius: 20px;
+    background: var(--bgPrimary);
+}
+.profileMenuHead{
+    display: flex;
+    padding: 16px 16px;
+    align-items: flex-start;
+    align-self: stretch;
+}
+.profileMenuLogout{
+    display: flex;
+    padding: 16px 16px;
+    align-items: center;
+    align-self: stretch;
+    justify-content: space-between;
+
+}
+.profileMenuLogout{
+    color: var(--textPrimary);
+    font-family: "Golos Text";
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 24px;
+    letter-spacing: -0.4px;
+}
+.profileMenuHead>p{
+    color: var(--textPrimary);
+    font-family: "Golos Text";
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 24px;
+    letter-spacing: -0.4px;
+}
+.profileMenuItem{
+    display: flex;
+    align-items: center;
+    height: 48px;
+    padding: 16px 16px;
+    gap: 8px;
+    flex: 1 0 0;
+    cursor: pointer;
+}
+.profileSupport{
+    display: flex;
+    align-items: center;
+    height: 48px;
+    padding: 16px 16px;
+    gap: 8px;
+    flex: 1 0 0;
+    cursor: pointer;
+    background: #fff;
+    border-radius: 16px;
+}
+.indicatorSupport{
+    width: 12px;
+    height: 12px;
+    border-radius: 6px;
+    border: 4px solid #39BF87;
+    position: absolute;
+    right: 0px;
+    background: #fff;
+}
+.profileSupport>p{
+    color: var(--textPrimary);
+    font-family: "Golos Text";
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 20px; /* 125% */
+    letter-spacing: -0.32px;
+}
+.profileMenuItem>p{
+    color: var(--textPrimary);
+    font-family: "Golos Text";
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 20px; /* 125% */
+    letter-spacing: -0.32px;
+}
+.orderList{
+    margin-top: 40px;
+    display: flex;
+    flex-direction: column;
+    flex:1 0 0;
+    /*padding: 16px;*/
+    align-items: flex-start;
+    gap: 8px;
+    align-self: stretch;
+    border-radius: 16px;
+
+}
+.orderListMob{
+    margin-top: 40px;
+    display: flex;
+    flex-direction: column;
+    flex:1 0 0;
+    /*padding: 16px;*/
+    align-items: flex-start;
+    gap: 8px;
+    align-self: stretch;
+    border-radius: 16px;
+
+}
+.orderItemListBg{
+    padding: 16px;
+    background: var(--bgPrimary);
+    width: 100%;
+    border-radius: 16px;
+}
+.orderListWrap{
+    width: 100%;
+    margin-top: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+.orderListHead{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+.orderListHead>p{
+    color: var(--textPrimary);
+    font-family: "Golos Text";
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 18px;
+    letter-spacing: -0.28px;
+}
+.orderItem{
+    display: flex;
+    padding: 24px;
+    flex-direction: column;
+    align-items: flex-start;
+    align-self: stretch;
+    border-radius:24px;
+    border-bottom: 1px solid var(--primary_blue);
+    background: var(--bgPrimary);
+    box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.12), 0px 4px 12px 0px rgba(0, 0, 0, 0.12);
+}
+.orderItemHead{
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+.orderItemHeadLeft>p:nth-child(1){
+    color: var(--textPrimary);
+    font-family: "Golos Text";
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 24px; /* 120% */
+    letter-spacing: -0.4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.orderItemId{
+    color: var(--textTertiary);
+    font-family: "Golos Text";
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 24px;
+    letter-spacing: -0.4px;
+}
+.orderItemStatus{
+    display: flex;
+    height: 20px;
+    padding: 0px 12px;
+    justify-content: center;
+    align-items: center;
+    border-radius: 15px;
+    background: var(--primary_blue);
+    color: var(--primary_b, #FFF);
+    leading-trim: both;
+    text-edge: cap;
+    font-family: "Golos Text";
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 16px;
+    letter-spacing: -0.24px;
+}
+.orderItemDate{
+    color: var(--textSecondary);
+    font-family: "Golos Text";
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 20px; /* 125% */
+    letter-spacing: -0.32px;
+}
+.orderItemPrices{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: space-between;
+}
+.orderItemPrices>p:nth-child(1){
+    color: var(--textPrimary, #1F1F1F);
+    text-align: right;
+    font-family: "Golos Text";
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 20px; /* 125% */
+    letter-spacing: -0.32px;
+}
+.orderItemPrices>p:nth-child(2){
+    color: var(--textSecondary);
+    text-align: right;
+    font-family: "Golos Text";
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 18px;
+    letter-spacing: -0.28px;
+}
+.orderItemInfo{
+    display: flex;
+    padding: 24px 0 8px 0;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    align-self: stretch;
+    border-top: 1px solid var(--borderTertiary);
+    margin-top: 24px;
+}
+.orderItemInfo>p{
+    color: var(--textPrimary);
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 18px;
+    letter-spacing: -0.28px;
+}
+.orderItemInfo>p:nth-child(4){
+    color: var(--textDisabled);
+}
+.pending{
+    border-bottom: 1px solid var(--primary_blue);
+    box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.12), 0px 4px 12px 0px rgba(0, 0, 0, 0.12);
+}
+.confirm{
+    border-bottom: 1px solid var(--primary_green);
+    box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.12), 0px 4px 12px 0px rgba(0, 0, 0, 0.12);
+}
+.cancel{
+    border-bottom: 1px solid var(--textTertiary);
+    box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.12), 0px 4px 12px 0px rgba(0, 0, 0, 0.12);
+}
+
+@media (max-width: 768px) {
+    /*.orderList{*/
+    /*    display: none;*/
+    /*}*/
+    .profileCard{
+        flex-direction: row;
+        justify-content: flex-start;
+        min-height: 88px;
+    }
+    .profileName{
+        flex-direction: row;
+        gap: 6px;
+        font-size: 18px;
+    }
+    .profilePicture{
+        width: 50px;
+        height: 50px;
+    }
+    .orderItemHead{
+        flex-direction: column;
+    }
+    .orderItemPrices{
+        align-items: flex-start;
+    }
+    .orderItemId{
+        font-size: 16px;
+    }
+    .orderList{
+        display: none;
+    }
+    .deleteBlock{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 20px;
+        font-size: 14px;
+        color: red;
+    }
+    .modalDeleteAccount{
+        width: 100%;
+        position: fixed;
+        bottom: 0;
+        /*height: 300px;*/
+        z-index: 999999999;
+        background-color: #fff;
+        left: 0;
+        border-top-left-radius: 32px;
+        border-top-right-radius: 32px;
+    }
+.modalDeleteAccountLeyer{
+    position: fixed;
+    z-index: 999999;
+    width: 100%;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: #1F1F1F95;
+
+}
+    .modalDeleteAccountHead{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 40px;
+        border-bottom: 1px solid var(--bgSecondary);
+    }
+    .modalDeleteAccountBody{
+        padding: 15px;
+    }
+    .modalDeleteAccountBody>p:nth-child(1){
+        font-size: 16px;
+        text-align: center;
+        margin-bottom: 10px;
+    }
+    .modalDeleteAccountBody>p:nth-child(2){
+        font-size: 12px;
+        text-align: center;
+    }
+    .modalDeleteAccountFooter{
+        display: flex;
+        padding: 15px;
+        gap: 20px;
+    }
+    .cancelBtn{
+        height: 50px;
+        background-color: var(--primary_red);
+        display: flex;
+        flex: 1;
+        justify-content: center;
+        align-items: center;
+        border-radius: 15px;
+        color: #fff;
+    }
+    .applyBtn{
+        height: 50px;
+        background-color: var(--primary_green);
+        display: flex;
+        flex: 1;
+        justify-content: center;
+        align-items: center;
+        border-radius: 15px;
+        color: #fff;
+    }
+}
+

@@ -1,0 +1,23 @@
+.inputsCode{
+    display: flex;
+    height: 56px;
+    align-items: flex-start;
+    width: 98px;
+    /*flex: 0.2;*/
+    border: 1px solid var(--borderSecondary);
+    border-radius: 16px;
+    text-align: center;
+    font-size: 2rem;
+}
+.inputsCodeWrap{
+    /*width: 400px;*/
+    display: flex;
+    gap: 8px;
+    justify-content: space-between;
+    flex: 1;
+}
+@media (max-width: 768px) {
+   .inputsCode{
+       width: 86px;
+   }
+}

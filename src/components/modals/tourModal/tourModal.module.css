@@ -1,0 +1,36 @@
+.tourModal{
+    display: flex;
+    flex-direction: column;
+    /*align-items: flex-start;*/
+    gap: 4px;
+    align-self: stretch;
+}
+.tourModalItem{
+    display: flex;
+    padding: 16px;
+    align-items: flex-start;
+    flex-direction: column;
+    /*gap: 16px;*/
+    align-self: stretch;
+    border-radius: 16px;
+    background: var(--bgDisabled);
+    width: 100%;
+}
+.tourModalItem>p:nth-child(1){
+    color: var(--textPrimary);
+    /*font-family: "Golos Text";*/
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 20px;
+    letter-spacing: -0.32px;
+}
+.tourModalItem>p:nth-child(2){
+    color: var(--textTertiary);
+    /*font-family: "Golos Text";*/
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 18px;
+    letter-spacing: -0.28px;
+}

@@ -1,0 +1,54 @@
+.rangeInput{
+
+}
+.rangeInputHead{
+    display: flex;
+    height: 48px;
+    align-items: center;
+    justify-content: space-between;
+    /*gap: 8px;*/
+    /*flex: 1 0 0;*/
+
+}
+.rangeInputBadge{
+    display: flex;
+    /*width: 230px;*/
+    padding: 0px 9px;
+    justify-content: center;
+    align-items: center;
+    border-radius: 8px;
+    height: 24px;
+    background: var(--core_Orange);
+}
+.rangeInputBadge>p{
+    color: var(--textPrimaryB);
+    text-align: center;
+    /* Body - Caption/Medium */
+    /*font-family: "Golos Text";*/
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 18px; /* 128.571% */
+    letter-spacing: -0.28px;
+}
+.rangeInputHead>p{
+    color: var(--textPrimary);
+    /* Headline - Body/Medium */
+    /*font-family: "Golos Text";*/
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 20px; /* 125% */
+    letter-spacing: -0.32px;
+}
+.rangeInputGroup{
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 10px;
+}
+.rangeInputGroupLine{
+    width: 16px;
+    height: 1px;
+    background: var(--textPrimary);
+}

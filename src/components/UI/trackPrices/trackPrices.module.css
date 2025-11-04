@@ -1,0 +1,49 @@
+.trackPrices{
+    display: flex;
+    height: 64px;
+    padding: 4px 16px;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    align-self: stretch;
+    border-radius: 16px;
+    border-bottom: 1px solid var(--core_Orange, #FE732E);
+    background: var(--bgPrimary, #FFF);
+    box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.12), 0px 4px 12px 0px rgba(0, 0, 0, 0.12);
+}
+.trackPricesNotify{
+    display: flex;
+    /*width: 305px;*/
+    align-items: center;
+    gap: 8px;
+}
+.trackPricesSwitch{
+    display: flex;
+    /*width: 305px;*/
+    justify-content: flex-end;
+    align-items: center;
+    gap: 8px;
+}
+.trackPricesSwitch>p{
+    color: var(--textPrimary);
+    /*font-family: "Golos Text";*/
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 18px; /* 128.571% */
+    letter-spacing: -0.28px;
+}
+.trackPricesNotify>p{
+    color: var(--textPrimary, #1F1F1F);
+    /*font-family: "Golos Text";*/
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 20px;
+    letter-spacing: -0.32px;
+}
+@media (max-width: 768px) {
+    .trackPrices{
+        display: none;
+    }
+}

@@ -1,0 +1,580 @@
+.search{
+    display: flex;
+    padding: 56px 80px;
+    flex-direction: column;
+    align-items: flex-start;
+    align-self: stretch;
+    background-color: var(--bgSecondary);
+    background-image: url('./../../assets/images/cover.webp');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+.searchTitle{
+    color: var(--textPrimaryB);
+    /*font-family: "Golos Text";*/
+    font-size: 48px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 56px;
+    letter-spacing: -0.96px;
+    text-align: center;
+}
+.searchForm{
+    width: 100%;
+    height: 76px;
+    background-color: var(--primary_b);
+    border-radius: 24px;
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    align-items: center;
+    padding:10px;
+}
+.searchContent{
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+.searchFields{
+    width: 100%;
+    height: 56px;
+    border-radius: 16px;
+    display: flex;
+}
+.searchGroup{
+    display: flex;
+    flex: 1;
+    width: 100%;
+}
+.searchGroup>div{
+    flex: .5;
+}
+/*.searchField:nth-child(1){*/
+/*    flex: 0.2;*/
+/*}*/
+/*.searchField:nth-child(2){*/
+/*    flex: 0.2;*/
+/*}*/
+/*.searchField:nth-child(3){*/
+/*    flex: 1;*/
+/*}*/
+
+.searchField:nth-child(3){
+    flex: .5;
+}
+.searchField{
+    height: 56px;
+    display: flex;
+    gap: 7px;
+    align-items: center;
+    justify-content: space-between;
+    padding-left: 7px;
+    padding-right: 7px;
+    border-left: 1px solid var(--borderSecondary);
+    border-top: 1px solid var(--borderSecondary);
+    border-bottom: 1px solid var(--borderSecondary);
+    position: relative;
+}
+.searchFieldInfo{
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    flex: 1;
+}
+.searchFieldsLabel{
+    color: var(--textTertiary);
+    font-family: "Golos Text";
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 16px;
+    letter-spacing: -0.24px;
+}
+.searchFieldsValue{
+    color: var(--textPrimary);
+    font-family: "Golos Text";
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 20px;
+    letter-spacing: -0.32px;
+    border:none;
+    outline: none;
+    width: 100%;
+}
+.whereFrom{
+    border-bottom-right-radius: 16px;
+    border-top-right-radius: 16px;
+    border-right: 1px solid var(--borderSecondary);
+}
+
+.radioFrom{
+    border-bottom-left-radius: 16px!important;
+    border-top-left-radius: 16px!important;
+    border-left: 1px solid var(--borderSecondary);
+}
+.people{
+    /*border-bottom-right-radius: 16px;*/
+    /*border-top-right-radius: 16px;*/
+    /*border: 1px solid var(--borderSecondary);*/
+}
+.modalPeople{
+    width: 354px;
+    /*height: 170px;*/
+    position: absolute;
+    background-color: var(--primary_b);
+    padding-top: 24px;
+    right: 0;
+    top:100%;
+    margin-top:5px;
+    border-radius: 20px;
+    box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.12), 0 4px 12px 0 rgba(0, 0, 0, 0.12);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    z-index: 20;
+}
+
+.modalPeopleTitle{
+    color: var(--textPrimary);
+    /*font-family: "Golos Text";*/
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 18px;
+    letter-spacing: -0.28px;
+    margin-left: 24px;
+}
+.modalPeopleCounter{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    padding: 0 24px;
+    height: 64px;
+    justify-content: space-between;
+
+}
+.modalPeopleCounter:nth-child(2){
+    border-bottom: 1px solid var(--borderTertiary);
+}
+.modalPeopleCounter >ul{
+    list-style-type: none;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+.modalPeopleCounter >ul>li:nth-child(2){
+    color: var(--textPrimary);
+    /* Headline - Body/Medium */
+    /*font-family: "Golos Text";*/
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 20px; /* 125% */
+    letter-spacing: -0.32px;
+}
+.modalPeopleCounter >ul>li:first-child{
+    border: 1px solid var(--borderTertiary);
+    width: 32px;
+    height: 32px;
+    border-radius: 16px;
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    cursor: pointer;
+}
+.modalPeopleCounter >ul>li:last-child{
+    border: 1px solid var(--borderTertiary);
+    width: 32px;
+    height: 32px;
+    border-radius: 16px;
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    cursor: pointer;
+}
+.modalPeopleCounterTitle{
+    color: var(--textPrimary);
+    /*font-family: "Golos Text";*/
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 20px;
+    letter-spacing: -0.32px;
+}
+.modalPeopleCounterText{
+    color: var(--textTertiary, #7A7A7A);
+    /*font-family: "Golos Text";*/
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 18px;
+    letter-spacing: -0.28px;
+}
+.nightsModal{
+    width: 354px;
+    /*height: 170px;*/
+    position: absolute;
+    background-color: var(--primary_b);
+    padding-top: 24px;
+    left: 0;
+    top:100%;
+    margin-top:5px;
+    border-radius: 20px;
+    box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.12), 0 4px 12px 0 rgba(0, 0, 0, 0.12);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    z-index: 20;
+}
+.nightsModalHead{
+    height: 48px;
+    border-bottom: 1px solid var(--borderTertiary);
+    width: 100%;
+    padding: 0 24px;
+}
+.nightsModalHead>p{
+    color: var(--textPrimary);
+    /*font-family: "Golos Text";*/
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 24px;
+    letter-spacing: -0.4px;
+}
+.nightsModalFooter{
+    border-top: 1px solid var(--borderTertiary);
+    padding: 0 24px;
+    width: 100%;
+    height: 88px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.nightsModalFooter > div{
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.nightsModalFooter > div >p:nth-child(1){
+    color: var(--textPrimary);
+    /*font-family: "Golos Text";*/
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 20px;
+    letter-spacing: -0.32px;
+}
+.nightsModalFooter > div >p:nth-child(2){
+    color: var(--textTertiary);
+    /*font-family: "Golos Text";*/
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 18px; /* 128.571% */
+    letter-spacing: -0.28px;
+}
+.dateModal{
+    width: 400px;
+    /*height: 170px;*/
+    position: absolute;
+    background-color: var(--primary_b);
+    padding: 32px;
+    left: 0;
+    top:100%;
+    margin-top:5px;
+    border-radius: 20px;
+    box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.12), 0 4px 12px 0 rgba(0, 0, 0, 0.12);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    z-index: 20;
+}
+
+.whereFromModal{
+    width: 354px;
+    position: absolute;
+    background-color: var(--primary_b);
+    padding: 8px 16px;
+    left: 0;
+    top:100%;
+    margin-top:5px;
+    border-radius: 20px;
+    box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.12), 0 4px 12px 0 rgba(0, 0, 0, 0.12);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    z-index: 20;
+    max-height: 300px; /* Adjust depending on your item height */
+    overflow-y: auto;
+}
+.locationItem{
+    display: flex;
+    height: 64px;
+    /*padding: 13px;*/
+    width: 100%;
+    border-bottom: 1px solid var(--borderTertiary);
+    gap: 8px;
+    padding-top: 13px;
+}
+.locationItemName{
+    color: var(--textPrimary);
+    /*font-family: "Golos Text";*/
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 20px; /* 125% */
+    letter-spacing: -0.32px;
+}
+.locationItemType{
+    color: var(--textTertiary);
+    /*font-family: "Golos Text";*/
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 18px; /* 128.571% */
+    letter-spacing: -0.28px;
+}
+
+.whereFromModalHead{
+    display: none;
+}
+.searchFieldInfoM{
+    display: none;
+}
+.dateFromModalHead{
+    display: none;
+}
+.nightsFooter{
+    display: none;
+}
+.dateFooter{
+    display: none;
+}
+.selectdFormM{
+    display: none;
+}
+.searchGroup{
+    width: 100%;
+}
+.searchGroupListText{
+    font-size: 14px;
+    color: var(--textPrimary);
+}
+.searchGroupListItem{
+    /*border-bottom: 1px solid var(--borderTertiary);*/
+    width: 100%;
+    min-height: 48px;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    /*margin-top: 10px;*/
+}
+.searchGroupListItem>p:nth-child(1){
+    font-size: 16px;
+}
+.searchGroupListItem>p:nth-child(2){
+    font-size: 10px;
+}
+.logoHomeM{
+    display: none;
+}
+@media (max-width: 1024px) {
+    .logoHomeM{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        /*margin-top: 15px;*/
+    }
+    .search{
+        padding: 0;
+    }
+    .searchTitle{
+        margin-top: -30px;
+        font-size: 16px;
+    }
+    .searchForm{
+        height: auto;
+        flex-direction: column;
+        padding: 0;
+        background: none;
+        align-items:normal;
+    }
+    .searchFields{
+        flex-direction: column;
+        height: auto;
+        background-color: var(--primary_b);
+    }
+    .searchContent{
+        gap: 0;
+        padding-bottom: 20px;
+        width: 65%;
+    }
+    .whereFrom,.searchField{
+        border-left: none;
+        border-top: none;
+        border-radius: 0;
+        border-right: none;
+    }
+    .whereFrom:last-child{
+        border-bottom: none;
+        border-top: 1px solid var(--borderSecondary);
+
+    }
+    .whereFrom >svg,.searchField>svg{
+        display: none;
+    }
+    .searchField{
+        padding: 15px;
+    }
+
+    .people{
+        border: none;
+    }
+    .searchGroup>div:first-child{
+        border-right: 1px solid var(--borderSecondary);
+    }
+    .whereFromModal{
+        width: 100%;
+        position: fixed;
+        background-color: var(--primary_b);
+        top: 0;
+        bottom: 0;
+        max-height: 100%;
+        margin-top:0px;
+        border-radius: 0;
+        padding: 0;
+        z-index: 9999999999;
+    }
+    .searchFieldInfoM{
+        width: 100%;
+        border-bottom: 1px solid var(--borderTertiary);
+        /*padding: 0px 16px;*/
+        padding-left: 16px;
+        padding-right: 16px;
+        padding-bottom: 8px;
+        display: block;
+    }
+    .searchFieldInfoM>input{
+        border: 1px solid var(--borderTertiary);
+        width: 100%;
+        height: 46px;
+        border-radius: 16px;
+        padding: 0 9px;
+    }
+    .whereFromModalHead{
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        /*margin-bottom: 10px;*/
+        padding: 10px 16px;
+    }
+    .locationItem{
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+    .nightsModal{
+        position: fixed;
+        margin-top: -298px;
+        width: 100%;
+        border-bottom-right-radius: 0;
+        border-bottom-left-radius: 0;
+        z-index: 999999999;
+    }
+    .modalPeople{
+        position: fixed;
+        margin-top: -253px;
+        width: 100%;
+        border-bottom-right-radius: 0;
+        border-bottom-left-radius: 0;
+        z-index: 999999999;
+    }
+
+    .nightsFooter{
+        border-top: 1px solid var(--borderTertiary);
+        box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.12), 0px 4px 12px 0px rgba(0, 0, 0, 0.12);
+        display: flex;
+        width: 100%;
+        padding: 15px 10px;
+    }
+    .dateModal{
+        width: 100%;
+        position: fixed;
+        margin-top: -536px;
+        padding:15px;
+        border-bottom-right-radius: 0;
+        border-bottom-left-radius: 0;
+        z-index: 999999999;
+    }
+    .dateFooter{
+        padding-top: 20px;
+        width: 100%;
+        border-bottom-right-radius: 0;
+        border-bottom-left-radius: 0;
+        display: block;
+    }
+
+    .dateFromModalHead{
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+    }
+    .searchFormM{
+        display: none;
+    }
+    .selectdFormM{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: calc(100% - 50px);
+        margin-left: 40px;
+        /*border: 1px solid red;*/
+    }
+    .selectdFormM>p:nth-child(2){
+        color: var(--textTertiary);
+        text-align: center;
+        font-family: "Golos Text";
+        font-size: 12px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 16px; /* 133.333% */
+        letter-spacing: -0.24px;
+    }
+    .radioFrom{
+        border-bottom-left-radius: 0px!important;
+        border-top-left-radius: 0px!important;
+        border-left: none;
+    }
+    .modalPeople{
+
+    }
+
+}
+@media (width <= 768px) {
+    .searchContent {
+        gap: 0;
+        padding-bottom: 20px;
+        width: 100%;
+    }
+    .searchGroupTyping{
+        padding: 15px;
+
+    }
+    .searchGroupListText{
+        margin-top: 10px;
+        color: var(--core_Orange);
+    }
+    .noResults{
+        margin-left: 15px;
+        margin-top: 15px;
+    }
+    .mytextHeader{
+        white-space: nowrap;      /* Keep text in one line */
+        overflow: hidden;         /* Hide the extra text */
+        text-overflow: ellipsis;
+        width: 60%;
+        text-align: center;
+    }
+}

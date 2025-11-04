@@ -1,0 +1,200 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+#root {
+  display: block;
+}
+html,
+body {
+  /*scroll-behavior: smooth;*/
+}
+
+body {
+  /*-webkit-overflow-scrolling: touch;*/
+  /*overflow-y: auto;*/
+}
+:root {
+  --primary_a: #1f1f1f;
+  --primary_b: #ffffff;
+  --primary_blue: #0d77d3;
+  --secondary_blue: #61aaf2;
+  --primary_red: #cf3030;
+  --secondary_red: #f26161;
+  --primary_green: #288556;
+  --secondary_green: #39bf87;
+  --primary_yellow: #ce8508;
+  --secondary_yellow: #facd64;
+  --core_Orange: #fe732e;
+  --primary_orange: #c2410b;
+  --secondary_orange: #fa8842;
+  --glassPrimary: #80808030;
+  --primary_purple: #7e24b2;
+  --secondary_purple: #a985f2;
+  --primary_pink: #f285c5;
+  --bgPrimary: #ffffff;
+  --bgSecondary: #f5f5f5;
+  --bgTertiary: #b6b6b6;
+  --bgDisabled: #f5f5f5;
+  --bgActive: #e0e0e0;
+  --textPrimary: #1f1f1f;
+  --textSecondary: #3d3d3d;
+  --textTertiary: #7a7a7a;
+  --textDisabled: #b8b8b8;
+  --textPrimaryB: #ffffff;
+  --borderPrimary: #1f1f1f;
+  --borderSecondary: #b8b8b8;
+  --borderTertiary: #e0e0e0;
+  --hoverPrimary: #e2e2e2;
+}
+
+[data-theme="dark"] {
+  --primary_a: #111111;
+  --primary_b: #ffffff;
+  --primary_blue: #0d77d3;
+  --secondary_blue: #61aaf2;
+  --primary_red: #cf3030;
+  --secondary_red: #f26161;
+  --primary_green: #288556;
+  --secondary_green: #0dd6a4;
+  --primary_yellow: #ce8508;
+  --secondary_yellow: #facd64;
+  --core_Orange: #fe732e;
+  --primary_orange: #c2410b;
+  --secondary_orange: #fa8842;
+  --glassPrimary: #80808030;
+  --primary_purple: #7e24b2;
+  --secondary_purple: #a985f2;
+  --primary_pink: #f285c5;
+  --bgPrimary: #141414;
+  --bgSecondary: #1f1f1f;
+  --bgTertiary: #7a7a7a;
+  --bgDisabled: #1f1f1f;
+  --bgActive: #3d3d3d;
+  --textPrimary: #ffffff;
+  --textSecondary: #b8b8b8;
+  --textTertiary: #7a7a7a;
+  --textDisabled: #3d3d3d;
+  --textPrimaryB: #1f1f1f;
+  --borderPrimary: #7a7a7a;
+  --borderSecondary: #3d3d3d;
+  --borderTertiary: #1f1f1f;
+  --hoverPrimary: #4c4c4c;
+}
+@font-face {
+  font-family: "Golos Text";
+  src: url("./../assets/fonts/GolosText-VariableFont_wght.ttf") format("woff2");
+  font-weight: 100 900; /* variable font weight range */
+  font-style: normal;
+  font-display: swap;
+}
+
+.content {
+  width: 1280px;
+  margin: 0 auto;
+}
+.searchContainer {
+  background: var(--bgSecondary);
+  min-height: 43vh;
+  padding-bottom: 20px;
+}
+
+.slick-dots > ul > .slick-active > div {
+  background: var(--core_Orange) !important;
+  transform: scale(1.2) !important;
+  bottom: -28px !important;
+}
+
+.slick-slider {
+  padding-bottom: 24px !important;
+  margin-bottom: 30px !important;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Golos Text";
+  transition: background-color 0.3s, color 0.3s;
+}
+.row {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+}
+
+@media (max-width: 1024px) {
+  #root {
+    display: block;
+  }
+  .content {
+    width: 100%;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  .content {
+    width: 100%;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  .slick-slider {
+    padding-bottom: 16px !important;
+    margin-bottom: 0px !important;
+  }
+  .slick-dots {
+    bottom: -2px !important;
+    justify-content: center;
+  }
+  .slick-dots li {
+    width: auto !important;
+    height: auto !important;
+  }
+  #chat-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .content {
+    width: 100%;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  .slick-slider {
+    padding-bottom: 16px !important;
+    margin-bottom: 0px !important;
+  }
+  .searchContainer {
+    margin-top: 35px;
+    padding-top: 1px;
+    min-height: 100vh;
+  }
+  .mobHide {
+    display: none;
+  }
+  .mobShow {
+    display: flex;
+  }
+  #root {
+    display: block;
+  }
+  body::-webkit-scrollbar {
+    width: 0;
+    height: 0; /* for horizontal scrollbar */
+  }
+
+  /* For Firefox */
+  body {
+    scrollbar-width: none; /* hides scrollbar, still scrolls */
+  }
+  .slick-dots {
+    bottom: -2px !important;
+    justify-content: center;
+  }
+  .slick-dots li {
+    width: auto !important;
+    height: auto !important;
+  }
+}

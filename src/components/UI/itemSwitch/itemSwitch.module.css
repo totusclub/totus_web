@@ -1,0 +1,22 @@
+.itemSwitch{
+    display: flex;
+    /*flex: 1;*/
+    /*flex-direction: column;*/
+    background: var(--bgPrimary);
+    width: 100%;
+    height: 56px;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    border-radius: 20px;
+
+}
+.itemSwitchTitle{
+    color: var(--textPrimary);
+    /*font-family: "Golos Text";*/
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 20px;
+    letter-spacing: -0.32px;
+}

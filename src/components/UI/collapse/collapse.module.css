@@ -1,0 +1,47 @@
+.collapse {
+    /*border: 1px solid #ccc;*/
+    border-radius: 20px;
+    margin-bottom: 10px;
+    overflow: hidden;
+}
+
+.collapseHeader {
+    width: 100%;
+    background: var(--bgPrimary);
+    padding: 12px 16px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    height: 56px;
+
+}
+.collapseTitle{
+    color: var(--textPrimary);
+    /* Headline/Medium */
+    /*font-family: "Golos Text";*/
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 24px;
+    letter-spacing: -0.4px;
+}
+.contentWrapper {
+    overflow: hidden;
+    transition: height 0.3s ease;
+
+}
+
+.content {
+    padding: 12px 16px;
+    background: #fff;
+    border-top: 1px solid var(--borderTertiary);
+}
+@media (max-width: 768px) {
+    .collapseTitle{
+        font-size: 14px;
+    }
+}
