@@ -1,4 +1,4 @@
-import React, {CSSProperties, useEffect, useState} from 'react';
+import React, { CSSProperties, useEffect, useState } from 'react';
 import Slider from 'react-slick';
 import styles from './smallSlide.module.css';
 import "slick-carousel/slick/slick.css";
@@ -30,17 +30,15 @@ const PrevArrow = ({ onClick }: ArrowProps) => {
     );
 };
 
-const SmallSlider = ({images}) => {
+const SmallSlider = ({ images }) => {
     const [selectedIndex, setSelectedIndex] = useState<string>('');
-
-    // const [selectedImage, setSelectedImage] = useState<string>("");
     const [currentSlide, setCurrentSlide] = useState(0);
 
-    // useEffect(() => {
-    //     if (images?.length > 0) {
-    //         setSelectedIndex(`https://image.totus.club/imagePath?directory=${images[0]['x500']}`);
-    //     }
-    // }, [images]);
+    useEffect(() => {
+        if (images?.length > 0) {
+            setSelectedIndex(images[0]['x900']);
+        }
+    }, [images]);
 
     const maxDots = 10;
 
@@ -53,8 +51,8 @@ const SmallSlider = ({images}) => {
     // },[images])
 
     const settings = {
-        vertical: true,
-        slidesToShow: 6,
+        vertical: false,
+        slidesToShow: 3,
         slidesToScroll: 1,
         infinite: true,
         arrows: true,
@@ -98,7 +96,7 @@ const SmallSlider = ({images}) => {
                 breakpoint: 1026,
                 settings: {
                     vertical: false,
-                    slidesToShow: 2.2,
+                    slidesToShow: 3,
                     slidesToScroll: 2,
                     arrows: false,
                     dots: true,
@@ -135,18 +133,17 @@ const SmallSlider = ({images}) => {
 
                 {/*    className={styles.selectedImage}*/}
                 {/*/>*/}
-                <AppImage imageUrl={selectedIndex}/>
+                <AppImage imageUrl={selectedIndex} />
             </div>
             <Slider {...settings}>
                 {images.map((img, index) => (
                     <div key={index} onClick={() => setSelectedIndex(img['x900'])}>
                         <div
-                            className={`${styles.slideItem} ${
-                                selectedIndex === img['x900'] ? styles.selected : ''
-                            }`}
+                            className={`${styles.slideItem} ${selectedIndex === img['x900'] ? styles.selected : ''
+                                }`}
                         >
                             {/*<img  src={`https://image.totus.club/imagePath?directory=${img['x900'].replace("https://img.cdn.level.travel/", "")}`} alt={`No Image`} className={styles.thumbnail} />*/}
-                            <img  src={img['x900']} alt={`No Image`} className={styles.thumbnail} />
+                            <img src={img['x900']} alt={`No Image`} className={styles.thumbnail} />
                         </div>
                     </div>
                 ))}

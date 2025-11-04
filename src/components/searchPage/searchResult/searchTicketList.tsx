@@ -3,14 +3,17 @@ import { useState } from "react";
 import TrackPrices from "@/components/UI/trackPrices";
 import TicketItem from "@/components/ticketItem";
 import SelectedTour from "@/components/selectedTour";
+import Progress from '@/components/UI/progress';
 
 
-const ResultTicketList = ({flights,packages}:any) => {
+const ResultTicketList = ({ flights, packages, loading }: any) => {
     const [priceTrack, setPriceTrack] = useState(false);
 
     return (
         <div className={styles.resultList}>
-            <SelectedTour packages={packages}/>
+            <Progress title={'Ищем подходящие туры'} loading={loading} />
+
+            <SelectedTour packages={packages} />
             <div className={styles.resultListSelectedFilter}>
                 {/*<div className={styles.selectedFiltersList}>*/}
                 {/*    {filters.map((item) => (*/}
@@ -33,30 +36,36 @@ const ResultTicketList = ({flights,packages}:any) => {
                     <div className={styles.resultListSorting}>
                         <p>Найдено {flights?.length}</p>
                     </div>
-                ): (
+                ) : (
                     <div className={styles.resultListSorting}>
-                        <div className={styles.animationTextlazy} style={{width:'30%'}}></div>
+                        <div className={styles.animationTextlazy} style={{ width: '30%' }}></div>
                     </div>
                 )}
 
             </div>
-            {flights && flights.length > 0 ? (
-                <div className={styles.resultListItems}>
-                    {flights.map((item, index) => (
-                        <>
-                            <TicketItem lazy={false} price={packages.price} item={item} green={index === 0}/>
-                            {index === 4 && (
-                                <TrackPrices text={'Получайте автоматические оповещения при изменении цен.'}
-                                             priceTrack={priceTrack} setPriceTrack={setPriceTrack}/>
-                            )}
-                        </>
-                    ))}
-                </div>
-            ):(
-                <div className={styles.resultListItems}>
-                    <TicketItem lazy={true} price={0} item={null}/>
-                </div>
-            )}
+            <div className={styles.resultListItems}>
+                {loading && (
+                    <>
+                        <TicketItem lazy={true} price={0} item={null} />
+                        <TicketItem lazy={true} price={0} item={null} />
+                        <TicketItem lazy={true} price={0} item={null} />
+                    </>
+                )}
+
+                {!loading && flights && flights.length > 0 && (
+                    <>
+                        {flights.map((item, index) => (
+                            <>
+                                <TicketItem lazy={false} price={packages.price} item={item} green={index === 0} />
+                                {index === 4 && (
+                                    <TrackPrices text={'Получайте автоматические оповещения при изменении цен.'}
+                                        priceTrack={priceTrack} setPriceTrack={setPriceTrack} />
+                                )}
+                            </>
+                        ))}
+                    </>
+                )}
+            </div>
 
         </div>
     );

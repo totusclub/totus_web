@@ -1,835 +1,848 @@
-.HotelDetailsHeader{
-    margin-top: 40px;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    margin-bottom: 32px;
+.HotelDetailsHeader {
+  margin-top: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 32px;
 }
-.HotelDetailsHeaderRow{
-    display: flex;
-    align-items: center;
-    gap: 4px;
+.HotelDetailsHeaderRow {
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
-.HotelDetailsHeaderCity{
-    display: flex;
-    height: 24px;
-    padding: 0px 9px;
-    justify-content: center;
-    align-items: center;
-    gap: 4px;
-    border-radius: 12px;
-    border: 1px solid var(--secondary_green);
+.HotelDetailsHeaderCity {
+  display: flex;
+  height: 24px;
+  padding: 0px 9px;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  border-radius: 12px;
+  border: 1px solid var(--secondary_green);
 }
-.HotelDetailsHeaderCity>p{
-    color: var(--textPrimary);
-    text-align: center;
-    /*font-family: "Golos Text";*/
-    font-size: 12px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: 16px;
-    letter-spacing: -0.24px;
+.HotelDetailsHeaderCity > p {
+  color: var(--textPrimary);
+  text-align: center;
+  /*font-family: "Golos Text";*/
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 16px;
+  letter-spacing: -0.24px;
 }
-.HotelDetailsHeaderRate{
-    display: flex;
-    height: 24px;
-    padding: 0px 9px;
-    justify-content: center;
-    align-items: center;
-    gap: 4px;
-    border-radius: 12px;
-    border: 1px solid var(--secondary_yellow);
+.HotelDetailsHeaderRate {
+  display: flex;
+  height: 24px;
+  padding: 0px 9px;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  border-radius: 12px;
+  border: 1px solid var(--secondary_yellow);
 }
-.HotelDetailsHeaderRate>p{
-    color: var(--textPrimary);
-    text-align: center;
-    /*font-family: "Golos Text";*/
-    font-size: 12px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: 16px;
-    letter-spacing: -0.24px;
+.HotelDetailsHeaderRate > p {
+  color: var(--textPrimary);
+  text-align: center;
+  /*font-family: "Golos Text";*/
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 16px;
+  letter-spacing: -0.24px;
 }
-.HotelDetailsHeaderName{
-    color: var(--textPrimary);
-    /*font-family: "Golos Text";*/
-    font-size: 32px;
-    font-style: normal;
-    font-weight: 500;
-    line-height: 40px;
-    letter-spacing: -0.64px;
+.HotelDetailsHeaderName {
+  color: var(--textPrimary);
+  /*font-family: "Golos Text";*/
+  font-size: 32px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 40px;
+  letter-spacing: -0.64px;
 }
-.HotelDetailsHeaderAddress{
-    color: var(--textTertiary);
-    /*font-family: "Golos Text";*/
-    font-size: 16px;
-    font-style: normal;
-    font-weight: 500;
-    line-height: 20px;
-    letter-spacing: -0.32px;
-    text-decoration-line: underline;
-    text-decoration-style: solid;
-    text-decoration-skip-ink: none;
-    text-decoration-thickness: auto;
-    text-underline-offset: auto;
-    text-underline-position: from-font;
+.HotelDetailsHeaderAddress {
+  color: var(--textTertiary);
+  /*font-family: "Golos Text";*/
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 20px;
+  letter-spacing: -0.32px;
+  text-decoration-line: underline;
+  text-decoration-style: solid;
+  text-decoration-skip-ink: none;
+  text-decoration-thickness: auto;
+  text-underline-offset: auto;
+  text-underline-position: from-font;
 }
-.HotelDetailsInfoRow{
-    display: flex;
-    gap: 24px;
+.HotelDetailsInfoRow {
+  display: flex;
+  gap: 24px;
 }
-.HotelDetailsInfo{
-    /*border: 1px solid var(--secondary_yellow);*/
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    gap: 10px;
-    /*height: 200px;*/
+.HotelDetailsInfo {
+  /*border: 1px solid var(--secondary_yellow);*/
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 10px;
+  /*height: 200px;*/
 }
-.HotelDetailsInfoPrice{
-    display: flex;
-    padding: 16px;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 4px;
-    align-self: stretch;
-    border-radius:  16px;
-    background: var(--bgPrimary);
-    width: 100%;
+.HotelDetailsInfoPrice {
+  display: flex;
+  padding: 16px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  align-self: stretch;
+  border-radius: 16px;
+  background: var(--bgPrimary);
+  width: 100%;
 }
-.HotelDetailsInfoPriceText{
-    color: var(--core_Orange);
-    /*font-family: "Golos Text";*/
-    font-size: 32px;
-    font-style: normal;
-    font-weight: 500;
-    line-height: 40px;
-    letter-spacing: -0.64px;
-    margin-left: 16px;
+.HotelDetailsInfoPriceText {
+  color: var(--core_Orange);
+  /*font-family: "Golos Text";*/
+  font-size: 32px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 40px;
+  letter-spacing: -0.64px;
+  margin-left: 16px;
 }
-.HotelDetailsInfoDate{
-    display: flex;
-    height: 64px;
-    padding: 4px 16px;
-    flex-direction: column;
-    justify-content: center;
-    align-items: flex-start;
-    align-self: stretch;
-    gap: 4px;
+.HotelDetailsInfoDate {
+  display: flex;
+  height: 64px;
+  padding: 4px 16px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  align-self: stretch;
+  gap: 4px;
 }
-.HotelDetailsInfoDateTitle{
-    color: var(--textPrimary);
-    /*font-family: "Golos Text";*/
-    font-size: 16px;
-    font-style: normal;
-    font-weight: 500;
-    line-height: 20px;
-    letter-spacing: -0.32px;
+.HotelDetailsInfoDateTitle {
+  color: var(--textPrimary);
+  /*font-family: "Golos Text";*/
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 20px;
+  letter-spacing: -0.32px;
 }
-.HotelDetailsInfoDateText{
-    color: var(--textTertiary);
-    /*font-family: "Golos Text";*/
-    font-size: 14px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: 18px;
-    letter-spacing: -0.28px;
+.HotelDetailsInfoDateText {
+  color: var(--textTertiary);
+  /*font-family: "Golos Text";*/
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 18px;
+  letter-spacing: -0.28px;
 }
-.HotelDetailsInfoMessage{
-    display: flex;
-    padding: 36px 48px;
-    /*flex-direction: column;*/
-    justify-content: center;
-    align-items: flex-start;
-    align-self: stretch;
-    border-radius: 20px;
-    background: var(--bgPrimary);
-    gap: 16px;
-    /*box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.12), 0px 4px 12px 0px rgba(0, 0, 0, 0.12);*/
+.HotelDetailsInfoMessage {
+  display: flex;
+  padding: 36px 48px;
+  /*flex-direction: column;*/
+  justify-content: center;
+  align-items: flex-start;
+  align-self: stretch;
+  border-radius: 20px;
+  background: var(--bgPrimary);
+  gap: 16px;
+  /*box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.12), 0px 4px 12px 0px rgba(0, 0, 0, 0.12);*/
 }
-.HotelDetailsInfoMessageIcon{
-    width: 61px;
+.HotelDetailsInfoMessageIcon {
+  width: 61px;
 }
-.HotelDetailsInfoMessageText{
-    color: var(--textPrimary);
-    text-align: center;
-    /*font-family: "Golos Text";*/
-    font-size: 16px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: 20px;
-    letter-spacing: -0.32px;
+.HotelDetailsInfoMessageText {
+  color: var(--textPrimary);
+  text-align: center;
+  /*font-family: "Golos Text";*/
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 20px;
+  letter-spacing: -0.32px;
 }
-.HotelDetailsDesc{
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    align-self: stretch;
-    border-radius: 20px;
-    background: var(--bgPrimary);
-    margin: 24px 0;
-    padding-bottom: 24px;
+.HotelDetailsDesc {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  align-self: stretch;
+  border-radius: 20px;
+  background: var(--bgPrimary);
+  margin: 24px 0;
+  padding-bottom: 24px;
 }
-.HotelDetailsDescHead{
-    display: flex;
-    height: 48px;
-    padding: 0px 16px;
-    align-items: center;
-    align-self: stretch;
-    border-bottom: 1px solid var(--borderTertiary);
+.HotelDetailsDescHead {
+  display: flex;
+  height: 48px;
+  padding: 0px 16px;
+  align-items: center;
+  align-self: stretch;
+  border-bottom: 1px solid var(--borderTertiary);
 }
-.HotelDetailsDescItems{
-    display: flex;
-    padding: 16px;
-    align-items: center;
-    align-content: center;
-    gap: 8px;
-    align-self: stretch;
-    flex-wrap: wrap;
+.HotelDetailsDescItems {
+  display: flex;
+  padding: 16px;
+  align-items: center;
+  align-content: center;
+  gap: 8px;
+  align-self: stretch;
+  flex-wrap: wrap;
 }
-.HotelDetailsDescItem{
-    display: flex;
-    padding: 4px 8px;
-    justify-content: center;
-    align-items: center;
-    border-radius: 12px;
-    background: var(--bgSecondary);
+.HotelDetailsDescItem {
+  display: flex;
+  padding: 4px 8px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 12px;
+  background: var(--bgSecondary);
 }
-.HotelDetailsDescItem>p{
-    color: var(--textPrimary);
-    /*font-family: "Golos Text";*/
-    font-size: 12px;
-    font-style: normal;
-    font-weight: 500;
-    line-height: 16px; /* 133.333% */
-    letter-spacing: -0.24px;
+.HotelDetailsDescItem > p {
+  color: var(--textPrimary);
+  /*font-family: "Golos Text";*/
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 16px; /* 133.333% */
+  letter-spacing: -0.24px;
 }
-.HotelDetailsDescText{
-    display: flex;
-    padding: 4px 16px;
-    flex-direction: column;
-    justify-content: center;
-    align-items: flex-start;
-    align-self: stretch;
+.HotelDetailsDescText {
+  display: flex;
+  padding: 4px 16px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  align-self: stretch;
 }
-.HotelDetailsDescText>p{
-    color: var(--textPrimary);
-    /*font-family: "Golos Text";*/
-    font-size: 14px;
-    font-style: normal;
-    font-weight: 500;
-    line-height: 18px;
-    letter-spacing: -0.28px;
+.HotelDetailsDescText > p {
+  color: var(--textPrimary);
+  /*font-family: "Golos Text";*/
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 18px;
+  letter-spacing: -0.28px;
 }
-.HotelDetailsRoomsRow{
-    display: flex;
-    align-items: flex-start;
-    gap: 24px;
-    align-self: stretch;
+.HotelDetailsRoomsRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
+  align-self: stretch;
 }
-.HotelDetailsRooms{
-    display: flex;
-    width: 900px;
-    flex-direction: column;
-    align-items: flex-start;
-    border-radius: 20px;
-    background: var(--bgPrimary);
+.HotelDetailsRooms {
+  display: flex;
+  width: 900px;
+  flex-direction: column;
+  align-items: flex-start;
+  border-radius: 20px;
+  background: var(--bgPrimary);
 }
-.HotelDetailsMap{
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 24px;
-    flex: 1 0 0;
-    /*height: 200px;*/
+.HotelDetailsMap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 24px;
+  flex: 1 0 0;
+  /*height: 200px;*/
 }
-.HotelDetailsMapBox{
-    display: flex;
-    padding: 16px;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-    align-self: stretch;
-    border-radius: 16px;
-    background: var(--bgPrimary);
+.HotelDetailsMapBox {
+  display: flex;
+  padding: 16px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  align-self: stretch;
+  border-radius: 16px;
+  background: var(--bgPrimary);
 }
-.HotelDetailsMapBoxTitle{
-    display: flex;
-    gap: 4px;
-    align-items: center;
+.HotelDetailsMapBoxTitle {
+  display: flex;
+  gap: 4px;
+  align-items: center;
 }
-.map{
-    display: flex;
-    height: 184px;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-    flex-shrink: 0;
-    align-self: stretch;
-    border: 1px solid var(--borderTertiary);
-    border-radius: 8px;
+.map {
+  display: flex;
+  height: 184px;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  align-self: stretch;
+  border: 1px solid var(--borderTertiary);
+  border-radius: 8px;
 }
-.HotelDetailsMapBoxTitle>p{
-    color: var(--textTertiary);
-    /*font-family: "Golos Text";*/
-    font-size: 16px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: 20px; /* 125% */
-    letter-spacing: -0.32px;
+.HotelDetailsMapBoxTitle > p {
+  color: var(--textTertiary);
+  /*font-family: "Golos Text";*/
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 20px; /* 125% */
+  letter-spacing: -0.32px;
 }
-.HotelDetailsRoomsHead{
-    display: flex;
-    height: 48px;
-    padding: 0px 16px;
-    align-items: center;
-    align-self: stretch;
-    border-bottom: 1px solid var(--borderTertiary);
+.HotelDetailsRoomsHead {
+  display: flex;
+  height: 48px;
+  padding: 0px 16px;
+  align-items: center;
+  align-self: stretch;
+  border-bottom: 1px solid var(--borderTertiary);
 }
-.HotelDetailsRoomsHead>p{
-    color: var(--textPrimary);
-    /*font-family: "Golos Text";*/
-    font-size: 20px;
-    font-style: normal;
-    font-weight: 500;
-    line-height: 24px; /* 120% */
-    letter-spacing: -0.4px;
+.HotelDetailsRoomsHead > p {
+  color: var(--textPrimary);
+  /*font-family: "Golos Text";*/
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 24px; /* 120% */
+  letter-spacing: -0.4px;
 }
-.HotelDetailsDatePrices{
-    display: flex;
-    padding: 8px  16px;
-    align-items: flex-start;
-    gap: 4px;
-    align-self: stretch;
+.HotelDetailsDatePrices {
+  display: flex;
+  padding: 8px 16px;
+  align-items: flex-start;
+  gap: 4px;
+  align-self: stretch;
 }
-.HotelDetailsDatePrice{
-    display: flex;
-    height: 64px;
-    padding: 0px 16px;
-    flex-direction: column;
-    justify-content: center;
-    align-items: flex-start;
-    flex: 1 0 0;
-    border-radius: 16px;
-    border-right: 1px solid var(--borderTertiary);
-    background: var(--bgSecondary);
-    cursor: pointer;
+.HotelDetailsDatePrice {
+  display: flex;
+  height: 64px;
+  padding: 0px 16px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  flex: 1 0 0;
+  border-radius: 16px;
+  border-right: 1px solid var(--borderTertiary);
+  background: var(--bgSecondary);
+  cursor: pointer;
 }
-.HotelDetailsDatePrice>p:nth-child(1){
-    color: var(--textPrimary);
-    /*font-family: "Golos Text";*/
-    font-size: 20px;
-    font-style: normal;
-    font-weight: 500;
-    line-height: 24px; /* 120% */
-    letter-spacing: -0.4px;
+.HotelDetailsDatePrice > p:nth-child(1) {
+  color: var(--textPrimary);
+  /*font-family: "Golos Text";*/
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 24px; /* 120% */
+  letter-spacing: -0.4px;
 }
-.HotelDetailsDatePrice>p:nth-child(2){
-    color: var(--textTertiary);
-    /*font-family: "Golos Text";*/
-    font-size: 16px;
-    font-style: normal;
-    font-weight: 500;
-    line-height: 20px; /* 125% */
-    letter-spacing: -0.32px;
+.HotelDetailsDatePrice > p:nth-child(2) {
+  color: var(--textTertiary);
+  /*font-family: "Golos Text";*/
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 20px; /* 125% */
+  letter-spacing: -0.32px;
 }
-.HotelDetailsTourAgents{
-    display: flex;
-    align-items: flex-start;
-    align-content: flex-start;
-    gap: 8px 8px;
-    align-self: stretch;
-    flex-wrap: wrap;
+.HotelDetailsTourAgents {
+  display: flex;
+  align-items: flex-start;
+  align-content: flex-start;
+  gap: 8px 8px;
+  align-self: stretch;
+  flex-wrap: wrap;
 }
-.HotelDetailsTourAgent{
-    display: flex;
-    height: 40px;
-    padding: 16px;
-    justify-content: center;
-    align-items: center;
-    border-radius:24px;
-    cursor: pointer;
+.HotelDetailsTourAgent {
+  display: flex;
+  height: 40px;
+  padding: 16px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 24px;
+  cursor: pointer;
 }
-.HotelDetailsRoomItem{
-    display: flex;
-    padding: 16px;
-    margin: 0 16px 16px 16px;
-    flex-direction: column;
-    align-items: flex-start;
-    gap:  16px;
-    align-self: stretch;
-    border-radius: 16px;
-    border: 1px solid var(--borderTertiary);
-    background: var(--bgPrimary);
-
+.HotelDetailsRoomItem {
+  display: flex;
+  padding: 16px;
+  margin: 0 16px 16px 16px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+  align-self: stretch;
+  border-radius: 16px;
+  border: 1px solid var(--borderTertiary);
+  background: var(--bgPrimary);
 }
-.HotelDetailsRoom{
-    /*padding-top: 24px;*/
-    display: flex;
-    /*height: 200px;*/
-    align-items: center;
-    gap: 24px;
-    align-self: stretch;
-    border-bottom: 1px solid var(--borderTertiary);
-    padding-bottom: 16px;
+.HotelDetailsRoom {
+  /*padding-top: 24px;*/
+  display: flex;
+  /*height: 200px;*/
+  align-items: center;
+  gap: 24px;
+  align-self: stretch;
+  border-bottom: 1px solid var(--borderTertiary);
+  padding-bottom: 16px;
 }
-.HotelDetailsRoomImage{
-    display: flex;
-    width: 279px;
-    height: 200px;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-    border-radius: 8px;
-    overflow: hidden;
+.HotelDetailsRoomImage {
+  display: flex;
+  width: 279px;
+  height: 200px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  border-radius: 8px;
+  overflow: hidden;
+  flex-shrink: 0;
 }
-.HotelDetailsRoomImage>img{
-    /*width: 100%;*/
-    height: 110%;
-    object-fit: cover;
+.HotelDetailsRoomImage > img {
+  /*width: 100%;*/
+  height: 110%;
+  object-fit: cover;
 }
-.HotelDetailsRoomInforamation{
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 16px;
-    flex: 1 0 0;
-    align-self: stretch;
+.HotelDetailsRoomInforamation {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+  flex: 1 0 0;
+  align-self: stretch;
 }
-.HotelDetailsRoomInforamation>p{
-    color: var(--textPrimary, #1F1F1F);
-    /*font-family: "Golos Text";*/
-    font-size: 20px;
-    font-style: normal;
-    font-weight: 500;
-    line-height: 24px; /* 120% */
-    letter-spacing: -0.4px;
+.HotelDetailsRoomInforamation > p {
+  color: var(--textPrimary, #1f1f1f);
+  /*font-family: "Golos Text";*/
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 24px; /* 120% */
+  letter-spacing: -0.4px;
 }
-.HotelDetailsRoomOptions{
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: flex-start;
-    gap:  8px;
-    align-self: stretch;
+.HotelDetailsRoomOptions {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 8px;
+  align-self: stretch;
 }
-.HotelDetailsRoomOption{
-    display: flex;
-    align-items: center;
-    gap: 4px;
+.HotelDetailsRoomOption {
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
-.HotelDetailsRoomfacilities{
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
+.HotelDetailsRoomfacilities {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
-.HotelDetailsRoomfacilitiesItem{
-    padding: 4px 8px;
-    background: var(--bgSecondary);
-    font-size: 11px;
-    color: var(--textSecondary);
-    border-radius: 8px;
+.HotelDetailsRoomfacilitiesItem {
+  padding: 4px 8px;
+  background: var(--bgSecondary);
+  font-size: 11px;
+  color: var(--textSecondary);
+  border-radius: 8px;
 }
-.HotelDetailsRoomOption>p{
-    color: var(--textSecondary);
-    /*font-family: "Golos Text";*/
-    font-size: 14px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: 17px; /* 125% */
-    letter-spacing: -0.32px;
-
+.HotelDetailsRoomOption > p {
+  color: var(--textSecondary);
+  /*font-family: "Golos Text";*/
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 17px; /* 125% */
+  letter-spacing: -0.32px;
 }
-.HotelDetailsPriceList{
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 4px;
-    align-self: stretch;
+.HotelDetailsPriceList {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  align-self: stretch;
 }
-.HotelDetailsPriceListHead{
-    display: flex;
-    padding: 4px 16px 4px 0px;
-    flex-direction: column;
-    justify-content: center;
-    /*align-items: center;*/
-    gap: 4px;
-    align-self: stretch;
+.HotelDetailsPriceListHead {
+  display: flex;
+  padding: 4px 16px 4px 0px;
+  flex-direction: column;
+  justify-content: center;
+  /*align-items: center;*/
+  gap: 4px;
+  align-self: stretch;
 }
-.HotelDetailsPriceListHead>p:nth-child(1){
-    color: var(--textPrimary);
-    /*font-family: "Golos Text";*/
-    font-size: 14px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: 18px; /* 128.571% */
-    letter-spacing: -0.28px;
+.HotelDetailsPriceListHead > p:nth-child(1) {
+  color: var(--textPrimary);
+  /*font-family: "Golos Text";*/
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 18px; /* 128.571% */
+  letter-spacing: -0.28px;
 }
-.HotelDetailsPriceListHead>p:nth-child(2){
-    color: var(--textTertiary);
-    /*font-family: "Golos Text";*/
-    font-size: 12px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: 16px; /* 133.333% */
-    letter-spacing: -0.24px;
+.HotelDetailsPriceListHead > p:nth-child(2) {
+  color: var(--textTertiary);
+  /*font-family: "Golos Text";*/
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 16px; /* 133.333% */
+  letter-spacing: -0.24px;
 }
-.HotelDetailsPriceListItems{
-    display: flex;
-    /*padding: 16px 16px 0 16px;*/
-    align-items: center;
-    flex-direction: column;
-    /*gap: 16px;*/
-    align-self: stretch;
-    border-radius: 16px;
-    background: var(--bgDisabled);
+.HotelDetailsPriceListItems {
+  display: flex;
+  /*padding: 16px 16px 0 16px;*/
+  align-items: center;
+  flex-direction: column;
+  /*gap: 16px;*/
+  align-self: stretch;
+  border-radius: 16px;
+  background: var(--bgDisabled);
 }
-.HotelDetailsPriceListItem{
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    padding-right: 16px;
-    padding-left: 16px;
+.HotelDetailsPriceListItem {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  padding-right: 16px;
+  padding-left: 16px;
 }
-.HotelDetailsPriceListItem>div{
-    display: flex;
-    flex-direction: column;
-    flex: 0.4;
-    justify-content: center;
-    padding-top: 16px;
-    padding-bottom: 16px;
+.HotelDetailsPriceListItem > div {
+  display: flex;
+  flex-direction: column;
+  flex: 0.4;
+  justify-content: center;
+  padding-top: 16px;
+  padding-bottom: 16px;
 }
-.HotelDetailsPriceListItem>div:nth-child(3){
-    align-items: flex-end;
-    flex: 0.2;
+.HotelDetailsPriceListItem > div:nth-child(3) {
+  align-items: flex-end;
+  flex: 0.2;
 }
-.HotelDetailsPriceListItem>div>p:nth-child(1){
-    color: var(--textPrimary);
-    /*font-family: "Golos Text";*/
-    font-size: 16px;
-    font-style: normal;
-    font-weight: 500;
-    line-height: 20px; /* 125% */
-    letter-spacing: -0.32px;
+.HotelDetailsPriceListItem > div > p:nth-child(1) {
+  color: var(--textPrimary);
+  /*font-family: "Golos Text";*/
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 20px; /* 125% */
+  letter-spacing: -0.32px;
 }
-.HotelDetailsPriceListItem>div>p:nth-child(2){
-    color: var(--textTertiary);
-    /*font-family: "Golos Text";*/
-    font-size: 14px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: 18px; /* 128.571% */
-    letter-spacing: -0.28px;
+.HotelDetailsPriceListItem > div > p:nth-child(2) {
+  color: var(--textTertiary);
+  /*font-family: "Golos Text";*/
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 18px; /* 128.571% */
+  letter-spacing: -0.28px;
 }
 .HotelDetailsPriceListItem:not(:last-child) {
-    border-bottom: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
 }
-.HotelDetailsServices{
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    align-self: stretch;
-    border-radius: 20px;
-    background: var(--bgPrimary);
-    min-height: 200px;
-    margin-top: 24px;
+.HotelDetailsServices {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  align-self: stretch;
+  border-radius: 20px;
+  background: var(--bgPrimary);
+  min-height: 200px;
+  margin-top: 24px;
 }
-.HotelDetailsServicesHead{
-    display: flex;
-    height: 48px;
-    padding: 0px 16px;
-    align-items: center;
-    align-self: stretch;
-    border-bottom: 1px solid var(--borderTertiary);
+.HotelDetailsServicesHead {
+  display: flex;
+  height: 48px;
+  padding: 0px 16px;
+  align-items: center;
+  align-self: stretch;
+  border-bottom: 1px solid var(--borderTertiary);
 }
-.HotelDetailsServicesHead>p{
-    color: var(--textPrimary, #1F1F1F);
-    /*font-family: "Golos Text";*/
-    font-size: 20px;
-    font-style: normal;
-    font-weight: 500;
-    line-height: 24px; /* 120% */
-    letter-spacing: -0.4px;
+.HotelDetailsServicesHead > p {
+  color: var(--textPrimary, #1f1f1f);
+  /*font-family: "Golos Text";*/
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 24px; /* 120% */
+  letter-spacing: -0.4px;
 }
-.HotelDetailsServicesBody{
-    padding: 16px;
-    width: 100%;
+.HotelDetailsServicesBody {
+  padding: 16px;
+  width: 100%;
 }
-.hotelCardImageInfo{
-    display: flex;
-    gap: 8px;
+.hotelCardImageInfo {
+  display: flex;
+  gap: 8px;
 }
-.hotelCardImageInfo>p:nth-child(2){
-    color: var(--textPrimary);
-    text-align: right;
-    leading-trim: both;
-    text-edge: cap;
-    font-family: "Golos Text";
-    font-size: 12px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: 16px; /* 100% */
-    letter-spacing: -0.32px;
-    display: flex;
-    align-items: center;
-    gap: 2px;
+.hotelCardImageInfo > p:nth-child(2) {
+  color: var(--textPrimary);
+  text-align: right;
+  leading-trim: both;
+  text-edge: cap;
+  font-family: "Golos Text";
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 16px; /* 100% */
+  letter-spacing: -0.32px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
 }
-.hotelCardImageInfo>p:nth-child(1){
-    /*color: var(--textPrimary);*/
-    /*font-size: 9px;*/
-    /*font-style: normal;*/
-    /*font-weight: 400;*/
-    background: var(--textPrimary);
-    color: var(--textPrimaryB, #FFF);
-    text-align: center;
-    leading-trim: both;
-    text-edge: cap;
-    font-family: "Golos Text";
-    font-size: 16px;
-    font-style: normal;
-    font-weight: 500;
-    line-height: 16px; /* 100% */
-    letter-spacing: -0.32px;
-    display: flex;
-    padding: 4px;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-    border-radius: 4px;
-    background: var(--primary_green);
+.hotelCardImageInfo > p:nth-child(1) {
+  /*color: var(--textPrimary);*/
+  /*font-size: 9px;*/
+  /*font-style: normal;*/
+  /*font-weight: 400;*/
+  background: var(--textPrimary);
+  color: var(--textPrimaryB, #fff);
+  text-align: center;
+  leading-trim: both;
+  text-edge: cap;
+  font-family: "Golos Text";
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 16px; /* 100% */
+  letter-spacing: -0.32px;
+  display: flex;
+  padding: 4px;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  border-radius: 4px;
+  background: var(--primary_green);
 }
-.HotelDetailsDatePricesMob{
-    display: none;
+.HotelDetailsDatePricesMob {
+  display: none;
 }
-
 
 @media (max-width: 1024px) {
-    .HotelDetailsInfoRow{
-        flex-direction: column;
-    }
-    .HotelDetailsRoomsRow{
-        /*flex-direction: column;*/
-    }
-    .HotelDetailsRooms{
-        width: 100%;
-    }
-    .HotelDetailsRoom{
-        /*flex-direction: column;*/
-    }
-    .HotelDetailsDatePrices{
-        display: none;
-    }
-    .HotelDetailsDatePrice{
-        /*width: 120px*/
-    }
-    .HotelDetailsDatePricesMob{
-        display: block;
-        height: 80px;
-        width: 100%;
-        margin-top: 15px;
-        padding-left: 16px;
-    }
-    .HotelDetailsDatePricesMobRows{
-        display: flex;
-        overflow-x: auto;
-        overflow-y: hidden;
-        white-space: nowrap;
-        scroll-snap-type: x mandatory;
-        gap: 8px; /* Optional: space between items */
-        padding-bottom: 8px; /* Optional: space for scrollbar */
-        -webkit-overflow-scrolling: touch; /* Smooth scroll on iOS */
+  .HotelDetailsInfoRow {
+    flex-direction: column;
+  }
+  .HotelDetailsRoomsRow {
+    /*flex-direction: column;*/
+  }
+  .HotelDetailsRooms {
+    width: 100%;
+  }
+  .HotelDetailsRoom {
+    /*flex-direction: column;*/
+  }
+  .HotelDetailsDatePrices {
+    display: none;
+  }
+  .HotelDetailsDatePrice {
+    /*width: 120px*/
+  }
+  .HotelDetailsDatePricesMob {
+    display: block;
+    height: 80px;
+    width: 100%;
+    margin-top: 15px;
+    padding-left: 16px;
+  }
+  .HotelDetailsDatePricesMobRows {
+    display: flex;
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+    scroll-snap-type: x mandatory;
+    gap: 8px; /* Optional: space between items */
+    padding-bottom: 8px; /* Optional: space for scrollbar */
+    -webkit-overflow-scrolling: touch; /* Smooth scroll on iOS */
 
-        scrollbar-width: none; /* Firefox */
-        -ms-overflow-style: none; /* Internet Explorer 10+ */
-    }
-    .HotelDetailsDatePriceMob{
-        flex: 0 0 auto;
-        scroll-snap-align: start;
-        min-width: 120px; /* Or whatever fits best */
-        height: 60px;
-        border-radius: 8px;
-        /*align-items: center;*/
-        display: flex;
-        padding-left: 8px;
-        flex-direction: column;
-        justify-content: center;
-        background-color: #0D77D3;
-    }
-    .HotelDetailsInfoMessage{
-        display: none;
-    }
-    .trackPrices{
-        display: none
-    }
-    .HotelDetailsMap{
-        display: none;
-    }
-    .HotelDetailsPriceListItem{
-        /*flex-direction: column;*/
-        padding-top: 10px;
-        padding-bottom: 10px;
-        gap: 14px;
-    }
-    .HotelDetailsPriceListItem>div{
-        padding-top: 0;
-        padding-bottom: 0;
-    }
-    .HotelDetailsPriceListItem > div:nth-child(3) {
-        flex: 1;
-        /*align-items: flex-start;*/
-    }
-    .HotelDetailsPriceListItem > div:nth-child(3) >div {
-        /*width: 100% !important;*/
-    }
-    .HotelDetailsInfoPrice{
-        margin-top: 10px;
-    }
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* Internet Explorer 10+ */
+  }
+  .HotelDetailsDatePriceMob {
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+    min-width: 120px; /* Or whatever fits best */
+    height: 60px;
+    border-radius: 8px;
+    /*align-items: center;*/
+    display: flex;
+    padding-left: 8px;
+    flex-direction: column;
+    justify-content: center;
+    background-color: #0d77d3;
+  }
+  .HotelDetailsInfoMessage {
+    display: none;
+  }
+  .trackPrices {
+    display: none;
+  }
+  .HotelDetailsMap {
+    display: none;
+  }
+  .HotelDetailsPriceListItem {
+    /*flex-direction: column;*/
+    padding-top: 10px;
+    padding-bottom: 10px;
+    gap: 14px;
+  }
+  .HotelDetailsPriceListItem > div {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+  .HotelDetailsPriceListItem > div:nth-child(3) {
+    flex: 1;
+    /*align-items: flex-start;*/
+  }
+  .HotelDetailsPriceListItem > div:nth-child(3) > div {
+    /*width: 100% !important;*/
+  }
+  .HotelDetailsInfoPrice {
+    margin-top: 10px;
+  }
+
+  /* Mobile skeleton overrides */
+  .image_placeholder {
+    width: 100%;
+    height: 300px;
+    border-radius: 8px;
+  }
 }
 
 @media (max-width: 768px) {
-    .HotelDetailsInfoRow{
-        flex-direction: column;
-    }
-    .HotelDetailsRoomsRow{
-        flex-direction: column;
-    }
-    .HotelDetailsRooms{
-        width: 100%;
-    }
-    .HotelDetailsRoom{
-        flex-direction: column;
-    }
-    .HotelDetailsDatePrices{
-        display: none;
-    }
-    .HotelDetailsDatePrice{
-        /*width: 120px*/
-    }
-    .HotelDetailsDatePricesMob{
-        display: block;
-        height: 80px;
-        width: 100%;
-        margin-top: 15px;
-        padding-left: 16px;
-    }
-    .HotelDetailsDatePricesMobRows{
-        display: flex;
-        overflow-x: auto;
-        overflow-y: hidden;
-        white-space: nowrap;
-        scroll-snap-type: x mandatory;
-        gap: 8px; /* Optional: space between items */
-        padding-bottom: 8px; /* Optional: space for scrollbar */
-        -webkit-overflow-scrolling: touch; /* Smooth scroll on iOS */
-
-        scrollbar-width: none; /* Firefox */
-        -ms-overflow-style: none; /* Internet Explorer 10+ */
-    }
-    .HotelDetailsDatePriceMob{
-        flex: 0 0 auto;
-        scroll-snap-align: start;
-        min-width: 120px; /* Or whatever fits best */
-        height: 60px;
-        border-radius: 8px;
-        /*align-items: center;*/
-        display: flex;
-        padding-left: 8px;
-        flex-direction: column;
-        justify-content: center;
-        background-color: #0D77D3;
-    }
-    .HotelDetailsInfoMessage{
-        display: none;
-    }
-    .trackPrices{
-        display: none
-    }
-    .HotelDetailsMap{
-        display: none;
-    }
-    .HotelDetailsPriceListItem{
-        flex-direction: column;
-        padding-top: 10px;
-        padding-bottom: 10px;
-        gap: 14px;
-    }
-    .HotelDetailsPriceListItem>div{
-        padding-top: 0;
-        padding-bottom: 0;
-    }
-    .HotelDetailsPriceListItem > div:nth-child(3) {
-        flex: 1;
-        align-items: flex-start;
-    }
-    .HotelDetailsPriceListItem > div:nth-child(3) >div {
-        width: 100% !important;
-    }
-}
-
-
-.animationTextlazy1{
-    width: 40%;
-    height: 20px;
-    background: linear-gradient(
-            90deg,
-            #f0f0f0 25%,
-            #e0e0e0 37%,
-            #f0f0f0 63%
-    );
-    background-size: 400% 100%; /* Important for shimmer effect */
-    animation: placeholderShimmer 1.5s ease-in-out infinite;
-    border-radius: 8px;
-    margin-top: 12px;
-}
-
-.animationTextlazy2{
-    width: 60%;
-    height: 10px;
-    background: linear-gradient(
-            90deg,
-            #f0f0f0 25%,
-            #e0e0e0 37%,
-            #f0f0f0 63%
-    );
-    background-size: 400% 100%; /* Important for shimmer effect */
-    animation: placeholderShimmer 1.5s ease-in-out infinite;
-    border-radius: 8px;
-    margin-top: 12px;
-}
-.animationButtonLazy{
+  .HotelDetailsInfoRow {
+    flex-direction: column;
+  }
+  .HotelDetailsRoomsRow {
+    flex-direction: column;
+  }
+  .HotelDetailsRooms {
     width: 100%;
-    height: 40px;
-    background: linear-gradient(
-            90deg,
-            #f0f0f0 25%,
-            #e0e0e0 37%,
-            #f0f0f0 63%
-    );
-    background-size: 400% 100%; /* Important for shimmer effect */
-    animation: placeholderShimmer 1.5s ease-in-out infinite;
-    border-radius: 20px;
-    margin-top: 12px;
-}
-.animationTextlazy{
-    width: 40%;
-    height: 10px;
-    background: linear-gradient(
-            90deg,
-            #f0f0f0 25%,
-            #e0e0e0 37%,
-            #f0f0f0 63%
-    );
-    background-size: 400% 100%; /* Important for shimmer effect */
-    animation: placeholderShimmer 1.5s ease-in-out infinite;
+  }
+  .HotelDetailsRoom {
+    flex-direction: column;
+  }
+
+  .HotelDetailsRoomImage {
+    width: 100%;
+    height: 200px;
+  }
+  .HotelDetailsDatePrices {
+    display: none;
+  }
+  .HotelDetailsDatePrice {
+    /*width: 120px*/
+  }
+  .HotelDetailsDatePricesMob {
+    display: block;
+    height: 80px;
+    width: 100%;
+    margin-top: 15px;
+    padding-left: 16px;
+  }
+  .HotelDetailsDatePricesMobRows {
+    display: flex;
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+    scroll-snap-type: x mandatory;
+    gap: 8px; /* Optional: space between items */
+    padding-bottom: 8px; /* Optional: space for scrollbar */
+    -webkit-overflow-scrolling: touch; /* Smooth scroll on iOS */
+
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* Internet Explorer 10+ */
+  }
+  .HotelDetailsDatePriceMob {
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+    min-width: 120px; /* Or whatever fits best */
+    height: 60px;
     border-radius: 8px;
-    margin-top: 12px;
+    /*align-items: center;*/
+    display: flex;
+    padding-left: 8px;
+    flex-direction: column;
+    justify-content: center;
+    background-color: #0d77d3;
+  }
+  .HotelDetailsInfoMessage {
+    display: none;
+  }
+  .trackPrices {
+    display: none;
+  }
+  .HotelDetailsMap {
+    display: none;
+  }
+  .HotelDetailsPriceListItem {
+    flex-direction: column;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    gap: 14px;
+  }
+  .HotelDetailsPriceListItem > div {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+  .HotelDetailsPriceListItem > div:nth-child(3) {
+    flex: 1;
+    align-items: flex-start;
+  }
+  .HotelDetailsPriceListItem > div:nth-child(3) > div {
+    width: 100% !important;
+  }
+
+  /* Mobile skeleton overrides */
+  .image_placeholder {
+    width: 100%;
+    height: 300px;
+    border-radius: 8px;
+  }
+}
+
+.animationTextlazy1 {
+  width: 40%;
+  height: 20px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 37%, #f0f0f0 63%);
+  background-size: 400% 100%; /* Important for shimmer effect */
+  animation: placeholderShimmer 1.5s ease-in-out infinite;
+  border-radius: 8px;
+  margin-top: 12px;
+}
+
+.animationTextlazy2 {
+  width: 60%;
+  height: 10px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 37%, #f0f0f0 63%);
+  background-size: 400% 100%; /* Important for shimmer effect */
+  animation: placeholderShimmer 1.5s ease-in-out infinite;
+  border-radius: 8px;
+  margin-top: 12px;
+}
+.animationButtonLazy {
+  width: 100%;
+  height: 40px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 37%, #f0f0f0 63%);
+  background-size: 400% 100%; /* Important for shimmer effect */
+  animation: placeholderShimmer 1.5s ease-in-out infinite;
+  border-radius: 20px;
+  margin-top: 12px;
+}
+.animationTextlazy {
+  width: 40%;
+  height: 10px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 37%, #f0f0f0 63%);
+  background-size: 400% 100%; /* Important for shimmer effect */
+  animation: placeholderShimmer 1.5s ease-in-out infinite;
+  border-radius: 8px;
+  margin-top: 12px;
+}
+
+/* Additional skeleton styles */
+.image_placeholder {
+  width: 560px;
+  height: 556px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 37%, #f0f0f0 63%);
+  background-size: 400% 100%;
+  animation: placeholderShimmer 1.5s ease-in-out infinite;
+  border-radius: 13.666px;
+}
+
+.animationTaglazy {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 37%, #f0f0f0 63%);
+  background-size: 400% 100%;
+  animation: placeholderShimmer 1.5s ease-in-out infinite;
+  border-radius: 12px;
 }
 
 @keyframes placeholderShimmer {
-    0% {
-        background-position: -100% 0;
-    }
-    100% {
-        background-position: 100% 0;
-    }
+  0% {
+    background-position: -100% 0;
+  }
+  100% {
+    background-position: 100% 0;
+  }
 }

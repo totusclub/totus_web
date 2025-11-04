@@ -23,13 +23,19 @@ const ArrowTop = ({ onClick }: ArrowProps) => (
     </div>
 );
 
-const VerticalSlider = ({ images ,loading}: any) => {
+const VerticalSlider = ({ images, loading }: any) => {
     const [selectedImage, setSelectedImage] = useState<string>("");
     const [currentSlide, setCurrentSlide] = useState(0);
 
+    // Initialize selectedImage when images are available
+    const initialImage = images?.length > 0 ? `https://img.cdn.level.travel/${images[0]['x500']}` : "";
+
     useEffect(() => {
+        console.log('VerticalSlider useEffect:', { images: images?.length, loading, selectedImage });
         if (images?.length > 0) {
-            setSelectedImage(`https://image.totus.club/imagePath?directory=${images[0]['x900']}`);
+            const imageUrl = `https://img.cdn.level.travel/${images[0]['x500']}`;
+            console.log('Setting selectedImage to:', imageUrl);
+            setSelectedImage(imageUrl);
         }
     }, [images]);
 
@@ -110,48 +116,48 @@ const VerticalSlider = ({ images ,loading}: any) => {
         ],
     };
 
-if(loading){
-    return (
-        <div className={styles.container}>
-            <div className={styles.sliderWrapper}>
-                <Slider {...settings}>
-                    {images.map((img: any, index: number) => (
-                        <div
-                            key={index}
-                            onClick={() =>
-                                // setSelectedImage(`https://image.totus.club/imagePath?directory=${img['x500']}`)
-                                setSelectedImage(`https://img.cdn.level.travel/${img['x500']}`)
-                            }
-                        >
-                            <img
-                                src={`https://img.cdn.level.travel/${img['x500']}`}
-                                alt={`Thumb ${index}`}
-                                className={`${styles.thumbnail} ${
-                                    selectedImage ===
-                                    `https://img.cdn.level.travel/${img['x500']}`
+    console.log('VerticalSlider render:', { loading, imagesLength: images?.length, selectedImage, initialImage });
+
+    if (!loading && images?.length > 0) {
+        return (
+            <div className={styles.container}>
+                <div className={styles.sliderWrapper}>
+                    <Slider {...settings}>
+                        {images.map((img: any, index: number) => (
+                            <div
+                                key={index}
+                                onClick={() =>
+                                    setSelectedImage(`https://img.cdn.level.travel/${img['x500']}`)
+                                }
+                            >
+                                <img
+                                    src={`https://img.cdn.level.travel/${img['x500']}`}
+                                    alt={`Thumb ${index}`}
+                                    className={`${styles.thumbnail} ${selectedImage ===
+                                        `https://img.cdn.level.travel/${img['x500']}`
                                         ? styles.selectedThumbnail
                                         : ''
-                                }`}
-                                tabIndex={index}
-                            />
-                        </div>
-                    ))}
-                </Slider>
+                                        }`}
+                                    tabIndex={index}
+                                />
+                            </div>
+                        ))}
+                    </Slider>
+                </div>
+                <div>
+                    <img
+                        src={selectedImage || initialImage}
+                        alt="Selected"
+                        className={styles.selectedImage}
+                    />
+                </div>
             </div>
-            <div>
-                <img
-                    src={selectedImage}
-                    alt="Selected"
-                    className={styles.selectedImage}
-                />
-            </div>
-        </div>
-    );
-}else{
-    return (
-        <div className={styles.image_placeholder}></div>
-    )
-}
+        );
+    } else {
+        return (
+            <div className={styles.image_placeholder}></div>
+        )
+    }
 
 };
 

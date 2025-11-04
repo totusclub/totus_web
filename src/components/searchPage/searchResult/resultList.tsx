@@ -4,9 +4,9 @@ import HotelCard from "@/components/hotelCard";
 import TrackPrices from "@/components/UI/trackPrices";
 import { useEffect, useState } from "react";
 import { useRouter } from 'next/router';
-import {useDispatch, useSelector} from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { setLoadMore } from '@/store/slices/searchSlice';
-import {RootState} from '@/store';
+import { RootState } from '@/store';
 
 interface ResultListProps {
     tickets?: boolean;
@@ -17,7 +17,7 @@ interface ResultListProps {
 const ResultList = ({ tickets, loading, data }: ResultListProps) => {
     const dispatch = useDispatch();
     const router = useRouter();
-    const {allMyHotels} = useSelector((state: RootState) => state.search);
+    const { allMyHotels } = useSelector((state: RootState) => state.search);
     const [allHotels, setAllHotels] = useState<any[]>([]);
     const [hasMore, setHasMore] = useState(true);
     const [loadingMore, setLoadingMore] = useState(false);
@@ -83,6 +83,12 @@ const ResultList = ({ tickets, loading, data }: ResultListProps) => {
     return (
         <div className={styles.resultList}>
             <Progress title={'Ищем подходящие туры'} loading={loading} />
+
+            {loading && (
+                <div className={styles.resultListSorting}>
+                    <div className={styles.animationTextlazy} style={{ width: '30%', height: '16px' }}></div>
+                </div>
+            )}
 
             {!loading && (
                 <div className={styles.resultListSorting}>
