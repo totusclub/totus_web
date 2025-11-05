@@ -296,7 +296,11 @@
     flex-direction: column;
   }
   .ticketItemDetails {
-    display: none;
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    padding: 8px;
+    margin-top: 8px;
   }
   /* Mobile skeleton overrides */
   .animationImagelazy {

@@ -58,7 +58,6 @@ export default function Tickets() {
         <main className={'searchContainer'}>
 
             <Steps active={3} />
-
             <SearchResult flightsFilter={flightsFilter} packages={packages} tickets={true} flights={allFlights} setFiltersRequest={setFiltersRequest} loading={loading} />
         </main>
     );

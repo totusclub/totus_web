@@ -25,7 +25,6 @@ const SearchResult = ({ tickets, flights, packages, flightsFilter, setFiltersReq
                 request_id: hotels?.request_id,
                 readyOperators: hotels?.readyOperators,
             };
-            console.log('hotels', hotels);
         }
     }, [hotels]);
 
@@ -40,7 +39,7 @@ const SearchResult = ({ tickets, flights, packages, flightsFilter, setFiltersReq
                     <Filters statistics={hotels?.statistics} allFilters={hotels?.filters} selectedFilters={selectedFilters} />
                 )}
 
-                {tickets ? <ResultTicketList packages={packages} flights={flights} loading={ticketsLoading || false} /> : <ResultList data={hotels} loading={loading} tickets={hotels} />}
+                {tickets ? <ResultTicketList packages={packages} flights={flights} loading={ticketsLoading || false} /> : <ResultList data={hotels} loading={loading} tickets={hotels} setFiltersRequest={setFiltersRequest} />}
             </div>
         </div>
     );

@@ -1,0 +1,44 @@
+.phoneInputWrapper {
+  width: 100%;
+}
+
+.phoneInput {
+  height: 56px;
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid var(--borderSecondary);
+  border-radius: 16px;
+  background: var(--bgPrimary, #fff);
+  font-size: 16px;
+  color: var(--textPrimary, #000);
+  outline: none;
+}
+
+.phoneInput:hover {
+  border-color: var(--core_Orange, #fe732e);
+}
+
+.phoneInput:focus {
+  border-color: var(--core_Orange, #fe732e);
+}
+
+.phoneInput::placeholder {
+  color: var(--textTertiary, #999);
+}
+
+.phoneInputError {
+  border-color: #ef4444 !important;
+}
+
+.phoneInputError:focus {
+  border-color: #ef4444 !important;
+}
+
+.errorMessage {
+  color: #ef4444;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 16px;
+  margin-top: 4px;
+  padding-left: 4px;
+}

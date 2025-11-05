@@ -1,0 +1,109 @@
+.dateInputWrapper {
+  position: relative;
+  flex: 1;
+  min-width: 0; /* Allows flex item to shrink below content size */
+}
+
+.label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--textSecondary, #666);
+}
+
+.dateInput {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border: 1px solid var(--borderTertiary, #e0e0e0);
+  border-radius: 16px;
+  background: var(--bgPrimary, #fff);
+  height: 56px;
+  box-sizing: border-box;
+}
+
+.dateInput:hover {
+  border-color: var(--core_Orange, #fe732e);
+}
+
+.dateInputError {
+  border-color: #ef4444 !important;
+}
+
+.dateInputError:hover {
+  border-color: #ef4444 !important;
+}
+
+.errorMessage {
+  color: #ef4444;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 16px;
+  margin-top: 4px;
+  padding-left: 4px;
+}
+
+.dateInput .input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 16px;
+  color: var(--textPrimary, #000);
+  cursor: text;
+  pointer-events: auto;
+  user-select: text;
+}
+
+.dateInput .input::placeholder {
+  color: var(--textTertiary, #999);
+}
+
+.dateModal {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 1000;
+  background: var(--bgPrimary, #fff);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  padding: 16px;
+  min-width: 320px;
+}
+
+.dateModalHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--borderTertiary, #e0e0e0);
+}
+
+.dateModalHead p {
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--textPrimary, #000);
+}
+
+.dateFooter {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--borderTertiary, #e0e0e0);
+}
+
+@media (max-width: 768px) {
+  .dateModal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: calc(100% - 32px);
+    max-width: 400px;
+  }
+  .dateInputWrapper {
+    width: 100%;
+  }
+}

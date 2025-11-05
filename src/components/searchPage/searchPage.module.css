@@ -1,266 +1,276 @@
-.stepsWrapper{
-    border-bottom: 1px solid var(--borderTertiary);
-    background: var(--bgSecondary);
+.stepsWrapper {
+  border-bottom: 1px solid var(--borderTertiary);
+  background: var(--bgSecondary);
 }
-.steps{
-    padding: 8px 0;
-    display: flex;
-    justify-content: space-between;
+.steps {
+  padding: 8px 0;
+  display: flex;
+  justify-content: space-between;
 }
-.step{
-    height: 40px;
-    display: flex;
-    align-items: center;
-    max-width: 100%;
+.step {
+  height: 40px;
+  display: flex;
+  align-items: center;
+  max-width: 100%;
 }
-.stepNumber{
-    width: 40px;
-    height: 40px;
-    border-radius: 20px;
-    background: var(--bgPrimary);
-    display: flex;
-    justify-content: center;
-    align-items: center;
+.stepNumber {
+  width: 40px;
+  height: 40px;
+  border-radius: 20px;
+  background: var(--bgPrimary);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
-.stepNumber>span{
-    color: var(--textTertiary);
-    /*font-family: "Golos Text";*/
-    font-size: 16px;
-    font-style: normal;
-    font-weight: 500;
-    line-height: 20px;
-    letter-spacing: -0.32px;
+.stepNumber > span {
+  color: var(--textTertiary);
+  /*font-family: "Golos Text";*/
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 20px;
+  letter-spacing: -0.32px;
 }
-.stepName{
-    color: var(--textPrimary);
-    /*font-family: "Golos Text";*/
-    font-size: 14px;
-    font-style: normal;
-    font-weight: 500;
-    line-height: 18px;
-    letter-spacing: -0.28px;
-    margin-left: 10px;
-    margin-right: 21px;
+.stepName {
+  color: var(--textPrimary);
+  /*font-family: "Golos Text";*/
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 18px;
+  letter-spacing: -0.28px;
+  margin-left: 10px;
+  margin-right: 21px;
 }
-.searchResultWrapper{
-    /*border: 1px solid red;*/
-    display: flex;
-    gap: 20px;
-    margin-top: 40px;
+.searchResultWrapper {
+  /*border: 1px solid red;*/
+  display: flex;
+  gap: 20px;
+  margin-top: 40px;
 }
-.filters{
-    display: flex;
-    flex:0.3;
-    /*background-color:  green;*/
-    min-height: 100px;
-    flex-direction: column;
-    gap: 16px;
+.filters {
+  display: flex;
+  flex: 0.3;
+  /*background-color:  green;*/
+  min-height: 100px;
+  flex-direction: column;
+  gap: 16px;
 }
-.resultList{
-    display: flex;
-    flex:0.7;
-    min-height: 100px;
-    flex-direction: column;
-    gap: 16px;
+.resultList {
+  display: flex;
+  flex: 0.7;
+  min-height: 100px;
+  flex-direction: column;
+  gap: 16px;
 }
-.resultListSelectedFilter{
-    display: flex;
-    padding: 16px;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 16px;
-    /*align-self: stretch;*/
-    border-radius: 16px;
-    background: var(--bgPrimary);
+.resultListSelectedFilter {
+  display: flex;
+  padding: 16px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+  /*align-self: stretch;*/
+  border-radius: 16px;
+  background: var(--bgPrimary);
 }
-.selectedFiltersList{
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 16px;
+.selectedFiltersList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
 }
-.resultListSorting{
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+.resultListSorting {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
 }
-.resultListSorting>p{
-    color: var(--textPrimary);
-    /*font-family: "Golos Text";*/
-    font-size: 14px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: 18px;
-    letter-spacing: -0.28px;
+.resultListSorting > p {
+  color: var(--textPrimary);
+  /*font-family: "Golos Text";*/
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 18px;
+  letter-spacing: -0.28px;
+  flex-shrink: 0;
+  margin: 0;
 }
-.resultListItems{
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
+.resultListSorting > :last-child {
+  flex-shrink: 0;
+  width: auto;
+  width: 320px;
 }
-.trackPrices{
-    display: flex;
-    height: 64px;
-    padding: 4px 16px;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    align-self: stretch;
-    border-radius: 16px;
-    border-bottom: 1px solid var(--core_Orange, #FE732E);
-    background: var(--bgPrimary, #FFF);
-    box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.12), 0px 4px 12px 0px rgba(0, 0, 0, 0.12);
+.resultListItems {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
-.trackPricesNotify{
-    display: flex;
-    /*width: 305px;*/
-    align-items: center;
-    gap: 8px;
+.trackPrices {
+  display: flex;
+  height: 64px;
+  padding: 4px 16px;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  align-self: stretch;
+  border-radius: 16px;
+  border-bottom: 1px solid var(--core_Orange, #fe732e);
+  background: var(--bgPrimary, #fff);
+  box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.12),
+    0px 4px 12px 0px rgba(0, 0, 0, 0.12);
 }
-.trackPricesSwitch{
-    display: flex;
-    /*width: 305px;*/
-    align-items: center;
-    gap: 8px;
+.trackPricesNotify {
+  display: flex;
+  /*width: 305px;*/
+  align-items: center;
+  gap: 8px;
 }
-.trackPricesSwitch>p{
-    color: var(--textPrimary);
-    /*font-family: "Golos Text";*/
-    font-size: 14px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: 18px; /* 128.571% */
-    letter-spacing: -0.28px;
+.trackPricesSwitch {
+  display: flex;
+  /*width: 305px;*/
+  align-items: center;
+  gap: 8px;
 }
-.trackPricesNotify>p{
-    color: var(--textPrimary, #1F1F1F);
-    /*font-family: "Golos Text";*/
-    font-size: 16px;
-    font-style: normal;
-    font-weight: 500;
-    line-height: 20px;
-    letter-spacing: -0.32px;
+.trackPricesSwitch > p {
+  color: var(--textPrimary);
+  /*font-family: "Golos Text";*/
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 18px; /* 128.571% */
+  letter-spacing: -0.28px;
 }
-.mobileFilterHeader{
-    display: none;
+.trackPricesNotify > p {
+  color: var(--textPrimary, #1f1f1f);
+  /*font-family: "Golos Text";*/
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 20px;
+  letter-spacing: -0.32px;
 }
-.mobileFilterFooter{
-    display: none;
+.mobileFilterHeader {
+  display: none;
 }
-.buttonFilterMob{
-    display: none;
+.mobileFilterFooter {
+  display: none;
+}
+.buttonFilterMob {
+  display: none;
 }
 @media (max-width: 1024px) {
-    .stepsWrapper{
-        display: none
-    }
-    .filters{
-        display: none;
-    }
-    .searchForm{
-        display: none!important;
-    }
-    .resultListSelectedFilter{
-        display: flex;
-        margin-top: 10px;
-    }
-    .resultList{
-        width: 100%;
-        margin-bottom: 60px;
-    }
-    .buttonFilterMob{
-        display: flex;
-        justify-content: flex-end;
-        align-items: center;
-        width: 36px;
-        height: 56px;
-        position: fixed;
-        top: 0;
-        right: 15px;
-        text-align: right;
-        /*padding-top: 16px;*/
-        z-index: 900000;
-
-    }
-    .resultListSorting{
-        /*display: none;*/
-        /*flex-direction: row-reverse;*/
-        gap: 10px;
-    }
-    .activeModal{
-        background-color: #fff;
-        position: fixed;
-        z-index: 900010;
-        width: 100%;
-        /*min-height: 100vh;*/
-        /*height: 100vh;*/
-        display: block;
-        top: 0;
-        left: 0;
-        padding-bottom: 60px;
-        min-height: 100vh;
-        max-height: 100vh;
-        overflow: auto;
-    }
-    .mobileFilterHeader{
-        display: flex;
-        justify-content: space-between;
-        padding: 15px;
-        border-bottom: 1px solid var(--borderTertiary)
-    }
-    .mobileFilterHeader>p:nth-child(1){
-        color: var(--textPrimary);
-        font-family: "Golos Text";
-        font-size: 16px;
-        font-style: normal;
-        font-weight: 500;
-        line-height: 20px;
-        letter-spacing: -0.32px;
-    }
-    .mobileFilterHeader>p:nth-child(2){
-        color: var(--core_Orange);
-        text-align: right;
-        font-family: "Golos Text";
-        font-size: 16px;
-        font-style: normal;
-        font-weight: 500;
-        line-height: 20px;
-        letter-spacing: -0.32px;
-    }
-    .mobileFilterFooter{
-        display: flex;
-        position: fixed;
-        bottom: 58px;
-        border-bottom: 1px solid var(--borderTertiary);
-        background: var(--bgPrimary);
-        box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.12), 0px 4px 12px 0px rgba(0, 0, 0, 0.12);
-        width: 100%;
-        padding: 8px;
-    }
-    .searchResultWrapper{
-        width: 100%;
-        flex-direction: column;
-    }
-    .animationTextlazy{
-        height: 8px;
-        background: linear-gradient(
-                90deg,
-                #f0f0f0 25%,
-                #e0e0e0 37%,
-                #f0f0f0 63%
-        );
-        background-size: 400% 100%; /* Important for shimmer effect */
-        animation: placeholderShimmer 1.5s ease-in-out infinite;
-        border-radius: 8px;
-        margin-top: 12px;
-    }
+  .stepsWrapper {
+    display: none;
+  }
+  .filters {
+    display: none;
+  }
+  .searchForm {
+    display: none !important;
+  }
+  .resultListSelectedFilter {
+    display: flex;
+    margin-top: 10px;
+  }
+  .resultList {
+    width: 100%;
+    margin-bottom: 60px;
+  }
+  .buttonFilterMob {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    width: 36px;
+    height: 56px;
+    position: fixed;
+    top: 0;
+    right: 15px;
+    text-align: right;
+    /*padding-top: 16px;*/
+    z-index: 900000;
+  }
+  .resultListSorting {
+    /*display: none;*/
+    /*flex-direction: row-reverse;*/
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .resultListSorting > :last-child {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+  .activeModal {
+    background-color: #fff;
+    position: fixed;
+    z-index: 900010;
+    width: 100%;
+    /*min-height: 100vh;*/
+    /*height: 100vh;*/
+    display: block;
+    top: 0;
+    left: 0;
+    padding-bottom: 60px;
+    min-height: 100vh;
+    max-height: 100vh;
+    overflow: auto;
+  }
+  .mobileFilterHeader {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px;
+    border-bottom: 1px solid var(--borderTertiary);
+  }
+  .mobileFilterHeader > p:nth-child(1) {
+    color: var(--textPrimary);
+    font-family: "Golos Text";
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 20px;
+    letter-spacing: -0.32px;
+  }
+  .mobileFilterHeader > p:nth-child(2) {
+    color: var(--core_Orange);
+    text-align: right;
+    font-family: "Golos Text";
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 20px;
+    letter-spacing: -0.32px;
+  }
+  .mobileFilterFooter {
+    display: flex;
+    position: fixed;
+    bottom: 58px;
+    border-bottom: 1px solid var(--borderTertiary);
+    background: var(--bgPrimary);
+    box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.12),
+      0px 4px 12px 0px rgba(0, 0, 0, 0.12);
+    width: 100%;
+    padding: 8px;
+  }
+  .searchResultWrapper {
+    width: 100%;
+    flex-direction: column;
+  }
+  .animationTextlazy {
+    height: 8px;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 37%, #f0f0f0 63%);
+    background-size: 400% 100%; /* Important for shimmer effect */
+    animation: placeholderShimmer 1.5s ease-in-out infinite;
+    border-radius: 8px;
+    margin-top: 12px;
+  }
 }
 @keyframes placeholderShimmer {
-    0% {
-        background-position: -100% 0;
-    }
-    100% {
-        background-position: 100% 0;
-    }
+  0% {
+    background-position: -100% 0;
+  }
+  100% {
+    background-position: 100% 0;
+  }
 }

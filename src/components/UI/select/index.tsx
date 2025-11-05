@@ -18,14 +18,14 @@ interface SelectProps {
 }
 
 const Select: React.FC<SelectProps> = ({
-                                           options,
-                                           value,
-                                           onChange,
-                                           placeholder = 'Select an option',
-                                           label,
-                                           isFull = false,
-                                            type
-                                       }) => {
+    options,
+    value,
+    onChange,
+    placeholder = 'Select an option',
+    label,
+    isFull = false,
+    type
+}) => {
     const [open, setOpen] = useState(false);
     const [openUp, setOpenUp] = useState(false);
     const selectRef = useRef<HTMLDivElement>(null);
@@ -67,7 +67,7 @@ const Select: React.FC<SelectProps> = ({
             <div className={styles.selectButton} onClick={() => setOpen(prev => !prev)}>
                 <div className={styles.selectButtonInfo}>
                     {label && <p className={styles.selectLabel}>{label}</p>}
-                    <p className={styles.selectValue}>{value?.name || placeholder}</p>
+                    <p className={styles.selectValue}>{value || placeholder}</p>
                 </div>
                 <div className={styles.arrow}>
                     <Icon name="downArrow" size={24} />
@@ -76,9 +76,8 @@ const Select: React.FC<SelectProps> = ({
 
             {open && (
                 <ul
-                    className={`${styles.optionsList} ${
-                        openUp ? styles.openUp : styles.openDown
-                    }`}
+                    className={`${styles.optionsList} ${openUp ? styles.openUp : styles.openDown
+                        }`}
                 >
                     {options.map((option) => (
                         <li

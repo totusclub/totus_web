@@ -24,11 +24,21 @@
   border: 4px solid var(--core_Orange);
 }
 
+.selectedImageWrapper {
+  cursor: pointer;
+  position: relative;
+}
+
 .selectedImage {
   width: 560px;
   height: 556px;
   object-fit: cover;
   border-radius: 13.666px;
+  transition: opacity 0.2s ease;
+}
+
+.selectedImageWrapper:hover .selectedImage {
+  opacity: 0.9;
 }
 
 .selectedThumbnail {

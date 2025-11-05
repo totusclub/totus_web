@@ -1,50 +1,77 @@
-.input>input::-webkit-outer-spin-button,
-.input>input::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
+.input > input::-webkit-outer-spin-button,
+.input > input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
+.inputWrapper {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  gap: 4px;
+}
 
-.input{
-    display: flex;
-    height: 56px;
-    align-items: flex-start;
-    flex-direction: column;
-    flex: auto;
-    border-radius: 16px;
-    border: 1px solid var(--borderSecondary);
-    overflow: hidden;
-    padding: 8px 16px;
+.input {
+  display: flex;
+  height: 56px;
+  align-items: flex-start;
+  flex-direction: column;
+  flex: auto;
+  border-radius: 16px;
+  border: 1px solid var(--borderSecondary);
+  overflow: hidden;
+  padding: 8px 16px;
+  transition: border-color 0.2s ease;
 }
-.input>label{
-    color: var(--textTertiary);
-    /* Caption/Medium */
-    /*font-family: "Golos Text";*/
-    font-size: 12px;
-    font-style: normal;
-    font-weight: 500;
-    line-height: 16px; /* 133.333% */
-    letter-spacing: -0.24px;
-}
-.input>input{
-    width: 100%;
-    height: 56px;
-    border: none;
-    outline: none;
-    -moz-appearance: textfield;
 
-    color: var(--textPrimary);
-    /* Headline - Body/Medium */
-    /*font-family: "Golos Text";*/
-    font-size: 16px;
-    font-style: normal;
-    font-weight: 500;
-    line-height: 20px; /* 125% */
-    letter-spacing: -0.32px;
+.inputError {
+  border-color: #ef4444;
 }
+
+.inputError:focus-within {
+  border-color: #ef4444;
+}
+.input > label {
+  color: var(--textTertiary);
+  /* Caption/Medium */
+  /*font-family: "Golos Text";*/
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 16px; /* 133.333% */
+  letter-spacing: -0.24px;
+}
+.input > input {
+  width: 100%;
+  height: 56px;
+  border: none;
+  outline: none;
+  -moz-appearance: textfield;
+
+  color: var(--textPrimary);
+  /* Headline - Body/Medium */
+  /*font-family: "Golos Text";*/
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 20px; /* 125% */
+  letter-spacing: -0.32px;
+}
+.errorMessage {
+  color: #ef4444;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 16px;
+  margin-top: 4px;
+  padding-left: 4px;
+}
+
 @media (max-width: 768px) {
-    .input{
-        width: 100%;
-    }
-
+  .input {
+    width: 100%;
+  }
+  .inputWrapper {
+    width: 100%;
+  }
 }

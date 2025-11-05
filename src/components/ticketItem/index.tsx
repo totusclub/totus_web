@@ -6,12 +6,12 @@ import TicketModal from "@/components/modals/ticketModal";
 import { useState, FC } from "react";
 import useAuth from "@/hooks/useAuth";
 import AuthModal from "@/components/auth";
+import { formatRussianDateTime, formatRussianDate, secondsToRussianTime } from "@/utils/dateTimeUtils";
 
 interface TicketItemProps {
     green?: boolean;
     item: any
     price?: number
-    price?: boolean
     lazy: boolean
 }
 
@@ -27,46 +27,7 @@ const TicketItem: FC<TicketItemProps> = ({ green, item, price, lazy }) => {
         } else {
             setAuthModal(true)
         }
-
     };
-
-    function formatRussianDateTime(isoString) {
-        const date = new Date(isoString);
-
-        const timeFormatter = new Intl.DateTimeFormat('ru-RU', {
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: false,
-            timeZone: 'Europe/Moscow', // Adjust if needed
-        });
-
-        const time = date && timeFormatter.format(date);          // "14:45"
-        return `${time}`;
-    }
-
-    const formatRussianDate = (isoString) => {
-        const date = new Date(isoString);
-
-        const dateFormatter = new Intl.DateTimeFormat('ru-RU', {
-            day: '2-digit',
-            month: 'short',
-            weekday: 'short',
-            timeZone: 'Europe/Moscow',
-        });
-        const datePart = dateFormatter.format(date);
-        return `${datePart}`
-    }
-
-
-    function secondsToRussianTime(seconds) {
-        const hours = Math.floor(seconds / 3600);
-        const minutes = Math.floor((seconds % 3600) / 60);
-
-        const hoursStr = hours > 0 ? `${hours}ч` : '';
-        const minutesStr = minutes > 0 ? `${minutes}м` : '';
-
-        return `${hoursStr} ${minutesStr}`.trim();
-    }
 
     const classFlight = {
         econom: 'Эконом',
@@ -178,7 +139,7 @@ const TicketItem: FC<TicketItemProps> = ({ green, item, price, lazy }) => {
                     )}
                 </div>
 
-                <TicketModal open={open} setOpen={setOpen} />
+                <TicketModal open={open} setOpen={setOpen} item={item} />
                 <AuthModal open={authModal} setOpen={setAuthModal} />
             </>
         );

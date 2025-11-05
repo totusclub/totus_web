@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
     addDays,
     subMonths,
@@ -22,14 +22,33 @@ import SwitchToggle from "@/components/UI/switch";
 interface CalendarProps {
     selectedDate: Date | null;
     setSelectedDate: (date: Date) => void;
+    allowPastDates?: boolean; // If true, allows selecting past dates (for date of birth, etc.)
+    hideToggle?: boolean; // If true, hides the ±2 days toggle
 }
 
 
-const Calendar = ({selectedDate,setSelectedDate}:CalendarProps) => {
+const Calendar = ({ selectedDate, setSelectedDate, allowPastDates = false, hideToggle = false }: CalendarProps) => {
     const [currentMonth, setCurrentMonth] = useState(new Date());
     const [showPlusMinus, setShowPlusMinus] = useState(false);
+    const [showYearPicker, setShowYearPicker] = useState(false);
+    const [showMonthPicker, setShowMonthPicker] = useState(false);
+    const calendarRef = useRef<HTMLDivElement>(null);
 
     const today = startOfDay(new Date());
+
+    // Close pickers when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (calendarRef.current && !calendarRef.current.contains(event.target as Node)) {
+                setShowYearPicker(false);
+                setShowMonthPicker(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
 
     const isPlusMinusTwo = (date: Date) => {
         if (!selectedDate || isSameDay(date, selectedDate)) return false;
@@ -37,17 +56,89 @@ const Calendar = ({selectedDate,setSelectedDate}:CalendarProps) => {
         return diff <= 2;
     };
 
-    const renderHeader = () => (
-        <div className={styles.headerCalendar}>
-            <button onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}>
-               <Icon name={'leftArrow'} size={24} color="#000"/>
-            </button>
-            <p>{format(currentMonth, 'LLLL yyyy', { locale: ru })}</p>
-            <button onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}>
-                <Icon name={'rightArrow'} size={24} color="#000"/>
-            </button>
-        </div>
-    );
+    const renderHeader = () => {
+        const currentYear = currentMonth.getFullYear();
+        const currentMonthIndex = currentMonth.getMonth();
+        const years = [];
+        const startYear = allowPastDates ? currentYear - 100 : currentYear - 10;
+        const endYear = currentYear + 10;
+
+        for (let year = startYear; year <= endYear; year++) {
+            years.push(year);
+        }
+
+        const months = [
+            'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
+            'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
+        ];
+
+        return (
+            <div className={styles.headerCalendar}>
+                <button onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}>
+                    <Icon name={'leftArrow'} size={24} color="#000" />
+                </button>
+                <div className={styles.headerDatePicker}>
+                    <button
+                        className={styles.datePickerButton}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setShowMonthPicker(!showMonthPicker);
+                            setShowYearPicker(false);
+                        }}
+                    >
+                        {months[currentMonthIndex]}
+                    </button>
+                    <button
+                        className={styles.datePickerButton}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setShowYearPicker(!showYearPicker);
+                            setShowMonthPicker(false);
+                        }}
+                    >
+                        {currentYear}
+                    </button>
+                    {showMonthPicker && (
+                        <div className={styles.pickerDropdown} onClick={(e) => e.stopPropagation()}>
+                            {months.map((month, index) => (
+                                <div
+                                    key={index}
+                                    className={`${styles.pickerItem} ${index === currentMonthIndex ? styles.pickerItemActive : ''}`}
+                                    onClick={() => {
+                                        setCurrentMonth(new Date(currentYear, index, 1));
+                                        setShowMonthPicker(false);
+                                    }}
+                                >
+                                    {month}
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                    {showYearPicker && (
+                        <div className={styles.pickerDropdown} onClick={(e) => e.stopPropagation()}>
+                            <div className={styles.yearPickerContainer}>
+                                {years.map((year) => (
+                                    <div
+                                        key={year}
+                                        className={`${styles.pickerItem} ${year === currentYear ? styles.pickerItemActive : ''}`}
+                                        onClick={() => {
+                                            setCurrentMonth(new Date(year, currentMonthIndex, 1));
+                                            setShowYearPicker(false);
+                                        }}
+                                    >
+                                        {year}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                </div>
+                <button onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}>
+                    <Icon name={'rightArrow'} size={24} color="#000" />
+                </button>
+            </div>
+        );
+    };
 
     const renderDays = () => {
         const days = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
@@ -78,7 +169,7 @@ const Calendar = ({selectedDate,setSelectedDate}:CalendarProps) => {
                 const isSelected = selectedDate && isSameDay(currentDay, selectedDate);
                 const isInRange = showPlusMinus && isPlusMinusTwo(currentDay);
                 const isCurrentMonth = isSameMonth(currentDay, currentMonth);
-                const isDisabled = isBefore(currentDay, today);
+                const isDisabled = !allowPastDates && isBefore(currentDay, today);
 
                 let backgroundColor = 'transparent';
                 if (isSelected) backgroundColor = 'var(--core_Orange)';
@@ -94,7 +185,7 @@ const Calendar = ({selectedDate,setSelectedDate}:CalendarProps) => {
                             color: isCurrentMonth
                                 ? isDisabled
                                     ? '#aaa'
-                                    : isSelected?'#fff':'#000'
+                                    : isSelected ? '#fff' : '#000'
                                 : '#ccc',
                             fontWeight: isSelected ? 'bold' : 'normal',
                             cursor: isDisabled ? 'not-allowed' : 'pointer',
@@ -121,14 +212,16 @@ const Calendar = ({selectedDate,setSelectedDate}:CalendarProps) => {
     };
 
     return (
-        <div className={styles.calendarWrapper}>
+        <div className={styles.calendarWrapper} ref={calendarRef}>
             {renderHeader()}
             {renderDays()}
             {renderCells()}
-            <div className={styles.toggleRow}>
-                <p>±2 дня</p>
-                <SwitchToggle isOn={showPlusMinus} setIsOn={setShowPlusMinus}/>
-            </div>
+            {!hideToggle && (
+                <div className={styles.toggleRow}>
+                    <p>±2 дня</p>
+                    <SwitchToggle isOn={showPlusMinus} setIsOn={setShowPlusMinus} />
+                </div>
+            )}
         </div>
     );
 };

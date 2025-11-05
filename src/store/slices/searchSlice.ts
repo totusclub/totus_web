@@ -291,7 +291,12 @@ const searchSlice = createSlice({
             state.allMyHotels = [...state.allMyHotels, action.payload.hotels];
         },
         setAllMyHotels(state, action) {
-            state.allMyHotels = action.payload.hotels;
+            // Handle both { hotels: [] } and [] formats
+            if (Array.isArray(action.payload)) {
+                state.allMyHotels = action.payload;
+            } else {
+                state.allMyHotels = action.payload?.hotels || [];
+            }
         }
 
     },
@@ -321,8 +326,17 @@ const searchSlice = createSlice({
             .addCase(searchFilters.fulfilled, (state, action) => {
                 state.hotels = action.payload;
                 state.loading = false;
-                state.allMyHotels = [...state.allMyHotels || [], ...(action.payload.hotels || [])];
-
+                // If page_number is 1, replace hotels. Otherwise append for pagination
+                const pageNumber = action.payload.page_number || 1;
+                const hotels = action.payload.hotels || [];
+                
+                if (pageNumber === 1) {
+                    // Replace the entire list for new searches/filters/sorts
+                    state.allMyHotels = hotels;
+                } else {
+                    // Append for pagination
+                    state.allMyHotels = [...(state.allMyHotels || []), ...hotels];
+                }
             })
             .addCase(searchFilters.rejected, (state, action) => {
                 state.loading = false;

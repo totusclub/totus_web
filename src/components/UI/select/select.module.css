@@ -1,97 +1,98 @@
 .customSelect {
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    width: 320px;
-    /*font-family: Arial, sans-serif;*/
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  width: 100%;
+  min-width: 0; /* Allows flex item to shrink below content size */
+  /*font-family: Arial, sans-serif;*/
 }
 
 .selectButton {
-    width: 100%;
-    background-color: var(--primary_b);
-    border: 1px solid var(--borderSecondary);
-    border-radius: 16px;
-    cursor: pointer;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    height: 56px;
-    padding-left: 16px;
-    padding-right: 16px;
+  width: 100%;
+  background-color: var(--primary_b);
+  border: 1px solid var(--borderSecondary);
+  border-radius: 16px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 56px;
+  padding-left: 16px;
+  padding-right: 16px;
+  box-sizing: border-box;
 }
-.selectButtonInfo{
-    width: 100%;
+.selectButtonInfo {
+  width: 100%;
 }
-.selectLabel{
-    color: var(--textTertiary);
-    /*font-family: "Golos Text";*/
-    font-size: 12px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: 16px; /* 133.333% */
-    letter-spacing: -0.24px;
+.selectLabel {
+  color: var(--textTertiary);
+  /*font-family: "Golos Text";*/
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 16px; /* 133.333% */
+  letter-spacing: -0.24px;
 }
-.selectValue{
-    color: var(--textPrimary);
-    /*font-family: "Golos Text";*/
-    font-size: 16px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: 20px; /* 125% */
-    letter-spacing: -0.32px;
+.selectValue {
+  color: var(--textPrimary);
+  /*font-family: "Golos Text";*/
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 20px; /* 125% */
+  letter-spacing: -0.32px;
 }
 .arrow {
-    width: 24px;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  width: 24px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .optionsList {
-    position: absolute;
-    width: 100%;
-    background-color: #fff;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    max-height: 200px;
-    overflow-y: auto;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
+  position: absolute;
+  width: 100%;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  max-height: 200px;
+  overflow-y: auto;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
 }
 
 .openDown {
-    top: 100%;
-    margin-top: 4px;
+  top: 100%;
+  margin-top: 4px;
 }
 
 .openUp {
-    bottom: 100%;
-    margin-bottom: 4px;
+  bottom: 100%;
+  margin-bottom: 4px;
 }
 
 .optionItem {
-    padding: 10px 12px;
-    cursor: pointer;
+  padding: 10px 12px;
+  cursor: pointer;
 }
 
 .optionItem:hover {
-    background-color: #f2f2f2;
+  background-color: #f2f2f2;
 }
 @media (max-width: 768px) {
-    .customSelect{
-        flex: 1!important;
-        width: 100%;
-
-    }
-    .selectButton{
-        border-radius: 16px;
-        height: 56px;
-    }
-    .selectLabel{
-        font-size: 11px;
-    }
-    .selectValue{
-        font-size: 12px;
-    }
+  .customSelect {
+    flex: 1 !important;
+    width: 100%;
+  }
+  .selectButton {
+    border-radius: 16px;
+    height: 56px;
+  }
+  .selectLabel {
+    font-size: 11px;
+  }
+  .selectValue {
+    font-size: 12px;
+  }
 }
