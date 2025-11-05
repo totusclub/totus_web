@@ -19,7 +19,7 @@ interface ResultListProps {
 const ResultList = ({ tickets, loading, data, setFiltersRequest }: ResultListProps) => {
     const dispatch = useDispatch();
     const router = useRouter();
-    const { allMyHotels, hotels, loadMore } = useSelector((state: RootState) => state.search);
+    const { allMyHotels, hotels } = useSelector((state: RootState) => state.search);
     const [allHotels, setAllHotels] = useState<any[]>([]);
     const [hasMore, setHasMore] = useState(true);
     const [loadingMore, setLoadingMore] = useState(false);
@@ -89,31 +89,8 @@ const ResultList = ({ tickets, loading, data, setFiltersRequest }: ResultListPro
         );
     };
 
-    // ✅ Handle pagination - dispatch searchFilters when page_number changes (like filters.tsx)
-    useEffect(() => {
-        if (!router.isReady) return;
-        const pageNumber = parseInt((router.query.page_number as string) || "1", 10);
-
-        if (pageNumber > 1 && loadMore && selectedFilters) {
-            // Build params with current filters and sort_by from data
-            const paramsFilter: any = {
-                ...selectedFilters,
-                page_limit: 20,
-                page_number: pageNumber
-            };
-
-            // Include sort_by from data.sort_by if it exists
-            if (data?.sort_by) {
-                paramsFilter.sort_by = data.sort_by;
-            } else if (router.query.sort_by) {
-                // Fallback to URL if data.sort_by doesn't exist
-                paramsFilter.sort_by = router.query.sort_by;
-            }
-
-            dispatch(searchFilters(paramsFilter) as any);
-            dispatch(setLoadMore(false));
-        }
-    }, [router.query.page_number, loadMore, router.isReady, selectedFilters, data?.sort_by]);
+    // Note: Pagination is handled by filters.tsx component, not here
+    // This prevents duplicate requests
 
     // ✅ Handle incoming data and merge into state
     useEffect(() => {

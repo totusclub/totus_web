@@ -212,7 +212,13 @@ const Filters = ({ selectedFilters, allFilters, statistics }: any) => {
         const pageNumber = parseInt((router.query.page_number as string) || "1", 10);
         console.log('.............', loadMore);
         if (pageNumber > 1 && loadMore) {
-            let paramsFilter = { ...filters, ...selectedFilters, page_limit: 20, page_number: pageNumber }
+            let paramsFilter: any = { ...filters, ...selectedFilters, page_limit: 20, page_number: pageNumber }
+
+            // Preserve sort_by if it exists in URL
+            if (router.query.sort_by) {
+                paramsFilter.sort_by = router.query.sort_by;
+            }
+
             setFilters(paramsFilter)
             dispatch(searchFilters(paramsFilter))
             dispatch(setLoadMore(false))
