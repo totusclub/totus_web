@@ -16,7 +16,7 @@ const SignUpForm: React.FC = ({setScreen,setEmail,email}:any) => {
     const handelSignup = async ()=>{
         //setScreen('SIGNUP')//VERIFICATION
         const res =  await SignUpRequest(params)
-        console.log('res',res.screen)
+        // console.log('res',res.screen)
         setEmail(params.email)
         setScreen(res.screen)
 

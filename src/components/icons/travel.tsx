@@ -4,7 +4,7 @@ import { SVGProps } from 'react';
 export default function TravelIcon(props: SVGProps<SVGSVGElement>) {
     return (
         <svg width="62" height="52" viewBox="0 0 62 52" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
-            <g clip-path="url(#clip0_172_31652)">
+            <g clipPath="url(#clip0_172_31652)">
                 <path d="M2.37842 19.4121V20.0168H43.6224C43.721 19.7978 43.8377 19.6132 43.9458 19.4121H2.37842Z"
                       fill="#FE732E"/>
                 <path

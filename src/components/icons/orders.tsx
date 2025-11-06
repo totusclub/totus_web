@@ -15,7 +15,7 @@ export default function OrderIcon(props: SVGProps<SVGSVGElement>) {
                 fill={props.color?props.color:"#1F1F1F"}/>
             <path
                 d="M9 6.67383H20M9 12.6738H20M9 18.6738H20M5 6.67383C5 7.22611 4.55228 7.67383 4 7.67383C3.44772 7.67383 3 7.22611 3 6.67383C3 6.12154 3.44772 5.67383 4 5.67383C4.55228 5.67383 5 6.12154 5 6.67383ZM5 12.6738C5 13.2261 4.55228 13.6738 4 13.6738C3.44772 13.6738 3 13.2261 3 12.6738C3 12.1215 3.44772 11.6738 4 11.6738C4.55228 11.6738 5 12.1215 5 12.6738ZM5 18.6738C5 19.2261 4.55228 19.6738 4 19.6738C3.44772 19.6738 3 19.2261 3 18.6738C3 18.1215 3.44772 17.6738 4 17.6738C4.55228 17.6738 5 18.1215 5 18.6738Z"
-                stroke={props.color?props.color:"#1F1F1F"} stroke-width="1.5" stroke-linecap="round"/>
+                stroke={props.color?props.color:"#1F1F1F"} strokeWidth="1.5" strokeLinecap="round"/>
         </svg>
     );
 }

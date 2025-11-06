@@ -41,7 +41,7 @@ const HotelDetailsRooms = ({ rooms }: any) => {
                 return acc;
             }, {});
 
-        console.log("Sorted by start_date with min prices:", sorted);
+        // console.log("Sorted by start_date with min prices:", sorted);
         return sorted
     }, [rooms]);
 
@@ -96,7 +96,7 @@ const HotelDetailsRooms = ({ rooms }: any) => {
     const handleBook = async (id: any) => {
         setLoading(true)
         const res = await createPackage({ request_id: router.query.request_id, tour_id: id })
-        console.log('handleBook', res.package.id)
+        // console.log('handleBook', res.package.id)
         setLoading(false)
         router.push(`/tickets?package=${res.package.id}`);
     };

@@ -24,12 +24,17 @@ const ResultList = ({ tickets, loading, data, setFiltersRequest }: ResultListPro
     const [hasMore, setHasMore] = useState(true);
     const [loadingMore, setLoadingMore] = useState(false);
     const [priceTrack, setPriceTrack] = useState(false);
+
+    // recomand
+    // dear
+    // cheap
+    // reating
     const options = [
-        { value: 'relevance', name: 'По рекомендации' },
-        { value: 'rating,desc', name: 'Высокий рейтинг' },
-        { value: 'rating,asc', name: 'Низкий рейтинг' },
-        { value: 'price,asc', name: 'Сначала дешёвые' },
-        { value: 'price,desc', name: 'Сначала дорогие' },
+        { value: 'relevance', name: 'По рекомендации',icon:'recomand' },
+        { value: 'rating,desc', name: 'Высокий рейтинг' , icon:'reating'},
+        // { value: 'rating,asc', name: 'Низкий рейтинг',icon:'cheap' },
+        { value: 'price,asc', name: 'Сначала дешёвые',icon:'cheap' },
+        { value: 'price,desc', name: 'Сначала дорогие' ,icon:'dear'},
     ];
 
 
@@ -130,6 +135,7 @@ const ResultList = ({ tickets, loading, data, setFiltersRequest }: ResultListPro
         return () => window.removeEventListener("scroll", handleScroll);
     }, [loadingMore, hasMore, router.query]);
 
+
     const loadNextPage = () => {
         if (loadingMore || !hasMore) return;
 
@@ -138,18 +144,16 @@ const ResultList = ({ tickets, loading, data, setFiltersRequest }: ResultListPro
 
         setLoadingMore(true);
         dispatch(setLoadMore(true));
-
-        // Preserve sort_by when loading next page - use data.sort_by if available, otherwise selected or URL
         const queryParams: any = { ...router.query, page_number: nextPage };
-        const sortByToUse = data?.sort_by || selected || router.query.sort_by;
-        if (sortByToUse && sortByToUse !== 'relevance') {
-            queryParams.sort_by = sortByToUse;
-        }
+        // const sortByToUse = data?.sort_by || selected || router.query.sort_by;
+        // if (sortByToUse && sortByToUse !== 'relevance') {
+        //     queryParams.sort_by = sortByToUse;
+        // }
 
         router.push(
             {
                 pathname: router.pathname,
-                query: queryParams,
+                query: {...queryParams},
             },
             undefined,
             { scroll: false }

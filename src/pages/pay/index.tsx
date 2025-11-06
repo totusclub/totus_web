@@ -11,7 +11,6 @@ export default function Pay() {
     useEffect(()=>{
         if(router?.query?.orderId){
             checkPay({orderId:router?.query?.orderId}).then((e)=>{
-                console.log(e);
                 setStatus(e?.status);
             })
         }

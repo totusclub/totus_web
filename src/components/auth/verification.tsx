@@ -25,7 +25,7 @@ export default function Verification({email,setOpen}:any) {
           }
           setOpen(false)
       }else{
-          console.log('data',data)
+          // console.log('data',data)
           setValid(true)
       }
     };

@@ -210,7 +210,6 @@ const Filters = ({ selectedFilters, allFilters, statistics }: any) => {
     useEffect(() => {
         if (!router.isReady) return;
         const pageNumber = parseInt((router.query.page_number as string) || "1", 10);
-        console.log('.............', loadMore);
         if (pageNumber > 1 && loadMore) {
             let paramsFilter: any = { ...filters, ...selectedFilters, page_limit: 20, page_number: pageNumber }
 
@@ -223,7 +222,7 @@ const Filters = ({ selectedFilters, allFilters, statistics }: any) => {
             dispatch(searchFilters(paramsFilter))
             dispatch(setLoadMore(false))
         }
-    }, [router.query.page_number, loadMore]);
+    }, [router.query]);
 
 
     return (

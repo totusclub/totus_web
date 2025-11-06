@@ -5,7 +5,6 @@ const BASE_URL = 'https://api.totus.club';
 
 export async function startSearch(params) {
     try {
-        console.log('params22222',params)
         const res = await axios.get(`${BASE_URL}/start-search`,{params});
         return res.data;
     } catch (error) {
@@ -78,7 +77,6 @@ export async function getHotelOffers(data ) {
     // if (operator_ids) params.operator_ids = operator_ids;
     if (data.compact !== undefined) params.compact = data.compact;
 
-    console.log('params',params)
 
     const response = await axios.get(`${BASE_URL}/get-hotel-offers`, {
         params,
@@ -99,8 +97,6 @@ export async function getHotelRooms(data ) {
     };
 
 
-    console.log('params',params)
-
     const response = await axios.get(`${BASE_URL}/hotels-rooms`, {
         params,
     });
@@ -109,7 +105,6 @@ export async function getHotelRooms(data ) {
 };
 
 export async function getHotelInfo(data:any ) {
-    console.log('data.....',data)
     if (!data.hotel_id) {
         throw new Error('Missing request_id or hotel_id');
     }
@@ -167,7 +162,7 @@ export async function Packagesflights(params: any) {
     // const data = {
     //     package_id: id,
     // };
-    console.log('Packagesflights',params)
+    // console.log('Packagesflights',params)
 
     const response = await axios.post(`${BASE_URL}/packages/flights`, params);
 

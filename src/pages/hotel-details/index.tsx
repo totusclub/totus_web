@@ -20,7 +20,7 @@ export default function HotelDetails() {
             const hotelInfo = await getHotelInfo(roomParams)
             setHotel(hotelInfo)
             setRooms(allRooms?.result)
-            console.log('Hotel data loaded:', { hotelInfo, images: hotelInfo?.images });
+            // console.log('Hotel data loaded:', { hotelInfo, images: hotelInfo?.images });
         } catch (err) {
             console.error('Search failed:', err);
         } finally {
@@ -30,7 +30,7 @@ export default function HotelDetails() {
 
     useEffect(() => {
         if (router?.isReady && router?.query?.hotel_id) {
-            console.log('router.query', router.query)
+            // console.log('router.query', router.query)
             handleSearch(router.query)
         }
     }, [])

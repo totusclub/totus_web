@@ -14,7 +14,7 @@ const SignInForm: React.FC = ({setScreen,setEmail}:any) => {
     const handelLogin = async ()=>{
         //setScreen('SIGNUP')//VERIFICATION
        const res =  await SignInRequest({email: login})
-        console.log('res',res.screen)
+        // console.log('res',res.screen)
 
         setEmail(login)
         setScreen(res.screen)

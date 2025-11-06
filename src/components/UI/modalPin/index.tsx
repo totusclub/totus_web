@@ -10,7 +10,7 @@ const ModalPin = ({open,setOpen}: { open:boolean,setOpen:any}) => {
     const [valid, setValid] = useState(false);
 
     const handleComplete =(code)=>{
-        console.log(code)
+        // console.log(code)
             if(+code === +PIN){
                 savePin()
                 setValid(false)

@@ -35,6 +35,7 @@ interface SearchParams {
     hotel_ids: number[];
     page_number: number;
     page_limit: number;
+    sort_by: string;
 }
 
 
@@ -59,7 +60,8 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
         // kids_ages: ['8'],
         search_type: 'package',
         page_limit: 20,
-        page_number: 1
+        page_number: 1,
+        sort_by:'relevance'
         // hotel_ids:[9069464]
     });
 
@@ -104,7 +106,7 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
                 setParams({ ...restParams, ...restParsed });
             }
             if (parsed?.hotel_ids) {
-                console.log(parsed?.hotel_ids);
+                // console.log(parsed?.hotel_ids);
                 setParams({ ...params, hotel_ids: parsed?.hotel_ids });
             }
             if (Object.keys(parsed).length > 0) {
@@ -124,7 +126,6 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
         // console.log('data',data,params?.hotel_ids?.length> 0);
         if (+data?.page_number === 1 && startSearchValid) {
             if (data?.hotel_ids?.length > 0) {
-                console.log('data?.sort_by', data?.sort_by);
                 dispatch(runFullSearchFlow({
                     searchParams: data,
                     filterParams: {
@@ -135,7 +136,6 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
                     }
                 }));
             } else {
-
                 dispatch(runFullSearchFlow({
                     searchParams: data,
                     filterParams: {
@@ -154,9 +154,6 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
     }
 
 
-    useEffect(() => {
-        console.log('headerName', headerName);
-    }, [headerName]);
 
     const handleChange = (value: string | number | number[], key: keyof SearchParams, type: string) => {
         if (key === 'from_city') {

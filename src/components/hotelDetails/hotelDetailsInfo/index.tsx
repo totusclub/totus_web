@@ -50,7 +50,7 @@ const HotelDetailsInfo = ({ images, rooms, panding }: any) => {
             return earliest;
         })();
         setFisrtDate(closestOffer)
-        console.log('Closest (first date) offer:', closestOffer);
+        // console.log('Closest (first date) offer:', closestOffer);
     }, [rooms])
 
     const formatDate = useMemo(() => {

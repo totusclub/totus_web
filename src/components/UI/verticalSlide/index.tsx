@@ -34,10 +34,10 @@ const VerticalSlider = ({ images, loading }: any) => {
     const initialImage = images?.length > 0 ? `https://img.cdn.level.travel/${images[0]['x500']}` : "";
 
     useEffect(() => {
-        console.log('VerticalSlider useEffect:', { images: images?.length, loading, selectedImage });
+        // console.log('VerticalSlider useEffect:', { images: images?.length, loading, selectedImage });
         if (images?.length > 0) {
             const imageUrl = `https://img.cdn.level.travel/${images[0]['x500']}`;
-            console.log('Setting selectedImage to:', imageUrl);
+            // console.log('Setting selectedImage to:', imageUrl);
             setSelectedImage(imageUrl);
         }
     }, [images]);
@@ -119,7 +119,7 @@ const VerticalSlider = ({ images, loading }: any) => {
         ],
     };
 
-    console.log('VerticalSlider render:', { loading, imagesLength: images?.length, selectedImage, initialImage });
+    // console.log('VerticalSlider render:', { loading, imagesLength: images?.length, selectedImage, initialImage });
 
     if (!loading && images?.length > 0) {
         return (

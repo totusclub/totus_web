@@ -28,7 +28,7 @@ const HotelDetailsPriceList: React.FC<HotelDetailsPriceListProps> = ({ item,sele
 
     const handleBook =async (id) => {
       const res =  await createPackage({request_id:router.query.request_id,tour_id:id})
-        console.log('handleBook',res.package.id)
+        // console.log('handleBook',res.package.id)
         router.push(`/tickets?package=${res.package.id}`);
     };
 
