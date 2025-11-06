@@ -89,12 +89,15 @@ const Select: React.FC<SelectProps> = ({
                             onClick={() => handleSelect(option)}
                             className={`${styles.optionItem} ${value === option.name ? styles.active : ''}`}
                         >
-                            <div>
-                                <Icon name={option.icon} size={16}/>
-                                {option.name}
-                            </div>
+
+                                <div>
+                                    {option?.icon && (
+                                    <Icon name={option.icon} size={16}/>
+                                    )}
+                                    {option.name}
+                                </div>
                             {value === option.name && (
-                                <Icon name={'optionCheck'} size={16} />
+                                <Icon name={'optionCheck'} size={16}/>
                             )}
                         </li>
                     ))}
