@@ -70,6 +70,11 @@ import ShareIcon from "@/components/icons/share";
 import OrderIcon from "@/components/icons/orders";
 import SupportIcon from '@/components/icons/support';
 import PhoneIcon from '@/components/icons/phone';
+import RecomendIcon from '@/components/icons/recomend';
+import DearIcon from '@/components/icons/dear';
+import CheapIcon from '@/components/icons/cheap';
+import ReatingIcon from '@/components/icons/reating';
+import OptionCheckIcon from '@/components/icons/optionCheck';
 
 
 const icons = {
@@ -145,6 +150,11 @@ const icons = {
     order: OrderIcon,
     support: SupportIcon,
     phone: PhoneIcon,
+    recomand: RecomendIcon,
+    dear: DearIcon,
+    cheap: CheapIcon,
+    reating: ReatingIcon,
+    optionCheck: OptionCheckIcon,
 }
 
 type IconName = keyof typeof icons;

@@ -6,73 +6,34 @@ import TicketModal from "@/components/modals/ticketModal";
 import { useState, FC } from "react";
 import useAuth from "@/hooks/useAuth";
 import AuthModal from "@/components/auth";
+import { formatRussianDateTime, formatRussianDate, secondsToRussianTime } from "@/utils/dateTimeUtils";
 
 interface TicketItemProps {
     green?: boolean;
-    item:any
+    item: any
     price?: number
-    price?: boolean
-    lazy:boolean
+    lazy: boolean
 }
 
-const TicketItem: FC<TicketItemProps> = ({ green,item ,price,lazy}) => {
+const TicketItem: FC<TicketItemProps> = ({ green, item, price, lazy }) => {
     const [open, setOpen] = useState<boolean>(false);
     const router = useRouter();
-    const [authModal,setAuthModal] = useState(false)
-    const {user,token} = useAuth()
+    const [authModal, setAuthModal] = useState(false)
+    const { user, token } = useAuth()
 
     const handleClick = (id) => {
-        if(token){
+        if (token) {
             router.push(`/booking?package=${router.query.package}&flight_pair_id=${id}`);
-        }else{
+        } else {
             setAuthModal(true)
         }
-
     };
 
-    function formatRussianDateTime(isoString) {
-        const date = new Date(isoString);
-
-        const timeFormatter = new Intl.DateTimeFormat('ru-RU', {
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: false,
-            timeZone: 'Europe/Moscow', // Adjust if needed
-        });
-
-        const time = date &&  timeFormatter.format(date);          // "14:45"
-        return `${time}`;
-    }
-
-   const formatRussianDate =(isoString)=>{
-       const date = new Date(isoString);
-
-       const dateFormatter = new Intl.DateTimeFormat('ru-RU', {
-           day: '2-digit',
-           month: 'short',
-           weekday: 'short',
-           timeZone: 'Europe/Moscow',
-       });
-       const datePart = dateFormatter.format(date);
-       return `${datePart}`
-   }
-
-
-    function secondsToRussianTime(seconds) {
-        const hours = Math.floor(seconds / 3600);
-        const minutes = Math.floor((seconds % 3600) / 60);
-
-        const hoursStr = hours > 0 ? `${hours}ч` : '';
-        const minutesStr = minutes > 0 ? `${minutes}м` : '';
-
-        return `${hoursStr} ${minutesStr}`.trim();
-    }
-
     const classFlight = {
-        econom:'Эконом',
-        business:'Бизнес'
+        econom: 'Эконом',
+        business: 'Бизнес'
     }
-    if(!lazy){
+    if (!lazy) {
         return (
             <>
                 <div className={green ? styles.ticketItemWrapper : ''}>
@@ -89,7 +50,7 @@ const TicketItem: FC<TicketItemProps> = ({ green,item ,price,lazy}) => {
                             <div className={styles.ticketItemLine}>
                                 <div className={styles.ticketItemLineItem}>
                                     <div className={styles.ticketItemLogo}>
-                                        <img src={item?.to?.airline?.logo?.src} alt={item?.to?.airline?.name}/>
+                                        <img src={item?.to?.airline?.logo?.src} alt={item?.to?.airline?.name} />
                                     </div>
                                     <div className={styles.ticketItemDate}>
                                         <p>{formatRussianDateTime(item?.to?.departure)} - {formatRussianDateTime(item?.to?.arrival)}</p>
@@ -112,7 +73,7 @@ const TicketItem: FC<TicketItemProps> = ({ green,item ,price,lazy}) => {
                             <div className={styles.ticketItemLine}>
                                 <div className={styles.ticketItemLineItem}>
                                     <div className={styles.ticketItemLogo}>
-                                        <img src={item?.back?.airline?.logo?.src} alt={item?.to?.airline?.name}/>
+                                        <img src={item?.back?.airline?.logo?.src} alt={item?.to?.airline?.name} />
                                     </div>
                                     <div className={styles.ticketItemDate}>
                                         <p>{formatRussianDateTime(item?.back?.departure)} - {formatRussianDateTime(item?.back?.arrival)}</p>
@@ -158,13 +119,13 @@ const TicketItem: FC<TicketItemProps> = ({ green,item ,price,lazy}) => {
                                 <p>За тур с перелётом</p>
                             </div>
                             <Button
-                                onClick={()=>handleClick(item?.flight_pair_id)}
+                                onClick={() => handleClick(item?.flight_pair_id)}
                                 title="Выбрать"
                                 height="40px"
                                 full={true}
                             />
                             <div onClick={() => setOpen(true)} className={styles.ticketItemDetails}>
-                                <Icon name="info" size={16}/>
+                                <Icon name="info" size={16} />
                                 <p>Детали перелёта</p>
                             </div>
                         </div>
@@ -172,81 +133,108 @@ const TicketItem: FC<TicketItemProps> = ({ green,item ,price,lazy}) => {
 
                     {green && (
                         <div className={styles.ticketItemAlert}>
-                            <Icon name="light" size={20} color="var(--bgPrimary)"/>
+                            <Icon name="light" size={20} color="var(--bgPrimary)" />
                             <p>Самый выгодный рейс к туру</p>
                         </div>
                     )}
                 </div>
 
-                <TicketModal open={open} setOpen={setOpen}/>
+                <TicketModal open={open} setOpen={setOpen} item={item} />
                 <AuthModal open={authModal} setOpen={setAuthModal} />
             </>
         );
-    }else{
+    } else {
         return (
             <div className={styles.ticketItem}>
+                {/* Info Section - flex: 1 */}
                 <div className={styles.ticketItemInfo}>
+                    {/* Badge Section */}
+                    <div className={styles.ticketItemBadgeSkeleton}>
+                        <div className={styles.animationTaglazy} style={{ width: '90px' }}></div>
+                    </div>
+
+                    {/* Outbound Flight Line */}
                     <div className={styles.ticketItemLine}>
+                        {/* Logo + Time */}
                         <div className={styles.ticketItemLineItem}>
                             <div className={styles.ticketItemLogo}>
-                                <div className={styles.animationImagelazy}></div>
+                                <div className={styles.animationImagelazy} style={{ width: '50px', height: '50px' }}></div>
                             </div>
                             <div className={styles.ticketItemDate}>
-                                <div className={styles.animationTextlazy} style={{width: '50px'}}></div>
-                                <div className={styles.animationTextlazy} style={{width: '20px'}}></div>
-                            </div>
-                        </div>
-                        <div className={styles.ticketItemLineItem}>
-                            <div className={styles.ticketItemDate}>
-                                <div className={styles.animationTextlazy} style={{width: '50px'}}></div>
-                                <div className={styles.animationTextlazy} style={{width: '30px'}}></div>
+                                <div className={styles.animationTextlazy} style={{ width: '130px', height: '16px' }}></div>
+                                <div className={styles.animationTextlazy} style={{ width: '70px', height: '14px', marginTop: '4px' }}></div>
                             </div>
                         </div>
+                        {/* Flight Type */}
                         <div className={styles.ticketItemLineItem}>
                             <div className={styles.ticketItemDate}>
-                                <div className={styles.animationTextlazy} style={{width: '50px'}}></div>
-                                <div className={styles.animationTextlazy} style={{width: '30px'}}></div>
+                                <div className={styles.animationTextlazy} style={{ width: '60px', height: '16px' }}></div>
+                                <div className={styles.animationTextlazy} style={{ width: '100px', height: '14px', marginTop: '4px' }}></div>
+                            </div>
+                        </div>
+                        {/* Duration + Route */}
+                        <div className={styles.ticketItemLineItem}>
+                            <div className={styles.ticketItemDate}>
+                                <div className={styles.animationTextlazy} style={{ width: '50px', height: '16px' }}></div>
+                                <div className={styles.animationTextlazy} style={{ width: '60px', height: '14px', marginTop: '4px' }}></div>
                             </div>
                         </div>
                     </div>
+
+                    {/* Return Flight Line */}
                     <div className={styles.ticketItemLine}>
+                        {/* Logo + Time */}
                         <div className={styles.ticketItemLineItem}>
                             <div className={styles.ticketItemLogo}>
-                                <div className={styles.animationImagelazy}></div>
+                                <div className={styles.animationImagelazy} style={{ width: '50px', height: '50px' }}></div>
                             </div>
                             <div className={styles.ticketItemDate}>
-                                <div className={styles.animationTextlazy} style={{width: '50px'}}></div>
-                                <div className={styles.animationTextlazy} style={{width: '20px'}}></div>
-                            </div>
-                        </div>
-                        <div className={styles.ticketItemLineItem}>
-                            <div className={styles.ticketItemDate}>
-                                <div className={styles.animationTextlazy} style={{width: '50px'}}></div>
-                                <div className={styles.animationTextlazy} style={{width: '30px'}}></div>
+                                <div className={styles.animationTextlazy} style={{ width: '130px', height: '16px' }}></div>
+                                <div className={styles.animationTextlazy} style={{ width: '70px', height: '14px', marginTop: '4px' }}></div>
                             </div>
                         </div>
+                        {/* Flight Type */}
                         <div className={styles.ticketItemLineItem}>
                             <div className={styles.ticketItemDate}>
-                                <div className={styles.animationTextlazy} style={{width: '50px'}}></div>
-                                <div className={styles.animationTextlazy} style={{width: '30px'}}></div>
+                                <div className={styles.animationTextlazy} style={{ width: '60px', height: '16px' }}></div>
+                                <div className={styles.animationTextlazy} style={{ width: '100px', height: '14px', marginTop: '4px' }}></div>
+                            </div>
+                        </div>
+                        {/* Duration + Route */}
+                        <div className={styles.ticketItemLineItem}>
+                            <div className={styles.ticketItemDate}>
+                                <div className={styles.animationTextlazy} style={{ width: '50px', height: '16px' }}></div>
+                                <div className={styles.animationTextlazy} style={{ width: '60px', height: '14px', marginTop: '4px' }}></div>
                             </div>
                         </div>
                     </div>
-                    <div className={styles.animationRow}>
-                        <div className={styles.animationTaglazy} style={{width: '60px'}}></div>
-                        <div className={styles.animationTaglazy} style={{width: '90px'}}></div>
-                        <div className={styles.animationTaglazy} style={{width: '90px'}}></div>
-                        <div className={styles.animationTaglazy} style={{width: '80px'}}></div>
-                        <div className={styles.animationTaglazy} style={{width: '60px'}}></div>
-                    </div>
+
+                    {/* Luggage Info List */}
+                    <ul>
+                        <li><div className={styles.animationTextlazy} style={{ width: '70px', height: '16px' }}></div></li>
+                        <li><div className={styles.animationTextlazy} style={{ width: '140px', height: '16px' }}></div></li>
+                        <li><div className={styles.animationTextlazy} style={{ width: '120px', height: '16px' }}></div></li>
+                        <li><div className={styles.animationTextlazy} style={{ width: '130px', height: '16px' }}></div></li>
+                    </ul>
                 </div>
+
+                {/* Price Section - 200px width */}
                 <div className={styles.ticketItemPriceInfo}>
-                    <div className={styles.ticketItemPriceLoad}>
-                        <div className={styles.animationTextlazy} style={{width: '70px'}}></div>
-                        <div className={styles.animationTextlazy} style={{width: '120px'}}></div>
-                        <div className={styles.animationTextlazy} style={{width: '70px'}}></div>
+                    {/* Price Details */}
+                    <div className={styles.ticketItemPrice}>
+                        <div className={styles.animationTextlazy} style={{ width: '120px', height: '24px' }}></div>
+                        <div className={styles.animationTextlazy} style={{ width: '160px', height: '18px', marginTop: '4px' }}></div>
+                        <div className={styles.animationTextlazy} style={{ width: '140px', height: '16px', marginTop: '4px' }}></div>
                     </div>
+
+                    {/* Button */}
                     <div className={styles.leazyButton}></div>
+
+                    {/* Details Link */}
+                    <div className={styles.ticketItemDetails}>
+                        <div className={styles.animationImagelazy} style={{ width: '16px', height: '16px' }}></div>
+                        <div className={styles.animationTextlazy} style={{ width: '110px', height: '16px' }}></div>
+                    </div>
                 </div>
             </div>
         )
@@ -255,6 +243,7 @@ const TicketItem: FC<TicketItemProps> = ({ green,item ,price,lazy}) => {
 };
 
 export default TicketItem;
+
 
 
 

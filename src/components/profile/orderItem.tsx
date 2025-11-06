@@ -38,7 +38,7 @@ const OrderItem = ({item}:any) => {
 
     },[item])
 
-    console.log('item.package.status',item)
+    // console.log('item.package.status',item)
 
     return (
         <div className={`${styles.orderItem} ${styles[item.package.status]}`}>

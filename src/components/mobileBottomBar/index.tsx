@@ -34,7 +34,7 @@ const MobileBottomBar = () => {
         }else{
             setPinModalOpen(true);
         }
-        console.log(checkPin)
+        // console.log(checkPin)
     },[])
 
     const handleHome = () => {

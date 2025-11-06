@@ -83,7 +83,7 @@ const OrderList = (show:boolean) => {
     useEffect(() => {
         if(user){
             getOrdersUsers(user?.id).then(res=>{
-                console.log('getOrdersUsers',res)
+                // console.log('getOrdersUsers',res)
                 setOrders(res || [])
             })
         }

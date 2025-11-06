@@ -16,7 +16,6 @@ const MyOrders = ()=> {
     useEffect(() => {
         if(user){
             getOrdersUsers(user?.id).then(res=>{
-                console.log('getOrdersUsers',res)
                 setOrders(res || [])
             })
         }

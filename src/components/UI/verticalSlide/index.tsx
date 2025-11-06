@@ -4,6 +4,7 @@ import styles from './verticalSlide.module.css';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import Icon from "@/components/icons/Icon";
+import GalleryModal from "@/components/UI/galleryModal";
 
 interface ArrowProps {
     onClick?: () => void;
@@ -23,13 +24,21 @@ const ArrowTop = ({ onClick }: ArrowProps) => (
     </div>
 );
 
-const VerticalSlider = ({ images ,loading}: any) => {
+const VerticalSlider = ({ images, loading }: any) => {
     const [selectedImage, setSelectedImage] = useState<string>("");
     const [currentSlide, setCurrentSlide] = useState(0);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+
+    // Initialize selectedImage when images are available
+    const initialImage = images?.length > 0 ? `https://img.cdn.level.travel/${images[0]['x500']}` : "";
 
     useEffect(() => {
+        // console.log('VerticalSlider useEffect:', { images: images?.length, loading, selectedImage });
         if (images?.length > 0) {
-            setSelectedImage(`https://image.totus.club/imagePath?directory=${images[0]['x900']}`);
+            const imageUrl = `https://img.cdn.level.travel/${images[0]['x500']}`;
+            // console.log('Setting selectedImage to:', imageUrl);
+            setSelectedImage(imageUrl);
         }
     }, [images]);
 
@@ -110,48 +119,66 @@ const VerticalSlider = ({ images ,loading}: any) => {
         ],
     };
 
-if(loading){
-    return (
-        <div className={styles.container}>
-            <div className={styles.sliderWrapper}>
-                <Slider {...settings}>
-                    {images.map((img: any, index: number) => (
-                        <div
-                            key={index}
-                            onClick={() =>
-                                // setSelectedImage(`https://image.totus.club/imagePath?directory=${img['x500']}`)
-                                setSelectedImage(`https://img.cdn.level.travel/${img['x500']}`)
-                            }
-                        >
-                            <img
-                                src={`https://img.cdn.level.travel/${img['x500']}`}
-                                alt={`Thumb ${index}`}
-                                className={`${styles.thumbnail} ${
-                                    selectedImage ===
-                                    `https://img.cdn.level.travel/${img['x500']}`
-                                        ? styles.selectedThumbnail
-                                        : ''
-                                }`}
-                                tabIndex={index}
-                            />
-                        </div>
-                    ))}
-                </Slider>
-            </div>
-            <div>
-                <img
-                    src={selectedImage}
-                    alt="Selected"
-                    className={styles.selectedImage}
+    // console.log('VerticalSlider render:', { loading, imagesLength: images?.length, selectedImage, initialImage });
+
+    if (!loading && images?.length > 0) {
+        return (
+            <div className={styles.container}>
+                <div className={styles.sliderWrapper}>
+                    <Slider {...settings}>
+                        {images.map((img: any, index: number) => {
+                            const imageUrl = `https://img.cdn.level.travel/${img['x500']}`;
+                            return (
+                                <div
+                                    key={index}
+                                    onClick={() => {
+                                        setSelectedImage(imageUrl);
+                                        setSelectedImageIndex(index);
+                                    }}
+                                >
+                                    <img
+                                        src={imageUrl}
+                                        alt={`Thumb ${index}`}
+                                        className={`${styles.thumbnail} ${selectedImage === imageUrl
+                                            ? styles.selectedThumbnail
+                                            : ''
+                                            }`}
+                                        tabIndex={index}
+                                    />
+                                </div>
+                            );
+                        })}
+                    </Slider>
+                </div>
+                <div
+                    className={styles.selectedImageWrapper}
+                    onClick={() => {
+                        const currentIndex = images.findIndex((img: any) =>
+                            `https://img.cdn.level.travel/${img['x500']}` === selectedImage
+                        );
+                        setSelectedImageIndex(currentIndex >= 0 ? currentIndex : 0);
+                        setIsModalOpen(true);
+                    }}
+                >
+                    <img
+                        src={selectedImage || initialImage}
+                        alt="Selected"
+                        className={styles.selectedImage}
+                    />
+                </div>
+                <GalleryModal
+                    isOpen={isModalOpen}
+                    onClose={() => setIsModalOpen(false)}
+                    images={images}
+                    initialIndex={selectedImageIndex}
                 />
             </div>
-        </div>
-    );
-}else{
-    return (
-        <div className={styles.image_placeholder}></div>
-    )
-}
+        );
+    } else {
+        return (
+            <div className={styles.image_placeholder}></div>
+        )
+    }
 
 };
 

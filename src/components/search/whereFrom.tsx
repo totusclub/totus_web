@@ -46,7 +46,6 @@ const WhereFrom = ({handleChange,value,name}) => {
     }, [isOpen]);
     // if (status === "loading") return <p>Loading...</p>;
     // if (status === "failed") return <p>Error: {error}</p>;
-    console.log('results',results)
     return (
         <div className={`${styles.searchField} ${styles.whereFrom}`} ref={wrapperRef} onClick={handleToggle}>
             <Icon name="from" size={24} color="#000" />

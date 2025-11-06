@@ -7,9 +7,9 @@ import WhereFrom from "@/components/search/whereFrom";
 import SelectDate from "@/components/search/date";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import {useDispatch, useSelector} from 'react-redux';
-import {runFullSearchFlow, setStartSearch} from '@/store/slices/searchSlice';
-import {RootState} from '@/store';
+import { useDispatch, useSelector } from 'react-redux';
+import { runFullSearchFlow, setStartSearch } from '@/store/slices/searchSlice';
+import { RootState } from '@/store';
 
 interface SearchFormProps {
     header?: boolean;
@@ -33,13 +33,14 @@ interface SearchParams {
     kids_ages: number[];
     search_type: string;
     hotel_ids: number[];
-    page_number:number;
-    page_limit:number;
+    page_number: number;
+    page_limit: number;
+    sort_by: string;
 }
 
 
-const SearchForm = ({ header,pageName}: SearchFormProps) => {
-    const { hotels, loading,headerName,startSearchValid} = useSelector((state: RootState) => state.search);
+const SearchForm = ({ header, pageName }: SearchFormProps) => {
+    const { hotels, loading, headerName, startSearchValid } = useSelector((state: RootState) => state.search);
 
 
     const dispatch = useDispatch();
@@ -49,30 +50,31 @@ const SearchForm = ({ header,pageName}: SearchFormProps) => {
         from_country: 'RU',
         // to_city: 'Kemer',
         to_country: 'TR',
-        adults: '2',
+        adults: '1',
         start_date: '2025-07-21',
         nights: '7..9',
-        flex_dates:'2',
+        flex_dates: '2',
         start_date_from: "2025-07-21",
         end_date_till: "2025-08-06",
         // kids: '1',
         // kids_ages: ['8'],
         search_type: 'package',
-        page_limit:20,
-        page_number:1
+        page_limit: 20,
+        page_number: 1,
+        sort_by:'relevance'
         // hotel_ids:[9069464]
     });
 
 
 
-    useEffect(()=>{
+    useEffect(() => {
         const today = new Date();
         const plus7 = new Date();
         plus7.setDate(today.getDate() + 7);
-        const dayPlus =  params?.nights?.split('..')?.[0] || params?.nights;
-        const interval =  calculateStayDates(plus7,+dayPlus);
-        setParams({...params, ...interval});
-    },[])
+        const dayPlus = params?.nights?.split('..')?.[0] || params?.nights;
+        const interval = calculateStayDates(plus7, +dayPlus);
+        setParams({ ...params, ...interval });
+    }, [])
 
     function calculateStayDates(startDateStr, nightCount) {
         const startDate = new Date(startDateStr);
@@ -88,7 +90,7 @@ const SearchForm = ({ header,pageName}: SearchFormProps) => {
         return {
             start_date: formatDate(startDate),
             start_date_from: formatDate(startDate),
-            end_date_till:formatDate(endDate)
+            end_date_till: formatDate(endDate)
         };
     }
 
@@ -103,44 +105,46 @@ const SearchForm = ({ header,pageName}: SearchFormProps) => {
                 const { to_city: _, ...restParsed } = parsed || {};
                 setParams({ ...restParams, ...restParsed });
             }
-            if(parsed?.hotel_ids){
-                console.log(parsed?.hotel_ids);
-                setParams({...params,hotel_ids:parsed?.hotel_ids});
+            if (parsed?.hotel_ids) {
+                // console.log(parsed?.hotel_ids);
+                setParams({ ...params, hotel_ids: parsed?.hotel_ids });
             }
-            if(Object.keys(parsed).length > 0){
+            if (Object.keys(parsed).length > 0) {
                 startSearch(parsed)
-            }else{
+            } else {
                 const today = new Date();
                 const plus7 = new Date();
                 plus7.setDate(today.getDate() + 7);
-                const dayPlus =  params?.nights?.split('..')?.[0] || params?.nights;
-                const interval =  calculateStayDates(plus7,+dayPlus);
-                setParams({...params, ...interval});
+                const dayPlus = params?.nights?.split('..')?.[0] || params?.nights;
+                const interval = calculateStayDates(plus7, +dayPlus);
+                setParams({ ...params, ...interval });
             }
         }
-    }, [router.isReady,pageName]);
+    }, [router.isReady, pageName]);
 
     const startSearch = async (data: SearchParams) => {
         // console.log('data',data,params?.hotel_ids?.length> 0);
-        if(+data?.page_number === 1 && startSearchValid){
-            if(data?.hotel_ids?.length> 0){
+        if (+data?.page_number === 1 && startSearchValid) {
+            if (data?.hotel_ids?.length > 0) {
                 dispatch(runFullSearchFlow({
                     searchParams: data,
                     filterParams: {
                         filter_instant_confirm: false,
                         page_number: data.page_number,
                         page_limit: data.page_limit,
+                        sort_by: data?.sort_by || 'relevance'
                     }
                 }));
-            }else{
+            } else {
                 dispatch(runFullSearchFlow({
                     searchParams: data,
                     filterParams: {
                         filter_instant_confirm: false,
                         page_number: data.page_number,
                         page_limit: data.page_limit,
-                        filter_stars:'3,4,5',
-                        filter_meals:'AI'
+                        filter_stars: '3,4,5',
+                        filter_meals: 'AI',
+                        sort_by: data?.sort_by || 'relevance'
                     }
                 }));
             }
@@ -150,59 +154,56 @@ const SearchForm = ({ header,pageName}: SearchFormProps) => {
     }
 
 
-    useEffect(() => {
-        console.log('headerName',headerName);
-    }, [headerName]);
 
-    const handleChange = (value: string | number | number[], key: keyof SearchParams,type:string) => {
-        if(key === 'from_city'){
+    const handleChange = (value: string | number | number[], key: keyof SearchParams, type: string) => {
+        if (key === 'from_city') {
             setParams((prev) => ({
                 ...prev,
-                from_country:value?.iso2
+                from_country: value?.iso2
             }));
-        }else if(key === 'to_city'){
-            if(type === 'countries'){
+        } else if (key === 'to_city') {
+            if (type === 'countries') {
                 delete params.hotel_ids
                 setParams((prev) => ({
                     ...prev,
-                    to_country:value?.iso2
+                    to_country: value?.iso2
                 }));
             }
-            if(type === 'regions' || type === 'metaregions'){
+            if (type === 'regions' || type === 'metaregions') {
                 delete params.hotel_ids
                 setParams((prev) => ({
                     ...prev,
                     to_city: value?.name_en,
-                    to_country:value?.iso2
+                    to_country: value?.iso2
                 }));
             }
-            if(type === 'hotels'){
+            if (type === 'hotels') {
                 setParams((prev) => ({
                     ...prev,
                     to_city: value?.name_en,
-                    to_country:value?.iso2,
-                    hotel_ids:[value.id]
+                    to_country: value?.iso2,
+                    hotel_ids: [value.id]
                 }));
             }
-        }else if(key === 'form_date'){
-            const dayPlus =  params?.nights?.split('..')?.[0] || params?.nights;
-            const interval =  calculateStayDates(value,+dayPlus);
-            setParams({...params, ...interval});
-        }else if(key === 'nights'){
-            const interval =  calculateStayDates(params?.start_date,+value);
-            setParams({...params, ...interval,nights:value});
-        }else if(key === 'adults'){
-            setParams({...params, adults:value});
-        }else if(key === 'kids'){
+        } else if (key === 'form_date') {
+            const dayPlus = params?.nights?.split('..')?.[0] || params?.nights;
+            const interval = calculateStayDates(value, +dayPlus);
+            setParams({ ...params, ...interval });
+        } else if (key === 'nights') {
+            const interval = calculateStayDates(params?.start_date, +value);
+            setParams({ ...params, ...interval, nights: value });
+        } else if (key === 'adults') {
+            setParams({ ...params, adults: value });
+        } else if (key === 'kids') {
             let age = []
-            for(let i=0;i<value;i++){
+            for (let i = 0; i < value; i++) {
                 age.push('8')
             }
             let kids_ages = []
-            for (let i=0;i<value;i++){
+            for (let i = 0; i < value; i++) {
                 kids_ages.push(9);
             }
-            setParams({...params, kids:value,kids_ages:kids_ages});
+            setParams({ ...params, kids: value, kids_ages: kids_ages });
         }
     };
 
@@ -266,17 +267,17 @@ const SearchForm = ({ header,pageName}: SearchFormProps) => {
 
     return (
         <>
-            {pageName === 'search' || pageName==='home' && (
+            {pageName === 'search' || pageName === 'home' && (
                 <div className={`${styles.searchForm} ${header && styles.searchFormM}`}>
                     <div className={styles.searchFields}>
                         <WhereTo handleChange={handleChange} name={'to_city'} value={params.to_city} />
                         <div className={styles.searchGroup}>
-                            <SelectDate handleChange={handleChange} name={'form_date'} value={params.start_date}/>
-                            <Nights handleChange={handleChange} name={'nights'} value={params.nights}/>
+                            <SelectDate handleChange={handleChange} name={'form_date'} value={params.start_date} />
+                            <Nights handleChange={handleChange} name={'nights'} value={params.nights} />
                         </div>
                         <People handleChange={handleChange}
-                                value={{adults: params.adults, kids: params.kids, kids_ages: params.kids_ages}}/>
-                        <WhereFrom handleChange={handleChange} name={'from_city'} value={params.from_city}/>
+                            value={{ adults: params.adults, kids: params.kids, kids_ages: params.kids_ages }} />
+                        <WhereFrom handleChange={handleChange} name={'from_city'} value={params.from_city} />
                     </div>
                     <Button
                         br={16}

@@ -32,7 +32,7 @@ const DatesPrice = ({ dates,selectedDate, setSelectedDate }: DatesPriceProps) =>
         if (firstEntry) {
             const [firstDate, firstPrice] = firstEntry;
             setSelectedDate(firstDate)
-            console.log(firstDate); // "2025-07-19"
+            // console.log(firstDate); // "2025-07-19"
         }
     },[dates])
 

@@ -3,12 +3,12 @@ import DatesPrice from "@/components/hotelDetails/hotelDetailsRooms/datesPrice";
 import HotelDetailsRoomItem from "@/components/hotelDetails/hotelDetailsRooms/roomItem";
 import Icon from "@/components/icons/Icon";
 import Button from "@/components/UI/button";
-import {router} from "next/client";
-import {useEffect, useMemo, useState} from "react";
-import {createPackage} from "@/api/levelTravelApi";
-import {useRouter} from "next/router";
+import { router } from "next/client";
+import { useEffect, useMemo, useState } from "react";
+import { createPackage } from "@/api/levelTravelApi";
+import { useRouter } from "next/router";
 
-const HotelDetailsRooms = ({rooms}:any) => {
+const HotelDetailsRooms = ({ rooms }: any) => {
     const router = useRouter();
     const [selectedDate, setSelectedDate] = useState<Date | null>(null);
     const [fisrtDate, setFisrtDate] = useState(null);
@@ -41,25 +41,25 @@ const HotelDetailsRooms = ({rooms}:any) => {
                 return acc;
             }, {});
 
-        console.log("Sorted by start_date with min prices:", sorted);
+        // console.log("Sorted by start_date with min prices:", sorted);
         return sorted
     }, [rooms]);
 
 
-    const roomTypeName= {
-        BB:'Завтрак',
-        RO:'Без питания',
-        AI:'Всё включено',
-        UAI:'Ультра всё включено',
-        HB:'Завтрак и ужин',
-        FB:'Завтрак, обед, ужин',
-        HBD:'Завтрак и ужин',
-        AI24:'Всё включено 24 часа',
-        DNR:'Ужин',
-        AIL:'Всё включено с ограничениями',
-        'FB+':'Завтрак, обед, ужин +',
-        'HB+':'Завтрак и ужин +',
-        HBL:'Завтрак и обед'
+    const roomTypeName = {
+        BB: 'Завтрак',
+        RO: 'Без питания',
+        AI: 'Всё включено',
+        UAI: 'Ультра всё включено',
+        HB: 'Завтрак и ужин',
+        FB: 'Завтрак, обед, ужин',
+        HBD: 'Завтрак и ужин',
+        AI24: 'Всё включено 24 часа',
+        DNR: 'Ужин',
+        AIL: 'Всё включено с ограничениями',
+        'FB+': 'Завтрак, обед, ужин +',
+        'HB+': 'Завтрак и ужин +',
+        HBL: 'Завтрак и обед'
     }
 
 
@@ -90,19 +90,19 @@ const HotelDetailsRooms = ({rooms}:any) => {
             return earliest;
         })();
         setFisrtDate(closestOffer)
-    },[rooms])
+    }, [rooms])
 
 
-    const handleBook =  async (id:any) => {
+    const handleBook = async (id: any) => {
         setLoading(true)
-        const res =  await createPackage({request_id:router.query.request_id,tour_id:id})
-        console.log('handleBook',res.package.id)
+        const res = await createPackage({ request_id: router.query.request_id, tour_id: id })
+        // console.log('handleBook', res.package.id)
         setLoading(false)
         router.push(`/tickets?package=${res.package.id}`);
     };
 
-    const formatDate= useMemo(() => {
-        if(fisrtDate?.start_date){
+    const formatDate = useMemo(() => {
+        if (fisrtDate?.start_date) {
             const date = new Date(fisrtDate?.start_date);
 
             const formatter = new Intl.DateTimeFormat('ru-RU', {
@@ -114,7 +114,7 @@ const HotelDetailsRooms = ({rooms}:any) => {
 
             return `с ${formatted}`;
         }
-    },[fisrtDate?.start_date])
+    }, [fisrtDate?.start_date])
 
     return (
         <div className={'content'}>
@@ -123,16 +123,16 @@ const HotelDetailsRooms = ({rooms}:any) => {
                     <div className={styles.HotelDetailsRoomsHead}>
                         <p>Выберите номер</p>
                     </div>
-                    <DatesPrice dates={pricesList} selectedDate={selectedDate} setSelectedDate={setSelectedDate}/>
+                    <DatesPrice dates={pricesList} selectedDate={selectedDate} setSelectedDate={setSelectedDate} />
                     {rooms.map((r, i) => (
-                        <HotelDetailsRoomItem item={r} selectedDate={selectedDate}/>
+                        <HotelDetailsRoomItem item={r} selectedDate={selectedDate} />
                     ))}
 
                 </div>
                 <div className={styles.HotelDetailsMap}>
                     <div className={styles.HotelDetailsMapBox}>
                         <div className={styles.HotelDetailsMapBoxTitle}>
-                            <Icon name={'location'} size={16}/>
+                            <Icon name={'location'} size={16} />
                             <p> Jumeirah Beach Road, Дубай, ОАЭ</p>
                         </div>
                         <div className={styles.map}>
@@ -146,7 +146,7 @@ const HotelDetailsRooms = ({rooms}:any) => {
                             <p className={styles.HotelDetailsInfoDateText}>{formatDate}, {fisrtDate?.nights_count} ночей</p>
                         </div>
                         <Button loading={loading} onClick={() => handleBook(fisrtDate?.id)} title={'Выбрать номер'}
-                                full={true}/>
+                            full={true} />
                     </div>
 
                 </div>

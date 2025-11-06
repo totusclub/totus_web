@@ -30,7 +30,7 @@ const HotelDetailsRoomItem = ({item,selectedDate}:any) => {
                 name: offer.operator_name
             }));
 
-            console.log('Filtered Offers:', selectedDate, filteredOffers, simplified);
+            // console.log('Filtered Offers:', selectedDate, filteredOffers, simplified);
             setSelectedOperator(simplified[0]?.['id'])
             return {offersRoom:filteredOffers,operators:simplified}
         }

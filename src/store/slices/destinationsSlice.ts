@@ -7,7 +7,6 @@ export const fetchDestinations = createAsyncThunk(
         // query:'""',from_city:from_city,search_type:'package'
         const res = await axios.get(`https://api.totus.club/references/autocomplete_v2?query="${params.query}"&from_city=${params?.from_city}&search_type=package` );
         // const res = await axios.get('https://api.totus.club/references/destinations', { params });
-        console.log('dsvsdv',res.data);
         return res.data;
     }
 );

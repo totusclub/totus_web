@@ -3,23 +3,24 @@ import HotelDetailsHeader from "@/components/hotelDetails/hotelDetailsHeader";
 import HotelDetailsInfo from "@/components/hotelDetails/hotelDetailsInfo";
 import HotelDetailsDesc from "@/components/hotelDetails/hotelDetailsDesc";
 import HotelDetailsRooms from "@/components/hotelDetails/hotelDetailsRooms";
-import HotelDetailsServices from "@/components/hotelDetails/hotelDetailsRooms/services";
-import {useEffect, useState} from "react";
-import {createPackage, getHotelInfo, getHotelOffers, getHotelRooms, runFullSearchFlow} from "@/api/levelTravelApi";
-import {router} from "next/client";
+import HotelDetailsSkeleton from "@/components/hotelDetails/hotelDetailsSkeleton";
+import { useEffect, useState } from "react";
+import { getHotelInfo, getHotelRooms } from "@/api/levelTravelApi";
+import { router } from "next/client";
 
 export default function HotelDetails() {
-    const [hotel, setHotel] = useState(null);
-    const [rooms, setRooms] = useState([]);
+    const [hotel, setHotel] = useState<any>(null);
+    const [rooms, setRooms] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
     //
-    const handleSearch = async (roomParans) => {
+    const handleSearch = async (roomParams: any) => {
         setLoading(true);
         try {
-           const allRooms = await getHotelRooms(roomParans)
-           const hotelInfo = await getHotelInfo(roomParans)
+            const allRooms = await getHotelRooms(roomParams)
+            const hotelInfo = await getHotelInfo(roomParams)
             setHotel(hotelInfo)
             setRooms(allRooms?.result)
+            // console.log('Hotel data loaded:', { hotelInfo, images: hotelInfo?.images });
         } catch (err) {
             console.error('Search failed:', err);
         } finally {
@@ -29,26 +30,26 @@ export default function HotelDetails() {
 
     useEffect(() => {
         if (router?.isReady && router?.query?.hotel_id) {
-            console.log('router.query',router.query)
+            // console.log('router.query', router.query)
             handleSearch(router.query)
-            // getHotelInfo(router.query)
         }
-
-    },[router?.isReady,router?.query])
+    }, [])
 
 
 
     return (
         <main className={'searchContainer'}>
-            <Steps active={2}/>
-            {/*<div className={'content'}>*/}
-                 <HotelDetailsHeader info={hotel} loading={loading}/>
-                 <HotelDetailsInfo rooms={rooms} panding={loading} images={hotel?.images || []} />
-                 <HotelDetailsDesc loading={loading} info={hotel} />
-                {!loading && (<HotelDetailsRooms  rooms={rooms}/>)}
-
-                 {/*<HotelDetailsServices info={hotel}/>*/}
-            {/*</div>*/}
+            <Steps active={2} />
+            {loading ? (
+                <HotelDetailsSkeleton />
+            ) : (
+                <>
+                    <HotelDetailsHeader info={hotel} loading={loading} />
+                    <HotelDetailsInfo rooms={rooms} panding={loading} images={hotel?.images || []} />
+                    <HotelDetailsDesc loading={loading} info={hotel} />
+                    <HotelDetailsRooms rooms={rooms} />
+                </>
+            )}
         </main>
     );
 }

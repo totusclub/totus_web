@@ -5,6 +5,7 @@ import Icon from "@/components/icons/Icon";
 interface OptionType {
     name: string;
     value: string;
+    icon:string
 }
 
 interface SelectProps {
@@ -18,14 +19,14 @@ interface SelectProps {
 }
 
 const Select: React.FC<SelectProps> = ({
-                                           options,
-                                           value,
-                                           onChange,
-                                           placeholder = 'Select an option',
-                                           label,
-                                           isFull = false,
-                                            type
-                                       }) => {
+    options,
+    value,
+    onChange,
+    placeholder = 'Select an option',
+    label,
+    isFull = false,
+    type
+}) => {
     const [open, setOpen] = useState(false);
     const [openUp, setOpenUp] = useState(false);
     const selectRef = useRef<HTMLDivElement>(null);
@@ -53,40 +54,48 @@ const Select: React.FC<SelectProps> = ({
         }
     }, [open, options.length]);
 
-    const handleSelect = (option: string) => {
+    const handleSelect = (option: OptionType) => {
         onChange(option);
         setOpen(false);
     };
-
+    console.log('value',value);
     return (
         <div
             ref={selectRef}
             className={styles.customSelect}
             style={{ flex: isFull ? 1 : 'none' }}
         >
-            <div className={styles.selectButton} onClick={() => setOpen(prev => !prev)}>
-                <div className={styles.selectButtonInfo}>
+            <div className={styles.selectButton} >
+                <div className={styles.selectButtonInfo} onClick={() => setOpen(prev => !prev)}>
                     {label && <p className={styles.selectLabel}>{label}</p>}
-                    <p className={styles.selectValue}>{value?.name || placeholder}</p>
+                    <p className={styles.selectValue}>{value || placeholder}</p>
                 </div>
                 <div className={styles.arrow}>
                     <Icon name="downArrow" size={24} />
+                </div>
+                <div className={styles.arrowMob}>
+                    <Icon name="downArrow" size={24} color="#FE732E" />
                 </div>
             </div>
 
             {open && (
                 <ul
-                    className={`${styles.optionsList} ${
-                        openUp ? styles.openUp : styles.openDown
-                    }`}
+                    className={`${styles.optionsList} ${openUp ? styles.openUp : styles.openDown
+                        }`}
                 >
-                    {options.map((option) => (
+                    {options.map((option,index) => (
                         <li
-                            key={option.id}
+                            key={index}
                             onClick={() => handleSelect(option)}
-                            className={styles.optionItem}
+                            className={`${styles.optionItem} ${value === option.name ? styles.active : ''}`}
                         >
-                            {option.name}
+                            <div>
+                                <Icon name={option.icon} size={16}/>
+                                {option.name}
+                            </div>
+                            {value === option.name && (
+                                <Icon name={'optionCheck'} size={16} />
+                            )}
                         </li>
                     ))}
                 </ul>
