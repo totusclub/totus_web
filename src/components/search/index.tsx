@@ -1,10 +1,18 @@
 import styles from './search.module.css';
 import SearchForm from "@/components/search/searchForm";
 import Icon from "@/components/icons/Icon";
+import {useDispatch} from 'react-redux';
+import {useEffect} from 'react';
+import {clearSearch} from '@/store/slices/searchSlice';
 
 
 
 const Search = () => {
+    const dispatch = useDispatch();
+    useEffect(() => {
+        dispatch(clearSearch())
+    }, []);
+
     return (
         <div className={styles.search}>
             <div className={`content ${styles.searchContent}`}>
