@@ -66,6 +66,11 @@ const BookingOrderForm: React.FC<BookingOrderFormProps> = ({ params, handleChang
     const options: SelectOption[] = [{ value: '225', name: 'Россия' }];
     const options2: SelectOption[] = [{ value: 'international_passport', name: 'Заграничный паспорт РФ' }];
 
+    // Add icon property to options for Select component compatibility
+    const genderOptionsWithIcon = genderSelectOptions.map(opt => ({ ...opt, icon: '' }));
+    const nationalityOptionsWithIcon = options.map(opt => ({ ...opt, icon: '' }));
+    const docTypeOptionsWithIcon = options2.map(opt => ({ ...opt, icon: '' }));
+
     // const [params, setParams] = useState<Params>({
     //     email: "",
     //     phone: "",
@@ -197,13 +202,14 @@ const BookingOrderForm: React.FC<BookingOrderFormProps> = ({ params, handleChang
                                     />
                                     <div className={styles.selectWrapper}>
                                         {(() => {
+                                            const selectedGenderOption = genderSelectOptions.find(opt => opt.value === params.tourist[index].gender);
                                             const SelectProps = {
                                                 isFull: true as const,
-                                                options: genderSelectOptions,
-                                                value: genderSelectOptions.find(opt => opt.value === params.tourist[index].gender),
+                                                options: genderOptionsWithIcon,
+                                                value: selectedGenderOption?.name || '',
                                                 onChange: (option: string | SelectOption) => {
                                                     const selectedOption = typeof option === 'string'
-                                                        ? genderSelectOptions.find(opt => opt.value === option)
+                                                        ? genderSelectOptions.find(opt => opt.value === option || opt.name === option)
                                                         : option;
                                                     if (selectedOption) {
                                                         handleChangeTourist(selectedOption.value, 'gender', index);
@@ -226,13 +232,14 @@ const BookingOrderForm: React.FC<BookingOrderFormProps> = ({ params, handleChang
                                 <div className={styles.bookingFormInputs}>
                                     <div className={styles.selectWrapper}>
                                         {(() => {
+                                            const selectedNationalityOption = options.find(opt => opt.value === params.tourist[index].nationality_id?.toString());
                                             const SelectProps = {
                                                 isFull: true as const,
-                                                options: options,
-                                                value: options.find(opt => opt.value === params.tourist[index].nationality_id?.toString()),
+                                                options: nationalityOptionsWithIcon,
+                                                value: selectedNationalityOption?.name || '',
                                                 onChange: (option: string | SelectOption) => {
                                                     const selectedOption = typeof option === 'string'
-                                                        ? options.find(opt => opt.value === option)
+                                                        ? options.find(opt => opt.value === option || opt.name === option)
                                                         : option;
                                                     if (selectedOption) {
                                                         handleChangeTourist(parseInt(selectedOption.value), 'nationality_id', index);
@@ -251,13 +258,14 @@ const BookingOrderForm: React.FC<BookingOrderFormProps> = ({ params, handleChang
                                     </div>
                                     <div className={styles.selectWrapper}>
                                         {(() => {
+                                            const selectedDocTypeOption = options2.find(opt => opt.value === params.tourist[index].doc_type);
                                             const SelectProps = {
                                                 isFull: true as const,
-                                                options: options2,
-                                                value: options2.find(opt => opt.value === params.tourist[index].doc_type),
+                                                options: docTypeOptionsWithIcon,
+                                                value: selectedDocTypeOption?.name || '',
                                                 onChange: (option: string | SelectOption) => {
                                                     const selectedOption = typeof option === 'string'
-                                                        ? options2.find(opt => opt.value === option)
+                                                        ? options2.find(opt => opt.value === option || opt.name === option)
                                                         : option;
                                                     if (selectedOption) {
                                                         handleChangeTourist(selectedOption.value, 'doc_type', index);
