@@ -75,6 +75,7 @@ import DearIcon from '@/components/icons/dear';
 import CheapIcon from '@/components/icons/cheap';
 import ReatingIcon from '@/components/icons/reating';
 import OptionCheckIcon from '@/components/icons/optionCheck';
+import BirdIcon from '@/components/icons/bird';
 
 
 const icons = {
@@ -155,6 +156,7 @@ const icons = {
     cheap: CheapIcon,
     reating: ReatingIcon,
     optionCheck: OptionCheckIcon,
+    bird: BirdIcon,
 }
 
 type IconName = keyof typeof icons;

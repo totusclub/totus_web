@@ -27,16 +27,24 @@ const MenuProfile = () => {
         }
 
     }
+
     return (
         <div className={styles.profileMenuCol}>
             <div className={styles.profileCard}>
-                <div className={styles.profilePicture}>
-                    <p>{user?.name?.[0]}{user?.l_name?.[0]}</p>
+                <div className={styles.profileCardHeader}>
+                    <p>Карта лояльности</p>
+                    <Icon name={'bird'} size={64}/>
+                </div>
+                <div className={styles.profileCardInfo}>
+                    <p className={styles.profileCardNumber}>{user?.loyalty_id}</p>
+                    <p className={styles.smallInfoCard}><Icon name={'info'} color={'#fff'} size={18}/>Ваш персональный нормер</p>
                 </div>
                 <div className={styles.profileName}>
-                    <p>{user?.name}</p>
-                    <p>{user?.l_name}</p>
-                    {/*<p className={styles.editProfile}>Изменить профиль</p>*/}
+                    <p>{`${user?.name} ${user?.l_name}`}</p>
+                    <div className={styles.userCardIcon}>
+                        <Icon name={'user'} size={16}/>
+                    </div>
+
                 </div>
             </div>
             {/*<div className={styles.profileMenu}>*/}
