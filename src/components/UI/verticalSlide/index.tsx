@@ -29,6 +29,7 @@ const VerticalSlider = ({ images, loading }: any) => {
     const [currentSlide, setCurrentSlide] = useState(0);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+    const [isMobile, setIsMobile] = useState(false);
 
     // Initialize selectedImage when images are available
     const initialImage = images?.length > 0 ? `https://img.cdn.level.travel/${images[0]['x500']}` : "";
@@ -41,6 +42,18 @@ const VerticalSlider = ({ images, loading }: any) => {
             setSelectedImage(imageUrl);
         }
     }, [images]);
+
+    // Detect mobile screen size
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth <= 1026);
+        };
+
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
 
     const maxDots = 10;
 
@@ -134,6 +147,10 @@ const VerticalSlider = ({ images, loading }: any) => {
                                     onClick={() => {
                                         setSelectedImage(imageUrl);
                                         setSelectedImageIndex(index);
+                                        // On mobile, open modal when clicking thumbnail
+                                        if (isMobile) {
+                                            setIsModalOpen(true);
+                                        }
                                     }}
                                 >
                                     <img
