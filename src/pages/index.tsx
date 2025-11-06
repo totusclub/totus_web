@@ -17,11 +17,11 @@ export default function Home() {
             <Search />
             <HomeBanners />
             <HotDealsSlide title={'Начните планирование путешествия здесь'} slidesToShow={3} />
-            <Services />
+            {/*<Services />*/}
             <PopularDestinations />
             <Partner />
             <CallRequest />
-            <Faq />
+            {/*<Faq />*/}
 
         </main>
     );
