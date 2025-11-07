@@ -76,6 +76,10 @@ import CheapIcon from '@/components/icons/cheap';
 import ReatingIcon from '@/components/icons/reating';
 import OptionCheckIcon from '@/components/icons/optionCheck';
 import BirdIcon from '@/components/icons/bird';
+import FolderIcon from './folder';
+import SupportInfoIcon from './supportInfo';
+import SmileIcon from './smile';
+import UploadIcon from './upload';
 
 
 const icons = {
@@ -102,8 +106,8 @@ const icons = {
     check: CheckIcon,
     appStore: AppStoreIcon,
     googlePlay: GooglePlayIcon,
-    fb:FbIcon,
-    x:XIcon,
+    fb: FbIcon,
+    x: XIcon,
     instagram: InstagramIcon,
     youtube: YoutubeIcon,
     line: LineIcon,
@@ -157,6 +161,10 @@ const icons = {
     reating: ReatingIcon,
     optionCheck: OptionCheckIcon,
     bird: BirdIcon,
+    folder: FolderIcon,
+    supportInfo: SupportInfoIcon,
+    smile: SmileIcon,
+    upload: UploadIcon,
 }
 
 type IconName = keyof typeof icons;
@@ -168,7 +176,7 @@ interface IconProps {
     onClick?: () => void;
 }
 
-export default function Icon({ name, size = 24, color = 'currentColor' ,onClick}: IconProps) {
+export default function Icon({ name, size = 24, color = 'currentColor', onClick }: IconProps) {
     const Component = icons[name as IconName];
     return <Component width={size} height={size} color={color} onClick={onClick} />;
 }

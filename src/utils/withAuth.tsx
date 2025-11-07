@@ -9,8 +9,9 @@ const withAuth = (WrappedComponent) => {
         const router = useRouter();
 
         useEffect(() => {
+            console.log('user', user)
             if (!user) {
-                router.replace('/');
+                // router.replace('/');
             }
         }, [user]);
 

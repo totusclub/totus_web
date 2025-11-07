@@ -1,15 +1,16 @@
 import styles from './profile.module.css'
 import Icon from "@/components/icons/Icon";
 import useAuth from "@/hooks/useAuth";
-import {useDispatch} from "react-redux";
-import {logout} from "@/store/slices/authSlice";
-import {deleteToken} from "@/utils/auth";
-import {router} from "next/client";
-import {useState} from "react";
+import { useDispatch } from "react-redux";
+import { logout } from "@/store/slices/authSlice";
+import { deleteToken } from "@/utils/auth";
+import { router } from "next/client";
+import { useState } from "react";
+import MessengerSection from "./messengerSection";
 
 const MenuProfile = () => {
     const dispatch = useDispatch();
-    const {user,token} = useAuth()
+    const { user, token } = useAuth()
     const [deleteModal, setDeleteModal] = useState<boolean>(false)
 
     const handleLogout = () => {
@@ -21,7 +22,7 @@ const MenuProfile = () => {
         }
     }
 
-    const handelCall = ()=>{
+    const handelCall = () => {
         if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
             window.ReactNativeWebView.postMessage("openModal")
         }
@@ -33,16 +34,16 @@ const MenuProfile = () => {
             <div className={styles.profileCard}>
                 <div className={styles.profileCardHeader}>
                     <p>Карта лояльности</p>
-                    <Icon name={'bird'} size={64}/>
+                    <Icon name={'bird'} size={64} />
                 </div>
                 <div className={styles.profileCardInfo}>
                     <p className={styles.profileCardNumber}>{user?.loyalty_id}</p>
-                    <p className={styles.smallInfoCard}><Icon name={'info'} color={'#fff'} size={18}/>Ваш персональный нормер</p>
+                    <p className={styles.smallInfoCard}><Icon name={'info'} color={'#fff'} size={18} />Ваш персональный нормер</p>
                 </div>
                 <div className={styles.profileName}>
                     <p>{`${user?.name} ${user?.l_name}`}</p>
                     <div className={styles.userCardIcon}>
-                        <Icon name={'user'} size={16}/>
+                        <Icon name={'user'} size={16} />
                     </div>
 
                 </div>
@@ -66,14 +67,17 @@ const MenuProfile = () => {
             {/*</div>*/}
             <div onClick={() => handelCall()} className={styles.profileSupport}>
                 <div className={styles.profileSupport}>
-                    <div style={{position:'relative'}}>
-                        <div className={styles.indicatorSupport}/>
-                        <Icon name={'support'} size={24}/>
+                    <div style={{ position: 'relative' }}>
+                        <div className={styles.indicatorSupport} />
+                        <Icon name={'support'} size={24} />
                     </div>
                     <p>Звонок в поддержку </p>
                 </div>
-                <Icon name={'phone'} size={18}/>
+                <Icon name={'phone'} size={18} />
             </div>
+
+            <MessengerSection />
+
             <div className={styles.profileMenu}>
                 {/*<div className={styles.profileMenuHead}>*/}
                 {/*    <p>Личная информация</p>*/}
@@ -84,7 +88,7 @@ const MenuProfile = () => {
                 {/*</div>*/}
 
                 <div onClick={() => router.push('profile/my-orders')} className={styles.profileMenuItem}>
-                    <Icon name={'order'} size={24}/>
+                    <Icon name={'order'} size={24} />
                     <p>Мои заказы</p>
                 </div>
                 {/*<div className={styles.profileMenuItem}>*/}
@@ -92,7 +96,7 @@ const MenuProfile = () => {
                 {/*    <p>Избранное</p>*/}
                 {/*</div>*/}
                 <div onClick={() => router.push('privacy-policy')} className={styles.profileMenuItem}>
-                    <Icon name={'faq'} size={24}/>
+                    <Icon name={'faq'} size={24} />
                     <p>Политика конфиденциальности</p>
                 </div>
 
@@ -113,7 +117,7 @@ const MenuProfile = () => {
             <div className={styles.profileMenu}>
                 <div onClick={() => handleLogout()} className={styles.profileMenuLogout}>
                     <p>Выйти</p>
-                    <Icon name={'logout'} size={24}/>
+                    <Icon name={'logout'} size={24} />
                 </div>
             </div>
             <div className={styles.deleteBlock}>

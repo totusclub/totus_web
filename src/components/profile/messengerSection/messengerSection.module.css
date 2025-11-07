@@ -1,0 +1,73 @@
+.messengerSection {
+  width: 100%;
+  display: flex;
+  padding: 16px;
+  flex-direction: column;
+  align-items: flex-start;
+  align-self: stretch;
+  border-radius: 20px;
+  background: var(--bgPrimary);
+}
+
+.messengerSectionHead {
+  display: flex;
+  padding: 16px 16px;
+  align-items: flex-start;
+  align-self: stretch;
+}
+
+.messengerSectionHead > p {
+  color: var(--textPrimary);
+  font-family: "Golos Text";
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 24px;
+  letter-spacing: -0.4px;
+}
+
+.messengerSectionItem {
+  display: flex;
+  align-items: center;
+  height: 48px;
+  padding: 16px 16px;
+  gap: 8px;
+  flex: 1 0 0;
+  cursor: pointer;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.messengerSectionLeft {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.messengerIconWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.indicatorMessage {
+  z-index: 1;
+  border-radius: 4px;
+  width: 8px;
+  height: 8px;
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  border: 2px solid #fe732e;
+}
+
+.messengerSectionItem > p {
+  color: var(--textPrimary);
+  font-family: "Golos Text";
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 20px;
+  letter-spacing: -0.32px;
+}
