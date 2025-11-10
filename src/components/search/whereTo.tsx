@@ -91,7 +91,7 @@ const ignorName = ['Крым', 'Донецк', 'Луганск', 'Ялта','Yal
             {isOpen && (
                 <div className={styles.whereFromModal} onClick={(e) => e.stopPropagation()}>
                     <div className={styles.whereFromModalHead}>
-                        <p>Страна или город</p>
+                        <p>Страна, город или отель</p>
                         <div onClick={() => setIsOpen(false)}>
                             <Icon name={'closeLine'} size={24} color="#000"/>
                         </div>
