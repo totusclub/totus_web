@@ -73,7 +73,7 @@ const ignorName = ['Крым', 'Донецк', 'Луганск', 'Ялта','Yal
         <div className={`${styles.searchField} ${styles.radioFrom}`} ref={wrapperRef} onClick={handleToggle}>
             <Icon name={'to'} size={24} color="#000"/>
             <div className={styles.searchFieldInfo}>
-                <p className={styles.searchFieldsLabel}>Страна, город или отель</p>
+                <p className={styles.searchFieldsLabel}>Страна, город, регион или отель</p>
                 <input
                     className={styles.searchFieldsValue}
                     type="text"
@@ -91,7 +91,7 @@ const ignorName = ['Крым', 'Донецк', 'Луганск', 'Ялта','Yal
             {isOpen && (
                 <div className={styles.whereFromModal} onClick={(e) => e.stopPropagation()}>
                     <div className={styles.whereFromModalHead}>
-                        <p>Страна, город или отель</p>
+                        <p>Страна, город, регион или отель</p>
                         <div onClick={() => setIsOpen(false)}>
                             <Icon name={'closeLine'} size={24} color="#000"/>
                         </div>
