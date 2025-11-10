@@ -1,0 +1,192 @@
+.modalOverlay {
+  background-color: rgba(0, 0, 0, 0.5);
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999999999;
+}
+
+.membersModal {
+  position: relative;
+  width: 90%;
+  max-width: 500px;
+  max-height: 80vh;
+  background: var(--bgPrimary);
+  border-radius: 20px;
+  outline: none;
+  border: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.modalContent {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.modalHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--borderTertiary);
+}
+
+.modalHeaderLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.modalTitle {
+  color: var(--textPrimary);
+  font-family: "Golos Text";
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 24px;
+  letter-spacing: -0.4px;
+  margin: 0;
+}
+
+.modalMemberCount {
+  color: var(--textSecondary);
+  font-family: "Golos Text";
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 18px;
+  letter-spacing: -0.28px;
+  margin: 0;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.closeButton {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid var(--textTertiary);
+  transition: background 0.2s;
+}
+
+.closeButton:hover {
+  background: var(--bgSecondary);
+}
+
+.membersList {
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  gap: 12px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.memberItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--bgSecondary);
+  border-radius: 12px;
+  transition: background 0.2s;
+}
+
+.memberItem:hover {
+  background: var(--borderTertiary);
+}
+
+.memberAvatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.avatarInitial {
+  color: var(--textPrimary);
+  font-family: "Golos Text";
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 20px;
+}
+
+.memberName {
+  flex: 1;
+  color: var(--textPrimary);
+  font-family: "Golos Text";
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 20px;
+  letter-spacing: -0.32px;
+}
+
+.memberActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.callButton {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #39bf87;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.callButton:hover {
+  background: #2fa572;
+}
+
+.deleteButton {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .membersModal {
+    width: 95%;
+    max-height: 90vh;
+  }
+
+  .modalHeader {
+    padding: 16px 20px;
+  }
+
+  .membersList {
+    padding: 12px;
+  }
+}

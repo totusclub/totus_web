@@ -80,6 +80,7 @@ import FolderIcon from './folder';
 import SupportInfoIcon from './supportInfo';
 import SmileIcon from './smile';
 import UploadIcon from './upload';
+import MessageArrowIcon from './messageArrow';
 
 
 const icons = {
@@ -165,6 +166,7 @@ const icons = {
     supportInfo: SupportInfoIcon,
     smile: SmileIcon,
     upload: UploadIcon,
+    messageArrow: MessageArrowIcon,
 }
 
 type IconName = keyof typeof icons;

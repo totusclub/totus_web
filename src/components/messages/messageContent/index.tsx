@@ -1,81 +1,81 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '@/store';
+import { fetchRoomMessages, sendMessage } from '@/store/slices/chat/chatSlice';
 import styles from './messageContent.module.css';
 import Icon from "@/components/icons/Icon";
+import DefaultMessage from './defaultMessage';
+import MessageList from '../messageList';
+import MembersModal, { ChatMember } from '../membersModal';
 
-type Message = {
-  id: string;
-  sender: string;
-  text: string;
-  time: string;
-  isOwn: boolean;
-  avatarInitial?: string;
-  avatarColor?: string;
-  isOnline?: boolean;
-};
 
-type ChatData = {
-  id: string;
-  title: string;
-  icon: string;
-  iconColor: string;
-  memberCount: number;
-  messages: Message[];
-};
 
 const MessageContent = ({ selectedChat }: { selectedChat: string | null }) => {
+  const dispatch = useDispatch<AppDispatch>();
   const [messageText, setMessageText] = useState('');
-
-  // Mock chat data - replace with actual API call
-  const getChatData = (chatId: string | null): ChatData | null => {
-    if (!chatId) return null;
-
-    const chats: { [key: string]: ChatData } = {
-      '1': {
-        id: '1',
-        title: 'Семья',
-        icon: 'user',
-        iconColor: '#FE732E',
-        memberCount: 4,
-        messages: [
-          { id: '1', sender: 'Анна Иванова', text: 'Здесь должен быть текст', time: 'Понедельник, 16:23', isOwn: false, avatarInitial: 'А', avatarColor: '#FFD700', isOnline: true },
-          { id: '2', sender: 'Екатерина Смирнова', text: 'Привет! Вот отчет за этот год, пожалуйста, посмотри и дай знать, что ты думаешь. Я жду твоего подтверждения для загрузки.', time: 'Понедельник, 16:23', isOwn: false, avatarInitial: 'Е', avatarColor: '#FFD700', isOnline: true },
-          { id: '3', sender: 'Ты', text: 'Спасибо, Ава! Все выглядит отлично.', time: '9:36', isOwn: true },
-          { id: '4', sender: 'Ольга Федорова', text: 'Комментарий', time: '13:12', isOwn: false, avatarInitial: 'О', avatarColor: '#FFD700', isOnline: false },
-          { id: '5', sender: 'Мария Васильева', text: 'Встреча в 15:00', time: 'Только что', isOwn: false, avatarInitial: 'М', avatarColor: '#FFD700', isOnline: true },
-          { id: '6', sender: 'Ты', text: 'Давайте встретимся завтра', time: 'Только что', isOwn: true },
-        ]
-      },
-      '2': {
-        id: '2',
-        title: 'Друзья',
-        icon: 'user',
-        iconColor: '#FE732E',
-        memberCount: 3,
-        messages: []
-      },
-      '3': {
-        id: '3',
-        title: 'Поддержка',
-        icon: 'help',
-        iconColor: '#0D77D3',
-        memberCount: 2,
-        messages: []
+  const [isMembersModalOpen, setIsMembersModalOpen] = useState(false);
+  const messagesAreaRef = useRef<HTMLDivElement>(null);
+  const isLoadingMoreRef = useRef(false);
+  const { chatRooms, messagesByRoom } = useSelector(
+    (state: RootState) => state.chat
+  );
+  // Get selected chat room data
+  const selectedChatRoom = chatRooms.find(room => room.id === selectedChat);
+  // Get messages for selected chat
+  const chatMessages = selectedChat ? messagesByRoom[selectedChat] : null;
+  // Fetch messages when chat is selected
+  useEffect(() => {
+    if (selectedChat && !messagesByRoom[selectedChat]) {
+      // Initial load - fetch first 20 messages
+      dispatch(fetchRoomMessages({ roomId: selectedChat, offset: 0, limit: 20 }));
+    }
+  }, [selectedChat, messagesByRoom, dispatch]);
+  // Handle scroll to load more messages (pagination)
+  const handleScroll = useCallback(() => {
+    if (!messagesAreaRef.current || !selectedChat || !chatMessages) return;
+    const { scrollTop } = messagesAreaRef.current;
+    // Load more when scrolled to top (within 100px)
+    if (scrollTop < 100 && chatMessages.hasMore && !chatMessages.isLoading && !isLoadingMoreRef.current) {
+      isLoadingMoreRef.current = true;
+      dispatch(fetchRoomMessages({
+        roomId: selectedChat,
+        offset: chatMessages.offset,
+        limit: 20,
+      })).finally(() => {
+        isLoadingMoreRef.current = false;
+      });
+    }
+  }, [selectedChat, chatMessages, dispatch]);
+  // Attach scroll listener
+  useEffect(() => {
+    const messagesArea = messagesAreaRef.current;
+    if (messagesArea) {
+      messagesArea.addEventListener('scroll', handleScroll);
+      return () => messagesArea.removeEventListener('scroll', handleScroll);
+    }
+  }, [handleScroll]);
+  // Scroll to bottom when new messages arrive (only if already at bottom)
+  useEffect(() => {
+    if (messagesAreaRef.current && selectedChat && messagesByRoom[selectedChat]) {
+      const { scrollTop, scrollHeight, clientHeight } = messagesAreaRef.current;
+      const isNearBottom = scrollHeight - scrollTop - clientHeight < 100;
+      if (isNearBottom) {
+        messagesAreaRef.current.scrollTop = messagesAreaRef.current.scrollHeight;
       }
-    };
-
-    return chats[chatId] || null;
-  };
-
-  const chatData = getChatData(selectedChat);
-
+    }
+  }, [selectedChat, messagesByRoom]);
   const handleSendMessage = () => {
-    if (messageText.trim()) {
-      // Handle send message
-      console.log('Sending message:', messageText);
+    if (messageText.trim() && selectedChat) {
+      dispatch(sendMessage({ roomId: selectedChat, text: messageText.trim() }));
       setMessageText('');
+      // Scroll to bottom after sending
+      setTimeout(() => {
+        if (messagesAreaRef.current) {
+          messagesAreaRef.current.scrollTop = messagesAreaRef.current.scrollHeight;
+        }
+      }, 100);
     }
   };
-
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -83,30 +83,76 @@ const MessageContent = ({ selectedChat }: { selectedChat: string | null }) => {
     }
   };
 
-  if (!selectedChat || !chatData) {
+  // Mock members data - TODO: Replace with actual API call
+  const getMembers = (): ChatMember[] => {
+    if (!selectedChatRoom) return [];
+
+    // Mock members based on chat room
+    const mockMembers: ChatMember[] = [
+      {
+        id: '1',
+        name: 'Вы',
+        avatarInitial: selectedChatRoom.title[0]?.toUpperCase() || 'В',
+        avatarColor: selectedChatRoom.iconColor,
+        isCurrentUser: true,
+      },
+      {
+        id: '2',
+        name: 'Сергей Сидоров',
+        avatarInitial: 'С',
+        avatarColor: '#FFD700',
+      },
+      {
+        id: '3',
+        name: 'София Смирнова',
+        avatarInitial: 'С',
+        avatarColor: '#FFD700',
+      },
+      {
+        id: '4',
+        name: 'Светлана Кузнецова',
+        avatarInitial: 'С',
+        avatarColor: '#FFD700',
+      },
+    ];
+
+    return mockMembers;
+  };
+
+  const handleCallMember = (memberId: string) => {
+    console.log('Call member:', memberId);
+    // TODO: Implement call functionality
+  };
+
+  const handleDeleteMember = (memberId: string) => {
+    console.log('Delete member:', memberId);
+    // TODO: Implement delete member functionality
+  };
+
+  if (!selectedChat || !selectedChatRoom) {
     return (
-      <div className={styles.messageContent}>
-        <div className={styles.messageContentHeader}>
-          <h2 className={styles.messageContentTitle}>Мессенджер</h2>
-          <p className={styles.messageContentText}>
-            {'Ваши личные сообщения защищены сквозным шифрованием.'}
-          </p>
-        </div>
-      </div>
+      <DefaultMessage />
     );
   }
-
+  const messages = chatMessages?.messages || [];
   return (
     <div className={styles.messageContent}>
       {/* Chat Header */}
       <div className={styles.chatHeader}>
         <div className={styles.chatHeaderLeft}>
-          <div className={styles.chatAvatar} style={{ backgroundColor: chatData.iconColor }}>
-            <Icon name={chatData.icon} size={24} color={'#fff'} />
+          <div className={styles.chatAvatar} style={{ backgroundColor: selectedChatRoom.iconColor }}>
+            <span className={styles.chatAvatarInitial}>
+              {selectedChatRoom.title[0]?.toUpperCase() || ''}
+            </span>
           </div>
           <div className={styles.chatHeaderInfo}>
-            <h3 className={styles.chatTitle}>{chatData.title}</h3>
-            <p className={styles.chatMemberCount}>{chatData.memberCount} участника</p>
+            <h3 className={styles.chatTitle}>{selectedChatRoom.title}</h3>
+            <p
+              className={styles.chatMemberCount}
+              onClick={() => setIsMembersModalOpen(true)}
+            >
+              {selectedChatRoom.memberCount} участника
+            </p>
           </div>
         </div>
         <button className={styles.chatMenuButton}>
@@ -117,79 +163,28 @@ const MessageContent = ({ selectedChat }: { selectedChat: string | null }) => {
           </div>
         </button>
       </div>
-
       {/* Messages Area */}
-      <div className={styles.messagesArea}>
-        <div className={styles.messageDateDivider}>
-          <span>Понедельник</span>
-        </div>
-        {chatData.messages.map((message) => (
-          <div
-            key={message.id}
-            className={`${styles.messageItem} ${message.isOwn ? styles.messageOwn : styles.messageOther}`}
-          >
-            {!message.isOwn ? (
-              <>
-                <div className={styles.messageAvatarWrapper}>
-                  <div
-                    className={styles.messageAvatar}
-                    style={{ backgroundColor: message.avatarColor || '#FFD700' }}
-                  >
-                    <span className={styles.avatarInitial}>{message.avatarInitial || message.sender[0]}</span>
-                    {message.isOnline && <div className={styles.onlineIndicator}></div>}
-                  </div>
-                </div>
-                <div className={styles.messageContentWrapper}>
-                  <div className={styles.messageBubbleHeader}>
-                    <span className={styles.messageSender}>{message.sender}</span>
-                    <span className={styles.messageTimeHeader}>{message.time}</span>
-                  </div>
-                  <div className={styles.messageBubble}>
-                    <p className={styles.messageText}>{message.text}</p>
-                  </div>
-                </div>
-              </>
-            ) : (
-              <div className={styles.messageContentWrapper}>
-                <div className={styles.messageBubbleHeader}>
-                  <span className={styles.messageSender}>Ты</span>
-                  <span className={styles.messageTimeHeader}>{message.time}</span>
-                </div>
-                <div className={styles.messageBubble}>
-                  <p className={styles.messageText}>{message.text}</p>
-                </div>
+      <div className={styles.messagesArea} ref={messagesAreaRef}>
+        {chatMessages?.isLoading && messages.length === 0 ? (
+          <div className={styles.loadingState}>Загрузка сообщений...</div>
+        ) : chatMessages?.error ? (
+          <div className={styles.errorState}>Ошибка: {chatMessages.error}</div>
+        ) : (
+          <>
+            {chatMessages?.hasMore && (
+              <div className={styles.loadMoreIndicator}>
+                {chatMessages.isLoading ? 'Загрузка...' : 'Прокрутите вверх для загрузки старых сообщений'}
               </div>
             )}
-          </div>
-        ))}
-        <div className={styles.messageDateDivider}>
-          <span>Сегодня</span>
-        </div>
-        <div className={`${styles.messageItem} ${styles.messageOther} ${styles.typingIndicator}`}>
-          <div className={styles.messageAvatarWrapper}>
-            <div className={styles.messageAvatar} style={{ backgroundColor: '#FFD700' }}>
-              <span className={styles.avatarInitial}>С</span>
-              <div className={styles.onlineIndicator}></div>
-            </div>
-          </div>
-          <div className={styles.messageBubble}>
-            <div className={styles.messageBubbleHeader}>
-              <span className={styles.messageSender}>Светлана Петрова</span>
-              <span className={styles.messageTimeHeader}>Только что</span>
-            </div>
-            <div className={styles.typingDots}>
-              <span></span>
-              <span></span>
-              <span></span>
-            </div>
-          </div>
-        </div>
+            <MessageList messages={messages} />
+            {/* Typing indicator - can be added later when socket is connected */}
+          </>
+        )}
       </div>
-
       {/* Input Area */}
       <div className={styles.inputArea}>
         <button className={styles.inputButton}>
-          <Icon name={'upload'} size={25} />
+          <Icon name={'upload'} size={30} />
         </button>
         <input
           type="text"
@@ -202,13 +197,22 @@ const MessageContent = ({ selectedChat }: { selectedChat: string | null }) => {
         <button className={styles.inputButton}>
           <Icon name={'smile'} size={20} />
         </button>
-        <button onClick={handleSendMessage} className={styles.sendButton}>
-          <Icon name={'rightArrow'} size={20} color={'#fff'} />
+        <button onClick={handleSendMessage} className={styles.sendButton} disabled={!messageText.trim()}>
+          <Icon name={'messageArrow'} size={20} color={'#fff'} />
         </button>
       </div>
+
+      {/* Members Modal */}
+      <MembersModal
+        isOpen={isMembersModalOpen}
+        onClose={() => setIsMembersModalOpen(false)}
+        title={selectedChatRoom.title}
+        memberCount={selectedChatRoom.memberCount}
+        members={getMembers()}
+        onCall={handleCallMember}
+        onDelete={handleDeleteMember}
+      />
     </div>
   );
 };
-
 export default MessageContent;
-

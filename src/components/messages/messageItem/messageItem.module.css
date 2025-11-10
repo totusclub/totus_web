@@ -1,0 +1,142 @@
+.messageItem {
+  display: flex;
+  gap: 12px;
+  max-width: 70%;
+  width: 100%;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.messageOwn {
+  align-self: flex-end;
+  align-items: flex-end;
+  max-width: 70%;
+  flex-direction: column;
+}
+
+.messageOther {
+  align-self: flex-start;
+  align-items: flex-start;
+  width: 100%;
+  flex-direction: row;
+}
+
+.messageContentWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.messageAvatarWrapper {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.messageAvatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.avatarInitial {
+  color: var(--textPrimary);
+  font-family: "Golos Text";
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 20px;
+}
+
+.onlineIndicator {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #39bf87;
+  border: 2px solid var(--bgPrimary);
+}
+
+.messageBubbleHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 0 4px;
+}
+
+.messageOwn .messageBubbleHeader {
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.messageSender {
+  color: var(--textPrimary);
+  font-family: "Golos Text";
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 20px;
+  letter-spacing: -0.32px;
+}
+
+.messageTimeHeader {
+  color: var(--textSecondary);
+  font-family: "Golos Text";
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 18px;
+  letter-spacing: -0.28px;
+}
+
+.messageBubble {
+  padding: 12px 16px;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.messageOwn .messageBubble {
+  background: #fdd87d;
+  border-top-right-radius: 0;
+  margin-left: 0;
+  position: relative;
+  width: 100%;
+  flex: none;
+}
+
+.messageOther .messageBubble {
+  background: var(--bgSecondary);
+  border-top-left-radius: 0;
+  margin-left: 0;
+  flex: 1;
+}
+
+.messageText {
+  color: var(--textPrimary);
+  font-family: "Golos Text";
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 20px;
+  letter-spacing: -0.32px;
+  margin: 0;
+}
+
+.messageOwn .messageText {
+  color: var(--textPrimary);
+}
+
+@media (max-width: 768px) {
+  .messageItem {
+    max-width: 85%;
+  }
+}
+

@@ -1,14 +1,10 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '@/store';
+import { fetchChatRooms, setSelectedChat } from '@/store/slices/chat/chatSlice';
 import styles from './chatList.module.css';
 import Icon from "@/components/icons/Icon";
-
-type ChatRoom = {
-    id: string;
-    icon: string;
-    iconColor: string;
-    title: string;
-    lastMessage: string;
-};
+import NewGroupModal from '../newGroupModal';
 
 interface ChatListProps {
     selectedChat: string | null;
@@ -16,38 +12,30 @@ interface ChatListProps {
 }
 
 const ChatList = ({ selectedChat, onChatSelect }: ChatListProps) => {
+    const dispatch = useDispatch<AppDispatch>();
+    const [isNewGroupModalOpen, setIsNewGroupModalOpen] = useState(false);
+    const { chatRooms, chatRoomsLoading, chatRoomsError } = useSelector(
+        (state: RootState) => state.chat
+    );
 
-    // Mock data - replace with actual data from API
-    const chatRooms: ChatRoom[] = [
-        {
-            id: '1',
-            icon: 'folder',
-            iconColor: '#FE732E',
-            title: 'Семья',
-            lastMessage: 'Пол - Приходи ко мне, я готовлю еду на двоих'
-        },
-        {
-            id: '2',
-            icon: 'folder',
-            iconColor: '#FE732E',
-            title: 'Друзья',
-            lastMessage: 'Оскар - Приходи ко мне, я готовлю еду на двоих'
-        },
-        {
-            id: '3',
-            icon: 'supportInfo',
-            iconColor: '#0D77D3',
-            title: 'Поддержка',
-            lastMessage: 'Ваши документы готовы'
-        }
-    ];
+    useEffect(() => {
+        // Fetch chat rooms on component mount
+        dispatch(fetchChatRooms());
+    }, [dispatch]);
 
     const handleAddChat = () => {
-        // Handle add new chat
-        console.log('Add new chat');
+        setIsNewGroupModalOpen(true);
+    };
+
+    const handleCreateGroup = (groupType: string, loyaltyCards: string[]) => {
+        console.log('Create group:', { groupType, loyaltyCards });
+        // TODO: Implement API call to create new group
+        // After successful creation, refresh chat rooms list
+        dispatch(fetchChatRooms());
     };
 
     const handleChatSelect = (chatId: string) => {
+        dispatch(setSelectedChat(chatId));
         onChatSelect(chatId);
     };
 
@@ -60,22 +48,35 @@ const ChatList = ({ selectedChat, onChatSelect }: ChatListProps) => {
                 </button>
             </div>
             <div className={styles.chatListItems}>
-                {chatRooms.map((chat) => (
-                    <div
-                        key={chat.id}
-                        onClick={() => handleChatSelect(chat.id)}
-                        className={`${styles.chatItem} ${selectedChat === chat.id ? styles.chatItemActive : ''}`}
-                    >
-                        <div className={styles.chatItemIcon} style={{ backgroundColor: chat.iconColor }}>
-                            <Icon name={chat.icon as any} size={20} />
+                {chatRoomsLoading ? (
+                    <div className={styles.loadingState}>Загрузка...</div>
+                ) : chatRoomsError ? (
+                    <div className={styles.errorState}>Ошибка: {chatRoomsError}</div>
+                ) : (
+                    chatRooms.map((chat) => (
+                        <div
+                            key={chat.id}
+                            onClick={() => handleChatSelect(chat.id)}
+                            className={`${styles.chatItem} ${selectedChat === chat.id ? styles.chatItemActive : ''}`}
+                        >
+                            <div className={styles.chatItemIcon} style={{ backgroundColor: chat.iconColor }}>
+                                <Icon name={chat.icon as any} size={20} />
+                            </div>
+                            <div className={styles.chatItemContent}>
+                                <p className={styles.chatItemTitle}>{chat.title}</p>
+                                <p className={styles.chatItemMessage}>{chat.lastMessage}</p>
+                            </div>
                         </div>
-                        <div className={styles.chatItemContent}>
-                            <p className={styles.chatItemTitle}>{chat.title}</p>
-                            <p className={styles.chatItemMessage}>{chat.lastMessage}</p>
-                        </div>
-                    </div>
-                ))}
+                    ))
+                )}
             </div>
+
+            {/* New Group Modal */}
+            <NewGroupModal
+                isOpen={isNewGroupModalOpen}
+                onClose={() => setIsNewGroupModalOpen(false)}
+                onCreate={handleCreateGroup}
+            />
         </div>
     );
 };
