@@ -37,7 +37,7 @@ const MenuProfile = () => {
                 </div>
                 <div className={styles.profileCardInfo}>
                     <p className={styles.profileCardNumber}>{user?.loyalty_id}</p>
-                    <p className={styles.smallInfoCard}><Icon name={'info'} color={'#fff'} size={18}/>Ваш персональный нормер</p>
+                    <p className={styles.smallInfoCard}><Icon name={'info'} color={'#fff'} size={18}/>Ваш персональный номер</p>
                 </div>
                 <div className={styles.profileName}>
                     <p>{`${user?.name} ${user?.l_name}`}</p>
