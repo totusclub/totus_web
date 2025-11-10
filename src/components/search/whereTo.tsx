@@ -73,7 +73,7 @@ const ignorName = ['Крым', 'Донецк', 'Луганск', 'Ялта','Yal
         <div className={`${styles.searchField} ${styles.radioFrom}`} ref={wrapperRef} onClick={handleToggle}>
             <Icon name={'to'} size={24} color="#000"/>
             <div className={styles.searchFieldInfo}>
-                <p className={styles.searchFieldsLabel}>Страна или город?</p>
+                <p className={styles.searchFieldsLabel}>Страна, город или отель</p>
                 <input
                     className={styles.searchFieldsValue}
                     type="text"
