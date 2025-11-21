@@ -24,8 +24,7 @@ const Select: React.FC<SelectProps> = ({
     onChange,
     placeholder = 'Select an option',
     label,
-    isFull = false,
-    type
+    isFull = false
 }) => {
     const [open, setOpen] = useState(false);
     const [openUp, setOpenUp] = useState(false);
@@ -55,7 +54,7 @@ const Select: React.FC<SelectProps> = ({
     }, [open, options.length]);
 
     const handleSelect = (option: OptionType) => {
-        onChange(option);
+        onChange(option.name);
         setOpen(false);
     };
     console.log('value', value);
@@ -96,7 +95,7 @@ const Select: React.FC<SelectProps> = ({
                                 {option.name}
                             </div>
                             {value === option.name && (
-                                <Icon name={'optionCheck'} size={16}/>
+                                <Icon name={'optionCheck'} size={16} />
                             )}
                         </li>
                     ))}
