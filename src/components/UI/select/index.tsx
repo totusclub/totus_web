@@ -96,7 +96,7 @@ const Select: React.FC<SelectProps> = ({
                                 {option.name}
                             </div>
                             {value === option.name && (
-                                <Icon name={'optionCheck'} size={16} />
+                                <Icon name={'optionCheck'} size={16}/>
                             )}
                         </li>
                     ))}
