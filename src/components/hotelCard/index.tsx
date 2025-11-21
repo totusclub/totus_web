@@ -3,7 +3,6 @@ import Icon from "@/components/icons/Icon";
 import Button from "@/components/UI/button";
 import { router } from "next/client";
 import { useMemo } from "react";
-import SparkMD5 from "spark-md5";
 
 interface HotelCardItemProps {
     id: number,
@@ -146,7 +145,7 @@ const HotelCard = ({ item, request_id, lazy }: HotelCardState) => {
 
     const showImage = useMemo(() => {
         if (hotel?.images?.length > 0) {
-            let path = hotel.images[0]?.webp_x620 || "";
+            let path = hotel.images[0]?.webp_x620 || hotel.images[0].x500 || "";
             // Remove the prefix
             // console.log('path.replace("https://img.cdn.level.travel/", "")',path.replace("https://img.cdn.level.travel/", ""));
             // return path.replace("https://img.cdn.level.travel/", "");

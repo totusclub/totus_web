@@ -61,7 +61,7 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
         search_type: 'package',
         page_limit: 20,
         page_number: 1,
-        sort_by:'relevance'
+        sort_by: 'relevance'
         // hotel_ids:[9069464]
     });
 
@@ -195,15 +195,17 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
         } else if (key === 'adults') {
             setParams({ ...params, adults: value });
         } else if (key === 'kids') {
-            let age = []
-            for (let i = 0; i < value; i++) {
-                age.push('8')
+            // value is now an object with kids, kids_ages, kids0to3, kids3to12
+            if (typeof value === 'object' && value !== null) {
+                setParams({
+                    ...params,
+                    kids: value.kids || '0',
+                    kids_ages: value.kids_ages || []
+                });
+            } else {
+                // Fallback for old format
+                setParams({ ...params, kids: value, kids_ages: [] });
             }
-            let kids_ages = []
-            for (let i = 0; i < value; i++) {
-                kids_ages.push(9);
-            }
-            setParams({ ...params, kids: value, kids_ages: kids_ages });
         }
     };
 

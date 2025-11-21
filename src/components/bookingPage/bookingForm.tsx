@@ -4,6 +4,7 @@ import Input from "@/components/UI/input";
 import Select from "@/components/UI/select";
 import DateInput from "@/components/UI/dateInput";
 import PhoneInputField from "@/components/UI/phoneInputField";
+import { getChildAgeRange } from "@/utils/dateTimeUtils";
 
 type SelectOption = {
     value: string;
@@ -21,6 +22,7 @@ type Tourist = {
     passport_number: string | number;
     passport_expires_on: string;
     child?: boolean;
+    child_age?: number; // Age from kids_ages array
 };
 
 type Params = {
@@ -65,7 +67,6 @@ const genderSelectOptions: SelectOption[] = [
 const BookingOrderForm: React.FC<BookingOrderFormProps> = ({ params, handleChangeTourist, handleChange, errors = {} }) => {
     const options: SelectOption[] = [{ value: '225', name: 'Россия' }];
     const options2: SelectOption[] = [{ value: 'international_passport', name: 'Заграничный паспорт РФ' }];
-
     // Add icon property to options for Select component compatibility
     const genderOptionsWithIcon = genderSelectOptions.map(opt => ({ ...opt, icon: '' }));
     const nationalityOptionsWithIcon = options.map(opt => ({ ...opt, icon: '' }));
@@ -119,7 +120,6 @@ const BookingOrderForm: React.FC<BookingOrderFormProps> = ({ params, handleChang
     // const handleChange = (value: string | number, key: keyof Params) => {
     //     setParams({ ...params, [key]: value });
     // };
-
     return (
         <div className={styles.bookingForm}>
             <div className={styles.bookingFormCard}>
@@ -162,8 +162,8 @@ const BookingOrderForm: React.FC<BookingOrderFormProps> = ({ params, handleChang
                             <div key={index} className={styles.bookingFormInputsList}>
                                 <div className={styles.bookingFormTourist}>
                                     <div className={styles.bookingFormTouristInfo}>
-                                        <p>Взрослый</p>
-                                        <p>старше 17 лет</p>
+                                        <p>{_tourist.child ? 'Ребенок' : 'Взрослый'}</p>
+                                        <p>{_tourist.child ? getChildAgeRange(_tourist.child_age) : 'старше 17 лет'}</p>
                                     </div>
                                 </div>
 

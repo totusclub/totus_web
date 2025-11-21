@@ -17,6 +17,7 @@ type Tourist = {
     passport_number: string | number;
     passport_expires_on: string;
     child?: boolean;
+    child_age?: number; // Age from kids_ages array
 };
 
 type Params = {
@@ -47,7 +48,7 @@ type ValidationErrors = {
 
 const BookingCard = () => {
     const router = useRouter();
-    const [packageData, setPackageData] = useState<{ adults_count?: number; kids_count?: number } | null>(null);
+    const [packageData, setPackageData] = useState<{ adults_count?: number; kids_count?: number; kids_ages?: number[] } | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const [dataLoading, setDataLoading] = useState<boolean>(true);
     const { user } = useAuth()
@@ -57,7 +58,6 @@ const BookingCard = () => {
         tourist: []
     });
     const [errors, setErrors] = useState<ValidationErrors>({});
-
     useEffect(() => {
         if (router?.query?.package && router?.query?.flight_pair_id) {
             setDataLoading(true);
@@ -72,7 +72,6 @@ const BookingCard = () => {
         }
 
     }, [router]);
-
 
     useEffect(() => {
         if (packageData) {
@@ -94,6 +93,7 @@ const BookingCard = () => {
                     doc_type: "international_passport"
                 })
             }
+            const kidsAges = packageData.kids_ages || [];
             for (let i = 0; i < kidsCount; i++) {
                 allTourist.push({
                     gender: "F",
@@ -105,6 +105,7 @@ const BookingCard = () => {
                     passport_expires_on: "",
                     nationality_id: 225,
                     child: true,
+                    child_age: kidsAges[i] || undefined, // Store age from kids_ages array
                     doc_type: "international_passport"
                 })
             }

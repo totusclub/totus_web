@@ -93,13 +93,13 @@ export default function PopularDestinations() {
 
             <div className={styles.recomendDeslist}>
                 {MOCK_DATA.map((item, index) => (
-                    <div key={index} className={styles.recomendDeslistItem} style={{ backgroundImage: `url(${item.image})` }}>
-                        <div className={styles.recomendDeslistItemInfo}>
-                            <Link href={item?.url}>
-                                <p className={styles.recomendDeslistItemInfoText}>{item.name}     <Icon name={'next'} /></p>
-                            </Link>
+                    <Link href={item?.url} key={index} style={{ textDecoration: 'none', color: "#fff" }}>
+                        <div className={styles.recomendDeslistItem} style={{ backgroundImage: `url(${item.image})` }}>
+                            <div className={styles.recomendDeslistItemInfo}>
+                                <p className={styles.recomendDeslistItemInfoText}>{item.name} <Icon name={'next'} /></p>
+                            </div>
                         </div>
-                    </div>
+                    </Link>
                 ))}
             </div>
 

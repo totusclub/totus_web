@@ -98,12 +98,15 @@ const SelectedTour = ({ packages }: any) => {
 
                             {/* Price Comparison (old price → new price) */}
                             <div className={styles.actualePackageParices}>
-                                {/* Old Price (crossed out) */}
-                                <del>{packages?.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '\u202F')}₽</del>
-                                {/* Arrow Icon */}
+                                <del>{(packages?.price + packages?.predicted_surcharge).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '\u202F')}₽</del>
+
                                 <Icon name={'prev'} size={16} />
+                                {/* Old Price (crossed out) */}
+                                <p>{packages?.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '\u202F')}₽</p>
+                                {/* Arrow Icon */}
+
                                 {/* New Price */}
-                                <p>{(packages?.price + packages?.predicted_surcharge).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '\u202F')}₽</p>
+
                             </div>
 
                             {/* Additional Fees Text */}

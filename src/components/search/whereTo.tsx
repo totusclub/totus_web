@@ -1,20 +1,61 @@
 import styles from './search.module.css';
 import Icon from "@/components/icons/Icon";
 import { useEffect, useRef, useState } from "react";
-import {useDestinationsSearch} from "@/hooks/useDestinationsSearch";
-import {fetchDestinations} from "@/store/slices/destinationsSlice";
-import {useDispatch, useSelector} from "react-redux";
-import {RootState} from "@/store";
-import {setHeaderName} from '@/store/slices/searchSlice';
+import { fetchDestinations } from "@/store/slices/destinationsSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState, AppDispatch } from "@/store";
+import { setHeaderName } from '@/store/slices/searchSlice';
+import Image from 'next/image';
 
-const WhereFrom = ({handleChange,value,name}) => {
-    const dispatch = useDispatch();
+// Popular destinations in the specified order
+const POPULAR_DESTINATIONS = [
+    { name: 'Турция', iso2: 'TR', image: '/images/turky.png' },
+    { name: 'Египет', iso2: 'EG', image: '/images/egypt.png' },
+    { name: 'Россия', iso2: 'RU', image: '/images/russon.png' },
+    { name: 'ОАЭ', iso2: 'AE', image: '/images/oae.png' },
+    { name: 'Мальдивы', iso2: 'MV', image: '/images/maldiv.png' },
+    { name: 'Индия', iso2: 'IN', image: '/images/egypt.png' }, // Using placeholder until India image is added
+    { name: 'Индонезия', iso2: 'ID', image: '/images/indonezia.png' },
+];
+
+interface DestinationItem {
+    id?: string | number;
+    name?: string;
+    name_ru?: string;
+    name_en?: string;
+    iso2?: string;
+    image?: string;
+    visa_type?: string;
+    active_regions?: string;
+    description?: string;
+    country_name_ru?: string;
+    city_name?: string;
+    [key: string]: string | number | boolean | undefined;
+}
+
+interface WhereToProps {
+    handleChange: (value: DestinationItem | string | number | number[], key: string, type: string) => void;
+    value?: string;
+    name: string;
+}
+
+const WhereFrom = ({ handleChange, value, name }: WhereToProps) => {
+    const dispatch = useDispatch<AppDispatch>();
     const inputRef = useRef<HTMLInputElement | null>(null);
     const wrapperRef = useRef<HTMLDivElement>(null);
     const [isOpen, setIsOpen] = useState(false);
     const [searchValue, setSearchValue] = useState("");
-    // const { results, status, error,data } = useDestinationsSearch(searchValue,'Moscow');
-    const { data, status, error } = useSelector((state: RootState) => state.destinations);
+    const { data } = useSelector((state: RootState) => state.destinations);
+
+    // Type guard for data structure
+    interface DataGroup {
+        group_name?: string;
+        results?: DestinationItem[];
+    }
+
+    const isDataGroup = (item: unknown): item is DataGroup => {
+        return typeof item === 'object' && item !== null && 'group_name' in item;
+    };
 
 
     useEffect(() => {
@@ -24,7 +65,7 @@ const WhereFrom = ({handleChange,value,name}) => {
                     query: searchValue,
                     from_city: "Moscow",
                     search_type: "package",
-                })
+                } as unknown as undefined)
             );
         }, 500); // debounce 500ms
 
@@ -49,10 +90,11 @@ const WhereFrom = ({handleChange,value,name}) => {
         setTimeout(() => inputRef.current?.focus(), 0);
     };
 
-    const handleSelect = (type:string,item: string) => {
-        setSearchValue(item.name);
-        dispatch(setHeaderName(item.name))
-        handleChange(item,name,type);
+    const handleSelect = (type: string, item: DestinationItem) => {
+        const displayName = item.name || item.name_ru || item.name_en || '';
+        setSearchValue(displayName);
+        dispatch(setHeaderName(displayName));
+        handleChange(item, name, type);
         setIsOpen(false);
     };
 
@@ -64,14 +106,76 @@ const WhereFrom = ({handleChange,value,name}) => {
         }
     }, [isOpen]);
 
-    // if (status === "failed") return <p>Error: {error}</p>;
+    // Initialize searchValue from value prop
+    useEffect(() => {
+        if (value && !searchValue) {
+            setSearchValue(value);
+        }
+    }, [value, searchValue]);
 
+    // Fetch destinations on mount when modal opens
+    useEffect(() => {
+        if (isOpen && !searchValue) {
+            dispatch(
+                fetchDestinations({
+                    query: "",
+                    from_city: "Moscow",
+                    search_type: "package",
+                } as unknown as undefined)
+            );
+        }
+    }, [isOpen, dispatch, searchValue]);
 
-const ignorName = ['Крым', 'Донецк', 'Луганск', 'Ялта','Yalta']
+    const ignorName = ['Крым', 'Донецк', 'Луганск', 'Ялта', 'Yalta']
+
+    // Get popular destinations from API data or create them
+    const getPopularDestinations = (): DestinationItem[] => {
+        if (!data || !Array.isArray(data)) return POPULAR_DESTINATIONS.map(p => ({ ...p, visa_type: '' }));
+
+        const countriesData = data.find((item: unknown) =>
+            isDataGroup(item) && item.group_name === "countries"
+        ) as DataGroup | undefined;
+        const apiCountries: DestinationItem[] = countriesData?.results || [];
+
+        // Match popular destinations with API data or create them
+        return POPULAR_DESTINATIONS.map(popular => {
+            const apiMatch = apiCountries.find((c: DestinationItem) =>
+                c.iso2 === popular.iso2 ||
+                c.name === popular.name ||
+                c.name_ru === popular.name ||
+                c.name_en?.toLowerCase() === popular.name.toLowerCase()
+            );
+
+            return apiMatch ? {
+                ...apiMatch,
+                image: apiMatch.image || popular.image,
+                isPopular: true
+            } : {
+                name: popular.name,
+                iso2: popular.iso2,
+                image: popular.image,
+                visa_type: '',
+                isPopular: true
+            };
+        });
+    };
+
+    // Get other countries (excluding popular ones)
+    const getOtherCountries = (): DestinationItem[] => {
+        if (!data || !Array.isArray(data)) return [];
+
+        const countriesData = data.find((item: unknown) =>
+            isDataGroup(item) && item.group_name === "countries"
+        ) as DataGroup | undefined;
+        const apiCountries: DestinationItem[] = countriesData?.results || [];
+        const popularIso2s = POPULAR_DESTINATIONS.map(d => d.iso2);
+
+        return apiCountries.filter((c: DestinationItem) => !popularIso2s.includes(c.iso2 || ''));
+    };
 
     return (
         <div className={`${styles.searchField} ${styles.radioFrom}`} ref={wrapperRef} onClick={handleToggle}>
-            <Icon name={'to'} size={24} color="#000"/>
+            <Icon name={'to'} size={24} color="#000" />
             <div className={styles.searchFieldInfo}>
                 <p className={styles.searchFieldsLabel}>Страна или город?</p>
                 <input
@@ -87,13 +191,13 @@ const ignorName = ['Крым', 'Донецк', 'Луганск', 'Ялта','Yal
                     placeholder="Египет"
                 />
             </div>
-            <Icon name={'downArrow'} size={24} color="#000"/>
+            <Icon name={'downArrow'} size={24} color="#000" />
             {isOpen && (
                 <div className={styles.whereFromModal} onClick={(e) => e.stopPropagation()}>
                     <div className={styles.whereFromModalHead}>
                         <p>Страна или город</p>
                         <div onClick={() => setIsOpen(false)}>
-                            <Icon name={'closeLine'} size={24} color="#000"/>
+                            <Icon name={'closeLine'} size={24} color="#000" />
                         </div>
                     </div>
                     <div className={styles.searchFieldInfoM}>
@@ -110,86 +214,172 @@ const ignorName = ['Крым', 'Донецк', 'Луганск', 'Ялта','Yal
                             placeholder="Москва"
                         />
                     </div>
-                        <div className={styles.searchGroupTyping}>
-                            <div className={styles.searchGroupList}>
-                            {data
-                                ?.filter(item => item?.group_name === "countries" ) // only keep countries group
-                                .flatMap(item =>
-                                    item?.results?.map((c,i) => (
-                                        <>
-                                        {i === 0 && (
-                                            <p className={styles?.searchGroupListText}>Популярные страны</p>
-                                        )}
-                                        <div className={styles?.searchGroupListItem} onClick={() => handleSelect('countries',c)}>
-                                            <p key={c?.id}>{c?.name}</p>
-                                            <p>{c.visa_type}</p>
+                    <div className={styles.searchGroupTyping}>
+                        <div className={styles.searchGroupList}>
+                            {/* Popular destinations */}
+                            {getPopularDestinations().length > 0 && (
+                                <>
+                                    <p className={styles?.searchGroupListText}>Популярные страны</p>
+                                    {getPopularDestinations().map((c, i) => (
+                                        <div
+                                            key={`popular-${c.iso2 || i}`}
+                                            className={styles?.searchGroupListItem}
+                                            onClick={() => handleSelect('countries', c)}
+                                        >
+                                            {c.image && (
+                                                <div className={styles.destinationImage}>
+                                                    <Image
+                                                        src={c.image}
+                                                        alt={(c.name || c.name_ru || c.name_en || 'Destination') as string}
+                                                        width={40}
+                                                        height={40}
+                                                        style={{ borderRadius: '50%', objectFit: 'cover' }}
+                                                    />
+                                                </div>
+                                            )}
+                                            <div className={styles.destinationInfo}>
+                                                <p>{c.name || c.name_ru || c.name_en}</p>
+                                                <p>{c.visa_type || ''}</p>
+                                            </div>
                                         </div>
-                                        </>
-                                    ))
-                                )}
-                                {data
-                                    ?.filter(item => item?.group_name === "regions") // only keep regions group
-                                    .flatMap(item =>
-                                        item?.results
-                                            ?.filter(c => !ignorName.some(name => c.active_regions?.includes(name))) // filter out ignored regions
-                                            .map((c, i) => (
-                                                <div
-                                                    key={c?.id}
-                                                    className={styles?.searchGroupListItem}
-                                                    onClick={() => handleSelect('regions', c)}
-                                                >
+                                    ))}
+                                </>
+                            )}
+                            {/* Other countries from API */}
+                            {getOtherCountries().length > 0 && (
+                                <>
+                                    {getPopularDestinations().length > 0 && (
+                                        <p className={styles?.searchGroupListText} style={{ marginTop: '16px' }}>Другие страны</p>
+                                    )}
+                                    {getOtherCountries().map((c, i) => (
+                                        <div
+                                            key={c?.id || `country-${i}`}
+                                            className={styles?.searchGroupListItem}
+                                            onClick={() => handleSelect('countries', c)}
+                                        >
+                                            {c.image && (
+                                                <div className={styles.destinationImage}>
+                                                    <Image
+                                                        src={c.image}
+                                                        alt={(c.name || c.name_ru || c.name_en || 'Destination') as string}
+                                                        width={40}
+                                                        height={40}
+                                                        style={{ borderRadius: '50%', objectFit: 'cover' }}
+                                                    />
+                                                </div>
+                                            )}
+                                            <div className={styles.destinationInfo}>
+                                                <p>{c.name || c.name_ru || c.name_en}</p>
+                                                <p>{c.visa_type || ''}</p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </>
+                            )}
+                            {/* Regions */}
+                            {data && Array.isArray(data) && data
+                                .filter((item: unknown): item is DataGroup => isDataGroup(item) && item.group_name === "regions")
+                                .flatMap((item: DataGroup) =>
+                                    item?.results
+                                        ?.filter((c: DestinationItem) => !ignorName.some(name => c.active_regions?.includes(name)))
+                                        .map((c: DestinationItem) => (
+                                            <div
+                                                key={c?.id}
+                                                className={styles?.searchGroupListItem}
+                                                onClick={() => handleSelect('regions', c)}
+                                            >
+                                                {c.image && (
+                                                    <div className={styles.destinationImage}>
+                                                        <Image
+                                                            src={c.image}
+                                                            alt={(c?.name || 'Region') as string}
+                                                            width={40}
+                                                            height={40}
+                                                            style={{ borderRadius: '50%', objectFit: 'cover' }}
+                                                        />
+                                                    </div>
+                                                )}
+                                                <div className={styles.destinationInfo}>
                                                     <p>{c?.name}</p>
                                                     <p>{c?.active_regions}</p>
                                                 </div>
-                                            ))
-                                    )}
-                            </div>
-                            <div className={styles.searchGroupList}>
-                                {data
-                                    ?.filter(item => item?.group_name === "metaregions") // only keep metaregions group
-                                    .flatMap(item =>
-                                        item?.results
-                                            ?.filter(m => !ignorName.some(name => m.description?.includes(name))) // skip ignored countries
-                                            .map((m, i) => (
-                                                <>
-                                                    {i === 0 && (
-                                                        <p className={styles?.searchGroupListText}>мегарегионы</p>
+                                            </div>
+                                        ))
+                                )}
+                        </div>
+                        <div className={styles.searchGroupList}>
+                            {data && Array.isArray(data) && data
+                                .filter((item: unknown): item is DataGroup => isDataGroup(item) && item.group_name === "metaregions")
+                                .flatMap((item: DataGroup) =>
+                                    item?.results
+                                        ?.filter((m: DestinationItem) => !ignorName.some(name => m.description?.includes(name)))
+                                        .map((m: DestinationItem, i: number) => (
+                                            <>
+                                                {i === 0 && (
+                                                    <p className={styles?.searchGroupListText}>мегарегионы</p>
+                                                )}
+                                                <div
+                                                    key={m?.id}
+                                                    className={styles?.searchGroupListItem}
+                                                    onClick={() => handleSelect('metaregions', m)}
+                                                >
+                                                    {m.image && (
+                                                        <div className={styles.destinationImage}>
+                                                            <Image
+                                                                src={m.image}
+                                                                alt={(m?.name || 'Metaregion') as string}
+                                                                width={40}
+                                                                height={40}
+                                                                style={{ borderRadius: '50%', objectFit: 'cover' }}
+                                                            />
+                                                        </div>
                                                     )}
-                                                    <div
-                                                        className={styles?.searchGroupListItem}
-                                                        onClick={() => handleSelect('metaregions', m)}
-                                                    >
-                                                        <p key={m?.id}>{m?.name}</p>
+                                                    <div className={styles.destinationInfo}>
+                                                        <p>{m?.name}</p>
                                                         <p>{m.country_name_ru}</p>
                                                     </div>
-                                                </>
-                                            ))
-                                    )}
-                            </div>
-                            <div className={styles.searchGroupList}>
-                                {data
-                                    ?.filter(item => item?.group_name === "hotels") // only keep hotels group
-                                    .flatMap(item =>
-                                        item?.results
-                                            ?.filter(m => !ignorName.some(name => m.city_name?.includes(name)) && !ignorName.some(name => m.name?.includes(name)) ) // skip ignored cities
-                                            .map((m, i) => (
-                                                <>
-                                                    {i === 0 && (
-                                                        <p className={styles?.searchGroupListText}>Отели</p>
+                                                </div>
+                                            </>
+                                        ))
+                                )}
+                        </div>
+                        <div className={styles.searchGroupList}>
+                            {data && Array.isArray(data) && data
+                                .filter((item: unknown): item is DataGroup => isDataGroup(item) && item.group_name === "hotels")
+                                .flatMap((item: DataGroup) =>
+                                    item?.results
+                                        ?.filter((m: DestinationItem) => !ignorName.some(name => m.city_name?.includes(name)) && !ignorName.some(name => m.name?.includes(name)))
+                                        .map((m: DestinationItem, i: number) => (
+                                            <>
+                                                {i === 0 && (
+                                                    <p className={styles?.searchGroupListText}>Отели</p>
+                                                )}
+                                                <div
+                                                    key={m?.id}
+                                                    className={styles?.searchGroupListItem}
+                                                    onClick={() => handleSelect('hotels', m)}
+                                                >
+                                                    {m.image && (
+                                                        <div className={styles.destinationImage}>
+                                                            <Image
+                                                                src={m.image}
+                                                                alt={(m?.name || 'Hotel') as string}
+                                                                width={40}
+                                                                height={40}
+                                                                style={{ borderRadius: '50%', objectFit: 'cover' }}
+                                                            />
+                                                        </div>
                                                     )}
-                                                    <div
-                                                        className={styles?.searchGroupListItem}
-                                                        onClick={() => handleSelect('hotels', m)}
-                                                    >
-                                                        <p key={m?.id}>{m?.name}</p>
+                                                    <div className={styles.destinationInfo}>
+                                                        <p>{m?.name}</p>
                                                         <p>{m.city_name}</p>
                                                     </div>
-                                                </>
-                                            ))
-                                    )}
-
-                            </div>
+                                                </div>
+                                            </>
+                                        ))
+                                )}
                         </div>
+                    </div>
                 </div>
             )}
         </div>

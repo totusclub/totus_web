@@ -5,7 +5,7 @@ import Icon from "@/components/icons/Icon";
 interface OptionType {
     name: string;
     value: string;
-    icon:string
+    icon: string
 }
 
 interface SelectProps {
@@ -58,7 +58,7 @@ const Select: React.FC<SelectProps> = ({
         onChange(option);
         setOpen(false);
     };
-    console.log('value',value);
+    console.log('value', value);
     return (
         <div
             ref={selectRef}
@@ -83,14 +83,16 @@ const Select: React.FC<SelectProps> = ({
                     className={`${styles.optionsList} ${openUp ? styles.openUp : styles.openDown
                         }`}
                 >
-                    {options.map((option,index) => (
+                    {options.map((option, index) => (
                         <li
                             key={index}
                             onClick={() => handleSelect(option)}
                             className={`${styles.optionItem} ${value === option.name ? styles.active : ''}`}
                         >
                             <div>
-                                <Icon name={option.icon} size={16}/>
+                                {option.icon && option.icon.trim() !== '' && (
+                                    <Icon name={option.icon} size={16} />
+                                )}
                                 {option.name}
                             </div>
                             {value === option.name && (

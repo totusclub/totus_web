@@ -46,3 +46,17 @@ export const secondsToRussianTime = (seconds: number): string => {
     return `${hoursStr} ${minutesStr}`.trim();
 };
 
+/**
+ * Gets child age range text based on age from package data
+ * @param childAge - Age of the child (from kids_ages array)
+ * @returns Age range string (e.g., "0-3 года", "3-17 лет", "от 0 до 17 лет")
+ */
+export const getChildAgeRange = (childAge?: number | null): string => {
+    if (childAge !== undefined && childAge !== null) {
+        if (childAge >= 3) return '3-17 лет';
+        return '0-3 года';
+    }
+    // Default if no age information available
+    return 'от 0 до 17 лет';
+};
+
