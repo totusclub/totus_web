@@ -667,6 +667,15 @@
     border-left: none;
   }
   .modalPeople {
+      z-index: 999999999;
+      border-bottom-right-radius: 0;
+      border-bottom-left-radius: 0;
+      width: 100%;
+      margin-top: -195px;
+      position: fixed;
+      background: #fff;
+      bottom: 0;
+      top: auto;
   }
 }
 @media (width <= 768px) {
