@@ -265,10 +265,9 @@
 }
 .kidsAgeOptions {
   position: absolute;
-  top: 100%;
+  bottom: calc(100% + 4px);
   left: 0;
   right: 0;
-  margin-top: 4px;
   background-color: var(--primary_b);
   border: 1px solid var(--borderSecondary);
   border-radius: 12px;
