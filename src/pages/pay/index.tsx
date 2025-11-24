@@ -16,6 +16,12 @@ export default function Pay() {
         }
     },[router])
 
+    const SendModalMessage = ()=>{
+        if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
+            window.ReactNativeWebView.postMessage({status:status});
+        }
+    }
+
     return (
 
             <div className="content">
@@ -24,14 +30,14 @@ export default function Pay() {
                         <div style={{width:'380px'}}>
                             <p style={{textAlign: 'center', marginTop: '15vh',fontSize:32}}>Спасибо за ваш заказ</p>
                             <p style={{textAlign: 'center',marginTop:4,fontSize:18,marginBottom:30}}>Платёж успешно выполнен</p>
-                            <Button title={'Перейти в профиль'} />
+                            <Button title={'Перейти в профиль'} onClick={()=>SendModalMessage()} />
                         </div>
                     )}
                     {status !== 'PAID' && (
                         <div style={{width:'380px'}}>
                             <p style={{textAlign: 'center', marginTop: '15vh',fontSize:32}}>Оплата не завершена</p>
                             <p style={{textAlign: 'center',marginTop:4,fontSize:18,marginBottom:30}}>К сожалению, платёж не был завершён. Попробуйте снова или используйте другой способ</p>
-                            <Button title={'Перейти на главную'} />
+                            <Button title={'Перейти на главную'} onClick={()=>SendModalMessage()} />
                         </div>
                     )}
 
