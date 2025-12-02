@@ -1,15 +1,15 @@
 import styles from './checkout.module.css';
 import Button from "@/components/UI/button";
-import {createPay} from "@/api/levelTravelApi";
+import { createPay } from "@/api/levelTravelApi";
 
 
 
 
 
-const CheckoutCard = ({order}) => {
+const CheckoutCard = ({ order }) => {
 
 
-    const createPaymantLink = async ()=>{
+    const createPaymantLink = async () => {
         const expireDate = new Date(Date.now() + 20 * 60 * 1000);
         const payInfo = await createPay({
             orderId: `ORDER${order.id}`,
@@ -19,7 +19,7 @@ const CheckoutCard = ({order}) => {
                 value: order?.full_price,
                 code: "RUB"
             },
-            returnUrl :"https://totus.club/pay"
+            returnUrl: "https://totus.club/pay"
         })
         // console.log('payInfo',payInfo)
         if (payInfo?.object?.payUrl) {
@@ -43,7 +43,7 @@ const CheckoutCard = ({order}) => {
                         <p>Итого</p>
                         <p>{order?.full_price.toString()?.replace(/\B(?=(\d{3})+(?!\d))/g, '\u202F')} ₽</p>
                     </div>
-                    <Button full={true} onClick={()=>createPaymantLink()} title={'Перейти к оплате'}/>
+                    <Button full={true} onClick={() => createPaymantLink()} title={'Перейти к оплате'} />
                 </div>
             </div>
         </div>

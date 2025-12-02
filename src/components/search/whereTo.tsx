@@ -7,17 +7,6 @@ import { RootState, AppDispatch } from "@/store";
 import { setHeaderName } from '@/store/slices/searchSlice';
 import Image from 'next/image';
 
-// Popular destinations in the specified order
-const POPULAR_DESTINATIONS = [
-    { name: 'Турция', iso2: 'TR', image: '/images/turky.png' },
-    { name: 'Египет', iso2: 'EG', image: '/images/egypt.png' },
-    { name: 'Россия', iso2: 'RU', image: '/images/russon.png' },
-    { name: 'ОАЭ', iso2: 'AE', image: '/images/oae.png' },
-    { name: 'Мальдивы', iso2: 'MV', image: '/images/maldiv.png' },
-    { name: 'Индия', iso2: 'IN', image: '/images/egypt.png' }, // Using placeholder until India image is added
-    { name: 'Индонезия', iso2: 'ID', image: '/images/indonezia.png' },
-];
-
 interface DestinationItem {
     id?: string | number;
     name?: string;
@@ -128,39 +117,20 @@ const WhereFrom = ({ handleChange, value, name }: WhereToProps) => {
 
     const ignorName = ['Крым', 'Донецк', 'Луганск', 'Ялта', 'Yalta']
 
-    // Get popular destinations from API data or create them
+    // Get popular destinations from API data - only countries with images
     const getPopularDestinations = (): DestinationItem[] => {
-        if (!data || !Array.isArray(data)) return POPULAR_DESTINATIONS.map(p => ({ ...p, visa_type: '' }));
+        if (!data || !Array.isArray(data)) return [];
 
         const countriesData = data.find((item: unknown) =>
             isDataGroup(item) && item.group_name === "countries"
         ) as DataGroup | undefined;
         const apiCountries: DestinationItem[] = countriesData?.results || [];
 
-        // Match popular destinations with API data or create them
-        return POPULAR_DESTINATIONS.map(popular => {
-            const apiMatch = apiCountries.find((c: DestinationItem) =>
-                c.iso2 === popular.iso2 ||
-                c.name === popular.name ||
-                c.name_ru === popular.name ||
-                c.name_en?.toLowerCase() === popular.name.toLowerCase()
-            );
-
-            return apiMatch ? {
-                ...apiMatch,
-                image: apiMatch.image || popular.image,
-                isPopular: true
-            } : {
-                name: popular.name,
-                iso2: popular.iso2,
-                image: popular.image,
-                visa_type: '',
-                isPopular: true
-            };
-        });
+        // Return only countries that have images
+        return apiCountries.filter((c: DestinationItem) => c.image && c.image.trim() !== '');
     };
 
-    // Get other countries (excluding popular ones)
+    // Get other countries - only those with images (since we only show destinations with images)
     const getOtherCountries = (): DestinationItem[] => {
         if (!data || !Array.isArray(data)) return [];
 
@@ -168,9 +138,14 @@ const WhereFrom = ({ handleChange, value, name }: WhereToProps) => {
             isDataGroup(item) && item.group_name === "countries"
         ) as DataGroup | undefined;
         const apiCountries: DestinationItem[] = countriesData?.results || [];
-        const popularIso2s = POPULAR_DESTINATIONS.map(d => d.iso2);
+        const popularIso2s = getPopularDestinations().map(d => d.iso2 || '');
 
-        return apiCountries.filter((c: DestinationItem) => !popularIso2s.includes(c.iso2 || ''));
+        // Return countries with images that are not in popular destinations
+        return apiCountries.filter((c: DestinationItem) =>
+            c.image &&
+            c.image.trim() !== '' &&
+            !popularIso2s.includes(c.iso2 || '')
+        );
     };
 
     return (

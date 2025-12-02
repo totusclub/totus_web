@@ -49,7 +49,7 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
         from_city: 'Moscow',
         from_country: 'RU',
         // to_city: 'Kemer',
-        to_country: 'TR',
+        to_country: 'EG',
         adults: '1',
         start_date: '2025-07-21',
         nights: '7..9',

@@ -1,53 +1,22 @@
-import React, {CSSProperties} from "react";
+import React, { CSSProperties, useMemo } from "react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import styles from './home.module.css'
 import HotelBoxCard from "@/components/hotelBox/hotelBoxCard";
 import Icon from "@/components/icons/Icon";
-const MOCK_DATA= [
-    // {
-    //     id:0,
-    //     name:'Movenpick Resort Antalya Tekirova (Ex Royal Diwa Tekirova)',
-    //     rate:5,
-    //     city:'Текирова, Кемер',
-    //     price:55723,
-    //     review:196,
-    //     image:'https://img.cdn.level.travel/hotels/36165/4d83acd7ab74c9d4fa1adca71d875c35_webp_x620.webp',
-    //     url:'/search?from_city=Moscow&from_country=RU&to_country=TR&adults=2&start_date=2025-10-15&nights=7..9&flex_dates=2&start_date_from=2025-10-15&end_date_till=2025-10-22&search_type=package&page_limit=20&page_number=1&to_city=null&hotel_ids=36165'
-    // },
-    {
-        id:0,
-        name:'Swissotel Sharm El Sheikh Managed By Rixos',
-        rate:5,
-        city:'Наама Бэй, Шарм-эль-Шейх',
-        price:55723,
-        review:10,
-        image:'https://img.cdn.level.travel/hotels/9149847/def8891aa911a636e350e8438d9437ba_webp_x620.webp',
-        url:'/search?from_city=Moscow&from_country=RU&to_country=EG&adults=2&start_date=2025-11-30&nights=7..9&flex_dates=2&start_date_from=2025-11-30&end_date_till=2025-12-07&search_type=package&page_limit=20&page_number=1&sort_by=relevance&to_city=null&hotel_ids=9149847'
-    },
-    {
-        id:1,
-        name:'Cosmos Collection Altay Resort',
-        rate:5,
-        city:'Урлу-Аспак, Майминский район',
-        price:55723,
-        review:12,
-        image:'https://img.cdn.level.travel/hotels/9085039/f58b3c014000931c90910baa6298598d_webp_x620.webp',
-        url:'/search?from_city=Moscow&from_country=RU&to_country=RU&adults=2&start_date=2025-11-30&nights=7..9&flex_dates=2&start_date_from=2025-11-30&end_date_till=2025-12-07&search_type=package&page_limit=20&page_number=1&sort_by=relevance&to_city=null&hotel_ids=9085039'
-    },
-    {
-        id:2,
-        name:'Rixos Premium Seagate',
-        rate:5,
-        city:'Шарм-эль-Шейх',
-        price:55723,
-        review:10,
-        image:'https://img.cdn.level.travel/hotels/9022465/2bc6112958c15dd0d888b039bf10c3ee_webp_x620.webp',
-        url:'/search?from_city=Moscow&from_country=RU&to_country=EG&adults=2&start_date=2025-11-30&nights=7..9&flex_dates=2&start_date_from=2025-11-30&end_date_till=2025-12-07&search_type=package&page_limit=20&page_number=1&sort_by=relevance&to_city=null&hotel_ids=9022465'
-    },
+import { useRouter } from "next/router";
 
-]
+interface HotelItem {
+    id: number | string;
+    name?: string;
+    rate?: number;
+    city?: string;
+    price?: number;
+    review?: number;
+    image?: string;
+    url?: string;
+}
 interface ArrowProps {
     onClick?: () => void;
     className?: string;
@@ -70,7 +39,53 @@ const PrevArrow = ({ onClick }: ArrowProps) => {
     );
 };
 
-export default function HotDealsSlide({slidesToShow,title}:{slidesToShow:number,title:string}) {
+// Helper function to get default start date (7 days from today)
+const getDefaultStartDate = (): string => {
+    const today = new Date();
+    const plus7 = new Date();
+    plus7.setDate(today.getDate() + 7);
+    const year = plus7.getFullYear();
+    const month = String(plus7.getMonth() + 1).padStart(2, '0');
+    const day = String(plus7.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+};
+
+export default function HotDealsSlide({ slidesToShow, title, recomendHotels }: { slidesToShow: number, title: string, recomendHotels?: HotelItem[] | null }) {
+    const router = useRouter();
+    const date = useMemo(() => {
+        return getDefaultStartDate();
+    }, []);
+
+    const handlePressHotel = React.useCallback(
+        (hotelId: number | string) => {
+            if (!hotelId) {
+                return;
+            }
+
+            // Build search params similar to React Native app
+            const queryParams = {
+                hotel_id: String(hotelId),
+                from_city: "Moscow",
+                from_country: "RU",
+                to_country: "RU",
+                to_city: "",
+                adults: "2",
+                start_date: date,
+                nights: "7",
+                search_type: "package",
+                flex_dates: "2",
+            };
+
+            // Navigate to hotel-details with search params using object format
+            // Use shallow: false to ensure fresh navigation and prevent conflicts
+            router.push({
+                pathname: '/hotel-details',
+                query: queryParams,
+            }, undefined, { shallow: false });
+        },
+        [router, date]
+    );
+
     const settings = {
         dots: true,
         infinite: false,
@@ -80,7 +95,7 @@ export default function HotDealsSlide({slidesToShow,title}:{slidesToShow:number,
         initialSlide: 0,
         nextArrow: <NextArrow />,
         prevArrow: <PrevArrow />,
-        appendDots: (dots:number) => (
+        appendDots: (dots: number) => (
             <div className={styles.customDotsWrapper}>
                 <ul> {dots} </ul>
             </div>
@@ -112,7 +127,7 @@ export default function HotDealsSlide({slidesToShow,title}:{slidesToShow:number,
                     slidesToShow: 1.2,
                     slidesToScroll: 1,
                     dots: false,
-                    arrows:false
+                    arrows: false
                 }
             }
 
@@ -122,14 +137,36 @@ export default function HotDealsSlide({slidesToShow,title}:{slidesToShow:number,
         <div className={`${styles.contentFull} ${styles.contentFullHide}`}>
             <p className={styles.hotProductTitle}>{title}</p>
             <div className={styles.recomendlist}>
-                    {MOCK_DATA.map((item, index) => (
-                        <HotelBoxCard {...item} />
-                    ))}
+                {recomendHotels?.map((item: HotelItem, index: number) => (
+                    <HotelBoxCard
+                        key={item.id ?? index}
+                        id={typeof item.id === 'number' ? item.id : Number(item.id) || 0}
+                        name={item.name || ''}
+                        rate={item.rate || 0}
+                        city={item.city || ''}
+                        price={item.price || 0}
+                        review={item.review || 0}
+                        image={item.image || ''}
+                        url=""
+                        onClick={() => handlePressHotel(item.id)}
+                    />
+                ))}
             </div>
             <div className={styles.recomendlistMob}>
                 <Slider {...settings}>
-                    {MOCK_DATA.map((item, index) => (
-                        <HotelBoxCard {...item} />
+                    {recomendHotels?.map((item: HotelItem, index: number) => (
+                        <HotelBoxCard
+                            key={item.id ?? index}
+                            id={typeof item.id === 'number' ? item.id : Number(item.id) || 0}
+                            name={item.name || ''}
+                            rate={item.rate || 0}
+                            city={item.city || ''}
+                            price={item.price || 0}
+                            review={item.review || 0}
+                            image={item.image || ''}
+                            url=""
+                            onClick={() => handlePressHotel(item.id)}
+                        />
                     ))}
                 </Slider>
             </div>

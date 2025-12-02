@@ -8,17 +8,22 @@ import Partner from "@/components/home/partner";
 import PopularDestinations from "@/components/home/popularDestinations";
 import CallRequest from "@/components/home/callRequest";
 import Faq from "@/components/home/faq";
+import { useLoadHomeData } from "@/hooks/loadHomeData";
 
 
 export default function Home() {
+
+    const { homeData } = useLoadHomeData();
+    console.log('homeData', homeData);
 
     return (
         <main>
             <Search />
             <HomeBanners />
-            <HotDealsSlide title={'Начните планирование путешествия здесь'} slidesToShow={3} />
+            <HotDealsSlide title={'Начните планирование путешествия здесь'} slidesToShow={3} recomendHotels={homeData?.recomendHotels
+            } />
             {/*<Services />*/}
-            <PopularDestinations />
+            <PopularDestinations popularDestinations={homeData?.popularDestinations} />
             <Partner />
             <CallRequest />
             {/*<Faq />*/}

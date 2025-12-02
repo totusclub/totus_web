@@ -25,16 +25,12 @@ const ResultList = ({ tickets, loading, data, setFiltersRequest }: ResultListPro
     const [loadingMore, setLoadingMore] = useState(false);
     const [priceTrack, setPriceTrack] = useState(false);
 
-    // recomand
-    // dear
-    // cheap
-    // reating
     const options = [
-        { value: 'relevance', name: 'По рекомендации',icon:'recomand' },
-        { value: 'rating,desc', name: 'Высокий рейтинг' , icon:'reating'},
+        { value: 'relevance', name: 'По рекомендации', icon: 'recomand' },
+        { value: 'rating,desc', name: 'Высокий рейтинг', icon: 'reating' },
         // { value: 'rating,asc', name: 'Низкий рейтинг',icon:'cheap' },
-        { value: 'price,asc', name: 'Сначала дешёвые',icon:'cheap' },
-        { value: 'price,desc', name: 'Сначала дорогие' ,icon:'dear'},
+        { value: 'price,asc', name: 'Сначала дешёвые', icon: 'cheap' },
+        { value: 'price,desc', name: 'Сначала дорогие', icon: 'dear' },
     ];
 
 
@@ -49,17 +45,41 @@ const ResultList = ({ tickets, loading, data, setFiltersRequest }: ResultListPro
         return null;
     }, [hotels]);
 
-    // Initialize selected sort from URL or default to 'relevance'
-    const selected = useMemo(() => {
-        if (router.query.sort_by && typeof router.query.sort_by === 'string') {
-            return router.query.sort_by;
+    // Get current filter params from hotels object (includes all applied filters)
+    // IMPORTANT: Do NOT include sort_by here - we set it explicitly in handleSelect
+    const currentFilters = useMemo(() => {
+        if (hotels) {
+            const filters: any = {
+                filter_instant_confirm: hotels?.filter_instant_confirm,
+                filter_stars: hotels?.filter_stars,
+                filter_meals: hotels?.filter_meals,
+                filter_price_min: hotels?.filter_price_min,
+                filter_price_max: hotels?.filter_price_max,
+            };
+            // Explicitly exclude sort_by to prevent it from being overridden
+            // We'll set sort_by explicitly in handleSelect
+            return filters;
         }
-        return 'relevance';
-    }, [router.query.sort_by]);
+        return {};
+    }, [hotels]);
 
-    const handleSelect = (option: any) => {
-        // Select component passes the full option object
-        const sortValue = option?.value || option || '';
+
+    const handleSelect = (optionName: string) => {
+        // Select component passes option.name (display text like "Сначала дорогие") as a STRING, not an object
+        // So we need to find the option by name and get its value (like "price,desc")
+        const trimmedName = optionName?.trim();
+        const selectedOption = options.find(opt => opt.name.trim() === trimmedName);
+
+        if (!selectedOption) {
+            return;
+        }
+
+        const sortValue = selectedOption.value; // This will be "price,desc", "price,asc", etc.
+
+        // Double-check that we have a valid value
+        if (!sortValue || sortValue === optionName) {
+            return;
+        }
 
         // For tickets: use setFiltersRequest (like filtersPackage.tsx)
         if (tickets && setFiltersRequest && typeof setFiltersRequest === 'function') {
@@ -70,14 +90,17 @@ const ResultList = ({ tickets, loading, data, setFiltersRequest }: ResultListPro
         // For hotels: use Redux searchFilters (like filters.tsx)
         if (!selectedFilters || !sortValue) return;
 
-        const paramsFilter = {
-            ...selectedFilters,
-            sort_by: sortValue,
+        // Include all current filter params when changing sort (same pattern as filters.tsx)
+        // Build paramsFilter and explicitly set sort_by to ensure it's the value, not the name
+        const paramsFilter: any = {
+            ...currentFilters, // Include all current filter params (excludes sort_by)
+            ...selectedFilters, // Include request_id and readyOperators
             page_limit: 20,
-            page_number: 1
+            page_number: 1,
         };
 
-        // Clear hotels list - same pattern as filters.tsx
+        paramsFilter.sort_by = sortValue;
+
         dispatch(setAllMyHotels([]));
 
         // Dispatch the search with sort filter
@@ -153,7 +176,7 @@ const ResultList = ({ tickets, loading, data, setFiltersRequest }: ResultListPro
         router.push(
             {
                 pathname: router.pathname,
-                query: {...queryParams},
+                query: { ...queryParams },
             },
             undefined,
             { scroll: false }

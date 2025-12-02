@@ -11,12 +11,27 @@ interface ProductCardProps {
     review:number,
     image:string,
     url:string,
+    onClick?: (e: React.MouseEvent) => void;
 }
 
 
-const HotelBoxCard = ({id,name,rate,city,price,review,image,url }: ProductCardProps) => {
+const HotelBoxCard = ({id,name,rate,city,price,review,image,url, onClick }: ProductCardProps) => {
+    const handleClick = (e: React.MouseEvent) => {
+        // If custom onClick is provided, use it (for hotDeals navigation)
+        if (onClick) {
+            onClick(e);
+            return;
+        }
+        
+        // Otherwise, use url navigation if provided
+        if (url && url.trim() !== '') {
+            e.stopPropagation();
+            router.push(url);
+        }
+    };
+
     return (
-        <div onClick={()=>router.push(`${url}`)} className={styles.hotelBoxCard} key={id}>
+        <div onClick={handleClick} className={styles.hotelBoxCard} key={id} style={{ cursor: onClick ? 'pointer' : undefined }}>
             <div className={styles.hotelBoxCardImage} style={{backgroundImage: `url(${image})`}}>
                 <div className={styles.hotelBoxCardImageInfo}>
                     <div className={styles.hotelBoxCardStatus}>

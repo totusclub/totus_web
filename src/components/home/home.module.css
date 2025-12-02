@@ -590,6 +590,7 @@
 .recomendDeslistItemInfoText {
   display: flex;
   align-items: center;
+  color: var(--primary_b);
   gap: 12px;
 }
 

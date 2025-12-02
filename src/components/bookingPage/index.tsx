@@ -341,7 +341,7 @@ const BookingCard = () => {
                 setLoading(false);
                 // Success - redirect to home
                 router.push('/');
-                // router.push(`checkout?order_id=${c_order?.order?.id}`)
+                router.push(`checkout?order_id=${c_order?.order?.id}`)
             } else {
                 setLoading(false);
             }

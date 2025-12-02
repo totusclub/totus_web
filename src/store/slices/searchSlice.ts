@@ -210,6 +210,8 @@ export const runFullSearchFlow = createAsyncThunk(
                 const interval = setInterval(async () => {
                     try {
                         const statusMap = await checkSearchStatus(request_id);
+                        console.log('statusMap',statusMap);
+
                         dispatch(updateProgress(statusMap));
 
                         const readyOperators = Object.entries(statusMap)
