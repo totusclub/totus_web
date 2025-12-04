@@ -28,7 +28,7 @@ const getAgeOptions = () => {
     return options;
 };
 
-const People = ({ handleChange, value }) => {
+const People = ({ handleChange, value, className }: { handleChange: any; value: any; className?: string }) => {
     const [adults, setAdults] = useState<number>(1);
     const [children, setChildren] = useState<number>(0);
     const [childrenAges, setChildrenAges] = useState<number[]>([]);
@@ -136,7 +136,7 @@ const People = ({ handleChange, value }) => {
     }, []);
 
     return (
-        <div className={`${styles.searchField} ${styles.people}`} ref={wrapperRef} onClick={handleToggle}>
+        <div className={`${styles.searchField} ${styles.people} ${className || ''}`} ref={wrapperRef} onClick={handleToggle}>
             <Icon name={'user'} size={24} color="#000" />
             <div className={styles.searchFieldInfo}>
                 <p className={styles.searchFieldsLabel}>Туристы</p>

@@ -1,7 +1,7 @@
 import styles from './hotelCard.module.css';
 import Icon from "@/components/icons/Icon";
 import Button from "@/components/UI/button";
-import { router } from "next/client";
+import { useRouter } from "next/router";
 import { useMemo } from "react";
 
 interface HotelCardItemProps {
@@ -23,9 +23,40 @@ interface HotelCardState {
 
 
 const HotelCard = ({ item, request_id, lazy }: HotelCardState) => {
+    const router = useRouter();
+    
     const handleClick = () => {
         sessionStorage.setItem("searchScroll", window.scrollY.toString());
-        router.push(`/hotel-details?request_id=${request_id}&hotel_id=${item?.hotel?.id}`); // Navigate to /about
+        
+        // Get all search params from current URL query
+        const queryParams: Record<string, string | string[]> = {
+            hotel_id: String(item?.hotel?.id),
+            request_id: request_id || '',
+            from_city: (router.query.from_city as string) || 'Moscow',
+            from_country: (router.query.from_country as string) || 'RU',
+            to_country: (router.query.to_country as string) || '',
+            to_city: (router.query.to_city as string) || '',
+            adults: (router.query.adults as string) || '2',
+            start_date: (router.query.start_date as string) || '',
+            nights: (router.query.nights as string) || '7',
+            search_type: (router.query.search_type as string) || 'package',
+            flex_dates: (router.query.flex_dates as string) || '2',
+        };
+
+        // Add optional params if they exist
+        if (router.query.kids) {
+            queryParams.kids = router.query.kids as string;
+        }
+        if (router.query.kids_ages) {
+            queryParams.kids_ages = Array.isArray(router.query.kids_ages) 
+                ? router.query.kids_ages 
+                : [router.query.kids_ages as string];
+        }
+
+        router.push({
+            pathname: '/hotel-details',
+            query: queryParams,
+        }, undefined, { shallow: false });
     };
     // console.log(item);
 

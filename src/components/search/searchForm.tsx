@@ -210,6 +210,49 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
     };
 
     const handleClick = () => {
+        // If hotel is selected and we're on homepage, navigate to hotel details
+        if (params.hotel_ids && params.hotel_ids.length > 0 && pageName === 'home') {
+            const hotelId = params.hotel_ids[0];
+            
+            // Calculate date range for start_date_from and end_date_till
+            const startDate = params.start_date || calculateStayDates(new Date(), 7).start_date;
+            const nightsValue = params.nights?.split('..')?.[0] || params.nights || '7';
+            const nightCount = parseInt(nightsValue, 10) || 7;
+            const dateRange = calculateStayDates(startDate, nightCount);
+            
+            const queryParams: Record<string, string | string[]> = {
+                hotel_id: String(hotelId),
+                from_city: params.from_city || "Moscow",
+                from_country: params.from_country || "RU",
+                // When hotel is selected, to_country should be set from hotel's iso2
+                // If it's missing, we still need a value, so default to "RU"
+                to_country: params.to_country || "RU",
+                to_city: params.to_city || "",
+                adults: params.adults || "2",
+                start_date: startDate,
+                start_date_from: dateRange.start_date_from,
+                end_date_till: dateRange.end_date_till,
+                nights: params.nights || "7",
+                search_type: params.search_type || "package",
+                flex_dates: params.flex_dates || "2",
+            };
+
+            // Add optional params if they exist
+            if (params.kids) {
+                queryParams.kids = params.kids;
+            }
+            if (params.kids_ages && params.kids_ages.length > 0) {
+                queryParams.kids_ages = params.kids_ages.map(String);
+            }
+
+            router.push({
+                pathname: '/hotel-details',
+                query: queryParams,
+            }, undefined, { shallow: false });
+            return;
+        }
+
+        // Otherwise, navigate to search page as usual
         const url = createSearchUrl(params);
         startSearch(params)
         router.push(`/search?${url}`);

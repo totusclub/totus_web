@@ -1,6 +1,7 @@
 import styles from '../hotelDetails.module.css';
 import DatesPrice from "@/components/hotelDetails/hotelDetailsRooms/datesPrice";
 import HotelDetailsRoomItem from "@/components/hotelDetails/hotelDetailsRooms/roomItem";
+import RoomsSkeleton from "@/components/hotelDetails/hotelDetailsRooms/roomsSkeleton";
 import Icon from "@/components/icons/Icon";
 import Button from "@/components/UI/button";
 import { router } from "next/client";
@@ -8,11 +9,16 @@ import { useEffect, useMemo, useState } from "react";
 import { createPackage } from "@/api/levelTravelApi";
 import { useRouter } from "next/router";
 
-const HotelDetailsRooms = ({ rooms }: any) => {
+interface HotelDetailsRoomsProps {
+  rooms: any[];
+  loading?: boolean;
+}
+
+const HotelDetailsRooms = ({ rooms, loading = false }: HotelDetailsRoomsProps) => {
     const router = useRouter();
     const [selectedDate, setSelectedDate] = useState<Date | null>(null);
     const [fisrtDate, setFisrtDate] = useState(null);
-    const [loading, setLoading] = useState(false);
+    const [isBooking, setIsBooking] = useState(false);
     const pricesList = useMemo(() => {
         if (!rooms) return;
 
@@ -94,10 +100,10 @@ const HotelDetailsRooms = ({ rooms }: any) => {
 
 
     const handleBook = async (id: any) => {
-        setLoading(true)
+        setIsBooking(true)
         const res = await createPackage({ request_id: router.query.request_id, tour_id: id })
         // console.log('handleBook', res.package.id)
-        setLoading(false)
+        setIsBooking(false)
         router.push(`/tickets?package=${res.package.id}`);
     };
 
@@ -116,6 +122,24 @@ const HotelDetailsRooms = ({ rooms }: any) => {
         }
     }, [fisrtDate?.start_date])
 
+    if (loading) {
+        return <RoomsSkeleton />;
+    }
+
+    if (!rooms || rooms.length === 0) {
+        return (
+            <div className={'content'}>
+                <div className={styles.HotelDetailsRoomsRow}>
+                    <div className={styles.HotelDetailsRooms}>
+                        <div className={styles.HotelDetailsRoomsHead}>
+                            <p>Номера не найдены</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className={'content'}>
             <div className={styles.HotelDetailsRoomsRow}>
@@ -125,7 +149,7 @@ const HotelDetailsRooms = ({ rooms }: any) => {
                     </div>
                     <DatesPrice dates={pricesList} selectedDate={selectedDate} setSelectedDate={setSelectedDate} />
                     {rooms.map((r, i) => (
-                        <HotelDetailsRoomItem item={r} selectedDate={selectedDate} />
+                        <HotelDetailsRoomItem key={i} item={r} selectedDate={selectedDate} />
                     ))}
 
                 </div>
@@ -145,7 +169,7 @@ const HotelDetailsRooms = ({ rooms }: any) => {
                             <p className={styles.HotelDetailsInfoDateTitle}>Цена за тур с перелётом</p>
                             <p className={styles.HotelDetailsInfoDateText}>{formatDate}, {fisrtDate?.nights_count} ночей</p>
                         </div>
-                        <Button loading={loading} onClick={() => handleBook(fisrtDate?.id)} title={'Выбрать номер'}
+                        <Button loading={isBooking} onClick={() => handleBook(fisrtDate?.id)} title={'Выбрать номер'}
                             full={true} />
                     </div>
 

@@ -1,0 +1,157 @@
+/* Additional styles for hotel search section */
+.hotelSearchSection {
+  margin: 24px 0;
+  width: 100%;
+}
+
+/* Replicate searchForm styles from search.module.css */
+.searchForm {
+  width: 100%;
+  height: 76px;
+  background-color: var(--primary_b);
+  border-radius: 24px;
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  align-items: center;
+  padding: 10px;
+}
+
+/* Replicate searchFields styles from search.module.css */
+.searchFields {
+  width: 100%;
+  height: 56px;
+  border-radius: 16px;
+  display: flex;
+}
+
+/* Replicate searchGroup styles from search.module.css */
+.searchGroup {
+  display: flex;
+  flex: 1;
+  width: 100%;
+}
+
+.searchGroup > div {
+  flex: 0.5;
+}
+
+/* radioFrom and whereFrom classes for components */
+.radioFrom {
+  border-bottom-left-radius: 16px !important;
+  border-top-left-radius: 16px !important;
+  border-left: 1px solid var(--borderSecondary);
+}
+
+.whereFrom {
+  border-bottom-right-radius: 16px;
+  border-top-right-radius: 16px;
+  border-right: 1px solid var(--borderSecondary);
+}
+
+/* Desktop: Border radius for first and last fields */
+@media (min-width: 1025px) {
+  /* First field - left border radius */
+  .searchGroup > div:first-child :global(.searchField),
+  .searchGroup > div:first-child :global(.radioFrom) {
+    border-bottom-left-radius: 16px !important;
+    border-top-left-radius: 16px !important;
+  }
+
+  /* Last field - right border radius */
+  .searchGroup > div:last-child :global(.people),
+  .searchGroup > div:last-child :global(.whereFrom) {
+    border-bottom-right-radius: 16px !important;
+    border-top-right-radius: 16px !important;
+    border-right: 1px solid var(--borderSecondary) !important;
+  }
+}
+
+/* Mobile styles - same as home page */
+@media (max-width: 1024px) {
+  .hotelSearchSection {
+    margin: 16px 0;
+  }
+
+  .searchForm {
+    height: auto;
+    flex-direction: column;
+    padding: 0;
+    background: none;
+    align-items: normal;
+  }
+
+  .searchFields {
+    flex-direction: column;
+    height: auto;
+    background-color: var(--primary_b);
+  }
+
+  .searchGroup {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: 100%;
+    gap: 0;
+  }
+
+  .searchGroup > div {
+    flex: none;
+  }
+
+  /* First row: Date and Nights side by side */
+  .searchGroup > div:first-child {
+    border-right: 1px solid var(--borderSecondary);
+    border-bottom: 1px solid var(--borderSecondary);
+  }
+
+  .searchGroup > div:nth-child(2) {
+    border-bottom: 1px solid var(--borderSecondary);
+  }
+
+  /* Second row: People takes left column */
+  .searchGroup > div:last-child {
+    grid-column: 1;
+  }
+
+  /* Remove all borders from fields on mobile */
+  .searchGroup > div :global(.searchField),
+  .searchGroup > div :global(.radioFrom),
+  .searchGroup > div :global(.people),
+  .searchGroup > div :global(.whereFrom) {
+    border-left: none !important;
+    border-right: none !important;
+    border-top: none !important;
+    border-bottom: none !important;
+    border-radius: 0 !important;
+  }
+
+  .radioFrom {
+    border-left: none !important;
+    border-bottom-left-radius: 0 !important;
+    border-top-left-radius: 0 !important;
+  }
+
+  .whereFrom {
+    border-right: none !important;
+    border-left: none !important;
+    border-bottom-right-radius: 0 !important;
+    border-top-right-radius: 0 !important;
+  }
+
+  /* Add padding to fields on mobile */
+  .searchGroup > div :global(.searchField) {
+    padding: 15px;
+  }
+
+  /* Remove borders from people on mobile */
+  .searchGroup > div :global(.people) {
+    border: none !important;
+  }
+
+  /* Hide icons on mobile */
+  .searchGroup > div :global(.searchField) > :global(svg),
+  .searchGroup > div :global(.whereFrom) > :global(svg),
+  .searchGroup > div :global(.radioFrom) > :global(svg) {
+    display: none;
+  }
+}

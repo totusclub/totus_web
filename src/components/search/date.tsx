@@ -5,7 +5,7 @@ import Calendar from "@/components/UI/calendar";
 import {format} from "date-fns";
 import Button from "@/components/UI/button";
 
-const SelectDate = ({handleChange,value,name}) => {
+const SelectDate = ({handleChange,value,name, className}: {handleChange: any; value: any; name: any; className?: string}) => {
     const [selectedDate, setSelectedDate] = useState<Date | null>(new Date(value));
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const wrapperRef = useRef<HTMLDivElement>(null);
@@ -36,7 +36,7 @@ const SelectDate = ({handleChange,value,name}) => {
         handleChange(dates,name)
     }
     return (
-        <div className={styles.searchField} ref={wrapperRef} onClick={handleToggle}>
+        <div className={`${styles.searchField} ${className || ''}`} ref={wrapperRef} onClick={handleToggle}>
             <Icon name={'calendar'} size={24} color="#000"/>
             <div className={styles.searchFieldInfo}>
                 <p className={styles.searchFieldsLabel}>Дата вылета</p>
