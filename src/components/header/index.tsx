@@ -4,11 +4,9 @@ import styles from './header.module.css';
 import Icon from "@/components/icons/Icon";
 import Button from "@/components/UI/button";
 import SearchForm from "@/components/search/searchForm";
-import { usePathname } from "next/navigation";
 import { useMemo, useState } from "react";
 import AuthModal from "@/components/auth";
 import useAuth from "@/hooks/useAuth";
-// import {router} from "next/client";
 import { useRouter } from "next/router";
 import { clearSearch } from '@/store/slices/searchSlice';
 import { useDispatch } from 'react-redux';
@@ -18,18 +16,19 @@ const Header = () => {
     const dispatch = useDispatch();
     const [authModalOpen, setAuthModalOpen] = useState(false);
     const { user, token } = useAuth()
-    const pathname = usePathname();
     const router = useRouter();
+    const pathname = router.pathname || '';
 
     const showSearch = useMemo(() => {
-        const segments = pathname.split('/').filter(Boolean); // removes empty strings
+        if (!pathname) return 'home';
+        const segments = pathname.split('/').filter(Boolean);
         return segments[segments.length - 1] || 'home';
     }, [pathname])
 
 
     const headerMobileRender = useMemo(() => {
         if (pathname) {
-            const segments = pathname.split('/').filter(Boolean); // removes empty strings
+            const segments = pathname.split('/').filter(Boolean);
             const pageName = segments[segments.length - 1] || 'home';
             if (pageName === 'search' || pageName === 'tickets') {
                 return <SearchForm pageName={pageName} header={true} />
@@ -39,6 +38,8 @@ const Header = () => {
                 return <p className={styles.pageName}>Профиль</p>
             } else if (pageName === 'my-orders') {
                 return <p className={styles.pageName}>Мои заказы</p>
+            } else if (pageName === '[order_id]') {
+                return <p className={styles.pageName}>Детали заказа</p>
             } else if (pageName === 'privacy-policy') {
                 return <p className={styles.pageName}>Политика конфиденциальности</p>
             }
@@ -47,15 +48,19 @@ const Header = () => {
     }, [pathname])
 
     const showHeader = useMemo(() => {
-        const segments = pathname.split('/').filter(Boolean); // removes empty strings
+        if (!pathname) return 'home';
+        const segments = pathname.split('/').filter(Boolean);
         return segments[segments.length - 1] || 'home';
     }, [pathname])
 
     const handleGoBack = () => {
-        const segments = pathname.split('/').filter(Boolean); // removes empty strings
+        if (!pathname) {
+            router.push('/');
+            return;
+        }
+        const segments = pathname.split('/').filter(Boolean);
         const pageName = segments[segments.length - 1] || 'home';
         if (pageName === 'search') {
-            // dispatch(clearSearch())
             router.push('/');
             dispatch(clearSearch())
         } else {

@@ -18,7 +18,7 @@ interface DateInputProps {
 const DateInput: React.FC<DateInputProps> = ({
     value,
     onChange,
-    placeholder = 'MM.DD.YYYY',
+    placeholder = 'DD.MM.YYYY',
     required,
     allowPastDates = false,
     label,
@@ -29,12 +29,12 @@ const DateInput: React.FC<DateInputProps> = ({
     const [inputValue, setInputValue] = useState<string>('');
     const wrapperRef = useRef<HTMLDivElement>(null);
 
-    // Parse value string (MM.DD.YYYY) to Date
+    // Parse value string (DD.MM.YYYY) to Date
     useEffect(() => {
         if (value && value.trim() !== '') {
             try {
-                // Try to parse MM.DD.YYYY format (note: dd in date-fns means day, DD means day of year)
-                const parsed = parse(value, 'MM.dd.yyyy', new Date());
+                // Try to parse DD.MM.YYYY format
+                const parsed = parse(value, 'dd.MM.yyyy', new Date());
                 if (!isNaN(parsed.getTime())) {
                     setSelectedDate(parsed);
                     setInputValue(value);
@@ -68,21 +68,21 @@ const DateInput: React.FC<DateInputProps> = ({
 
     const handleSelectDate = (date: Date) => {
         setSelectedDate(date);
-        const formattedDate = format(date, 'MM.dd.yyyy');
+        const formattedDate = format(date, 'dd.MM.yyyy');
         setInputValue(formattedDate);
         onChange(formattedDate);
     };
 
-    const validateDate = (month: string, day: string, year: string): boolean => {
-        // Validate month (01-12)
-        const monthNum = parseInt(month, 10);
-        if (isNaN(monthNum) || monthNum < 1 || monthNum > 12) {
-            return false;
-        }
-
+    const validateDate = (day: string, month: string, year: string): boolean => {
         // Validate day (01-31)
         const dayNum = parseInt(day, 10);
         if (isNaN(dayNum) || dayNum < 1 || dayNum > 31) {
+            return false;
+        }
+
+        // Validate month (01-12)
+        const monthNum = parseInt(month, 10);
+        if (isNaN(monthNum) || monthNum < 1 || monthNum > 12) {
             return false;
         }
 
@@ -101,13 +101,13 @@ const DateInput: React.FC<DateInputProps> = ({
 
             // Check if date is valid (e.g., Feb 30 doesn't exist)
             try {
-                const testDate = parse(`${month}.${day}.${year}`, 'MM.dd.yyyy', new Date());
+                const testDate = parse(`${day}.${month}.${year}`, 'dd.MM.yyyy', new Date());
                 if (isNaN(testDate.getTime())) {
                     return false;
                 }
                 // Check if parsed date matches input (handles Feb 29 in non-leap years)
-                const formatted = format(testDate, 'MM.dd.yyyy');
-                if (formatted !== `${month}.${day}.${year}`) {
+                const formatted = format(testDate, 'dd.MM.yyyy');
+                if (formatted !== `${day}.${month}.${year}`) {
                     return false;
                 }
             } catch {
@@ -129,54 +129,54 @@ const DateInput: React.FC<DateInputProps> = ({
         let formatted = '';
         let shouldUpdate = true;
 
-        // Add month (first 2 digits)
+        // Add day (first 2 digits) - DD.MM.YYYY format
         if (digitsOnly.length > 0) {
-            const month = digitsOnly.slice(0, 2);
+            const day = digitsOnly.slice(0, 2);
 
-            // Validate month after 2 digits
+            // Validate day after 2 digits
             if (digitsOnly.length >= 2) {
-                const monthNum = parseInt(month, 10);
-                // Prevent invalid months (00, 13-99)
-                if (monthNum > 12) {
-                    // Block invalid month - keep previous value
+                const dayNum = parseInt(day, 10);
+                // Basic day validation (01-31)
+                if (dayNum > 31) {
+                    // Block invalid day - keep previous value
                     shouldUpdate = false;
                 } else {
-                    formatted = month;
+                    formatted = day;
                 }
             } else {
-                formatted = month;
+                formatted = day;
             }
 
-            // Auto-add dot after month if there are more digits
+            // Auto-add dot after day if there are more digits
             if (digitsOnly.length > 2 && shouldUpdate) {
-                const day = digitsOnly.slice(2, 4);
+                const month = digitsOnly.slice(2, 4);
 
-                // Validate day after 4 digits
+                // Validate month after 4 digits
                 if (digitsOnly.length >= 4) {
-                    const dayNum = parseInt(day, 10);
-                    // Basic day validation (01-31)
-                    if (dayNum > 31) {
-                        // Block invalid day - keep previous value
+                    const monthNum = parseInt(month, 10);
+                    // Prevent invalid months (00, 13-99)
+                    if (monthNum > 12) {
+                        // Block invalid month - keep previous value
                         shouldUpdate = false;
                     } else {
                         // Validate day for specific month
-                        const monthNum = parseInt(month, 10);
+                        const dayNum = parseInt(day, 10);
                         if (monthNum >= 1 && monthNum <= 12) {
                             const daysInMonth = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
                             if (dayNum > daysInMonth[monthNum - 1]) {
                                 shouldUpdate = false;
                             } else {
-                                formatted += '.' + day;
+                                formatted += '.' + month;
                             }
                         } else {
-                            formatted += '.' + day;
+                            formatted += '.' + month;
                         }
                     }
                 } else {
-                    formatted += '.' + day;
+                    formatted += '.' + month;
                 }
 
-                // Auto-add dot after day if there are more digits
+                // Auto-add dot after month if there are more digits
                 if (digitsOnly.length > 4 && shouldUpdate) {
                     const year = digitsOnly.slice(4, 8);
                     formatted += '.' + year;
@@ -192,7 +192,7 @@ const DateInput: React.FC<DateInputProps> = ({
                 const parts = formatted.split('.');
                 if (parts.length === 3 && validateDate(parts[0], parts[1], parts[2])) {
                     try {
-                        const parsed = parse(formatted, 'MM.dd.yyyy', new Date());
+                        const parsed = parse(formatted, 'dd.MM.yyyy', new Date());
                         if (!isNaN(parsed.getTime())) {
                             setSelectedDate(parsed);
                             onChange(formatted);
@@ -218,9 +218,9 @@ const DateInput: React.FC<DateInputProps> = ({
             const parts = inputValue.split('.');
             if (parts.length === 3 && validateDate(parts[0], parts[1], parts[2])) {
                 try {
-                    const parsed = parse(inputValue, 'MM.dd.yyyy', new Date());
+                    const parsed = parse(inputValue, 'dd.MM.yyyy', new Date());
                     if (!isNaN(parsed.getTime())) {
-                        const formatted = format(parsed, 'MM.dd.yyyy');
+                        const formatted = format(parsed, 'dd.MM.yyyy');
                         setInputValue(formatted);
                         setSelectedDate(parsed);
                         onChange(formatted);

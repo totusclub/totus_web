@@ -1,0 +1,359 @@
+.orderDetailsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px 0;
+  margin-top: 24px;
+  margin-bottom: 44px;
+}
+
+.orderDetailsCard {
+  background: var(--bgPrimary);
+  border-radius: 24px;
+  padding: 16px;
+  box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.12),
+    0px 4px 12px 0px rgba(0, 0, 0, 0.12);
+}
+.orderDetailsTitleContainer {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.orderDetailsTitleId {
+  font-size: 20px;
+  color: #7a7a7a;
+}
+.orderDetailsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.orderDetailsHeaderLeft {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.backButton {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 4px;
+}
+
+.orderDetailsTitle {
+  color: var(--textPrimary);
+  font-family: "Golos Text";
+  font-size: 20px;
+  margin: 0;
+}
+
+.orderDetailsStatus {
+  display: inline-flex;
+  height: 24px;
+  padding: 0px 12px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 15px;
+  color: #fff;
+  font-family: "Golos Text";
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 16px;
+}
+
+.orderDetailsPanel {
+  display: flex;
+  flex-direction: column;
+  background-color: #f5f5f5;
+  padding: 16px;
+  align-items: flex-start;
+  align-self: stretch;
+  border-radius: 24px;
+  border-bottom: 1px solid #fe732e;
+  box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.12),
+    0px 4px 12px 0px rgba(0, 0, 0, 0.12);
+}
+
+.orderDetailsSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px 0;
+}
+
+.orderDetailsSectionLast {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 0 0 0;
+  gap: 4px;
+}
+
+.orderDetailsSectionSubtitle {
+  color: var(--textSecondary);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 18px;
+  margin: 0;
+}
+
+.orderDetailsAmount {
+  font-size: 16px;
+  line-height: 20px;
+  letter-spacing: -2%;
+  vertical-align: middle;
+  margin: 0;
+}
+
+.orderDetailsDivider {
+  height: 1px;
+  background: var(--bgTertiary);
+  width: 100%;
+}
+
+.touristsList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.touristItem {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.touristRow {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 0;
+}
+
+.touristName {
+  color: var(--textPrimary);
+  font-family: "Golos Text";
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 20px;
+  margin: 0;
+}
+
+.touristDetails {
+  color: var(--textSecondary);
+  font-family: "Golos Text";
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 18px;
+  margin: 0;
+}
+
+.documentsPanel {
+  background: #f5f5f5;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 16px;
+  cursor: pointer;
+}
+
+.documentsContent {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.documentsTitleContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.documentsTitleIcon {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.documentsTitle {
+  color: var(--textPrimary);
+  font-family: "Golos Text";
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 20px;
+  margin: 0;
+}
+
+.documentsDescription {
+  color: var(--textSecondary);
+  font-family: "Golos Text";
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 18px;
+  margin: 0;
+}
+
+.arrowContainer {
+  display: flex;
+  align-items: center;
+}
+
+.sectionWrapper {
+  margin-bottom: 16px;
+}
+
+.sectionHeader {
+  font-size: 14px;
+  line-height: 18px;
+  letter-spacing: -2%;
+  vertical-align: middle;
+
+  margin: 0 0 16px 0;
+}
+
+.infoPanel {
+  background: #f5f5f5;
+  border-radius: 16px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.infoRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  cursor: pointer;
+}
+
+.infoRowContent {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.infoRowLabel {
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 20px;
+  letter-spacing: -2%;
+  vertical-align: middle;
+  color: #7a7a7a;
+  margin: 0;
+}
+
+.infoRowValueContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.infoRowValue {
+  font-weight: 500;
+  font-style: Medium;
+  font-size: 16px;
+  line-height: 20px;
+  letter-spacing: -2%;
+  color: #1f1f1f;
+  vertical-align: middle;
+}
+
+.infoRowRightValue {
+  color: #1f1f1f;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 18px;
+  margin: 0;
+}
+
+.divider {
+  height: 1px;
+  background: var(--bgTertiary);
+  width: 100%;
+}
+
+.documentsModalContent {
+  padding: 8px 0;
+}
+
+.noDocuments {
+  color: var(--textSecondary);
+  font-family: "Golos Text";
+  font-size: 14px;
+  font-weight: 400;
+  text-align: center;
+  padding: 24px;
+  margin: 0;
+}
+
+.documentsCard {
+  display: flex;
+  flex-direction: column;
+}
+
+.documentRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  cursor: pointer;
+  border-radius: 12px;
+  transition: background-color 0.2s;
+}
+
+.documentRow:hover {
+  background: var(--bgSecondary);
+}
+
+.documentIcon {
+  display: flex;
+  align-items: center;
+}
+
+.documentName {
+  flex: 1;
+  color: var(--textPrimary);
+  font-family: "Golos Text";
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 20px;
+  margin: 0;
+}
+
+.downloadButton {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.orderDetailsLoading,
+.orderDetailsError {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 48px;
+  color: var(--textSecondary);
+  font-family: "Golos Text";
+  font-size: 16px;
+}
+@media (max-width: 768px) {
+  .orderDetailsTitle {
+    font-size: 16px;
+  }
+  .orderDetailsTitleId {
+    font-size: 16px;
+  }
+  .orderDetailsStatus {
+    font-size: 12px;
+  }
+  .orderDetailsHeaderLeft {
+    gap: 0px;
+  }
+}

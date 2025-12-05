@@ -22,6 +22,7 @@ const MobileBottomBar = () => {
     const {user,token} = useAuth()
     const pathname = usePathname();
     const pageName = useMemo(()=>{
+        if (!pathname) return 'home';
         const segments = pathname.split('/').filter(Boolean); // removes empty strings
         return segments[segments.length - 1] || 'home';
     },[pathname])

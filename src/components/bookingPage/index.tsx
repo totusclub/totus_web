@@ -5,20 +5,7 @@ import { useEffect, useState, useMemo } from "react";
 import { createOrder, PackagesActualizeFlight, validateTourist } from "@/api/levelTravelApi";
 import { useRouter } from "next/router";
 import useAuth from "@/hooks/useAuth";
-
-type Tourist = {
-    surname: string;
-    name: string;
-    patronymic: string;
-    birthday: string;
-    gender: string | null;
-    nationality_id: number | null | undefined;
-    doc_type: string;
-    passport_number: string | number;
-    passport_expires_on: string;
-    child?: boolean;
-    child_age?: number; // Age from kids_ages array
-};
+import { validateBookingForm, isBookingFormValid, type Tourist, type BookingValidationErrors } from "@/utils/bookingValidation";
 
 type Params = {
     email: string;
@@ -26,24 +13,7 @@ type Params = {
     tourist: Tourist[];
 };
 
-type ValidationErrors = {
-    email?: string;
-    phone?: string;
-    general?: string;
-    tourists?: {
-        [index: number]: {
-            surname?: string;
-            name?: string;
-            patronymic?: string;
-            birthday?: string;
-            gender?: string;
-            nationality_id?: string;
-            doc_type?: string;
-            passport_number?: string;
-            passport_expires_on?: string;
-        };
-    };
-};
+type ValidationErrors = BookingValidationErrors;
 
 
 const BookingCard = () => {
@@ -90,7 +60,8 @@ const BookingCard = () => {
                     passport_expires_on: "",
                     nationality_id: 225,
                     child: false,
-                    doc_type: "international_passport"
+                    doc_type: "international_passport",
+                    noPatronymic: false
                 })
             }
             const kidsAges = packageData.kids_ages || [];
@@ -106,7 +77,8 @@ const BookingCard = () => {
                     nationality_id: 225,
                     child: true,
                     child_age: kidsAges[i] || undefined, // Store age from kids_ages array
-                    doc_type: "international_passport"
+                    doc_type: "international_passport",
+                    noPatronymic: false
                 })
             }
             setParams(prev => ({
@@ -119,14 +91,16 @@ const BookingCard = () => {
     }, [packageData]);
 
     const handleChangeTourist = (value: string | boolean | number, key: keyof Tourist, index: number) => {
-        const updatedTourists = [...params.tourist];
-        updatedTourists[index] = {
-            ...updatedTourists[index],
-            [key]: value,
-        };
-        setParams({
-            ...params,
-            tourist: updatedTourists,
+        setParams(prevParams => {
+            const updatedTourists = [...prevParams.tourist];
+            updatedTourists[index] = {
+                ...updatedTourists[index],
+                [key]: value,
+            };
+            return {
+                ...prevParams,
+                tourist: updatedTourists,
+            };
         });
 
         // Clear error for this field when user changes it
@@ -168,127 +142,22 @@ const BookingCard = () => {
         }
     };
 
-    // Check if form is valid (all required fields filled) - recalculates when params change
+    // Check if form is valid using comprehensive validation utility
     const isFormValid = useMemo(() => {
-        // Check email
-        if (!params.email || typeof params.email !== 'string' || params.email.trim() === '') {
-            return false;
-        }
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(params.email.trim())) {
-            return false;
-        }
-
-        // Check phone
-        if (!params.phone || params.phone.toString().trim() === '') {
-            return false;
-        }
-
-        // Check tourists array
-        if (!params.tourist || params.tourist.length === 0) {
-            return false;
-        }
-
-        // Check all tourist fields
-        for (let i = 0; i < params.tourist.length; i++) {
-            const tourist = params.tourist[i];
-            if (!tourist.surname || typeof tourist.surname !== 'string' || tourist.surname.trim() === '') return false;
-            if (!tourist.name || typeof tourist.name !== 'string' || tourist.name.trim() === '') return false;
-            if (!tourist.patronymic || typeof tourist.patronymic !== 'string' || tourist.patronymic.trim() === '') return false;
-            if (!tourist.birthday || typeof tourist.birthday !== 'string' || tourist.birthday.trim() === '') return false;
-            if (!tourist.gender || tourist.gender === null || tourist.gender === '') return false;
-            if (!tourist.nationality_id || tourist.nationality_id === null || tourist.nationality_id === undefined) return false;
-            if (!tourist.doc_type || typeof tourist.doc_type !== 'string' || tourist.doc_type.trim() === '') return false;
-            if (!tourist.passport_number || tourist.passport_number.toString().trim() === '') return false;
-            if (!tourist.passport_expires_on || typeof tourist.passport_expires_on !== 'string' || tourist.passport_expires_on.trim() === '') return false;
-        }
-
-        return true;
+        return isBookingFormValid({
+            email: params.email,
+            phone: params.phone,
+            tourists: params.tourist
+        });
     }, [params]);
 
 
     const validateForm = (): ValidationErrors => {
-        const validationErrors: ValidationErrors = {};
-
-        // Validate email
-        if (!params.email || typeof params.email !== 'string' || params.email.trim() === '') {
-            validationErrors.email = 'Пожалуйста, заполните электронную почту';
-        } else {
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(params.email.trim())) {
-                validationErrors.email = 'Пожалуйста, введите корректный email адрес';
-            }
-        }
-
-        // Validate phone
-        if (!params.phone || params.phone.toString().trim() === '') {
-            validationErrors.phone = 'Пожалуйста, заполните телефон';
-        } else {
-            const phoneCleaned = params.phone.toString().replace(/\D/g, '');
-            if (phoneCleaned.length !== 11 || !phoneCleaned.startsWith('7')) {
-                validationErrors.phone = 'Пожалуйста, введите корректный номер телефона (11 цифр, начинается с 7)';
-            }
-        }
-
-        // Validate tourists array
-        if (!params.tourist || params.tourist.length === 0) {
-            validationErrors.general = 'Пожалуйста, добавьте данные туристов';
-        } else {
-            const touristErrors: NonNullable<ValidationErrors['tourists']> = {};
-            const dateRegex = /^\d{2}\.\d{2}\.\d{4}$/;
-
-            for (let i = 0; i < params.tourist.length; i++) {
-                const tourist = params.tourist[i];
-                const errors: NonNullable<ValidationErrors['tourists']>[number] = {};
-
-                if (!tourist.surname || typeof tourist.surname !== 'string' || tourist.surname.trim() === '') {
-                    errors.surname = 'Пожалуйста, заполните фамилию';
-                }
-                if (!tourist.name || typeof tourist.name !== 'string' || tourist.name.trim() === '') {
-                    errors.name = 'Пожалуйста, заполните имя';
-                }
-                if (!tourist.patronymic || typeof tourist.patronymic !== 'string' || tourist.patronymic.trim() === '') {
-                    errors.patronymic = 'Пожалуйста, заполните отчество';
-                }
-                if (!tourist.birthday || typeof tourist.birthday !== 'string' || tourist.birthday.trim() === '') {
-                    errors.birthday = 'Пожалуйста, заполните дату рождения';
-                } else if (!dateRegex.test(tourist.birthday.trim())) {
-                    errors.birthday = 'Введите дату в формате MM.DD.YYYY (например, 01.20.2025)';
-                }
-                if (!tourist.gender || tourist.gender === null || tourist.gender === '') {
-                    errors.gender = 'Пожалуйста, выберите пол';
-                }
-                if (!tourist.nationality_id || tourist.nationality_id === null || tourist.nationality_id === undefined) {
-                    errors.nationality_id = 'Пожалуйста, выберите гражданство';
-                }
-                if (!tourist.doc_type || typeof tourist.doc_type !== 'string' || tourist.doc_type.trim() === '') {
-                    errors.doc_type = 'Пожалуйста, выберите тип документа';
-                }
-                if (!tourist.passport_number || tourist.passport_number.toString().trim() === '') {
-                    errors.passport_number = 'Пожалуйста, заполните серию и номер документа';
-                } else {
-                    const passportNumberStr = tourist.passport_number.toString().replace(/\D/g, '');
-                    if (passportNumberStr.length !== 9) {
-                        errors.passport_number = 'Серия и номер документа должна содержать 9 цифр';
-                    }
-                }
-                if (!tourist.passport_expires_on || typeof tourist.passport_expires_on !== 'string' || tourist.passport_expires_on.trim() === '') {
-                    errors.passport_expires_on = 'Пожалуйста, заполните срок действия документа';
-                } else if (!dateRegex.test(tourist.passport_expires_on.trim())) {
-                    errors.passport_expires_on = 'Введите дату в формате MM.DD.YYYY (например, 01.20.2025)';
-                }
-
-                if (Object.keys(errors).length > 0) {
-                    touristErrors[i] = errors;
-                }
-            }
-
-            if (Object.keys(touristErrors).length > 0) {
-                validationErrors.tourists = touristErrors;
-            }
-        }
-
-        return validationErrors;
+        return validateBookingForm({
+            email: params.email,
+            phone: params.phone,
+            tourists: params.tourist
+        });
     };
 
     const handleSubmit = async () => {
@@ -321,9 +190,30 @@ const BookingCard = () => {
         setLoading(true);
 
         try {
+            // Prepare tourists data - map to API format
+            const touristsData = params.tourist.map((tourist) => {
+                const passportNumber = tourist.passport_number.toString().replace(/\D/g, '');
+
+                return {
+                    surname: tourist.surname.trim(),
+                    name: tourist.name.trim(),
+                    patronymic: tourist.noPatronymic ? '' : tourist.patronymic.trim(),
+                    birthday: tourist.birthday.trim(), // Format: DD.MM.YYYY
+                    gender: tourist.gender,
+                    nationality_id: tourist.nationality_id,
+                    doc_type: tourist.doc_type,
+                    document_number: passportNumber, // API expects document_number
+                    document_expires_on: tourist.passport_expires_on.trim(), // Format: DD.MM.YYYY
+                    passport_number: passportNumber, // API also expects passport_number
+                    passport_expires_on: tourist.passport_expires_on.trim(), // Format: DD.MM.YYYY
+                    child: tourist.child || false,
+                    child_age: tourist.child_age,
+                };
+            });
+
             const data = {
                 package_id: router?.query?.package,
-                tourists: params?.tourist
+                tourists: touristsData
             };
 
             const res = await validateTourist(data);
@@ -334,19 +224,38 @@ const BookingCard = () => {
                 return;
             }
 
-            const dataOtrderCreat = { ...data, flight_pair_id: router?.query?.flight_pair_id, user_id: user?.id };
+            const dataOrderCreate = {
+                ...data,
+                flight_pair_id: router?.query?.flight_pair_id,
+                user_id: user?.id
+            };
 
             if (res.valid) {
-                await createOrder(dataOtrderCreat);
-                setLoading(false);
-                // Success - redirect to home
-                router.push('/');
-                router.push(`checkout?order_id=${c_order?.order?.id}`)
+                // Create order
+                const orderResult = await createOrder(dataOrderCreate);
+
+                // Extract order_id from response
+                // Response structure: { order: { id: ... } } or { id: ... } or { package: { id: ... } }
+                const orderId = orderResult?.order?.id || orderResult?.id || orderResult?.package?.id;
+
+                if (orderId) {
+                    // Success - redirect to checkout page with order_id
+                    router.push({
+                        pathname: '/checkout',
+                        query: { order_id: orderId }
+                    });
+                } else {
+                    // If order_id is not found in response, show error
+                    setErrors({ general: 'Заказ создан, но не удалось получить номер заказа. Пожалуйста, проверьте заказы в профиле.' });
+                    setLoading(false);
+                }
             } else {
                 setLoading(false);
             }
-        } catch {
-            setErrors({ general: 'Произошла ошибка при отправке заказа. Пожалуйста, попробуйте еще раз.' });
+        } catch (error: any) {
+            // Handle errors
+            const errorMessage = error?.response?.data?.message || error?.message || 'Произошла ошибка при отправке заказа. Пожалуйста, попробуйте еще раз.';
+            setErrors({ general: errorMessage });
             setLoading(false);
         }
     }

@@ -58,6 +58,22 @@
   line-height: 20px; /* 125% */
   letter-spacing: -0.32px;
 }
+
+.inputDisabled {
+  background-color: var(--bgSecondary, #f5f5f5);
+  border-color: var(--borderSecondary, #e0e0e0);
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.inputDisabled > input {
+  color: var(--textSecondary, #7a7a7a);
+  cursor: not-allowed;
+}
+
+.inputDisabled > label {
+  color: var(--textSecondary, #7a7a7a);
+}
 .errorMessage {
   color: #ef4444;
   font-size: 12px;

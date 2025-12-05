@@ -12,6 +12,7 @@ interface InputProps {
     maxLength?: number;
     required?: boolean;
     error?: string;
+    disabled?: boolean;
 }
 
 const Input: React.FC<InputProps> = ({
@@ -25,6 +26,7 @@ const Input: React.FC<InputProps> = ({
     maxLength,
     required,
     error,
+    disabled = false,
 }) => {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         let val: string | number = e.target.value;
@@ -55,7 +57,7 @@ const Input: React.FC<InputProps> = ({
 
     return (
         <div className={styles.inputWrapper}>
-            <div className={`${styles.input} ${error ? styles.inputError : ''}`}>
+            <div className={`${styles.input} ${error ? styles.inputError : ''} ${disabled ? styles.inputDisabled : ''}`}>
                 {label && <label>{label}</label>}
                 <input
                     type={type}
@@ -66,6 +68,7 @@ const Input: React.FC<InputProps> = ({
                     max={type === 'number' && max !== undefined ? max : undefined}
                     maxLength={maxLength}
                     required={required}
+                    disabled={disabled}
                     aria-invalid={error ? 'true' : 'false'}
                 />
             </div>

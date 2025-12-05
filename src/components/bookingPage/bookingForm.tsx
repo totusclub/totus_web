@@ -4,26 +4,28 @@ import Input from "@/components/UI/input";
 import Select from "@/components/UI/select";
 import DateInput from "@/components/UI/dateInput";
 import PhoneInputField from "@/components/UI/phoneInputField";
+import SwitchToggle from "@/components/UI/switch";
 import { getChildAgeRange } from "@/utils/dateTimeUtils";
+import {
+    documentTypeMap,
+    documentTypeReverseMap,
+    nationalityMap,
+    nationalityReverseMap,
+    citizenshipOptions,
+    documentTypeOptions,
+    getNamePlaceholder,
+    getPassportPlaceholder,
+    getPassportMaxLength,
+} from "@/utils/documentMappings";
 
 type SelectOption = {
     value: string;
     name: string;
 };
 
-type Tourist = {
-    surname: string;
-    name: string;
-    patronymic: string;
-    birthday: string;
-    gender: string | null;
-    nationality_id: number | null | undefined;
-    doc_type: string;
-    passport_number: string | number;
-    passport_expires_on: string;
-    child?: boolean;
-    child_age?: number; // Age from kids_ages array
-};
+import type { Tourist, BookingValidationErrors } from "@/utils/bookingValidation";
+
+type ValidationErrors = BookingValidationErrors;
 
 type Params = {
     email: string;
@@ -31,24 +33,6 @@ type Params = {
     tourist: Tourist[];
 };
 
-type ValidationErrors = {
-    email?: string;
-    phone?: string;
-    general?: string;
-    tourists?: {
-        [index: number]: {
-            surname?: string;
-            name?: string;
-            patronymic?: string;
-            birthday?: string;
-            gender?: string;
-            nationality_id?: string;
-            doc_type?: string;
-            passport_number?: string;
-            passport_expires_on?: string;
-        };
-    };
-};
 
 type BookingOrderFormProps = {
     params: Params;
@@ -65,12 +49,22 @@ const genderSelectOptions: SelectOption[] = [
 ];
 
 const BookingOrderForm: React.FC<BookingOrderFormProps> = ({ params, handleChangeTourist, handleChange, errors = {} }) => {
-    const options: SelectOption[] = [{ value: '225', name: 'Россия' }];
-    const options2: SelectOption[] = [{ value: 'international_passport', name: 'Заграничный паспорт РФ' }];
+    // Nationality options
+    const nationalityOptions: SelectOption[] = citizenshipOptions.map(name => ({
+        value: String(nationalityMap[name]),
+        name: name
+    }));
+
+    // Document type options
+    const documentTypeOptionsList: SelectOption[] = documentTypeOptions.map(name => ({
+        value: documentTypeMap[name],
+        name: name
+    }));
+
     // Add icon property to options for Select component compatibility
     const genderOptionsWithIcon = genderSelectOptions.map(opt => ({ ...opt, icon: '' }));
-    const nationalityOptionsWithIcon = options.map(opt => ({ ...opt, icon: '' }));
-    const docTypeOptionsWithIcon = options2.map(opt => ({ ...opt, icon: '' }));
+    const nationalityOptionsWithIcon = nationalityOptions.map(opt => ({ ...opt, icon: '' }));
+    const docTypeOptionsWithIcon = documentTypeOptionsList.map(opt => ({ ...opt, icon: '' }));
 
     // const [params, setParams] = useState<Params>({
     //     email: "",
@@ -168,32 +162,54 @@ const BookingOrderForm: React.FC<BookingOrderFormProps> = ({ params, handleChang
                                 </div>
 
                                 <div className={styles.bookingFormInputs}>
+
                                     <Input
-                                        placeholder={'Фамилия латиницей'}
-                                        value={params.tourist[index].surname}
-                                        onChange={(e: string | number) => handleChangeTourist(e, 'surname', index)}
-                                        required={true}
-                                        error={errors.tourists?.[index]?.surname}
-                                    />
-                                    <Input
-                                        placeholder={'Имя латиницей'}
+                                        placeholder={getNamePlaceholder('name', params.tourist[index].doc_type)}
                                         value={params.tourist[index].name}
                                         onChange={(e: string | number) => handleChangeTourist(e, 'name', index)}
                                         required={true}
                                         error={errors.tourists?.[index]?.name}
                                     />
                                     <Input
-                                        placeholder={'Отчество латиницей'}
-                                        value={params.tourist[index].patronymic}
-                                        onChange={(e: string | number) => handleChangeTourist(e, 'patronymic', index)}
+                                        placeholder={getNamePlaceholder('surname', params.tourist[index].doc_type)}
+                                        value={params.tourist[index].surname}
+                                        onChange={(e: string | number) => handleChangeTourist(e, 'surname', index)}
                                         required={true}
-                                        error={errors.tourists?.[index]?.patronymic}
+                                        error={errors.tourists?.[index]?.surname}
                                     />
+                                    <Input
+                                        placeholder={getNamePlaceholder('patronymic', params.tourist[index].doc_type)}
+                                        value={params.tourist[index].patronymic}
+                                        onChange={(e: string | number) => {
+                                            const value = String(e);
+                                            handleChangeTourist(value, 'patronymic', index);
+                                            // If user types something, disable the "no patronymic" toggle
+                                            if (value && value.trim() !== '' && params.tourist[index].noPatronymic) {
+                                                handleChangeTourist(false, 'noPatronymic', index);
+                                            }
+                                        }}
+                                        required={!params.tourist[index].noPatronymic}
+                                        error={errors.tourists?.[index]?.patronymic}
+                                        disabled={params.tourist[index].noPatronymic}
+                                    />
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '-8px', marginBottom: '8px' }}>
+                                        <span style={{ fontSize: '16px', fontWeight: 400 }}>Нет отчества</span>
+                                        <SwitchToggle
+                                            isOn={params.tourist[index].noPatronymic || false}
+                                            setIsOn={(value: boolean) => {
+                                                handleChangeTourist(value, 'noPatronymic', index);
+                                                if (value) {
+                                                    // Clear patronymic when toggle is enabled
+                                                    handleChangeTourist('', 'patronymic', index);
+                                                }
+                                            }}
+                                        />
+                                    </div>
                                 </div>
                                 <div className={styles.bookingFormInputs}>
                                     <DateInput
                                         label={'Дата рождения'}
-                                        placeholder={'MM.DD.YYYY'}
+                                        placeholder={'DD.MM.YYYY'}
                                         value={params.tourist[index].birthday || ''}
                                         onChange={(value: string) => handleChangeTourist(value, 'birthday', index)}
                                         required={true}
@@ -232,14 +248,14 @@ const BookingOrderForm: React.FC<BookingOrderFormProps> = ({ params, handleChang
                                 <div className={styles.bookingFormInputs}>
                                     <div className={styles.selectWrapper}>
                                         {(() => {
-                                            const selectedNationalityOption = options.find(opt => opt.value === params.tourist[index].nationality_id?.toString());
+                                            const selectedNationalityOption = nationalityOptions.find(opt => opt.value === params.tourist[index].nationality_id?.toString());
                                             const SelectProps = {
                                                 isFull: true as const,
                                                 options: nationalityOptionsWithIcon,
-                                                value: selectedNationalityOption?.name || '',
+                                                value: selectedNationalityOption?.name || nationalityReverseMap[params.tourist[index].nationality_id || 225] || 'Россия',
                                                 onChange: (option: string | SelectOption) => {
                                                     const selectedOption = typeof option === 'string'
-                                                        ? options.find(opt => opt.value === option || opt.name === option)
+                                                        ? nationalityOptions.find(opt => opt.value === option || opt.name === option)
                                                         : option;
                                                     if (selectedOption) {
                                                         handleChangeTourist(parseInt(selectedOption.value), 'nationality_id', index);
@@ -258,14 +274,14 @@ const BookingOrderForm: React.FC<BookingOrderFormProps> = ({ params, handleChang
                                     </div>
                                     <div className={styles.selectWrapper}>
                                         {(() => {
-                                            const selectedDocTypeOption = options2.find(opt => opt.value === params.tourist[index].doc_type);
+                                            const selectedDocTypeOption = documentTypeOptionsList.find(opt => opt.value === params.tourist[index].doc_type);
                                             const SelectProps = {
                                                 isFull: true as const,
                                                 options: docTypeOptionsWithIcon,
-                                                value: selectedDocTypeOption?.name || '',
+                                                value: selectedDocTypeOption?.name || documentTypeReverseMap[params.tourist[index].doc_type] || 'Заграничный паспорт РФ',
                                                 onChange: (option: string | SelectOption) => {
                                                     const selectedOption = typeof option === 'string'
-                                                        ? options2.find(opt => opt.value === option || opt.name === option)
+                                                        ? documentTypeOptionsList.find(opt => opt.value === option || opt.name === option)
                                                         : option;
                                                     if (selectedOption) {
                                                         handleChangeTourist(selectedOption.value, 'doc_type', index);
@@ -286,18 +302,25 @@ const BookingOrderForm: React.FC<BookingOrderFormProps> = ({ params, handleChang
 
                                 <div className={styles.bookingFormInputs}>
                                     <Input
-                                        placeholder={'Серия и номер документа'}
+                                        placeholder={getPassportPlaceholder(params.tourist[index].doc_type)}
                                         value={params.tourist[index].passport_number}
                                         type={'number'}
-                                        onChange={(e: string | number) => handleChangeTourist(e, 'passport_number', index)}
+                                        onChange={(e: string | number) => {
+                                            // Remove all non-digit characters
+                                            const digitsOnly = String(e).replace(/\D/g, '');
+                                            // Get max length based on document type
+                                            const maxLength = getPassportMaxLength(params.tourist[index].doc_type);
+                                            // Limit to max length
+                                            const limitedValue = digitsOnly.slice(0, maxLength);
+                                            handleChangeTourist(limitedValue, 'passport_number', index);
+                                        }}
                                         required={true}
-                                        max={999999999}
-                                        maxLength={9}
+                                        maxLength={getPassportMaxLength(params.tourist[index].doc_type)}
                                         error={errors.tourists?.[index]?.passport_number}
                                     />
                                     <DateInput
                                         label={'Срок действия документа'}
-                                        placeholder={'MM.DD.YYYY'}
+                                        placeholder={'DD.MM.YYYY'}
                                         value={params.tourist[index].passport_expires_on || ''}
                                         onChange={(value: string) => handleChangeTourist(value, 'passport_expires_on', index)}
                                         required={true}

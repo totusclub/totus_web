@@ -1,15 +1,53 @@
-import React, {useMemo, useState} from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import styles from './checkout.module.css';
 import Icon from "@/components/icons/Icon";
 import TicketModal from "@/components/modals/ticketModal";
+import { Packagesflights } from "@/api/levelTravelApi";
 
 
-const CheckoutItems = ({order}:any) => {
+const CheckoutItems = ({ order }: any) => {
     const [modalTicket, setModalTicket] = useState<boolean>(false);
+    const [flightData, setFlightData] = useState<any>(null);
+    const [loadingFlight, setLoadingFlight] = useState<boolean>(false);
 
+    // Extract flight data from order or fetch it
+    useEffect(() => {
+        if (!order) return;
 
-    const formatDate = useMemo(()=>{
-        if(order){
+        // First, try to get flight data from order
+        const orderFlightData = order?.package?.flight ||
+            order?.package?.flight_pair ||
+            order?.flight ||
+            order?.flight_pair;
+
+        if (orderFlightData) {
+            setFlightData(orderFlightData);
+        } else if (order?.package?.id) {
+            // If flight data is not in order, fetch it using package_id
+            setLoadingFlight(true);
+            Packagesflights({ package_id: order.package.id })
+                .then((response) => {
+                    // Find the selected flight from the flights array
+                    // The order should have flight_pair_id stored somewhere
+                    const selectedFlight = response?.flights?.find(
+                        (flight: any) => flight.flight_pair_id === order?.package?.flight_pair_id
+                    ) || response?.flights?.[0];
+
+                    if (selectedFlight) {
+                        setFlightData(selectedFlight);
+                    }
+                })
+                .catch((err) => {
+                    console.error('Failed to fetch flight data:', err);
+                })
+                .finally(() => {
+                    setLoadingFlight(false);
+                });
+        }
+    }, [order]);
+
+    const formatDate = useMemo(() => {
+        if (order) {
             const startDate = new Date(order?.package?.dates_info?.start_date);
             const endDate = new Date(order?.package?.dates_info?.end_date);
 
@@ -30,7 +68,7 @@ const CheckoutItems = ({order}:any) => {
             return `${startDay}, ${startWeekday} – ${endDay}, ${endWeekday}`;
         }
 
-    },[order])
+    }, [order])
     return (
         <div className={styles.checkoutItemsWrap}>
             <div className={styles.checkoutMessage}>
@@ -51,7 +89,7 @@ const CheckoutItems = ({order}:any) => {
                                 <p>Даты перелёта</p>
                                 <p>{formatDate}</p>
                             </div>
-                            <Icon name={'rightArrow'}/>
+                            <Icon name={'rightArrow'} />
                         </div>
                         <div className={styles.checkoutInfoItem}>
                             <div className={styles.checkoutItemsList}>
@@ -68,14 +106,14 @@ const CheckoutItems = ({order}:any) => {
                                 <p>Скорость бронирования</p>
                                 <p>Быстрое подтверждение</p>
                             </div>
-                            <Icon name={'rightArrow'}/>
+                            <Icon name={'rightArrow'} />
                         </div>
                         <div className={styles.checkoutInfoItem}>
                             <div className={styles.checkoutItemsList}>
                                 <p>Туроператор</p>
                                 <p>{order?.package?.operator?.name}</p>
                             </div>
-                            <Icon name={'rightArrow'}/>
+                            <Icon name={'rightArrow'} />
                         </div>
                     </div>
                 </div>
@@ -90,7 +128,7 @@ const CheckoutItems = ({order}:any) => {
                                     <p>{item.name} {item.surname}</p>
                                     <p>{item.birthday}, загран. паспорт {item.passport}</p>
                                 </div>
-                                <Icon name={'rightArrow'}/>
+                                <Icon name={'rightArrow'} />
                             </div>
                         ))}
 
@@ -106,14 +144,14 @@ const CheckoutItems = ({order}:any) => {
                                 <p>Отель</p>
                                 <p>{order?.package?.hotel?.name}</p>
                             </div>
-                            <Icon name={'rightArrow'}/>
+                            <Icon name={'rightArrow'} />
                         </div>
                         <div className={styles.checkoutInfoItem}>
                             <div className={styles.checkoutItemsList}>
                                 <p>Номер</p>
                                 <p>{order?.package?.room_info?.name_ru}</p>
                             </div>
-                            <Icon name={'rightArrow'}/>
+                            <Icon name={'rightArrow'} />
                         </div>
                         <div className={styles.checkoutInfoItem}>
                             <div className={styles.checkoutItemsList}>
@@ -133,7 +171,7 @@ const CheckoutItems = ({order}:any) => {
                                 <p>Страховка</p>
                                 <p>Включена в стоимость</p>
                             </div>
-                            <Icon name={'rightArrow'}/>
+                            <Icon name={'rightArrow'} />
                         </div>
                         <div className={styles.checkoutInfoItem}>
                             <div className={styles.checkoutItemsList}>
@@ -160,13 +198,13 @@ const CheckoutItems = ({order}:any) => {
                         </div>
                     </div>
                     <div className={styles.checkoutMessage}>
-                        <Icon name={'info'} size={24} color={'var(--core_Orange'}/>
+                        <Icon name={'info'} size={24} color={'var(--core_Orange'} />
                         <p>Отправим документы на <span>tokclub@yandex.ru</span></p>
                     </div>
                 </div>
             </div>
 
-            <TicketModal open={modalTicket} setOpen={setModalTicket} />
+            <TicketModal open={modalTicket} setOpen={setModalTicket} item={flightData} />
 
         </div>
     );

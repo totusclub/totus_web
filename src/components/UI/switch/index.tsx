@@ -6,7 +6,8 @@ interface SwitchToggleProps {
 }
 
 const SwitchToggle = ({isOn,setIsOn}:SwitchToggleProps) => {
-    const toggleSwitch = () => {
+    const toggleSwitch = (e: React.MouseEvent) => {
+        e.stopPropagation();
         setIsOn(!isOn);
     };
 
