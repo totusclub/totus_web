@@ -75,7 +75,7 @@ const Calendar = ({ selectedDate, setSelectedDate, allowPastDates = false, hideT
         return (
             <div className={styles.headerCalendar}>
                 <button onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}>
-                    <Icon name={'leftArrow'} size={24} color="#000" />
+                    <Icon name={'leftArrow'} size={24} color="var(--textPrimary)" />
                 </button>
                 <div className={styles.headerDatePicker}>
                     <button
@@ -134,7 +134,7 @@ const Calendar = ({ selectedDate, setSelectedDate, allowPastDates = false, hideT
                     )}
                 </div>
                 <button onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}>
-                    <Icon name={'rightArrow'} size={24} color="#000" />
+                    <Icon name={'rightArrow'} size={24} color="var(--textPrimary)" />
                 </button>
             </div>
         );
@@ -184,9 +184,9 @@ const Calendar = ({ selectedDate, setSelectedDate, allowPastDates = false, hideT
                             backgroundColor,
                             color: isCurrentMonth
                                 ? isDisabled
-                                    ? '#aaa'
-                                    : isSelected ? '#fff' : '#000'
-                                : '#ccc',
+                                    ? 'var(--textDisabled)'
+                                    : isSelected ? 'var(--textPrimaryB)' : 'var(--textPrimary)'
+                                : 'var(--textTertiary)',
                             fontWeight: isSelected ? 'bold' : 'normal',
                             cursor: isDisabled ? 'not-allowed' : 'pointer',
                             opacity: isDisabled ? 0.5 : 1,

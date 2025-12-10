@@ -20,9 +20,10 @@
   flex: auto;
   border-radius: 16px;
   border: 1px solid var(--borderSecondary);
+  background: var(--bgPrimary);
   overflow: hidden;
   padding: 8px 16px;
-  transition: border-color 0.2s ease;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
 }
 
 .inputError {
@@ -48,7 +49,7 @@
   border: none;
   outline: none;
   -moz-appearance: textfield;
-
+  background: transparent;
   color: var(--textPrimary);
   /* Headline - Body/Medium */
   /*font-family: "Golos Text";*/
@@ -57,22 +58,32 @@
   font-weight: 500;
   line-height: 20px; /* 125% */
   letter-spacing: -0.32px;
+  transition: color 0.2s ease;
+}
+
+.input > input::placeholder {
+  color: var(--textTertiary);
+  transition: color 0.2s ease;
+}
+
+.input:focus-within {
+  border-color: var(--core_Orange);
 }
 
 .inputDisabled {
-  background-color: var(--bgSecondary, #f5f5f5);
-  border-color: var(--borderSecondary, #e0e0e0);
+  background-color: var(--bgSecondary);
+  border-color: var(--borderSecondary);
   opacity: 0.6;
   cursor: not-allowed;
 }
 
 .inputDisabled > input {
-  color: var(--textSecondary, #7a7a7a);
+  color: var(--textSecondary);
   cursor: not-allowed;
 }
 
 .inputDisabled > label {
-  color: var(--textSecondary, #7a7a7a);
+  color: var(--textSecondary);
 }
 .errorMessage {
   color: #ef4444;

@@ -14,13 +14,13 @@ interface ArrowProps {
 
 const ArrowLeft = ({ onClick }: ArrowProps) => (
     <div className={styles.arrowLeft} onClick={onClick}>
-        <Icon name="leftArrow" size={24} color="#000" />
+        <Icon name="leftArrow" size={24} color="var(--textPrimary)" />
     </div>
 );
 
 const ArrowRight = ({ onClick }: ArrowProps) => (
     <div className={styles.arrowRight} onClick={onClick}>
-        <Icon name="rightArrow" size={24} color="#000" />
+        <Icon name="rightArrow" size={24} color="var(--textPrimary)" />
     </div>
 );
 
@@ -160,7 +160,7 @@ const GalleryModal: React.FC<GalleryModalProps> = ({ isOpen, onClose, images, in
                 <div className={styles.modalHeader}>
                     <div className={styles.modalHeaderLine}></div>
                     <button className={styles.closeButton} onClick={onClose} aria-label="Close gallery">
-                        <Icon name="closeLine" size={24} />
+                        <Icon name="closeLine" size={24} color="var(--textPrimary)" />
                     </button>
                 </div>
 
@@ -198,10 +198,10 @@ const GalleryModal: React.FC<GalleryModalProps> = ({ isOpen, onClose, images, in
                             />
                             {/* Mobile arrows - only visible on mobile */}
                             <div className={styles.arrowLeftMobile} onClick={handlePrevious}>
-                                <Icon name="leftArrow" size={24} color="#000" />
+                                <Icon name="leftArrow" size={24} color="var(--textPrimary)" />
                             </div>
                             <div className={styles.arrowRightMobile} onClick={handleNext}>
-                                <Icon name="rightArrow" size={24} color="#000" />
+                                <Icon name="rightArrow" size={24} color="var(--textPrimary)" />
                             </div>
                         </div>
                         <ArrowRight onClick={handleNext} />

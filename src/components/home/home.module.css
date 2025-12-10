@@ -660,6 +660,10 @@
   background: var(--bgPrimary);
   cursor: pointer;
   margin-top: 19px;
+  transition: background-color 0.2s ease, opacity 0.2s ease, color 0.2s ease;
+}
+.formRequestCallBtn:hover {
+  opacity: 0.9;
 }
 .formRequestCallBtnDisable {
   display: flex;
@@ -672,16 +676,28 @@
   background: var(--core_Orange);
   cursor: pointer;
   margin-top: 19px;
-  color: var(--textPrimaryB);
+  opacity: 0.7;
+  transition: background-color 0.2s ease, opacity 0.2s ease, color 0.2s ease;
 }
 .formRequestCallBtn > p {
-  color: var(--primary_a);
+  color: var(--textPrimary);
   font-family: "Golos Text";
   font-size: 16px;
   font-style: normal;
   font-weight: 500;
   line-height: 20px;
   letter-spacing: -0.32px;
+  transition: color 0.2s ease;
+}
+.formRequestCallBtnDisable > p {
+  color: var(--textPrimaryB);
+  font-family: "Golos Text";
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 20px;
+  letter-spacing: -0.32px;
+  transition: color 0.2s ease;
 }
 .formRequestCallText {
   margin-top: 14px;

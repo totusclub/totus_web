@@ -9,7 +9,7 @@
 
 .selectButton {
   width: 100%;
-  background-color: var(--primary_b);
+  background-color: var(--bgPrimary);
   border: 1px solid var(--borderSecondary);
   border-radius: 16px;
   cursor: pointer;
@@ -20,6 +20,7 @@
   padding-left: 16px;
   padding-right: 16px;
   box-sizing: border-box;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 .selectButtonInfo {
   width: 100%;
@@ -41,6 +42,10 @@
   font-weight: 400;
   line-height: 20px; /* 125% */
   letter-spacing: -0.32px;
+  transition: color 0.2s ease;
+}
+.selectValue.placeholder {
+  color: var(--textTertiary);
 }
 .arrow {
   width: 24px;
@@ -56,8 +61,8 @@
 .optionsList {
   position: absolute;
   width: 100%;
-  background-color: #fff;
-  border: 1px solid #ccc;
+  background-color: var(--bgPrimary);
+  border: 1px solid var(--borderSecondary);
   /*border-radius: 6px;*/
   /*max-height: 200px;*/
   overflow-y: auto;
@@ -80,9 +85,10 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  color: var(--textPrimary);
 }
 .optionsList>li.active{
-  background-color: #F5F5F5;
+  background-color: var(--bgSecondary);
 }
 
 .openDown {
@@ -98,10 +104,12 @@
 .optionItem {
   padding: 10px 16px;
   cursor: pointer;
+  color: var(--textPrimary);
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .optionItem:hover {
-  background-color: #f2f2f2;
+  background-color: var(--hoverPrimary);
 }
 @media (max-width: 768px) {
   .customSelect {
@@ -121,7 +129,7 @@
   }
   .selectValue {
     font-size: 16px;
-    color: #FE732E;
+    color: var(--core_Orange);
     font-weight: 500;
     margin-right: 4px;
   }

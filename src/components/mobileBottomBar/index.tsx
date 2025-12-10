@@ -48,13 +48,13 @@ const MobileBottomBar = () => {
         <>
             <div className={styles.mobileTab}>
                 <div onClick={()=>handleHome()} className={styles.itemTabNav}>
-                    <Icon name={'search'} color={['home', 'search', 'tickets', 'hotel-details'].includes(pageName) ? '#fe732e' : "#000"} size={28}/>
+                    <Icon name={'search'} color={['home', 'search', 'tickets', 'hotel-details'].includes(pageName) ? 'var(--core_Orange)' : 'var(--textPrimary)'} size={28}/>
                 </div>
                 <div className={styles.itemTabNav} onClick={()=>{token? router.push('/profile/my-orders'):setAuthModalOpen(true)}}>
-                    <Icon color={['my-orders'].includes(pageName) ? '#fe732e' : "#000"} name={'order'} size={28}/>
+                    <Icon color={['my-orders'].includes(pageName) ? 'var(--core_Orange)' : 'var(--textPrimary)'} name={'order'} size={28}/>
                 </div>
                 <div className={styles.itemTabNav} onClick={()=>{token? router.push('/profile'):setAuthModalOpen(true)}}>
-                    <Icon color={['profile'].includes(pageName) ? '#fe732e' : "#000"} name={'user'} size={28}/>
+                    <Icon color={['profile'].includes(pageName) ? 'var(--core_Orange)' : 'var(--textPrimary)'} name={'user'} size={28}/>
                 </div>
                 {/*<div className={styles.itemTabNav}>*/}
                 {/*    <Support/>*/}

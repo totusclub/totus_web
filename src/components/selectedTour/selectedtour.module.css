@@ -144,7 +144,7 @@
   gap: 4px;
 }
 .actualePackageTotal {
-  color: var(--Color-Content-textPrimary, #1f1f1f);
+  color: var(--textPrimary);
   text-align: right;
   /* Headline/Medium */
   font-family: "Golos Text";
@@ -224,21 +224,21 @@
 .selectTourLazyImage {
   width: 223px;
   height: 160px;
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 37%, #f0f0f0 63%);
+  background: linear-gradient(90deg, var(--bgSecondary) 25%, var(--bgTertiary) 37%, var(--bgSecondary) 63%);
   background-size: 400% 100%; /* Important for shimmer effect */
   animation: placeholderShimmer 1.5s ease-in-out infinite;
   border-radius: 8px;
 }
 
 .animationTextlazy {
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 37%, #f0f0f0 63%);
+  background: linear-gradient(90deg, var(--bgSecondary) 25%, var(--bgTertiary) 37%, var(--bgSecondary) 63%);
   background-size: 400% 100%; /* Important for shimmer effect */
   animation: placeholderShimmer 1.5s ease-in-out infinite;
   border-radius: 4px;
 }
 
 .animationImagelazy {
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 37%, #f0f0f0 63%);
+  background: linear-gradient(90deg, var(--bgSecondary) 25%, var(--bgTertiary) 37%, var(--bgSecondary) 63%);
   background-size: 400% 100%; /* Important for shimmer effect */
   animation: placeholderShimmer 1.5s ease-in-out infinite;
   border-radius: 4px;

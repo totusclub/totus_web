@@ -127,7 +127,7 @@
     align-items: center;
     border-radius: 16px;
     border: 1px solid var(--primary_b);
-    background: linear-gradient(95deg, #FFF 0%, rgba(255, 255, 255, 0.60) 65.1%, rgba(255, 255, 255, 0.80) 100%);
+    background: linear-gradient(95deg, var(--bgPrimary) 0%, color-mix(in srgb, var(--bgPrimary) 60%, transparent) 65.1%, color-mix(in srgb, var(--bgPrimary) 80%, transparent) 100%);
     box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.10);
     backdrop-filter: blur(50px);
 }

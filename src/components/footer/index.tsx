@@ -18,10 +18,10 @@ const Footer = () => {
                         <div className={styles.social}>
                             <p className={styles.socialTitle}>Мы в соц. сетях</p>
                             <ul>
-                                <li><Icon name={"vk"} size={24}/></li>
-                                <li><Icon name={"rutube"} size={24}/></li>
-                                <li><Icon name={"aiStar"} size={24}/></li>
-                                <li><Icon name={"vc"} size={24}/></li>
+                                <li><Icon name={"vk"} size={24} color="var(--textPrimary)"/></li>
+                                <li><Icon name={"rutube"} size={24} color="var(--textPrimary)"/></li>
+                                <li><Icon name={"aiStar"} size={24} color="var(--textPrimary)"/></li>
+                                <li><Icon name={"vc"} size={24} color="var(--textPrimary)"/></li>
                             </ul>
                         </div>
                         <p className={styles.footerColumnTitle}>Можно платить</p>
@@ -78,10 +78,10 @@ const Footer = () => {
                         <div className={styles.social}>
                             <p className={styles.socialTitle}>Мы в соц. сетях</p>
                             <ul>
-                                <li><Icon name={"vk"} size={24}/></li>
-                                <li><Icon name={"rutube"} size={24}/></li>
-                                <li><Icon name={"aiStar"} size={24}/></li>
-                                <li><Icon name={"vc"} size={24}/></li>
+                                <li><Icon name={"vk"} size={24} color="var(--textPrimary)"/></li>
+                                <li><Icon name={"rutube"} size={24} color="var(--textPrimary)"/></li>
+                                <li><Icon name={"aiStar"} size={24} color="var(--textPrimary)"/></li>
+                                <li><Icon name={"vc"} size={24} color="var(--textPrimary)"/></li>
                             </ul>
                         </div>
 

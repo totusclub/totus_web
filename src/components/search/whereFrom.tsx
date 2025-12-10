@@ -48,7 +48,7 @@ const WhereFrom = ({handleChange,value,name}) => {
     // if (status === "failed") return <p>Error: {error}</p>;
     return (
         <div className={`${styles.searchField} ${styles.whereFrom}`} ref={wrapperRef} onClick={handleToggle}>
-            <Icon name="from" size={24} color="#000" />
+            <Icon name="from" size={24} color="var(--textPrimary)" />
             <div className={styles.searchFieldInfo}>
                 <p className={styles.searchFieldsLabel}>Откуда?</p>
                 <input
@@ -64,13 +64,13 @@ const WhereFrom = ({handleChange,value,name}) => {
                     placeholder="Москва"
                 />
             </div>
-            <Icon name="downArrow" size={24} color="#000" />
+            <Icon name="downArrow" size={24} color="var(--textPrimary)" />
             {isOpen && (
                 <div className={styles.whereFromModal} onClick={(e) => e.stopPropagation()}>
                     <div className={styles.whereFromModalHead}>
                         <p>Город вылета</p>
                         <div onClick={()=>setIsOpen(false)}>
-                            <Icon name={'closeLine'} size={24} color="#000" />
+                            <Icon name={'closeLine'} size={24} color="var(--textPrimary)" />
                         </div>
                     </div>
                     <div className={styles.searchFieldInfoM}>
@@ -98,7 +98,7 @@ const WhereFrom = ({handleChange,value,name}) => {
                                         onClick={() => handleSelect(item)}
                                         className={styles.locationItem}
                                     >
-                                        <Icon name={item.icon} size={24} color="#000" />
+                                        <Icon name={item.icon} size={24} color="var(--textPrimary)" />
                                         <div>
                                             <p className={styles.locationItemName}>{item.name}</p>
                                             <p className={styles.locationItemType}>{item.type}</p>
@@ -114,7 +114,7 @@ const WhereFrom = ({handleChange,value,name}) => {
                                 onClick={() => handleSelect(item)}
                                 className={styles.locationItem}
                             >
-                                <Icon name={item.icon} size={24} color="#000"/>
+                                <Icon name={item.icon} size={24} color="var(--textPrimary)"/>
                                 <div>
                                     <p className={styles.locationItemName}>{item.name}</p>
                                     <p className={styles.locationItemType}>{item.type}</p>

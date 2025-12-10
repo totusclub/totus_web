@@ -3,11 +3,12 @@ import type { AppProps } from 'next/app';
 import { useEffect, useState } from 'react';
 import { wrapper } from '../store';
 import '../styles/globals.css';
+import '@/utils/themeInit'; // Initialize theme before React renders
 import Header from '@/components/header';
 import Footer from '@/components/footer';
-import {decodeToken, loadToken} from "@/utils/auth";
-import {setAuth} from "@/store/slices/authSlice";
-import {useDispatch} from "react-redux";
+import { decodeToken, loadToken } from "@/utils/auth";
+import { setAuth } from "@/store/slices/authSlice";
+import { useDispatch } from "react-redux";
 import MobileBottomBar from "@/components/mobileBottomBar";
 import ScrollRestoration from '@/components/ScrollRestoration';
 

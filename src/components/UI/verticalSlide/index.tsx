@@ -14,13 +14,13 @@ interface ArrowProps {
 
 const ArrowBottom = ({ onClick }: ArrowProps) => (
     <div className={styles.arrowBottom} onClick={onClick}>
-        <Icon name="downArrow" size={24} color="#000" />
+        <Icon name="downArrow" size={24} color="var(--textPrimary)" />
     </div>
 );
 
 const ArrowTop = ({ onClick }: ArrowProps) => (
     <div className={styles.arrowTop} onClick={onClick}>
-        <Icon name="upArrow" size={24} color="#000" />
+        <Icon name="upArrow" size={24} color="var(--textPrimary)" />
     </div>
 );
 
@@ -93,7 +93,7 @@ const VerticalSlider = ({ images, loading }: any) => {
                     width: "8px",
                     height: "8px",
                     borderRadius: "50%",
-                    background: i === currentSlide ? "#FE732E" : "#8080804D", // Active dot = black
+                    background: i === currentSlide ? "var(--core_Orange)" : "var(--textDisabled)",
                     transition: "background 0.3s ease",
                 }}
             />

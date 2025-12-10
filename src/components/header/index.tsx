@@ -115,7 +115,7 @@ const Header = () => {
 
                 <div className={`${styles.headerRow} ${styles.headerRowPc}`}>
                     <div className={styles.favorite}>
-                        <Icon name="heart" size={24} color="#000" />
+                        <Icon name="heart" size={24} color="var(--textPrimary)" />
                     </div>
                     {token ? (
                         <div onClick={() => router.push('/profile')} className={styles.profileButton}>

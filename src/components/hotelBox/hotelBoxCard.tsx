@@ -1,6 +1,6 @@
 import styles from './hotelBox.module.css';
 import Icon from "@/components/icons/Icon";
-import {router} from "next/client";
+import { useRouter } from "next/router";
 
 interface ProductCardProps {
     id:number,
@@ -16,7 +16,12 @@ interface ProductCardProps {
 
 
 const HotelBoxCard = ({id,name,rate,city,price,review,image,url, onClick }: ProductCardProps) => {
+    const router = useRouter();
+    
     const handleClick = (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
         // If custom onClick is provided, use it (for hotDeals navigation)
         if (onClick) {
             onClick(e);
@@ -25,7 +30,6 @@ const HotelBoxCard = ({id,name,rate,city,price,review,image,url, onClick }: Prod
         
         // Otherwise, use url navigation if provided
         if (url && url.trim() !== '') {
-            e.stopPropagation();
             router.push(url);
         }
     };

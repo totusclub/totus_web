@@ -144,8 +144,8 @@ const TicketItem: FC<TicketItemProps> = ({ green, item, price, lazy }) => {
             </>
         );
     } else {
-        return (
-            <div className={styles.ticketItem}>
+        const skeletonContent = (
+            <div className={styles.ticketItem} style={{ border: green ? 'none' : '1px solid var(--borderTertiary)' }}>
                 {/* Info Section - flex: 1 */}
                 <div className={styles.ticketItemInfo}>
                     {/* Badge Section */}
@@ -237,7 +237,13 @@ const TicketItem: FC<TicketItemProps> = ({ green, item, price, lazy }) => {
                     </div>
                 </div>
             </div>
-        )
+        );
+
+        return green ? (
+            <div className={styles.ticketItemWrapper}>
+                {skeletonContent}
+            </div>
+        ) : skeletonContent;
     }
 
 };

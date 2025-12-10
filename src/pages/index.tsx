@@ -7,7 +7,7 @@ import HomeBanners from "@/components/home/banners";
 import Partner from "@/components/home/partner";
 import PopularDestinations from "@/components/home/popularDestinations";
 import CallRequest from "@/components/home/callRequest";
-import Faq from "@/components/home/faq";
+// import Faq from "@/components/home/faq";
 import { useLoadHomeData } from "@/hooks/loadHomeData";
 
 

@@ -46,7 +46,7 @@ const ResultTicketList = ({ flights, packages, loading }: any) => {
             <div className={styles.resultListItems}>
                 {loading && (
                     <>
-                        <TicketItem lazy={true} price={0} item={null} />
+                        <TicketItem lazy={true} price={0} item={null} green={true} />
                         <TicketItem lazy={true} price={0} item={null} />
                         <TicketItem lazy={true} price={0} item={null} />
                     </>

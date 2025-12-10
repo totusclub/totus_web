@@ -151,11 +151,11 @@ const SelectedTour = ({ packages }: any) => {
                     <div className={styles.selectedTourInfo}>
                         {/* Hotel Star Rating (1-5 stars) */}
                         <div className={styles.hotelStart}>
-                            <Icon name={'star'} size={18} color={'#dcdcdc'} />
-                            <Icon name={'star'} size={18} color={'#dcdcdc'} />
-                            <Icon name={'star'} size={18} color={'#dcdcdc'} />
-                            <Icon name={'star'} size={18} color={'#dcdcdc'} />
-                            <Icon name={'star'} size={18} color={'#dcdcdc'} />
+                            <Icon name={'star'} size={18} color={'var(--bgSecondary)'} />
+                            <Icon name={'star'} size={18} color={'var(--bgSecondary)'} />
+                            <Icon name={'star'} size={18} color={'var(--bgSecondary)'} />
+                            <Icon name={'star'} size={18} color={'var(--bgSecondary)'} />
+                            <Icon name={'star'} size={18} color={'var(--bgSecondary)'} />
                         </div>
 
                         {/* Hotel Name */}

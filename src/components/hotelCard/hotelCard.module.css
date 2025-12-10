@@ -233,7 +233,7 @@
 .image_placeholder {
   width: 212px;
   height: 152px;
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 37%, #f0f0f0 63%);
+  background: linear-gradient(90deg, var(--bgSecondary) 25%, var(--bgTertiary) 37%, var(--bgSecondary) 63%);
   background-size: 400% 100%; /* Important for shimmer effect */
   animation: placeholderShimmer 1.5s ease-in-out infinite;
   border-radius: 8px;
@@ -243,7 +243,7 @@
 .animationTextlazy {
   width: 60%;
   height: 20px;
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 37%, #f0f0f0 63%);
+  background: linear-gradient(90deg, var(--bgSecondary) 25%, var(--bgTertiary) 37%, var(--bgSecondary) 63%);
   background-size: 400% 100%; /* Important for shimmer effect */
   animation: placeholderShimmer 1.5s ease-in-out infinite;
   border-radius: 8px;
@@ -253,7 +253,7 @@
 .animationTextlazy2 {
   width: 40%;
   height: 16px;
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 37%, #f0f0f0 63%);
+  background: linear-gradient(90deg, var(--bgSecondary) 25%, var(--bgTertiary) 37%, var(--bgSecondary) 63%);
   background-size: 400% 100%; /* Important for shimmer effect */
   animation: placeholderShimmer 1.5s ease-in-out infinite;
   border-radius: 8px;
@@ -380,7 +380,7 @@
   .hotelCardLazy {
     display: flex;
     flex-direction: column;
-    background: #fff;
+    background: var(--bgPrimary);
     height: 320px;
     border-radius: 12px;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);

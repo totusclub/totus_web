@@ -116,8 +116,8 @@
 .lineStep {
   width: 2px;
   height: 38.5px;
-  background: linear-gradient(90deg, rgba(255, 255, 255, 0) 68.2%, #fff 100%),
-    var(--borderTertiary, #e0e0e0);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--bgPrimary) 0%, transparent) 68.2%, var(--bgPrimary) 100%),
+    var(--borderTertiary);
 }
 .ticketModalItemDestInfo {
   display: flex;

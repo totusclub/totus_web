@@ -37,18 +37,18 @@ const SelectDate = ({handleChange,value,name, className}: {handleChange: any; va
     }
     return (
         <div className={`${styles.searchField} ${className || ''}`} ref={wrapperRef} onClick={handleToggle}>
-            <Icon name={'calendar'} size={24} color="#000"/>
+            <Icon name={'calendar'} size={24} color="var(--textPrimary)"/>
             <div className={styles.searchFieldInfo}>
                 <p className={styles.searchFieldsLabel}>Дата вылета</p>
                 <p className={styles.searchFieldsValue}>{format(new Date(selectedDate as Date), 'dd.MM.yy')}</p>
             </div>
-            <Icon name={'downArrow'} size={24} color="#000"/>
+            <Icon name={'downArrow'} size={24} color="var(--textPrimary)"/>
             {isOpen && (
                 <div className={styles.dateModal} onClick={(e) => e.stopPropagation()}>
                     <div className={styles.dateFromModalHead}>
                         <p>Дата вылета</p>
                         <div onClick={() => setIsOpen(false)}>
-                            <Icon name={'closeLine'} size={24} color="#000"/>
+                            <Icon name={'closeLine'} size={24} color="var(--textPrimary)"/>
                         </div>
                     </div>
                     <Calendar setSelectedDate={handleSelectDate} selectedDate={selectedDate}/>

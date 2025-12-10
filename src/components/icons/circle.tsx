@@ -7,7 +7,7 @@ export default function CircleIcon(props: SVGProps<SVGSVGElement>) {
             <g clipPath="url(#clip0_471_10798)">
                 <path
                     d="M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z"
-                    stroke="#1F1F1F" strokeWidth="1.5"/>
+                    stroke={props?.color || "#1F1F1F"} strokeWidth="1.5"/>
             </g>
             <defs>
                 <clipPath id="clip0_471_10798">

@@ -150,7 +150,7 @@ const WhereFrom = ({ handleChange, value, name }: WhereToProps) => {
 
     return (
         <div className={`${styles.searchField} ${styles.radioFrom}`} ref={wrapperRef} onClick={handleToggle}>
-            <Icon name={'to'} size={24} color="#000" />
+            <Icon name={'to'} size={24} color="var(--textPrimary)" />
             <div className={styles.searchFieldInfo}>
                 <p className={styles.searchFieldsLabel}>Страна, город, регион или отель</p>
                 <input
@@ -166,13 +166,13 @@ const WhereFrom = ({ handleChange, value, name }: WhereToProps) => {
                     placeholder="Египет"
                 />
             </div>
-            <Icon name={'downArrow'} size={24} color="#000" />
+            <Icon name={'downArrow'} size={24} color="var(--textPrimary)" />
             {isOpen && (
                 <div className={styles.whereFromModal} onClick={(e) => e.stopPropagation()}>
                     <div className={styles.whereFromModalHead}>
                         <p>Страна, город, регион или отель</p>
                         <div onClick={() => setIsOpen(false)}>
-                            <Icon name={'closeLine'} size={24} color="#000" />
+                            <Icon name={'closeLine'} size={24} color="var(--textPrimary)" />
                         </div>
                     </div>
                     <div className={styles.searchFieldInfoM}>

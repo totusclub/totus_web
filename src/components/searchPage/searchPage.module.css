@@ -206,7 +206,7 @@
     min-width: 0;
   }
   .activeModal {
-    background-color: #fff;
+    background-color: var(--bgPrimary);
     position: fixed;
     z-index: 900010;
     width: 100%;
@@ -262,7 +262,7 @@
   }
   .animationTextlazy {
     height: 8px;
-    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 37%, #f0f0f0 63%);
+    background: linear-gradient(90deg, var(--bgSecondary) 25%, var(--bgTertiary) 37%, var(--bgSecondary) 63%);
     background-size: 400% 100%; /* Important for shimmer effect */
     animation: placeholderShimmer 1.5s ease-in-out infinite;
     border-radius: 8px;

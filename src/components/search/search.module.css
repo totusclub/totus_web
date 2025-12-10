@@ -23,13 +23,14 @@
 .searchForm {
   width: 100%;
   height: 76px;
-  background-color: var(--primary_b);
+  background: var(--bgPrimary);
   border-radius: 24px;
   display: flex;
   flex-direction: row;
   gap: 8px;
   align-items: center;
   padding: 10px;
+  transition: background-color 0.2s ease;
 }
 .searchContent {
   display: flex;
@@ -74,6 +75,7 @@
   border-left: 1px solid var(--borderSecondary);
   border-top: 1px solid var(--borderSecondary);
   border-bottom: 1px solid var(--borderSecondary);
+  background-color: var(--bgPrimary);
   position: relative;
 }
 .searchFieldInfo {
@@ -102,6 +104,10 @@
   border: none;
   outline: none;
   width: 100%;
+  background: transparent;
+}
+.searchFieldsValue::placeholder {
+  color: var(--textTertiary);
 }
 .whereFrom {
   border-bottom-right-radius: 16px;
@@ -123,7 +129,7 @@
   width: 354px;
   /*height: 170px;*/
   position: absolute;
-  background-color: var(--primary_b);
+  background-color: var(--bgPrimary);
   padding-top: 24px;
   right: 0;
   top: 100%;
@@ -247,7 +253,7 @@
   height: 48px;
   border: 1px solid var(--borderSecondary);
   border-radius: 12px;
-  background-color: var(--primary_b);
+  background-color: var(--bgPrimary);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -268,7 +274,7 @@
   bottom: calc(100% + 4px);
   left: 0;
   right: 0;
-  background-color: var(--primary_b);
+  background-color: var(--bgPrimary);
   border: 1px solid var(--borderSecondary);
   border-radius: 12px;
   max-height: 200px;
@@ -299,7 +305,7 @@
   width: 354px;
   /*height: 170px;*/
   position: absolute;
-  background-color: var(--primary_b);
+  background-color: var(--bgPrimary);
   padding-top: 24px;
   left: 0;
   top: 100%;
@@ -362,7 +368,7 @@
   width: 400px;
   /*height: 170px;*/
   position: absolute;
-  background-color: var(--primary_b);
+  background-color: var(--bgPrimary);
   padding: 32px;
   left: 0;
   top: 100%;
@@ -378,7 +384,7 @@
 .whereFromModal {
   width: 354px;
   position: absolute;
-  background-color: var(--primary_b);
+  background-color: var(--bgPrimary);
   padding: 8px 16px;
   left: 0;
   top: 100%;
@@ -521,7 +527,7 @@
   .searchFields {
     flex-direction: column;
     height: auto;
-    background-color: var(--primary_b);
+    background-color: var(--bgPrimary);
   }
   .searchContent {
     gap: 0;
@@ -556,7 +562,7 @@
   .whereFromModal {
     width: 100%;
     position: fixed;
-    background-color: var(--primary_b);
+    background-color: var(--bgPrimary);
     top: 0;
     bottom: 0;
     max-height: 100%;
@@ -580,6 +586,11 @@
     height: 46px;
     border-radius: 16px;
     padding: 0 9px;
+    background: var(--bgPrimary);
+    color: var(--textPrimary);
+  }
+  .searchFieldInfoM > input::placeholder {
+    color: var(--textTertiary);
   }
   .whereFromModalHead {
     display: flex;
@@ -672,7 +683,7 @@
       width: 100%;
       margin-top: -195px;
       position: fixed;
-      background: #fff;
+      background: var(--bgPrimary);
       bottom: 0;
       top: auto;
   }

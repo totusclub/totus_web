@@ -8,6 +8,8 @@
     border-radius: 16px;
     text-align: center;
     font-size: 2rem;
+    background: var(--bgPrimary);
+    color: var(--textPrimary);
 }
 .inputsCodeWrap{
     /*width: 400px;*/

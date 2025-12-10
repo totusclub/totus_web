@@ -30,8 +30,52 @@ const OrderDetails = () => {
         return (
             <main className={'searchContainer'}>
                 <div className={'content'}>
-                    <div className={styles.orderDetailsLoading}>
-                        <p>Загрузка...</p>
+                    <div className={styles.orderDetailsSkeleton}>
+                        {/* Header skeleton */}
+                        <div className={styles.orderDetailsSkeletonCard}>
+                            <div className={styles.orderDetailsSkeletonHeader}>
+                                <div className={styles.orderDetailsSkeletonHeaderLeft}>
+                                    <div className={styles.animationTextlazy} style={{ width: '24px', height: '24px', borderRadius: '50%' }}></div>
+                                    <div className={styles.animationTextlazy} style={{ width: '200px', height: '24px' }}></div>
+                                </div>
+                                <div className={styles.animationTextlazy} style={{ width: '120px', height: '24px', borderRadius: '15px' }}></div>
+                            </div>
+                            <div className={styles.orderDetailsSkeletonPanel}>
+                                <div className={styles.orderDetailsSkeletonSection}>
+                                    <div className={styles.animationTextlazy} style={{ width: '60%', height: '16px' }}></div>
+                                    <div className={styles.animationTextlazy} style={{ width: '80%', height: '14px' }}></div>
+                                </div>
+                                <div className={styles.animationTextlazy} style={{ width: '100%', height: '1px', background: 'var(--borderTertiary)' }}></div>
+                                <div className={styles.orderDetailsSkeletonSection}>
+                                    <div className={styles.animationTextlazy} style={{ width: '50%', height: '16px' }}></div>
+                                    <div className={styles.animationTextlazy} style={{ width: '70%', height: '14px' }}></div>
+                                    <div className={styles.animationTextlazy} style={{ width: '40%', height: '14px' }}></div>
+                                </div>
+                                <div className={styles.animationTextlazy} style={{ width: '100%', height: '1px', background: 'var(--borderTertiary)' }}></div>
+                                <div className={styles.orderDetailsSkeletonSection}>
+                                    <div className={styles.animationTextlazy} style={{ width: '30%', height: '16px' }}></div>
+                                </div>
+                            </div>
+                        </div>
+                        {/* Sections skeleton */}
+                        <div className={styles.orderDetailsSkeletonCard}>
+                            <div className={styles.orderDetailsSkeletonPanel}>
+                                <div className={styles.orderDetailsSkeletonSection}>
+                                    <div className={styles.animationTextlazy} style={{ width: '40%', height: '16px' }}></div>
+                                    <div className={styles.animationTextlazy} style={{ width: '60%', height: '14px' }}></div>
+                                </div>
+                            </div>
+                            <div className={styles.orderDetailsSkeletonSection} style={{ marginTop: '16px' }}>
+                                <div className={styles.animationTextlazy} style={{ width: '50%', height: '14px', marginBottom: '16px' }}></div>
+                                <div className={styles.orderDetailsSkeletonPanel}>
+                                    <div className={styles.animationTextlazy} style={{ width: '80%', height: '16px' }}></div>
+                                    <div className={styles.animationTextlazy} style={{ width: '100%', height: '1px', background: 'var(--borderTertiary)', margin: '12px 0' }}></div>
+                                    <div className={styles.animationTextlazy} style={{ width: '70%', height: '16px' }}></div>
+                                    <div className={styles.animationTextlazy} style={{ width: '100%', height: '1px', background: 'var(--borderTertiary)', margin: '12px 0' }}></div>
+                                    <div className={styles.animationTextlazy} style={{ width: '60%', height: '16px' }}></div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </main>

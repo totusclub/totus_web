@@ -3,6 +3,7 @@ import Icon from "@/components/icons/Icon";
 import Button from "@/components/UI/button";
 import { useRouter } from "next/router";
 import { useMemo } from "react";
+import { useTheme } from "@/hooks/useTheme";
 
 interface HotelCardItemProps {
     id: number,
@@ -24,10 +25,14 @@ interface HotelCardState {
 
 const HotelCard = ({ item, request_id, lazy }: HotelCardState) => {
     const router = useRouter();
-    
+    const { theme, mounted } = useTheme();
+
+    // Use safe default during SSR to prevent hydration mismatch
+    const iconColor = mounted ? (theme === 'dark' ? '#fff' : '#000') : '#000';
+
     const handleClick = () => {
         sessionStorage.setItem("searchScroll", window.scrollY.toString());
-        
+
         // Get all search params from current URL query
         const queryParams: Record<string, string | string[]> = {
             hotel_id: String(item?.hotel?.id),
@@ -48,8 +53,8 @@ const HotelCard = ({ item, request_id, lazy }: HotelCardState) => {
             queryParams.kids = router.query.kids as string;
         }
         if (router.query.kids_ages) {
-            queryParams.kids_ages = Array.isArray(router.query.kids_ages) 
-                ? router.query.kids_ages 
+            queryParams.kids_ages = Array.isArray(router.query.kids_ages)
+                ? router.query.kids_ages
                 : [router.query.kids_ages as string];
         }
 
@@ -210,7 +215,7 @@ const HotelCard = ({ item, request_id, lazy }: HotelCardState) => {
                         </div>
                         <div className={styles.hotelCardImageInfoM}>
                             <p><Icon name={'message'} size={14}
-                                color="#000" /> {hotel?.reviews_count > 0 ? `${hotel?.reviews_count} отзывов` : 'нет отзывов'}
+                                color={iconColor} /> {hotel?.reviews_count > 0 ? `${hotel?.reviews_count} отзывов` : 'нет отзывов'}
                             </p>
                             {hotel?.rating > 0 && (
                                 <p>{hotel.rating}</p>
@@ -233,7 +238,7 @@ const HotelCard = ({ item, request_id, lazy }: HotelCardState) => {
                 </div>
                 <div className={styles.hotelCardPrice}>
                     <div className={styles.hotelCardImageInfo}>
-                        <p><Icon name={'message'} size={14} color="#000" /> {hotel?.reviews_count > 0 ? `${hotel?.reviews_count} отзывов` : 'нет отзывов'}</p>
+                        <p><Icon name={'message'} size={14} color={iconColor} /> {hotel?.reviews_count > 0 ? `${hotel?.reviews_count} отзывов` : 'нет отзывов'}</p>
                         {hotel?.rating > 0 && (
                             <p>{hotel.rating}</p>
                         )}

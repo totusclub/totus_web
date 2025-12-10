@@ -21,7 +21,7 @@
 }
 .orderDetailsTitleId {
   font-size: 20px;
-  color: #7a7a7a;
+  color: var(--textTertiary);
 }
 .orderDetailsHeader {
   display: flex;
@@ -68,12 +68,12 @@
 .orderDetailsPanel {
   display: flex;
   flex-direction: column;
-  background-color: #f5f5f5;
+  background-color: var(--bgSecondary);
   padding: 16px;
   align-items: flex-start;
   align-self: stretch;
   border-radius: 24px;
-  border-bottom: 1px solid #fe732e;
+  border-bottom: 1px solid var(--core_Orange);
   box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.12),
     0px 4px 12px 0px rgba(0, 0, 0, 0.12);
 }
@@ -101,12 +101,21 @@
   margin: 0;
 }
 
+.orderDetailsSectionTitle {
+  color: var(--textPrimary);
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 20px;
+  margin: 0;
+}
+
 .orderDetailsAmount {
   font-size: 16px;
   line-height: 20px;
   letter-spacing: -2%;
   vertical-align: middle;
   margin: 0;
+  color: var(--textPrimary);
 }
 
 .orderDetailsDivider {
@@ -153,11 +162,16 @@
 }
 
 .documentsPanel {
-  background: #f5f5f5;
+  background: var(--bgSecondary);
   border-radius: 16px;
   padding: 20px;
   margin-bottom: 16px;
   cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.documentsPanel:hover {
+  background: var(--hoverPrimary);
 }
 
 .documentsContent {
@@ -210,12 +224,12 @@
   line-height: 18px;
   letter-spacing: -2%;
   vertical-align: middle;
-
+  color: var(--textPrimary);
   margin: 0 0 16px 0;
 }
 
 .infoPanel {
-  background: #f5f5f5;
+  background: var(--bgSecondary);
   border-radius: 16px;
   padding: 16px;
   display: flex;
@@ -244,7 +258,7 @@
   line-height: 20px;
   letter-spacing: -2%;
   vertical-align: middle;
-  color: #7a7a7a;
+  color: var(--textTertiary);
   margin: 0;
 }
 
@@ -261,12 +275,12 @@
   font-size: 16px;
   line-height: 20px;
   letter-spacing: -2%;
-  color: #1f1f1f;
+  color: var(--textPrimary);
   vertical-align: middle;
 }
 
 .infoRowRightValue {
-  color: #1f1f1f;
+  color: var(--textPrimary);
   font-size: 14px;
   font-weight: 400;
   line-height: 18px;

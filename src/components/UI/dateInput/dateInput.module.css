@@ -9,7 +9,7 @@
   margin-bottom: 8px;
   font-size: 14px;
   font-weight: 400;
-  color: var(--textSecondary, #666);
+  color: var(--textSecondary);
 }
 
 .dateInput {
@@ -17,11 +17,12 @@
   align-items: center;
   gap: 8px;
   padding: 12px 16px;
-  border: 1px solid var(--borderTertiary, #e0e0e0);
+  border: 1px solid var(--borderTertiary);
   border-radius: 16px;
-  background: var(--bgPrimary, #fff);
+  background: var(--bgPrimary);
   height: 56px;
   box-sizing: border-box;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
 }
 
 .dateInput:hover {
@@ -51,14 +52,16 @@
   outline: none;
   background: transparent;
   font-size: 16px;
-  color: var(--textPrimary, #000);
+  color: var(--textPrimary);
   cursor: text;
   pointer-events: auto;
   user-select: text;
+  transition: color 0.2s ease;
 }
 
 .dateInput .input::placeholder {
-  color: var(--textTertiary, #999);
+  color: var(--textTertiary);
+  transition: color 0.2s ease;
 }
 
 .dateModal {
@@ -66,7 +69,7 @@
   top: calc(100% + 8px);
   left: 0;
   z-index: 1000;
-  background: var(--bgPrimary, #fff);
+  background: var(--bgPrimary);
   border-radius: 16px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   padding: 16px;
@@ -79,19 +82,19 @@
   align-items: center;
   margin-bottom: 16px;
   padding-bottom: 16px;
-  border-bottom: 1px solid var(--borderTertiary, #e0e0e0);
+  border-bottom: 1px solid var(--borderTertiary);
 }
 
 .dateModalHead p {
   font-size: 18px;
   font-weight: 500;
-  color: var(--textPrimary, #000);
+  color: var(--textPrimary);
 }
 
 .dateFooter {
   margin-top: 16px;
   padding-top: 16px;
-  border-top: 1px solid var(--borderTertiary, #e0e0e0);
+  border-top: 1px solid var(--borderTertiary);
 }
 
 @media (max-width: 768px) {

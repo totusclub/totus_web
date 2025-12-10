@@ -245,7 +245,7 @@ const DateInput: React.FC<DateInputProps> = ({
             {label && <label className={styles.label}>{label}</label>}
             <div className={`${styles.dateInput} ${error ? styles.dateInputError : ''}`}>
                 <div onClick={handleToggle} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
-                    <Icon name={'calendar'} size={20} color="#666" />
+                    <Icon name={'calendar'} size={20} color="var(--textPrimary)" />
                 </div>
                 <input
                     type="text"
@@ -270,7 +270,7 @@ const DateInput: React.FC<DateInputProps> = ({
                     autoComplete="off"
                 />
                 <div onClick={handleToggle} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
-                    <Icon name={'downArrow'} size={20} color="#666" />
+                    <Icon name={'downArrow'} size={20} color="var(--textPrimary)" />
                 </div>
             </div>
             {isOpen && (
@@ -278,7 +278,7 @@ const DateInput: React.FC<DateInputProps> = ({
                     <div className={styles.dateModalHead}>
                         <p>{label || 'Выберите дату'}</p>
                         <div onClick={() => setIsOpen(false)}>
-                            <Icon name={'closeLine'} size={24} color="#000" />
+                            <Icon name={'closeLine'} size={24} color="var(--textPrimary)" />
                         </div>
                     </div>
                     <Calendar

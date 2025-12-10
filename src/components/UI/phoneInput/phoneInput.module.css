@@ -5,21 +5,27 @@
 }
 
 .card {
-    background-color: white;
+    background-color: var(--bgPrimary);
     border-radius: 12px;
     /*overflow: hidden;*/
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--borderTertiary);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.card:focus-within {
+    border-color: var(--core_Orange);
+    box-shadow: 0 2px 8px rgba(254, 115, 46, 0.2);
 }
 
 .section {
     padding: 16px;
-    border-bottom: 1px solid #e5e5e5;
+    border-bottom: 1px solid var(--borderTertiary);
     position: relative;
 }
 
 .label {
     font-size: 12px;
-    color: #888;
+    color: var(--textTertiary);
     margin-bottom: 6px;
     display: block;
 }
@@ -32,6 +38,15 @@
     text-align: left;
     padding: 0;
     cursor: pointer;
+    color: var(--textPrimary);
+    transition: color 0.2s ease;
+}
+.dropdownBtn:hover {
+    color: var(--textPrimary);
+}
+.dropdownBtn:focus {
+    color: var(--textPrimary);
+    outline: none;
 }
 
 .dropdownArrow {
@@ -43,8 +58,8 @@
     top: 100%;
     left: 0;
     right: 0;
-    background-color: white;
-    border: 1px solid #e5e5e5;
+    background-color: var(--bgPrimary);
+    border: 1px solid var(--borderTertiary);
     border-radius: 0 0 8px 8px;
     z-index: 10;
     max-height: 160px;
@@ -54,10 +69,11 @@
 .dropdownItem {
     padding: 12px 16px;
     cursor: pointer;
+    color: var(--textPrimary);
 }
 
 .dropdownItem:hover {
-    background-color: #f1f1f1;
+    background-color: var(--hoverPrimary);
 }
 
 .inputSection {
@@ -70,4 +86,17 @@
     border: none;
     outline: none;
     font-size: 16px;
+    background: transparent;
+    color: var(--textPrimary);
+    transition: color 0.2s ease;
+}
+.inputField::placeholder {
+    color: var(--textTertiary);
+    transition: color 0.2s ease;
+}
+.inputField:focus {
+    color: var(--textPrimary);
+}
+.inputField:focus::placeholder {
+    color: var(--textTertiary);
 }

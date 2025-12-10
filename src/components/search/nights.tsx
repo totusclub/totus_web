@@ -39,12 +39,12 @@ const Nights = ({handleChange,value,name}) => {
 
     return (
         <div className={styles.searchField} ref={wrapperRef} onClick={handleToggle}>
-            <Icon name={'moon'} size={24} color="#000"/>
+            <Icon name={'moon'} size={24} color="var(--textPrimary)"/>
             <div className={styles.searchFieldInfo}>
                 <p className={styles.searchFieldsLabel}>Количество ночей</p>
                 <p className={styles.searchFieldsValue}>{values[0]} ночей</p>
             </div>
-            <Icon name={'downArrow'} size={24} color="#000"/>
+            <Icon name={'downArrow'} size={24} color="var(--textPrimary)"/>
             {isOpen && (
                 <div className={styles.nightsModal} onClick={(e) => e.stopPropagation()}>
                     <div className={styles.nightsModalHead}>

@@ -137,14 +137,14 @@ const People = ({ handleChange, value, className }: { handleChange: any; value: 
 
     return (
         <div className={`${styles.searchField} ${styles.people} ${className || ''}`} ref={wrapperRef} onClick={handleToggle}>
-            <Icon name={'user'} size={24} color="#000" />
+            <Icon name={'user'} size={24} color="var(--textPrimary)" />
             <div className={styles.searchFieldInfo}>
                 <p className={styles.searchFieldsLabel}>Туристы</p>
                 <p className={styles.searchFieldsValue}>
                     {adults + children} турист{(adults + children) === 1 ? '' : 'а'}
                 </p>
             </div>
-            <Icon name={'downArrow'} size={24} color="#000" />
+            <Icon name={'downArrow'} size={24} color="var(--textPrimary)" />
 
             {isOpen && (
                 <div className={styles.modalPeople} onClick={(e) => e.stopPropagation()}>
@@ -156,11 +156,11 @@ const People = ({ handleChange, value, className }: { handleChange: any; value: 
                         </div>
                         <ul>
                             <li onClick={() => handleAdults('minus')}>
-                                <Icon name={'minus'} size={20} color="#000" />
+                                <Icon name={'minus'} size={20} color="var(--textPrimary)" />
                             </li>
                             <li>{adults}</li>
                             <li onClick={() => handleAdults('plus')}>
-                                <Icon name={'plus'} size={20} color="#000" />
+                                <Icon name={'plus'} size={20} color="var(--textPrimary)" />
                             </li>
                         </ul>
                     </div>
@@ -171,18 +171,18 @@ const People = ({ handleChange, value, className }: { handleChange: any; value: 
                         </div>
                         <ul>
                             <li onClick={() => handleChildren('minus')}>
-                                <Icon name={'minus'} size={20} color="#000" />
+                                <Icon name={'minus'} size={20} color="var(--textPrimary)" />
                             </li>
                             <li>{children}</li>
                             <li onClick={() => handleChildren('plus')}>
-                                <Icon name={'plus'} size={20} color="#000" />
+                                <Icon name={'plus'} size={20} color="var(--textPrimary)" />
                             </li>
                         </ul>
                     </div>
                     {children > 0 && (
                         <>
                             <div className={styles.kidsAgeInfo}>
-                                <Icon name={'info'} size={16} color="#7a7a7a" />
+                                <Icon name={'info'} size={16} color="var(--textTertiary)" />
                                 <p>Укажите возраст детей на момент окончания поездки</p>
                             </div>
                             <div className={styles.kidsAgeDropdowns}>
@@ -201,7 +201,7 @@ const People = ({ handleChange, value, className }: { handleChange: any; value: 
                                                 <p className={styles.kidsAgePlaceholder}>
                                                     {selectedAge ? selectedAge.name : 'Выберите возраст ребенка'}
                                                 </p>
-                                                <Icon name={'downArrow'} size={20} color="#000" />
+                                                <Icon name={'downArrow'} size={20} color="var(--textPrimary)" />
                                             </div>
                                             {openAgeDropdowns[index] && (
                                                 <ul className={styles.kidsAgeOptions}>

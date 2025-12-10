@@ -67,13 +67,15 @@ const Select: React.FC<SelectProps> = ({
             <div className={styles.selectButton} >
                 <div className={styles.selectButtonInfo} onClick={() => setOpen(prev => !prev)}>
                     {label && <p className={styles.selectLabel}>{label}</p>}
-                    <p className={styles.selectValue}>{value || placeholder}</p>
+                    <p className={`${styles.selectValue} ${!value ? styles.placeholder : ''}`}>
+                        {value || placeholder}
+                    </p>
                 </div>
                 <div className={styles.arrow}>
-                    <Icon name="downArrow" size={24} />
+                    <Icon name="downArrow" size={24} color="var(--textPrimary)" />
                 </div>
                 <div className={styles.arrowMob}>
-                    <Icon name="downArrow" size={24} color="#FE732E" />
+                    <Icon name="downArrow" size={24} color="var(--core_Orange)" />
                 </div>
             </div>
 
@@ -90,12 +92,12 @@ const Select: React.FC<SelectProps> = ({
                         >
                             <div>
                                 {option.icon && option.icon.trim() !== '' && (
-                                    <Icon name={option.icon} size={16} />
+                                    <Icon name={option.icon} size={16} color="var(--textPrimary)" />
                                 )}
                                 {option.name}
                             </div>
                             {value === option.name && (
-                                <Icon name={'optionCheck'} size={16} />
+                                <Icon name={'optionCheck'} size={16} color="var(--textPrimary)" />
                             )}
                         </li>
                     ))}
