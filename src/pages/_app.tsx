@@ -1,48 +1,21 @@
-
 import type { AppProps } from 'next/app';
 import { useEffect, useState } from 'react';
+import Script from 'next/script'; // ✅ ADD
 import { wrapper } from '../store';
 import '../styles/globals.css';
-import '@/utils/themeInit'; // Initialize theme before React renders
+import '@/utils/themeInit';
 import Header from '@/components/header';
 import Footer from '@/components/footer';
 import { decodeToken, loadToken } from "@/utils/auth";
 import { setAuth } from "@/store/slices/authSlice";
 import { useDispatch } from "react-redux";
 import MobileBottomBar from "@/components/mobileBottomBar";
-import ScrollRestoration from '@/components/ScrollRestoration';
-
-function getCookie(name: string): string | null {
-    const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
-    return match ? decodeURIComponent(match[2]) : null;
-}
-function setCookie(name: string, value: string, days: number) {
-    const expires = new Date(Date.now() + days * 864e5).toUTCString();
-    document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/`;
-}
+// import ScrollRestoration from '@/components/ScrollRestoration';
 
 function MyApp({ Component, pageProps }: AppProps) {
-    const [loggedIn, setLoggedIn] = useState(false);
     const dispatch = useDispatch();
 
     useEffect(() => {
-        // const loggedUser = getCookie('loggedInUser');
-        // if (loggedUser) {
-        //     setLoggedIn(true);
-        // } else {
-        //     const correctLogin = 'admin';
-        //     const correctPassword = '0wI?394ICMbq';
-        //     const login = prompt('Enter your login:');
-        //     const password = prompt('Enter your password:');
-        //     if (login === correctLogin && password === correctPassword) {
-        //         alert(`Login successful! Welcome, ${login}`);
-        //         setCookie('loggedInUser', login, 7);
-        //         setLoggedIn(true);
-        //     } else {
-        //         alert('Incorrect login or password. The page will reload.');
-        //         window.location.reload();
-        //     }
-        // }
         const token = loadToken();
         if (token) {
             const user = decodeToken(token);
@@ -50,21 +23,56 @@ function MyApp({ Component, pageProps }: AppProps) {
                 dispatch(setAuth({ token, user }));
             }
         }
-    }, []);
-
-    // if (!loggedIn) {
-    //     return null;
-    // }
-
+    }, [dispatch]);
 
     return (
-        <div id="root">
-            {/*<ScrollRestoration />*/}
-            <Header />
-            <Component {...pageProps} />
-            <Footer />
-            <MobileBottomBar />
-        </div>
+        <>
+            <Script
+                id="yandex-metrika"
+                strategy="afterInteractive"
+                dangerouslySetInnerHTML={{
+                    __html: `
+                        (function(m,e,t,r,i,k,a){
+                            m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+                            m[i].l=1*new Date();
+                            for (var j = 0; j < document.scripts.length; j++) {
+                                if (document.scripts[j].src === r) { return; }
+                            }
+                            k=e.createElement(t),a=e.getElementsByTagName(t)[0],
+                            k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
+                        })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=106173650', 'ym');
+
+                        ym(106173650, 'init', {
+                            ssr:true,
+                            webvisor:true,
+                            clickmap:true,
+                            ecommerce:"dataLayer",
+                            accurateTrackBounce:true,
+                            trackLinks:true
+                        });
+                    `,
+                }}
+            />
+
+            {/* ✅ Noscript fallback */}
+            <noscript>
+                <div>
+                    <img
+                        src="https://mc.yandex.ru/watch/106173650"
+                        style={{ position: 'absolute', left: '-9999px' }}
+                        alt=""
+                    />
+                </div>
+            </noscript>
+
+            <div id="root">
+                {/* <ScrollRestoration /> */}
+                <Header />
+                <Component {...pageProps} />
+                <Footer />
+                <MobileBottomBar />
+            </div>
+        </>
     );
 }
 
