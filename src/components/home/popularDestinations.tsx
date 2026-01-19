@@ -158,7 +158,7 @@ export default function PopularDestinations({ popularDestinations }: { popularDe
     );
     const settings = {
         dots: true,
-        infinite: false,
+        infinite: true,
         speed: 500,
         slidesToShow: 1,
         slidesToScroll: 1,
@@ -194,6 +194,7 @@ export default function PopularDestinations({ popularDestinations }: { popularDe
 
         ]
     };
+
     return (
         <div className={styles.popularDestinationsWrapper}>
             <p className={styles.hotProductTitle}>Популярные направления</p>
@@ -226,25 +227,24 @@ export default function PopularDestinations({ popularDestinations }: { popularDe
             <div className={styles.recomendDeslistMob}>
                 <Slider {...settings}>
                     {popularDestinations?.map((item, index) => {
-                        const destinationName = item?.name || item?.name_ru || item?.name_en || '';
-                        const destinationImage = item?.image || '';
-
                         return (
-                            <div
-                                key={item?.id || index}
-                                onClick={() => handlePressHotel(item)}
-                                className={styles.recomendDeslistItem}
-                                style={{
-                                    backgroundImage: `url(${destinationImage})`,
+                            <div   key={item?.id || index}>
+                            <div  style={{
+                                    backgroundImage: `url(${item?.image})`,
                                     cursor: 'pointer'
 
                                 }}
+                                onClick={() => handlePressHotel(item)}
+                                className={styles.recomendDeslistItem}
+
                             >
+
                                 <div className={styles.recomendDeslistItemInfo}>
                                     <p className={styles.recomendDeslistItemInfoText}>
-                                        {destinationName} <Icon name={'next'} />
+                                        {item?.name} <Icon name={'next'} />
                                     </p>
                                 </div>
+                            </div>
                             </div>
                         );
                     })}

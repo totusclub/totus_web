@@ -528,6 +528,7 @@
     flex-direction: column;
     height: auto;
     background-color: var(--bgPrimary);
+      overflow: hidden;
   }
   .searchContent {
     gap: 0;

@@ -964,4 +964,7 @@
   .contentFullHide {
     /*display: none;*/
   }
+  .recomendDeslistItemInfo{
+      height: 100%;
+  }
 }
