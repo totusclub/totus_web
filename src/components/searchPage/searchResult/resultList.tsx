@@ -8,6 +8,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setLoadMore, searchFilters, setAllMyHotels } from '@/store/slices/searchSlice';
 import { RootState } from '@/store';
 import Select from '@/components/UI/select';
+import Icon from "@/components/icons/Icon";
+import Button from "@/components/UI/button";
 
 interface ResultListProps {
     tickets?: boolean;
@@ -111,6 +113,40 @@ const ResultList = ({ tickets, loading, data, setFiltersRequest }: ResultListPro
             {
                 pathname: router.pathname,
                 query: { ...router.query, sort_by: sortValue, page_number: 1 },
+            },
+            undefined,
+            { scroll: false }
+        );
+    };
+
+    const handleResetFilters = () => {
+        if (!selectedFilters) return;
+
+        const availableStars = (hotels?.filters?.stars || [])
+            .map((star: any) => star?.id)
+            .filter((id: any) => id !== null && id !== undefined && String(id) !== '0');
+
+        const resetParams: any = {
+            ...selectedFilters,
+            page_limit: 20,
+            page_number: 1,
+            sort_by: 'relevance',
+            filter_instant_confirm: false,
+            filter_price_min: hotels?.filters?.prices?.min,
+            filter_price_max: hotels?.filters?.prices?.max,
+        };
+
+        if (availableStars.length > 0) {
+            resetParams.filter_stars = availableStars.join(',');
+        }
+
+        dispatch(setAllMyHotels([]));
+        dispatch(searchFilters(resetParams) as any);
+
+        router.push(
+            {
+                pathname: router.pathname,
+                query: { ...router.query, page_number: 1, sort_by: 'relevance' },
             },
             undefined,
             { scroll: false }
@@ -227,6 +263,20 @@ const ResultList = ({ tickets, loading, data, setFiltersRequest }: ResultListPro
                         )}
                     </div>
                 ))}
+
+                {!loading && (allMyHotels?.length || 0) === 0 && (
+                    <div className={styles.emptyState}>
+                        <div className={styles.emptyStateIconWrap}>
+                            <Icon name="tourist" size={80} color="var(--core_Orange)" />
+                        </div>
+                        <h3 className={styles.emptyStateTitle}>Ошибка</h3>
+                        <p className={styles.emptyStateText}>
+                            К сожалению, не найдено ни одного тура, соответствующего вашим критериям.
+                            Пожалуйста, попробуйте изменить параметры поиска или вернитесь позже.
+                        </p>
+                        <Button title={'Сбросить фильтры'} onClick={handleResetFilters} />
+                    </div>
+                )}
             </div>
 
             {loadingMore && (

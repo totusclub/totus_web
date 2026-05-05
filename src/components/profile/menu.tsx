@@ -68,16 +68,16 @@ const MenuProfile = () => {
             {/*        <p>Туристы</p>*/}
             {/*    </div>*/}
             {/*</div>*/}
-            <div onClick={() => handelCall()} className={styles.profileSupport}>
-                <div className={styles.profileSupport}>
-                    <div style={{ position: 'relative' }}>
-                        <div className={styles.indicatorSupport} />
-                        <Icon name={'support'} size={24} />
-                    </div>
-                    <p>Звонок в поддержку </p>
-                </div>
-                <Icon name={'phone'} size={18} />
-            </div>
+            {/*<div onClick={() => handelCall()} className={styles.profileSupport}>*/}
+            {/*    <div className={styles.profileSupport}>*/}
+            {/*        <div style={{ position: 'relative' }}>*/}
+            {/*            <div className={styles.indicatorSupport} />*/}
+            {/*            <Icon name={'support'} size={24} />*/}
+            {/*        </div>*/}
+            {/*        <p>Звонок в поддержку </p>*/}
+            {/*    </div>*/}
+            {/*    <Icon name={'phone'} size={18} />*/}
+            {/*</div>*/}
             <div className={styles.profileMenu}>
                 {/*<div className={styles.profileMenuHead}>*/}
                 {/*    <p>Личная информация</p>*/}
@@ -135,9 +135,9 @@ const MenuProfile = () => {
                     <Icon name={'logout'} size={24} />
                 </div>
             </div>
-            <div className={styles.deleteBlock}>
-                <p onClick={() => setDeleteModal(true)}>Удалить аккаунт</p>
-            </div>
+            {/*<div className={styles.deleteBlock}>*/}
+            {/*    <p onClick={() => setDeleteModal(true)}>Удалить аккаунт</p>*/}
+            {/*</div>*/}
             {deleteModal && (
                 <>
                     <div className={styles.modalDeleteAccountLeyer} onClick={() => setDeleteModal(false)}></div>

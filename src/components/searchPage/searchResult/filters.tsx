@@ -31,6 +31,22 @@ const Filters = ({ selectedFilters, allFilters, statistics }: any) => {
         sort_by: 'relevance'
     })
 
+    const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max);
+
+    const priceBounds = useMemo(() => {
+        const min = Number(allFilters?.prices?.min ?? 0);
+        const max = Number(allFilters?.prices?.max ?? 0);
+        return { min, max: max >= min ? max : min };
+    }, [allFilters?.prices?.min, allFilters?.prices?.max]);
+
+    const safePrice = useMemo(() => {
+        const min = priceBounds.min;
+        const max = priceBounds.max;
+        const left = clamp(Number(price?.[0] ?? min), min, max);
+        const right = clamp(Number(price?.[1] ?? max), min, max);
+        return [Math.min(left, right), Math.max(left, right)];
+    }, [price, priceBounds]);
+
     // Detect mobile screen
     useEffect(() => {
         const checkMobile = () => {
@@ -47,17 +63,19 @@ const Filters = ({ selectedFilters, allFilters, statistics }: any) => {
         if (allFilters) {
             const updatedFilters = {
                 ...filters,
-                filter_price_min: allFilters?.prices?.min || 0,
-                filter_price_max: allFilters?.prices?.max || 0
+                filter_price_min: priceBounds.min,
+                filter_price_max: priceBounds.max
             }
             setFilters(updatedFilters)
             setPendingFilters(updatedFilters)
         }
-        if (statistics) {
-            setPrice([statistics.shown_min_price || 0, statistics?.shown_max_price || 0]);
-        }
-
-    }, [allFilters, statistics])
+        const rawMin = Number(statistics?.shown_min_price ?? priceBounds.min);
+        const rawMax = Number(statistics?.shown_max_price ?? priceBounds.max);
+        setPrice([
+            clamp(rawMin, priceBounds.min, priceBounds.max),
+            clamp(rawMax, priceBounds.min, priceBounds.max),
+        ]);
+    }, [allFilters, statistics, priceBounds.min, priceBounds.max])
 
 
 
@@ -184,7 +202,9 @@ const Filters = ({ selectedFilters, allFilters, statistics }: any) => {
                     : [];
 
         return options.map(option => {
-            const optionId = String(option.id || option.luggage_type || option.flight_class || option.number || option.flight_type);
+            const optionId = String(
+                option?.id ?? option?.luggage_type ?? option?.flight_class ?? option?.number ?? option?.flight_type
+            );
             return {
                 ...option,
                 selected: selectedArray.includes(optionId)
@@ -241,9 +261,9 @@ const Filters = ({ selectedFilters, allFilters, statistics }: any) => {
                     <Collapse title={'Стоимость, ₽'} open={true}>
                         <RangeInput
                             step={1}
-                            min={allFilters?.prices?.min || 0}
-                            max={allFilters?.prices?.max || 0}
-                            values={price}
+                            min={priceBounds.min}
+                            max={priceBounds.max}
+                            values={safePrice}
                             setValues={setPrice}
                             onChangeComplete={onChangeFilters}
                             name={'price'}
@@ -283,7 +303,7 @@ const Filters = ({ selectedFilters, allFilters, statistics }: any) => {
                         <CheckboxGroup
                             name={'filter_stars'}
                             options={getOptionsWithSelected(
-                                allFilters?.stars || [],
+                                (allFilters?.stars || []).filter((star) => String(star?.id) !== '0'),
                                 isMobile && mobileModal ? pendingFilters?.filter_stars : filters?.filter_stars
                             )}
                             selected={isMobile && mobileModal ? pendingFilters?.filter_stars : filters?.filter_stars}

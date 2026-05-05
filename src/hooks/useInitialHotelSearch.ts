@@ -20,7 +20,13 @@ export const useInitialHotelSearch = (
   useEffect(() => {
     if (!isReady || !hotelId) return;
 
-    if (requestId || localRequestId) {
+    const query = router.query;
+    const currentFlexDates = Array.isArray(query.flex_dates)
+      ? query.flex_dates[0]
+      : query.flex_dates;
+    const needsForcedHotelFlex = String(currentFlexDates ?? '') !== '2';
+
+    if ((requestId || localRequestId) && !needsForcedHotelFlex) {
       return;
     }
 
@@ -28,7 +34,6 @@ export const useInitialHotelSearch = (
 
     const runInitialSearch = async () => {
       try {
-        const query = router.query;
         const searchParams = buildInitialSearchParams(query, hotelId);
         const response = await startSearch(searchParams);
 
@@ -63,7 +68,8 @@ export const useInitialHotelSearch = (
           if (!newQuery.search_type && searchParams.search_type) {
             newQuery.search_type = String(searchParams.search_type);
           }
-          if (newQuery.flex_dates == null && searchParams.flex_dates != null) {
+          if (searchParams.flex_dates != null) {
+            // Keep hotel page URL consistent with forced room-search flexibility.
             newQuery.flex_dates = String(searchParams.flex_dates);
           }
 

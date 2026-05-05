@@ -53,7 +53,7 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
         adults: '1',
         start_date: '2025-07-21',
         nights: '7',
-        flex_dates: '2',
+        flex_dates: '0',
         start_date_from: "2025-07-21",
         end_date_till: "2025-08-06",
         // kids: '1',
@@ -199,6 +199,8 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
         } else if (key === 'nights') {
             const interval = calculateStayDates(params?.start_date, +value);
             setParams({ ...params, ...interval, nights: String(value) });
+        } else if (key === 'flex_dates') {
+            setParams({ ...params, flex_dates: String(value) });
         } else if (key === 'adults') {
             setParams({ ...params, adults: value });
         } else if (key === 'kids') {
@@ -240,7 +242,7 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
                 end_date_till: dateRange.end_date_till,
                 nights: params.nights || "7",
                 search_type: params.search_type || "package",
-                flex_dates: params.flex_dates || "2",
+                flex_dates: params.flex_dates || "0",
             };
 
             // Add optional params if they exist
@@ -328,8 +330,14 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
                                 name={'form_date'}
                                 value={params.start_date}
                                 nights={params.nights}
+                                flexDates={params.flex_dates}
                             />
-                            <Nights handleChange={handleChange} name={'nights'} value={params.nights} />
+                            <Nights
+                                handleChange={handleChange}
+                                name={'nights'}
+                                value={params.nights}
+                                flexDates={params.flex_dates}
+                            />
                         </div>
                         <People handleChange={handleChange}
                             value={{ adults: params.adults, kids: params.kids, kids_ages: params.kids_ages }} />

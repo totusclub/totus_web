@@ -12,12 +12,12 @@ const Footer = () => {
             <div className={'content'}>
                 <div className={styles.footerRow}>
                     <div className={styles.footerColumnM}>
-                        <p className={styles.footerColumnTitle}>Скачать приложение</p>
+                        <p className={styles.footerColumnTitle}></p>
                         <div className={styles.appStore}>
                             <Icon name={"appStore"} size={'100%'}/>
                         </div>
                         <div className={styles.social}>
-                            <p className={styles.socialTitle}>Мы в соц. сетях</p>
+                            <p className={styles.socialTitle}></p>
                             <ul>
                                 <li><Icon name={"vk"} size={24} color="var(--textPrimary)"/></li>
                                 <li><Icon name={"rutube"} size={24} color="var(--textPrimary)"/></li>
@@ -25,7 +25,7 @@ const Footer = () => {
                                 <li><Icon name={"vc"} size={24} color="var(--textPrimary)"/></li>
                             </ul>
                         </div>
-                        <p className={styles.footerColumnTitle}>Можно платить</p>
+                        <p className={styles.footerColumnTitle}></p>
                         <div className={styles.footerPayList}>
                             <div><Icon name={'mir'} size={41}/></div>
                             <div><Icon name={'visa'} size={38}/></div>
@@ -33,13 +33,16 @@ const Footer = () => {
                         </div>
                     </div>
                     <div className={styles.footerColumn}>
-                        <p className={styles.footerColumnTitle}>Компания</p>
+                        <p className={styles.footerColumnTitle}></p>
                         <ul>
-                            <li>
-                                <Link href="/about-us" className={styles.footerLink}>
-                                    О Нас
-                                </Link>
+                            <li className={styles.footerColumn}>
+                                ООО «Арлекинотур»,ИНН 9729298840, <br/> ОГРН 1207700285033, 119361, город Москва, Малая Очаковская ул., д. 4, офис 7
                             </li>
+                            <div className={styles.appStore}>
+                                <Icon name={"appStore"} size={'100%'}/>
+                                <Icon name={"googlePlay"} size={'100%'}/>
+                                <Icon name={"ruStore"} size={'48px'}/>
+                            </div>
                             {/*<li>*/}
                             {/*    <Link href="/career" className={styles.footerLink}>Карьера</Link>*/}
                             {/*</li>*/}
@@ -49,28 +52,33 @@ const Footer = () => {
                             {/*<li>*/}
                             {/*    <Link href="/blog" className={styles.footerLink}>Блог</Link>*/}
                             {/*</li>*/}
-                            <li>
-                                <Link href="/how-we-work" className={styles.footerLink}>Как мы работаем</Link>
-                            </li>
+                            {/*<li>*/}
+                            {/*    <Link href="/how-we-work" className={styles.footerLink}>Как мы работаем</Link>*/}
+                            {/*</li>*/}
                         </ul>
                     </div>
                     <div className={styles.footerColumn}>
-                        <p className={styles.footerColumnTitle}>Контакт</p>
+                        <p className={styles.footerColumnTitle}></p>
                         <ul>
+                            <li>
+                                <Link href="/about-us" className={styles.footerLink}>
+                                    О Нас
+                                </Link>
+                            </li>
                             <li>
                                 <Link href="/help-faq" className={styles.footerLink}>
                                     Помощь/Часто задаваемые вопросы
                                 </Link>
                             </li>
-                            <li>
-                                <Link href="/press" className={styles.footerLink}>Пресса</Link>
-                            </li>
-                            <li>
-                                <Link href="/branches" className={styles.footerLink}>Филиалы</Link>
-                            </li>
-                            <li>
-                                <Link href="/hotel-owners" className={styles.footerLink}>Владельцы отелей</Link>
-                            </li>
+                            {/*<li>*/}
+                            {/*    <Link href="/press" className={styles.footerLink}>Пресса</Link>*/}
+                            {/*</li>*/}
+                            {/*<li>*/}
+                            {/*    <Link href="/branches" className={styles.footerLink}>Филиалы</Link>*/}
+                            {/*</li>*/}
+                            {/*<li>*/}
+                            {/*    <Link href="/hotel-owners" className={styles.footerLink}>Владельцы отелей</Link>*/}
+                            {/*</li>*/}
                             <li>
                                 <Link href="/partners" className={styles.footerLink}>Партнеры</Link>
                             </li>
@@ -81,11 +89,11 @@ const Footer = () => {
 
                     </div>
                     <div className={styles.footerColumn}>
-                        <p className={styles.footerColumnTitle}>Еще</p>
+                        <p className={styles.footerColumnTitle}></p>
                         <ul>
-                            <li>
-                                <Link href="/airline-fees" className={styles.footerLink}>Авиакомпанийные сборы</Link>
-                            </li>
+                            {/*<li>*/}
+                            {/*    <Link href="/airline-fees" className={styles.footerLink}>Авиакомпанийные сборы</Link>*/}
+                            {/*</li>*/}
                             <li>
                                 <Link href="/airlines" className={styles.footerLink}>Авиакомпании</Link>
                             </li>
@@ -93,7 +101,7 @@ const Footer = () => {
                                 <Link href="/low-fare-tips" className={styles.footerLink}>Советы по низким тарифам</Link>
                             </li>
                             <li>
-                                <Link href="/badges-certificates" className={styles.footerLink}>Значки и сертификаты</Link>
+                                <Link href="/badges-certificates" className={styles.footerLink}>Документы</Link>
                             </li>
                             <li>
                                 <Link href="/security" className={styles.footerLink}>Безопасность</Link>
@@ -101,19 +109,17 @@ const Footer = () => {
                         </ul>
                     </div>
                     <div className={`${styles.footerColumn} ${styles.noneMobile}`}>
-                        <p className={styles.footerColumnTitle}>Можно платить</p>
+                        <p className={styles.footerColumnTitle}></p>
                         <div className={styles.footerPayList}>
                             <div><Icon name={'mir'} size={41}/></div>
                             <div><Icon name={'visa'} size={38}/></div>
-                            <div><Icon name={'master'} size={29}/></div>
+                            {/*<div><Icon name={'master'} size={29}/></div>*/}
                         </div>
 
-                        <p className={styles.footerColumnTitle}>Скачать приложение</p>
-                        <div className={styles.appStore}>
-                            <Icon name={"appStore"} size={'100%'}/>
-                        </div>
+                        {/*<p className={styles.footerColumnTitle}>Скачать приложение</p>*/}
+
                         <div className={styles.social}>
-                            <p className={styles.socialTitle}>Мы в соц. сетях</p>
+                            {/*<p className={styles.socialTitle}>Мы в соц. сетях</p>*/}
                             <ul>
                                 <li><Icon name={"vk"} size={24} color="var(--textPrimary)"/></li>
                                 <li><Icon name={"rutube"} size={24} color="var(--textPrimary)"/></li>

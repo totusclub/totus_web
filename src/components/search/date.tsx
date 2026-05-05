@@ -12,9 +12,10 @@ type SelectDateProps = {
     name: any;
     className?: string;
     nights?: string | number;
+    flexDates?: string | number;
 };
 
-const SelectDate = ({ handleChange, value, name, className, nights = 1 }: SelectDateProps) => {
+const SelectDate = ({ handleChange, value, name, className, nights = 1, flexDates = 0 }: SelectDateProps) => {
     const [selectedDate, setSelectedDate] = useState<Date | null>(new Date(value));
     const [selectedEndDate, setSelectedEndDate] = useState<Date | null>(null);
     const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -123,7 +124,8 @@ const SelectDate = ({ handleChange, value, name, className, nights = 1 }: Select
                         rangeStart={selectedDate}
                         rangeEnd={selectedEndDate}
                         monthsToShow={2}
-                        hideToggle={true}
+                        plusMinusEnabled={Number(flexDates) === 2}
+                        onPlusMinusChange={(enabled) => handleChange(enabled ? '2' : '0', 'flex_dates')}
                     />
                     <div className={styles.dateFooter}>
                         <Button onClick={() => setIsOpen(false)} full={true} title={'Готово'} />

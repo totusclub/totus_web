@@ -28,6 +28,8 @@ interface CalendarProps {
     rangeStart?: Date | null;
     rangeEnd?: Date | null;
     monthsToShow?: number;
+    plusMinusEnabled?: boolean;
+    onPlusMinusChange?: (enabled: boolean) => void;
 }
 
 
@@ -39,6 +41,8 @@ const Calendar = ({
     rangeStart = null,
     rangeEnd = null,
     monthsToShow = 1,
+    plusMinusEnabled,
+    onPlusMinusChange,
 }: CalendarProps) => {
     const [currentMonth, setCurrentMonth] = useState(new Date());
     const [showPlusMinus, setShowPlusMinus] = useState(false);
@@ -61,6 +65,12 @@ const Calendar = ({
             document.removeEventListener('mousedown', handleClickOutside);
         };
     }, []);
+
+    useEffect(() => {
+        if (typeof plusMinusEnabled === 'boolean') {
+            setShowPlusMinus(plusMinusEnabled);
+        }
+    }, [plusMinusEnabled]);
 
     const isPlusMinusTwo = (date: Date) => {
         if (!selectedDate || isSameDay(date, selectedDate)) return false;
@@ -255,7 +265,13 @@ const Calendar = ({
             {!hideToggle && (
                 <div className={styles.toggleRow}>
                     <p>±2 дня</p>
-                    <SwitchToggle isOn={showPlusMinus} setIsOn={setShowPlusMinus} />
+                    <SwitchToggle
+                        isOn={showPlusMinus}
+                        setIsOn={(enabled: boolean) => {
+                            setShowPlusMinus(enabled);
+                            onPlusMinusChange?.(enabled);
+                        }}
+                    />
                 </div>
             )}
         </div>

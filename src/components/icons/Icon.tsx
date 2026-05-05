@@ -76,6 +76,7 @@ import CheapIcon from '@/components/icons/cheap';
 import ReatingIcon from '@/components/icons/reating';
 import OptionCheckIcon from '@/components/icons/optionCheck';
 import BirdIcon from '@/components/icons/bird';
+import RuStoreIcon from "@/components/icons/ruStore";
 
 
 const icons = {
@@ -102,6 +103,7 @@ const icons = {
     check: CheckIcon,
     appStore: AppStoreIcon,
     googlePlay: GooglePlayIcon,
+    ruStore: RuStoreIcon,
     fb:FbIcon,
     x:XIcon,
     instagram: InstagramIcon,

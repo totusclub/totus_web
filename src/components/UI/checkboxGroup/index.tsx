@@ -19,6 +19,9 @@ interface CheckboxGroupProps {
 
 
 export default function CheckboxGroup({options, selected, onChange,name,pk,netPrice}: CheckboxGroupProps) {
+    const getOptionValue = (item: any) =>
+        item?.id ?? item?.luggage_type ?? item?.flight_class ?? item?.number ?? item?.flight_type;
+
     useEffect(() => {
         if(selected){
             const values = Array.isArray(selected)
@@ -32,7 +35,7 @@ export default function CheckboxGroup({options, selected, onChange,name,pk,netPr
     const handleToggle = (id: number | string) => {
         const selectedIds = options
             .filter(item => item.selected)
-            .map(item => item.id || item.luggage_type || item.flight_class || item.number || item.flight_type);
+            .map((item) => getOptionValue(item));
         if (selectedIds.includes(id)) {
             onChange(name,selectedIds.filter((item) => item !== id).join(','));
         } else {
@@ -49,9 +52,9 @@ export default function CheckboxGroup({options, selected, onChange,name,pk,netPr
 
     const renderName =(item)=>{
         if(name==='filter_stars'){
-            if(item.id === '5'){
+            if(item.id === 5){
                 return `${item.id} звёзд`
-            }else if(item.id  === '1'){
+            }else if(item.id  === 1){
                 return `${item.id} звезда`
             }else{
                 return `${item.id} звезды`
@@ -110,7 +113,7 @@ export default function CheckboxGroup({options, selected, onChange,name,pk,netPr
                     <Checkbox option={option} handleToggle={handleToggle} />
                     {/*<Icon name={option.selected? 'checkBoxActive':'checkBox'} size={24} onClick={() => handleToggle(option.id || option.luggage_type || option.flight_class || option.number || option.flight_type)} />*/}
                     <div>
-                        <p onClick={() => handleToggle(option.id || option.luggage_type || option.flight_class || option.number || option.flight_type)}>{renderName(option)}</p>
+                        <p onClick={() => handleToggle(getOptionValue(option))}>{renderName(option)}</p>
                         {!pk && (
                             <span> {option?.hotel_count} отелей от {option?.min_price?.toString()?.replace(/\B(?=(\d{3})+(?!\d))/g, '\u202F')}₽</span>
                         )}

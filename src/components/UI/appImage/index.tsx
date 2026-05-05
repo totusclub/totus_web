@@ -51,15 +51,17 @@ export default function AppImage({ imageUrl }: Props) {
                     width: "100%",
                     paddingTop: `${100 / aspectRatio}%`,
                     position: "relative",
-                    borderRadius:12
+                    borderRadius:12,
+                    overflow:'hidden',
+                    height:'200px'
                 }}
             >
                 <img src={imageUrl} alt=""   style={{
                     position: "absolute",
                     top: 0,
                     left: 0,
-                    width: "100%",
-                    height: "100%",
+                    // width: "100%",
+                    height: "220px",
                     display: "block",
                     borderRadius:12
                 }}/>

@@ -118,14 +118,6 @@ const normalizeDate = (date: Date | string): string | null => {
 };
 
 /**
- * Parses flex_dates value (can be string or number).
- */
-const parseFlexDates = (flexDates?: string | number): number => {
-  if (!flexDates) return DEFAULT_FLEX_DATES;
-  return typeof flexDates === 'string' ? parseInt(flexDates, 10) : flexDates;
-};
-
-/**
  * Formats nights as range when flex_dates is enabled.
  * Example: 7 with flex_dates=2 becomes "7..9"
  */
@@ -315,8 +307,8 @@ const HotelSearchSection: React.FC<HotelSearchSectionProps> = ({
     const hotelCountry = apiHotelData?.country;
     const hotelCity = apiHotelData?.city;
 
-    // Parse flex_dates and format nights
-    const flexDates = parseFlexDates(sourceParams?.flex_dates);
+    // Hotel page should always search with ±2 nights flexibility.
+    const flexDates = DEFAULT_FLEX_DATES;
     const nightsFormatted = formatNightsForAPI(params.nights, flexDates);
 
     // Build search parameters

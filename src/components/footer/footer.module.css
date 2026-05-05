@@ -95,10 +95,13 @@
     text-decoration: underline;
 }
 .appStore{
-    width: 126px;
+    width: 160px;
     height: 42px;
     margin-bottom: 16px;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 16px;
 }
 .googlePlay{
     width: 126px;

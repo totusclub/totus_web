@@ -133,7 +133,8 @@ export const buildInitialSearchParams = (
 ): Record<string, unknown> => {
   const startDate = (query.start_date as string) || getDefaultStartDate();
   const nightsStr = (query.nights as string) || '7';
-  const flexDates = query.flex_dates ? Number(query.flex_dates) : 2;
+  // Hotel details room search must always use ±2 nights.
+  const flexDates = 2;
   
   // Calculate end date - use parseNightsValue to correctly handle "7..9" format
   const startDateObj = new Date(startDate);

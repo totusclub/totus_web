@@ -36,10 +36,20 @@ export async function getHomeData(): Promise<any> {
 
 export async function getGroupedHotels(params) {
     try {
+        const sanitizedParams = Object.fromEntries(
+            Object.entries(params || {}).filter(([_, value]) => {
+                if (value === null || value === undefined) return false;
+                if (typeof value === 'string') return value.trim() !== '';
+                if (Array.isArray(value)) return value.length > 0;
+                // Keep valid falsy values like 0 and false.
+                return true;
+            })
+        );
+
         const res = await axios.get(`${BASE_URL}/grouped-hotels`, {
-            params: params,
+            params: sanitizedParams,
         });
-        return { ...res.data, ...params };
+        return { ...res.data, ...sanitizedParams };
     } catch (error) {
         console.error('Error getting grouped hotels:', error);
         throw error;

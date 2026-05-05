@@ -10,7 +10,7 @@ const MIN = 1;
 const MAX = 30;
 
 
-const Nights = ({handleChange,value,name}) => {
+const Nights = ({handleChange,value,name, flexDates = '0'}) => {
     const [values, setValues] = useState([7]);
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [isOn, setIsOn] = useState<boolean>(false);
@@ -34,6 +34,10 @@ const Nights = ({handleChange,value,name}) => {
             setValues([parsed]);
         }
     }, [value]);
+
+    useEffect(() => {
+        setIsOn(Number(flexDates) === 2);
+    }, [flexDates]);
 
     const handleToggle = () => {
         setIsOpen(prev => !prev);
@@ -63,7 +67,13 @@ const Nights = ({handleChange,value,name}) => {
                             <p>Длительность тура ±2 ночи</p>
                             <p>Бывает выгоднее</p>
                         </div>
-                        <SwitchToggle setIsOn={setIsOn} isOn={isOn} />
+                        <SwitchToggle
+                            isOn={isOn}
+                            setIsOn={(enabled) => {
+                                setIsOn(enabled);
+                                handleChange(enabled ? '2' : '0', 'flex_dates');
+                            }}
+                        />
                     </div>
                     <div className={styles.nightsFooter}>
                         <Button onClick={()=>setIsOpen(false)} full={true} title={'Готово'}/>
