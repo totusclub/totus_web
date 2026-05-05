@@ -3,11 +3,13 @@ import TourAgents from "@/components/hotelDetails/hotelDetailsRooms/tourAgents";
 import Icon from "@/components/icons/Icon";
 import HotelDetailsPriceList from "@/components/hotelDetails/hotelDetailsRooms/priceList";
 import SmallSlider from "@/components/UI/smallSlide";
+import GalleryModal from "@/components/UI/galleryModal";
 import Image from "next/image";
 import React, {useEffect, useMemo, useState} from "react";
 
 const HotelDetailsRoomItem = ({item,selectedDate}:any) => {
     const [selectedOperator, setSelectedOperator] = useState<number | null>(null);
+    const [isRoomGalleryOpen, setIsRoomGalleryOpen] = useState(false);
 
    const roomItems =  useMemo(() => {
         if (selectedDate && item?.offers) {
@@ -45,7 +47,10 @@ const HotelDetailsRoomItem = ({item,selectedDate}:any) => {
                 {item?.room?.images?.length > 1 ? (
                     <SmallSlider images={item?.room?.images}/>
                 ) : (
-                    <div className={styles.HotelDetailsRoomImage}>
+                    <div
+                        className={styles.HotelDetailsRoomImage}
+                        onClick={() => setIsRoomGalleryOpen(true)}
+                    >
                         <img
                             // src={`https://image.totus.club/imagePath?directory=${item?.room?.images?.[0]?.['x900']?.replace('https://img.cdn.level.travel/', '')}`}
                             src={item?.room?.images?.[0]?.['x900']}
@@ -81,6 +86,13 @@ const HotelDetailsRoomItem = ({item,selectedDate}:any) => {
             {Object.entries(item?.offers)?.map(([type, offer], index) =>
                     <HotelDetailsPriceList key={index} selectedOperator={selectedOperator} selectedDate={selectedDate} item={roomItems?.offersRoom} type={type}  />
             )}
+
+            <GalleryModal
+                isOpen={isRoomGalleryOpen}
+                onClose={() => setIsRoomGalleryOpen(false)}
+                images={item?.room?.images || []}
+                initialIndex={0}
+            />
 
 
         </div>

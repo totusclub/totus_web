@@ -70,6 +70,49 @@ export const parseNightsValue = (nightsStr: string): number => {
   return isNaN(parsed) ? 7 : parsed;
 };
 
+/** All distinct offer start_date values from room list, sorted ascending */
+export const getAvailableStartDatesFromRooms = (rooms: any[] | undefined | null): string[] => {
+  const set = new Set<string>();
+  rooms?.forEach((room) => {
+    const offers = room?.offers || {};
+    Object.values(offers).forEach((offerList: any) => {
+      if (!Array.isArray(offerList)) return;
+      offerList.forEach((offer: any) => {
+        if (offer?.start_date) set.add(String(offer.start_date));
+      });
+    });
+  });
+  return Array.from(set).sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
+};
+
+/** Cheapest offer (by analytics_price) for a given start_date across all rooms */
+export const findCheapestOfferForStartDate = (
+  rooms: any[] | undefined | null,
+  startDate: string
+): any | null => {
+  if (!rooms?.length || !startDate) return null;
+  let best: any = null;
+  let bestPrice = Infinity;
+
+  rooms.forEach((room) => {
+    const offers = room?.offers || {};
+    Object.values(offers).forEach((offerList: any) => {
+      if (!Array.isArray(offerList)) return;
+      offerList.forEach((offer: any) => {
+        if (offer?.start_date !== startDate) return;
+        const price = Number(offer.analytics_price);
+        const p = Number.isFinite(price) ? price : Infinity;
+        if (p < bestPrice) {
+          bestPrice = p;
+          best = offer;
+        }
+      });
+    });
+  });
+
+  return best;
+};
+
 /**
  * Formats nights as range when flex_dates is enabled.
  * Example: 7 with flex_dates=2 becomes "7..9"
@@ -127,6 +170,41 @@ export const buildInitialSearchParams = (
     sort_by: (query.sort_by as string) || 'relevance',
   };
 };
+
+/** Default search query for `/hotel-details` (favorites, shared links) — matches `buildInitialSearchParams` defaults. */
+export function buildHotelDetailsDeepLinkQuery(hotelId: string | number): Record<string, string> {
+  const base: Record<string, string | string[] | undefined> = {
+    from_city: "Moscow",
+    from_country: "RU",
+    to_country: "",
+    adults: "2",
+    start_date: getDefaultStartDate(),
+    nights: "7",
+    search_type: "package",
+    flex_dates: "2",
+  };
+  const built = buildInitialSearchParams(base, String(hotelId));
+  const out: Record<string, string> = {
+    hotel_id: String(hotelId),
+    from_city: String(built.from_city),
+    from_country: String(built.from_country),
+    to_country: String(built.to_country ?? ""),
+    adults: String(built.adults),
+    start_date: String(built.start_date),
+    start_date_from: String(built.start_date_from),
+    end_date_till: String(built.end_date_till),
+    nights: String(built.nights),
+    search_type: String(built.search_type),
+    flex_dates: String(built.flex_dates),
+  };
+  if (built.to_city != null && String(built.to_city)) {
+    out.to_city = String(built.to_city);
+  }
+  if (built.kids != null) {
+    out.kids = String(built.kids);
+  }
+  return out;
+}
 
 /**
  * Validates hotel ID

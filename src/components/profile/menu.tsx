@@ -4,12 +4,13 @@ import useAuth from "@/hooks/useAuth";
 import { useDispatch } from "react-redux";
 import { logout } from "@/store/slices/authSlice";
 import { deleteToken } from "@/utils/auth";
-import { router } from "next/client";
+import { useRouter } from "next/router";
 import { useState } from "react";
 import SwitchToggle from "@/components/UI/switch";
 import { useTheme } from "@/hooks/useTheme";
 
 const MenuProfile = () => {
+    const router = useRouter();
     const dispatch = useDispatch();
     const { user, token } = useAuth()
     const [deleteModal, setDeleteModal] = useState<boolean>(false)
@@ -86,15 +87,15 @@ const MenuProfile = () => {
                 {/*    <p>Моя учетная запись</p>*/}
                 {/*</div>*/}
 
-                <div onClick={() => router.push('profile/my-orders')} className={styles.profileMenuItem}>
+                <div onClick={() => router.push('/profile/my-orders')} className={styles.profileMenuItem}>
                     <Icon name={'order'} size={24} />
                     <p>Мои заказы</p>
                 </div>
-                {/*<div className={styles.profileMenuItem}>*/}
-                {/*    <Icon name={'favorite'} size={24}/>*/}
-                {/*    <p>Избранное</p>*/}
-                {/*</div>*/}
-                <div onClick={() => router.push('privacy-policy')} className={styles.profileMenuItem}>
+                <div onClick={() => router.push('/profile/favorites')} className={styles.profileMenuItem}>
+                    <Icon name={'favorite'} size={24} />
+                    <p>Избранное</p>
+                </div>
+                <div onClick={() => router.push('/privacy-policy')} className={styles.profileMenuItem}>
                     <Icon name={'faq'} size={24} />
                     <p>Политика конфиденциальности</p>
                 </div>

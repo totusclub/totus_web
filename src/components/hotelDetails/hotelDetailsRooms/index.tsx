@@ -4,53 +4,88 @@ import HotelDetailsRoomItem from "@/components/hotelDetails/hotelDetailsRooms/ro
 import RoomsSkeleton from "@/components/hotelDetails/hotelDetailsRooms/roomsSkeleton";
 import Icon from "@/components/icons/Icon";
 import Button from "@/components/UI/button";
-import { router } from "next/client";
-import { useEffect, useMemo, useState } from "react";
+import dynamic from "next/dynamic";
+import Image from "next/image";
+import { useMemo, useState } from "react";
 import { createPackage } from "@/api/levelTravelApi";
 import { useRouter } from "next/router";
+import { findCheapestOfferForStartDate } from "@/utils/hotelDetailsUtils";
 
-interface HotelDetailsRoomsProps {
-  rooms: any[];
-  loading?: boolean;
+const HotelLocationMap = dynamic(() => import("./HotelLocationMap"), {
+    ssr: false,
+    loading: () => <div className={styles.image_placeholder} style={{ width: "100%", height: "100%", minHeight: 160 }} />,
+});
+
+export type HotelDetailsMapInfo = {
+    lat?: number | null;
+    long?: number | null;
+    lng?: number | null;
+    address?: string;
+    name?: string;
+    fallbackImage?: string;
+};
+
+function resolveHotelCoords(info?: HotelDetailsMapInfo): { lat: number; lng: number } | null {
+    if (!info) return null;
+    const lat = Number(info.lat);
+    const lng = Number(info.long ?? info.lng);
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+    if (Math.abs(lat) > 90 || Math.abs(lng) > 180) return null;
+    if (lat === 0 && lng === 0) return null;
+    return { lat, lng };
 }
 
-const HotelDetailsRooms = ({ rooms, loading = false }: HotelDetailsRoomsProps) => {
+interface HotelDetailsRoomsProps {
+    rooms: any[];
+    loading?: boolean;
+    hotelMap?: HotelDetailsMapInfo;
+    selectedDate: string;
+    onSelectedDateChange: (date: string) => void;
+}
+
+const HotelDetailsRooms = ({
+    rooms,
+    loading = false,
+    hotelMap,
+    selectedDate,
+    onSelectedDateChange,
+}: HotelDetailsRoomsProps) => {
     const router = useRouter();
-    const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-    const [fisrtDate, setFisrtDate] = useState(null);
     const [isBooking, setIsBooking] = useState(false);
-    const pricesList = useMemo(() => {
-        if (!rooms) return;
+    const pricesList = useMemo((): Record<string, number> | undefined => {
+        if (!rooms?.length) return undefined;
 
-        const grouped = rooms.reduce((acc, room) => {
+        const grouped: Record<string, number> = {};
+
+        rooms.forEach((room) => {
             const offers = room?.offers || {};
-
-            Object.values(offers).forEach(offerList => {
-                offerList.forEach(({ start_date, analytics_price }) => {
+            Object.values(offers).forEach((offerList) => {
+                if (!Array.isArray(offerList)) return;
+                offerList.forEach((item: { start_date?: string; analytics_price?: number }) => {
+                    const { start_date, analytics_price } = item;
+                    if (!start_date || analytics_price == null) return;
                     if (
-                        !acc[start_date] ||
-                        analytics_price < acc[start_date]
+                        grouped[start_date] === undefined ||
+                        analytics_price < grouped[start_date]
                     ) {
-                        acc[start_date] = analytics_price;
+                        grouped[start_date] = analytics_price;
                     }
                 });
             });
+        });
 
-            return acc;
-        }, {});
-
-        // Сортировка по дате
-        const sorted = Object.entries(grouped)
-            .sort(([dateA], [dateB]) => new Date(dateA) - new Date(dateB))
-            .reduce((acc, [date, price]) => {
+        return Object.entries(grouped)
+            .sort(([dateA], [dateB]) => new Date(dateA).getTime() - new Date(dateB).getTime())
+            .reduce<Record<string, number>>((acc, [date, price]) => {
                 acc[date] = price;
                 return acc;
             }, {});
-
-        // console.log("Sorted by start_date with min prices:", sorted);
-        return sorted
     }, [rooms]);
 
+    const highlightOffer = useMemo(
+        () => findCheapestOfferForStartDate(rooms, selectedDate),
+        [rooms, selectedDate]
+    );
 
     const roomTypeName = {
         BB: 'Завтрак',
@@ -70,35 +105,6 @@ const HotelDetailsRooms = ({ rooms, loading = false }: HotelDetailsRoomsProps) =
 
 
 
-    useEffect(() => {
-
-        const closestOffer = (() => {
-            let earliest = null;
-
-            rooms?.forEach(room => {
-                const offers = room?.offers || {};
-                Object.values(offers).forEach(offerList => {
-                    offerList.forEach(item => {
-                        const date = item?.start_date;
-                        if (!date) return;
-
-                        const itemDate = new Date(date);
-                        if (
-                            !earliest ||
-                            itemDate < new Date(earliest.start_date)
-                        ) {
-                            earliest = item;
-                        }
-                    });
-                });
-            });
-
-            return earliest;
-        })();
-        setFisrtDate(closestOffer)
-    }, [rooms])
-
-
     const handleBook = async (id: any) => {
         setIsBooking(true)
         const res = await createPackage({ request_id: router.query.request_id, tour_id: id })
@@ -108,19 +114,22 @@ const HotelDetailsRooms = ({ rooms, loading = false }: HotelDetailsRoomsProps) =
     };
 
     const formatDate = useMemo(() => {
-        if (fisrtDate?.start_date) {
-            const date = new Date(fisrtDate?.start_date);
+        if (!highlightOffer?.start_date) return "";
+        const date = new Date(highlightOffer.start_date);
+        const formatter = new Intl.DateTimeFormat("ru-RU", {
+            day: "numeric",
+            month: "long",
+        });
+        return `с ${formatter.format(date)}`;
+    }, [highlightOffer?.start_date]);
 
-            const formatter = new Intl.DateTimeFormat('ru-RU', {
-                day: 'numeric',
-                month: 'long'
-            });
+    const priceFormatted =
+        highlightOffer?.price != null
+            ? String(highlightOffer.price).replace(/\B(?=(\d{3})+(?!\d))/g, "\u202F")
+            : "—";
 
-            const formatted = formatter.format(date);
-
-            return `с ${formatted}`;
-        }
-    }, [fisrtDate?.start_date])
+    const hotelCoords = resolveHotelCoords(hotelMap);
+    const mapBalloon = [hotelMap?.name, hotelMap?.address].filter(Boolean).join(" — ");
 
     if (loading) {
         return <RoomsSkeleton />;
@@ -147,7 +156,11 @@ const HotelDetailsRooms = ({ rooms, loading = false }: HotelDetailsRoomsProps) =
                     <div className={styles.HotelDetailsRoomsHead}>
                         <p>Выберите номер</p>
                     </div>
-                    <DatesPrice dates={pricesList} selectedDate={selectedDate} setSelectedDate={setSelectedDate} />
+                    <DatesPrice
+                        dates={pricesList ?? {}}
+                        selectedDate={selectedDate}
+                        setSelectedDate={onSelectedDateChange}
+                    />
                     {rooms.map((r, i) => (
                         <HotelDetailsRoomItem key={i} item={r} selectedDate={selectedDate} />
                     ))}
@@ -156,21 +169,53 @@ const HotelDetailsRooms = ({ rooms, loading = false }: HotelDetailsRoomsProps) =
                 <div className={styles.HotelDetailsMap}>
                     <div className={styles.HotelDetailsMapBox}>
                         <div className={styles.HotelDetailsMapBoxTitle}>
-                            <Icon name={'location'} size={16} />
-                            <p> Jumeirah Beach Road, Дубай, ОАЭ</p>
+                            <Icon name={"location"} size={16} />
+                            <p>{hotelMap?.address || "Адрес отеля"}</p>
                         </div>
                         <div className={styles.map}>
-                            {/*<Map defaultState={{ center: [55.75, 37.57], zoom: 9 }} />*/}
+                            {hotelCoords ? (
+                                <HotelLocationMap
+                                    lat={hotelCoords.lat}
+                                    lng={hotelCoords.lng}
+                                    balloonContent={mapBalloon}
+                                />
+                            ) : hotelMap?.fallbackImage ? (
+                                <Image
+                                    className={styles.mapFallbackImg}
+                                    src={hotelMap.fallbackImage}
+                                    alt={
+                                        hotelMap?.name
+                                            ? `Схема расположения: ${hotelMap.name}`
+                                            : "Расположение отеля"
+                                    }
+                                    fill
+                                    sizes="(max-width: 1200px) 100vw, 420px"
+                                />
+                            ) : (
+                                <p className={styles.mapFallback}>
+                                    {hotelMap?.address
+                                        ? "Координаты отеля недоступны для карты."
+                                        : "Адрес и координаты отеля не указаны."}
+                                </p>
+                            )}
                         </div>
                     </div>
                     <div className={styles.HotelDetailsInfoPrice}>
-                        <p className={styles.HotelDetailsInfoPriceText}>от {fisrtDate?.price.toString()?.replace(/\B(?=(\d{3})+(?!\d))/g, '\u202F')}₽</p>
+                        <p className={styles.HotelDetailsInfoPriceText}>от {priceFormatted}₽</p>
                         <div className={styles.HotelDetailsInfoDate}>
                             <p className={styles.HotelDetailsInfoDateTitle}>Цена за тур с перелётом</p>
-                            <p className={styles.HotelDetailsInfoDateText}>{formatDate}, {fisrtDate?.nights_count} ночей</p>
+                            <p className={styles.HotelDetailsInfoDateText}>
+                                {formatDate}
+                                {highlightOffer?.nights_count != null ? `, ${highlightOffer.nights_count} ночей` : ""}
+                            </p>
                         </div>
-                        <Button loading={isBooking} onClick={() => handleBook(fisrtDate?.id)} title={'Выбрать номер'}
-                            full={true} />
+                        <Button
+                            loading={isBooking}
+                            disabled={highlightOffer?.id == null}
+                            onClick={() => highlightOffer?.id != null && handleBook(highlightOffer.id)}
+                            title={"Выбрать номер"}
+                            full={true}
+                        />
                     </div>
 
                 </div>

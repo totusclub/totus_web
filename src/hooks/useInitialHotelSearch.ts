@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { startSearch } from '@/api/levelTravelApi';
-import { buildInitialSearchParams, getDefaultStartDate } from '@/utils/hotelDetailsUtils';
+import { buildInitialSearchParams } from '@/utils/hotelDetailsUtils';
 
 /**
- * Hook to run initial search if we have search params but no request_id
- * This handles the case when coming from hot deals (no request_id in URL)
+ * Runs startSearch when there is a hotel_id but no request_id yet.
+ * `buildInitialSearchParams` fills defaults (dates, Moscow, adults, …) so deep links work:
+ * favorites, share, refresh on `/hotel-details?hotel_id=…` only.
  */
 export const useInitialHotelSearch = (
   hotelId: string | undefined,
@@ -19,16 +20,7 @@ export const useInitialHotelSearch = (
   useEffect(() => {
     if (!isReady || !hotelId) return;
 
-    // If we already have request_id, don't start a new search
     if (requestId || localRequestId) {
-      return;
-    }
-
-    // Check if we have search params in URL
-    const query = router.query;
-    const hasSearchParams = query.from_city || query.start_date || query.adults;
-
-    if (!hasSearchParams) {
       return;
     }
 
@@ -36,23 +28,49 @@ export const useInitialHotelSearch = (
 
     const runInitialSearch = async () => {
       try {
+        const query = router.query;
         const searchParams = buildInitialSearchParams(query, hotelId);
         const response = await startSearch(searchParams);
 
         if (isMounted && response?.request_id) {
-          // Update local state first (this will trigger useHotelRooms)
           setLocalRequestId(response.request_id);
-          
-          // Update URL with request_id without reloading
-          const newQuery = { ...query, request_id: response.request_id };
-          router.replace(
-            { pathname: router.pathname, query: newQuery },
-            undefined,
-            { shallow: true }
-          );
+
+          const newQuery: Record<string, string | string[] | undefined> = {
+            ...query,
+            request_id: response.request_id,
+          };
+          if (!newQuery.start_date && searchParams.start_date) {
+            newQuery.start_date = String(searchParams.start_date);
+          }
+          if (!newQuery.start_date_from && searchParams.start_date_from) {
+            newQuery.start_date_from = String(searchParams.start_date_from);
+          }
+          if (!newQuery.end_date_till && searchParams.end_date_till) {
+            newQuery.end_date_till = String(searchParams.end_date_till);
+          }
+          if (!newQuery.nights && searchParams.nights) {
+            newQuery.nights = String(searchParams.nights);
+          }
+          if (!newQuery.from_city && searchParams.from_city) {
+            newQuery.from_city = String(searchParams.from_city);
+          }
+          if (!newQuery.from_country && searchParams.from_country) {
+            newQuery.from_country = String(searchParams.from_country);
+          }
+          if (!newQuery.adults && searchParams.adults) {
+            newQuery.adults = String(searchParams.adults);
+          }
+          if (!newQuery.search_type && searchParams.search_type) {
+            newQuery.search_type = String(searchParams.search_type);
+          }
+          if (newQuery.flex_dates == null && searchParams.flex_dates != null) {
+            newQuery.flex_dates = String(searchParams.flex_dates);
+          }
+
+          router.replace({ pathname: router.pathname, query: newQuery }, undefined, { shallow: true });
         }
       } catch (error) {
-        console.error('[useInitialHotelSearch] Failed to start hotel search from params', error);
+        console.error("[useInitialHotelSearch] Failed to start hotel search", error);
       }
     };
 

@@ -1,6 +1,25 @@
 .calendarWrapper{
     width: 100%;
 }
+.monthsGrid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+}
+.monthsGridTwo {
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+.monthColumn {
+    min-width: 0;
+}
+.monthLabel {
+    color: var(--textPrimary);
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 6px;
+    text-transform: capitalize;
+}
 .headerCalendar {
     display: flex;
     justify-content: space-between;
@@ -130,4 +149,10 @@
     /*height: 48px;*/
     margin-top: 18px;
     padding-top: 18px;
+}
+@media (max-width: 768px) {
+    .monthsGridTwo {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
 }

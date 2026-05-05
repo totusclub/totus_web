@@ -1,10 +1,16 @@
+import { StaticInfoPage } from "@/components/staticInfoPage";
+import shellStyles from "@/components/staticInfoPage/staticInfoPage.module.css";
 import styles from './privace-police.module.css'
 
 
 const PrivacyPolicy = ()=> {
     return (
-        <main className={'searchContainer'}>
-            <div className={'content'}>
+        <StaticInfoPage
+            title="Политика конфиденциальности"
+            section="legal"
+            currentLabel="Конфиденциальность"
+        >
+            <div className={shellStyles.privacyInner}>
                 <section id="1">
                     <h2 className={styles.h2}>1. Общие положения</h2>
                     <p className={styles.p}>Настоящая политика обработки персональных данных составлена в соответствии с требованиями
@@ -348,7 +354,7 @@ const PrivacyPolicy = ()=> {
                     </ol>
                 </section>
             </div>
-        </main>
+        </StaticInfoPage>
     );
 }
 export default PrivacyPolicy

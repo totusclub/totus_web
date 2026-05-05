@@ -17,9 +17,14 @@ export const useRequestIdSync = (): {
   const router = useRouter();
   const { requestId: storeRequestId } = useSelector((state: RootState) => state.search);
 
-  const existingRequestId = router.query.request_id as string;
+  const rawRequestId = router.query.request_id;
+  const existingRequestId = Array.isArray(rawRequestId) ? rawRequestId[0] : rawRequestId;
   const initialRequestId = storeRequestId || null;
   const [localRequestId, setLocalRequestId] = useState<string | null>(null);
+
+  const rawHotelId = router.query.hotel_id;
+  const hotelIdInUrl = Array.isArray(rawHotelId) ? rawHotelId[0] : rawHotelId;
+  const hotelOnlyDeepLink = Boolean(hotelIdInUrl) && !existingRequestId;
 
   // Sync localRequestId from URL when coming from hotel list
   useEffect(() => {
@@ -28,17 +33,26 @@ export const useRequestIdSync = (): {
     }
   }, [router.isReady, existingRequestId, localRequestId]);
 
-  // Sync localRequestId from Redux when it changes externally (but only if no URL request_id)
+  // Sync localRequestId from Redux when it changes externally (but only if no URL request_id).
+  // Skip when URL is a deep hotel link (hotel_id without request_id): a new search will run;
+  // a stale Redux request_id would load wrong rooms for this hotel.
   useEffect(() => {
+    if (!router.isReady) return;
+    if (hotelOnlyDeepLink && initialRequestId) {
+      return;
+    }
     if (initialRequestId && initialRequestId !== localRequestId && !localRequestId && !existingRequestId) {
       setLocalRequestId(initialRequestId);
     }
-  }, [initialRequestId, localRequestId, existingRequestId]);
+  }, [router.isReady, hotelOnlyDeepLink, initialRequestId, localRequestId, existingRequestId]);
 
-  // Use local request_id if available, otherwise fall back to URL or Redux store
+  // Prefer URL/local. On deep hotel links (hotel_id, no request_id), ignore Redux — wrong search for this hotel.
   const requestId = useMemo(() => {
-    return localRequestId || existingRequestId || initialRequestId;
-  }, [localRequestId, existingRequestId, initialRequestId]);
+    if (localRequestId) return localRequestId;
+    if (existingRequestId) return existingRequestId;
+    if (hotelOnlyDeepLink) return undefined;
+    return initialRequestId ?? undefined;
+  }, [localRequestId, existingRequestId, hotelOnlyDeepLink, initialRequestId]);
 
   return {
     requestId,

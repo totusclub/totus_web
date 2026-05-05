@@ -27,6 +27,9 @@ const ArrowRight = ({ onClick }: ArrowProps) => (
 type ImageItem = {
     x500?: string;
     x900?: string;
+    x800?: string;
+    x620?: string;
+    src?: string;
     [key: string]: string | undefined;
 };
 
@@ -90,8 +93,22 @@ const GalleryModal: React.FC<GalleryModalProps> = ({ isOpen, onClose, images, in
 
     if (!images || images.length === 0) return null;
 
+    const resolveImageUrl = (value?: string) => {
+        if (!value) return '';
+        if (value.startsWith('http://') || value.startsWith('https://')) return value;
+        return `https://img.cdn.level.travel/${value}`;
+    };
+
     const currentImage = images[currentIndex];
-    const currentImageUrl = currentImage ? `https://img.cdn.level.travel/${currentImage['x900'] || currentImage['x500']}` : '';
+    const currentImageUrl = currentImage
+        ? resolveImageUrl(
+            currentImage['x900'] ||
+            currentImage['x800'] ||
+            currentImage['x620'] ||
+            currentImage['x500'] ||
+            currentImage.src
+        )
+        : '';
 
     const handlePrevious = () => {
         const newIndex = currentIndex > 0 ? currentIndex - 1 : images.length - 1;
@@ -172,7 +189,9 @@ const GalleryModal: React.FC<GalleryModalProps> = ({ isOpen, onClose, images, in
                             ref={(slider) => setThumbnailSliderDesktop(slider)}
                         >
                             {images.map((img: ImageItem, index: number) => {
-                                const thumbnailUrl = `https://img.cdn.level.travel/${img['x500']}`;
+                                const thumbnailUrl = resolveImageUrl(
+                                    img['x500'] || img['x620'] || img['x800'] || img['x900'] || img.src
+                                );
                                 return (
                                     <div key={index} className={styles.thumbnailSlideDesktop}>
                                         <img
@@ -214,7 +233,9 @@ const GalleryModal: React.FC<GalleryModalProps> = ({ isOpen, onClose, images, in
                             ref={(slider) => setThumbnailSliderMobile(slider)}
                         >
                             {images.map((img: ImageItem, index: number) => {
-                                const thumbnailUrl = `https://img.cdn.level.travel/${img['x500']}`;
+                                const thumbnailUrl = resolveImageUrl(
+                                    img['x500'] || img['x620'] || img['x800'] || img['x900'] || img.src
+                                );
                                 return (
                                     <div key={index} className={styles.thumbnailSlideMobile}>
                                         <img

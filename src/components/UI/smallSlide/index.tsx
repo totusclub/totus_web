@@ -6,6 +6,7 @@ import "slick-carousel/slick/slick-theme.css";
 import Icon from "@/components/icons/Icon";
 import Image from "next/image";
 import AppImage from "@/components/UI/appImage";
+import GalleryModal from "@/components/UI/galleryModal";
 
 
 interface ArrowProps {
@@ -33,6 +34,8 @@ const PrevArrow = ({ onClick }: ArrowProps) => {
 const SmallSlider = ({ images }) => {
     const [selectedIndex, setSelectedIndex] = useState<string>('');
     const [currentSlide, setCurrentSlide] = useState(0);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
     useEffect(() => {
         if (images?.length > 0) {
@@ -126,7 +129,14 @@ const SmallSlider = ({ images }) => {
 
     return (
         <div className={styles.containerSmallSlider}>
-            <div className={styles.selectedImageWrapper}>
+            <div
+                className={styles.selectedImageWrapper}
+                onClick={() => {
+                    const index = images?.findIndex((img) => img['x900'] === selectedIndex) ?? 0;
+                    setSelectedImageIndex(index >= 0 ? index : 0);
+                    setIsModalOpen(true);
+                }}
+            >
                 {/*<img*/}
                 {/*    src={selectedIndex}*/}
                 {/*    alt="Selected"*/}
@@ -137,7 +147,14 @@ const SmallSlider = ({ images }) => {
             </div>
             <Slider {...settings}>
                 {images.map((img, index) => (
-                    <div key={index} onClick={() => setSelectedIndex(img['x900'])}>
+                    <div
+                        key={index}
+                        onClick={() => {
+                            setSelectedIndex(img['x900']);
+                            setSelectedImageIndex(index);
+                            setIsModalOpen(true);
+                        }}
+                    >
                         <div
                             className={`${styles.slideItem} ${selectedIndex === img['x900'] ? styles.selected : ''
                                 }`}
@@ -148,6 +165,12 @@ const SmallSlider = ({ images }) => {
                     </div>
                 ))}
             </Slider>
+            <GalleryModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                images={images}
+                initialIndex={selectedImageIndex}
+            />
         </div>
     );
 };

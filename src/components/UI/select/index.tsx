@@ -57,15 +57,20 @@ const Select: React.FC<SelectProps> = ({
         onChange(option.name);
         setOpen(false);
     };
-    console.log('value', value);
     return (
         <div
             ref={selectRef}
             className={styles.customSelect}
             style={{ flex: isFull ? 1 : 'none' }}
         >
-            <div className={styles.selectButton} >
-                <div className={styles.selectButtonInfo} onClick={() => setOpen(prev => !prev)}>
+            <div
+                className={styles.selectButton}
+                onClick={() => setOpen((prev) => !prev)}
+                role="combobox"
+                aria-expanded={open}
+                aria-haspopup="listbox"
+            >
+                <div className={styles.selectButtonInfo}>
                     {label && <p className={styles.selectLabel}>{label}</p>}
                     <p className={`${styles.selectValue} ${!value ? styles.placeholder : ''}`}>
                         {value || placeholder}

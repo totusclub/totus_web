@@ -52,7 +52,7 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
         to_country: 'EG',
         adults: '1',
         start_date: '2025-07-21',
-        nights: '7..9',
+        nights: '7',
         flex_dates: '2',
         start_date_from: "2025-07-21",
         end_date_till: "2025-08-06",
@@ -65,14 +65,23 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
         // hotel_ids:[9069464]
     });
 
+    const getNightCount = (value: string | number | undefined) => {
+        if (typeof value === 'number') return value;
+        if (typeof value === 'string') {
+            const raw = value.split('..')[0] || value;
+            const parsed = parseInt(raw, 10);
+            return Number.isFinite(parsed) ? parsed : 7;
+        }
+        return 7;
+    };
+
 
 
     useEffect(() => {
         const today = new Date();
         const plus7 = new Date();
         plus7.setDate(today.getDate() + 7);
-        const dayPlus = params?.nights?.split('..')?.[0] || params?.nights;
-        const interval = calculateStayDates(plus7, +dayPlus);
+        const interval = calculateStayDates(plus7, getNightCount(params?.nights));
         setParams({ ...params, ...interval });
     }, [])
 
@@ -115,8 +124,7 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
                 const today = new Date();
                 const plus7 = new Date();
                 plus7.setDate(today.getDate() + 7);
-                const dayPlus = params?.nights?.split('..')?.[0] || params?.nights;
-                const interval = calculateStayDates(plus7, +dayPlus);
+                const interval = calculateStayDates(plus7, getNightCount(params?.nights));
                 setParams({ ...params, ...interval });
             }
         }
@@ -186,12 +194,11 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
                 }));
             }
         } else if (key === 'form_date') {
-            const dayPlus = params?.nights?.split('..')?.[0] || params?.nights;
-            const interval = calculateStayDates(value, +dayPlus);
+            const interval = calculateStayDates(value, getNightCount(params?.nights));
             setParams({ ...params, ...interval });
         } else if (key === 'nights') {
             const interval = calculateStayDates(params?.start_date, +value);
-            setParams({ ...params, ...interval, nights: value });
+            setParams({ ...params, ...interval, nights: String(value) });
         } else if (key === 'adults') {
             setParams({ ...params, adults: value });
         } else if (key === 'kids') {
@@ -216,8 +223,7 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
             
             // Calculate date range for start_date_from and end_date_till
             const startDate = params.start_date || calculateStayDates(new Date(), 7).start_date;
-            const nightsValue = params.nights?.split('..')?.[0] || params.nights || '7';
-            const nightCount = parseInt(nightsValue, 10) || 7;
+            const nightCount = getNightCount(params.nights);
             const dateRange = calculateStayDates(startDate, nightCount);
             
             const queryParams: Record<string, string | string[]> = {
@@ -317,7 +323,12 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
                     <div className={styles.searchFields}>
                         <WhereTo handleChange={handleChange} name={'to_city'} value={params.to_city} />
                         <div className={styles.searchGroup}>
-                            <SelectDate handleChange={handleChange} name={'form_date'} value={params.start_date} />
+                            <SelectDate
+                                handleChange={handleChange}
+                                name={'form_date'}
+                                value={params.start_date}
+                                nights={params.nights}
+                            />
                             <Nights handleChange={handleChange} name={'nights'} value={params.nights} />
                         </div>
                         <People handleChange={handleChange}

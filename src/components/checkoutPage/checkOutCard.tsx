@@ -21,7 +21,7 @@ const CheckoutCard = ({ order }) => {
             },
             returnUrl: "https://totus.club/pay"
         })
-        // console.log('payInfo',payInfo)
+        console.log('payInfo',payInfo)
         if (payInfo?.object?.payUrl) {
             // console.log('Redirecting to payment:', payInfo);
             window.location.href = payInfo?.object?.payUrl;

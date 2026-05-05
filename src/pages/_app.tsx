@@ -1,5 +1,5 @@
 import type { AppProps } from 'next/app';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import Script from 'next/script'; // ✅ ADD
 import { wrapper } from '../store';
 import '../styles/globals.css';
@@ -10,6 +10,7 @@ import { decodeToken, loadToken } from "@/utils/auth";
 import { setAuth } from "@/store/slices/authSlice";
 import { useDispatch } from "react-redux";
 import MobileBottomBar from "@/components/mobileBottomBar";
+import SiteSeo from "@/components/seo/SiteSeo";
 // import ScrollRestoration from '@/components/ScrollRestoration';
 
 function MyApp({ Component, pageProps }: AppProps) {
@@ -27,6 +28,7 @@ function MyApp({ Component, pageProps }: AppProps) {
 
     return (
         <>
+            <SiteSeo pageProps={pageProps} />
             <Script
                 id="yandex-metrika"
                 strategy="afterInteractive"

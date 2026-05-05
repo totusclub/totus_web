@@ -147,10 +147,7 @@ const VerticalSlider = ({ images, loading }: any) => {
                                     onClick={() => {
                                         setSelectedImage(imageUrl);
                                         setSelectedImageIndex(index);
-                                        // On mobile, open modal when clicking thumbnail
-                                        if (isMobile) {
-                                            setIsModalOpen(true);
-                                        }
+                                        setIsModalOpen(true);
                                     }}
                                 >
                                     <img
@@ -182,6 +179,20 @@ const VerticalSlider = ({ images, loading }: any) => {
                         alt="Selected"
                         className={styles.selectedImage}
                     />
+                    <button
+                        type="button"
+                        className={styles.showAllButton}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            const currentIndex = images.findIndex((img: any) =>
+                                `https://img.cdn.level.travel/${img['x500']}` === selectedImage
+                            );
+                            setSelectedImageIndex(currentIndex >= 0 ? currentIndex : 0);
+                            setIsModalOpen(true);
+                        }}
+                    >
+                        Все фото
+                    </button>
                 </div>
                 <GalleryModal
                     isOpen={isModalOpen}

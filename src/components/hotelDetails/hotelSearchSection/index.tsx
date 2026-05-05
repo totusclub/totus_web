@@ -253,6 +253,19 @@ const HotelSearchSection: React.FC<HotelSearchSectionProps> = ({
     updateParams({ nights: nightsValue });
   }, [updateParams]);
 
+  const handleDateFieldChange = useCallback((
+    value: Date | string | number,
+    key: string
+  ) => {
+    if (key === 'form_date') {
+      handleDateChange(value as Date | string);
+      return;
+    }
+    if (key === 'nights') {
+      handleNightsChange(value as string | number);
+    }
+  }, [handleDateChange, handleNightsChange]);
+
   const handleTouristsChange = useCallback((
     value: string | number | { kids: string; kids_ages: number[] },
     key: string
@@ -368,9 +381,10 @@ const HotelSearchSection: React.FC<HotelSearchSectionProps> = ({
           <div className={styles.searchFields}>
             <div className={styles.searchGroup}>
               <SelectDate
-                handleChange={handleDateChange}
+                handleChange={handleDateFieldChange}
                 name="form_date"
                 value={defaultDate}
+                nights={params.nights}
                 className={styles.radioFrom}
               />
               <Nights

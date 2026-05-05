@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import Head from 'next/head';
 import styles from './header.module.css';
 import Icon from "@/components/icons/Icon";
 import Button from "@/components/UI/button";
@@ -11,11 +10,12 @@ import { useRouter } from "next/router";
 import { clearSearch } from '@/store/slices/searchSlice';
 import { useDispatch } from 'react-redux';
 import LogoDesktopIcon from "@/components/icons/logoDesktop";
+import { FOOTER_STATIC_MOBILE_TITLES } from "@/config/footerStaticPages";
 
 const Header = () => {
     const dispatch = useDispatch();
     const [authModalOpen, setAuthModalOpen] = useState(false);
-    const { user, token } = useAuth()
+    const { user, token } = useAuth();
     const router = useRouter();
     const pathname = router.pathname || '';
 
@@ -40,8 +40,10 @@ const Header = () => {
                 return <p className={styles.pageName}>Мои заказы</p>
             } else if (pageName === '[order_id]') {
                 return <p className={styles.pageName}>Детали заказа</p>
-            } else if (pageName === 'privacy-policy') {
-                return <p className={styles.pageName}>Политика конфиденциальности</p>
+            } else if (FOOTER_STATIC_MOBILE_TITLES[pageName]) {
+                return <p className={styles.pageName}>{FOOTER_STATIC_MOBILE_TITLES[pageName]}</p>
+            } else if (pageName === 'favorites') {
+                return <p className={styles.pageName}>Избранное</p>
             }
         }
 
@@ -71,14 +73,6 @@ const Header = () => {
 
     return (
         <>
-            <Head>
-                <title>Арлекино тур</title>
-                <meta
-                    name="viewport"
-                    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-                />
-                <meta name="description" content="Лучшие туры с Арлекино тур – незабываемые путешествия и отдых." />
-            </Head>
             <header className={`${styles.header} ${showHeader === 'home' ? styles.hide : ''}`}>
                 <div className={styles.headerRow}>
                     <div className={styles.logo}>
@@ -106,34 +100,19 @@ const Header = () => {
                         </div>
                     )}
                 </div>
-                {/*<h1>{showSearch}</h1>*/}
-                {/*/!*{showSearch && (*!/*/}
-                {/*/!*    <SearchForm header={true}/>*!/*/}
-                {/*/!*)}*!/*/}
                 {headerMobileRender}
 
 
                 <div className={`${styles.headerRow} ${styles.headerRowPc}`}>
-                    <div className={styles.favorite}>
-                        <Icon name="heart" size={24} color="var(--textPrimary)" />
-                    </div>
                     {token ? (
                         <div onClick={() => router.push('/profile')} className={styles.profileButton}>
-                            <p>{user.name} {user.l_name}</p>
+                            <p>{user?.name} {user?.l_name}</p>
                         </div>
                     ) : (
                         <Button onClick={() => setAuthModalOpen(true)} title={'Войти'} />
                     )}
                 </div>
                 <div className={styles.headerRowM}>
-                    {/*{token ? (*/}
-                    {/*    <div onClick={()=>router.push('/profile')} className={styles.profileButton}>*/}
-                    {/*        <p>{user.name} {user.l_name}</p>*/}
-                    {/*    </div>*/}
-                    {/*):(*/}
-                    {/*    <Button onClick={()=>setAuthModalOpen(true)} title={'Войти'}/>*/}
-                    {/*) }*/}
-
                 </div>
             </header>
             <AuthModal open={authModalOpen} setOpen={setAuthModalOpen} />

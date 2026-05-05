@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import styles from './footer.module.css';
 import Icon from "@/components/icons/Icon";
 import Select from "@/components/UI/select";
@@ -34,33 +35,69 @@ const Footer = () => {
                     <div className={styles.footerColumn}>
                         <p className={styles.footerColumnTitle}>Компания</p>
                         <ul>
-                            <li>О Нас</li>
-                            <li>Карьера</li>
-                            <li>Приложения</li>
-                            <li>Блог</li>
-                            <li>Как мы работаем</li>
+                            <li>
+                                <Link href="/about-us" className={styles.footerLink}>
+                                    О Нас
+                                </Link>
+                            </li>
+                            {/*<li>*/}
+                            {/*    <Link href="/career" className={styles.footerLink}>Карьера</Link>*/}
+                            {/*</li>*/}
+                            {/*<li>*/}
+                            {/*    <Link href="/apps" className={styles.footerLink}>Приложения</Link>*/}
+                            {/*</li>*/}
+                            {/*<li>*/}
+                            {/*    <Link href="/blog" className={styles.footerLink}>Блог</Link>*/}
+                            {/*</li>*/}
+                            <li>
+                                <Link href="/how-we-work" className={styles.footerLink}>Как мы работаем</Link>
+                            </li>
                         </ul>
                     </div>
                     <div className={styles.footerColumn}>
                         <p className={styles.footerColumnTitle}>Контакт</p>
                         <ul>
-                            <li>Помощь/Часто задаваемые вопросы</li>
-                            <li>Пресса</li>
-                            <li>Филиалы</li>
-                            <li>Владельцы отелей</li>
-                            <li>Партнеры</li>
-                            <li>Рекламируйтесь у нас</li>
+                            <li>
+                                <Link href="/help-faq" className={styles.footerLink}>
+                                    Помощь/Часто задаваемые вопросы
+                                </Link>
+                            </li>
+                            <li>
+                                <Link href="/press" className={styles.footerLink}>Пресса</Link>
+                            </li>
+                            <li>
+                                <Link href="/branches" className={styles.footerLink}>Филиалы</Link>
+                            </li>
+                            <li>
+                                <Link href="/hotel-owners" className={styles.footerLink}>Владельцы отелей</Link>
+                            </li>
+                            <li>
+                                <Link href="/partners" className={styles.footerLink}>Партнеры</Link>
+                            </li>
+                            <li>
+                                <Link href="/advertise" className={styles.footerLink}>Рекламируйтесь у нас</Link>
+                            </li>
                         </ul>
 
                     </div>
                     <div className={styles.footerColumn}>
                         <p className={styles.footerColumnTitle}>Еще</p>
                         <ul>
-                            <li>Авиакомпанийные сборы</li>
-                            <li>Авиакомпании</li>
-                            <li>Советы по низким тарифам</li>
-                            <li>Значки и сертификаты</li>
-                            <li>Безопасность</li>
+                            <li>
+                                <Link href="/airline-fees" className={styles.footerLink}>Авиакомпанийные сборы</Link>
+                            </li>
+                            <li>
+                                <Link href="/airlines" className={styles.footerLink}>Авиакомпании</Link>
+                            </li>
+                            <li>
+                                <Link href="/low-fare-tips" className={styles.footerLink}>Советы по низким тарифам</Link>
+                            </li>
+                            <li>
+                                <Link href="/badges-certificates" className={styles.footerLink}>Значки и сертификаты</Link>
+                            </li>
+                            <li>
+                                <Link href="/security" className={styles.footerLink}>Безопасность</Link>
+                            </li>
                         </ul>
                     </div>
                     <div className={`${styles.footerColumn} ${styles.noneMobile}`}>
@@ -90,19 +127,27 @@ const Footer = () => {
                 </div>
                 <div className={styles.footerBottom}>
                     <ul>
-                        <li>©2025 Арлекинотур</li>
-                        <li>Настройки куки-файлов</li>
-                        <li>Конфиденциальность</li>
-                        <li>Условия и положения</li>
-                        <li>Выбор рекламы</li>
+                        <li>©2026 Totus Club</li>
                         <li>
-                            <Select
-                                options={options}
-                                value={selected}
-                                onChange={setSelected}
-                                label={'Валюта'}
-                                placeholder="Российский рубль (₽)"/>
+                            <Link href="/cookie-settings" className={styles.footerBottomLink}>
+                                Настройки куки-файлов
+                            </Link>
                         </li>
+                        <li>
+                            <Link href="/privacy-policy" className={styles.footerBottomLink}>
+                                Конфиденциальность
+                            </Link>
+                        </li>
+                        <li>
+                            <Link href="/terms" className={styles.footerBottomLink}>
+                                Условия и положения
+                            </Link>
+                        </li>
+                        {/*<li>*/}
+                        {/*    <Link href="/ad-choices" className={styles.footerBottomLink}>*/}
+                        {/*        Выбор рекламы*/}
+                        {/*    </Link>*/}
+                        {/*</li>*/}
                     </ul>
                 </div>
 

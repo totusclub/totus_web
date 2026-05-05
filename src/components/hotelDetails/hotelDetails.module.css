@@ -97,6 +97,35 @@
   background: var(--bgPrimary);
   width: 100%;
 }
+.HotelDetailsInfoPriceTop {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+  align-self: stretch;
+}
+.HotelDetailsInfoPriceMain {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+.HotelDetailsInfoPriceFav {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 22px;
+  border: 1px solid var(--textTertiary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bgSecondary);
+  margin-top: 2px;
+}
 .HotelDetailsInfoPriceText {
   color: var(--core_Orange);
   /*font-family: "Golos Text";*/
@@ -268,6 +297,21 @@
   align-self: stretch;
   border: 1px solid var(--borderTertiary);
   border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+}
+.mapFallback {
+  padding: 12px;
+  text-align: center;
+  color: var(--textTertiary);
+  font-size: 14px;
+  line-height: 1.4;
+}
+.mapFallbackImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 6px;
 }
 .HotelDetailsMapBoxTitle > p {
   color: var(--textTertiary);

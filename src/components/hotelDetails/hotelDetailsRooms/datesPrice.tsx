@@ -1,15 +1,10 @@
 import styles from '../hotelDetails.module.css';
-import {useEffect, useState} from "react";
-
-interface DatesPriceItem {
-    date: string | Date;
-    price: number | string;
-}
+import { useEffect } from "react";
 
 interface DatesPriceProps {
-    dates: DatesPriceItem[];
-    selectedDate:string,
-    setSelectedDate:any
+    dates: Record<string, number | string>;
+    selectedDate: string;
+    setSelectedDate: (date: string) => void;
 }
 
 function formatDateToRussian(date: Date): string {
@@ -27,18 +22,18 @@ const DatesPrice = ({ dates,selectedDate, setSelectedDate }: DatesPriceProps) =>
 
 
     useEffect(() => {
-        // setSelectedDate(dates[0]['date']);
-        const firstEntry = Object.entries(dates)[0];
-        if (firstEntry) {
-            const [firstDate, firstPrice] = firstEntry;
-            setSelectedDate(firstDate)
-            // console.log(firstDate); // "2025-07-19"
-        }
-    },[dates])
+        const dateKeys = Object.keys(dates || {});
+        if (dateKeys.length === 0) return;
 
-    const handleDateChange = (date: Date) => {
+        // Select first tab by default, and recover if current selection disappears
+        if (!selectedDate || !dateKeys.includes(selectedDate)) {
+            setSelectedDate(dateKeys[0]);
+        }
+    }, [dates, selectedDate, setSelectedDate]);
+
+    const handleDateChange = (date: string) => {
         setSelectedDate(date);
-    }
+    };
     return (
         <>
             <div className={styles.HotelDetailsDatePrices}>

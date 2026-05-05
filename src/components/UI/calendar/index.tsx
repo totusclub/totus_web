@@ -13,6 +13,7 @@ import {
     differenceInCalendarDays,
     isBefore,
     startOfDay,
+    isAfter,
 } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import Icon from "@/components/icons/Icon";
@@ -24,10 +25,21 @@ interface CalendarProps {
     setSelectedDate: (date: Date) => void;
     allowPastDates?: boolean; // If true, allows selecting past dates (for date of birth, etc.)
     hideToggle?: boolean; // If true, hides the ±2 days toggle
+    rangeStart?: Date | null;
+    rangeEnd?: Date | null;
+    monthsToShow?: number;
 }
 
 
-const Calendar = ({ selectedDate, setSelectedDate, allowPastDates = false, hideToggle = false }: CalendarProps) => {
+const Calendar = ({
+    selectedDate,
+    setSelectedDate,
+    allowPastDates = false,
+    hideToggle = false,
+    rangeStart = null,
+    rangeEnd = null,
+    monthsToShow = 1,
+}: CalendarProps) => {
     const [currentMonth, setCurrentMonth] = useState(new Date());
     const [showPlusMinus, setShowPlusMinus] = useState(false);
     const [showYearPicker, setShowYearPicker] = useState(false);
@@ -153,8 +165,8 @@ const Calendar = ({ selectedDate, setSelectedDate, allowPastDates = false, hideT
         );
     };
 
-    const renderCells = () => {
-        const monthStart = startOfMonth(currentMonth);
+    const renderCells = (month: Date) => {
+        const monthStart = startOfMonth(month);
         const monthEnd = endOfMonth(monthStart);
         const startDate = startOfWeek(monthStart, { locale: ru, weekStartsOn: 1 });
         const endDate = endOfWeek(monthEnd, { locale: ru, weekStartsOn: 1 });
@@ -168,11 +180,21 @@ const Calendar = ({ selectedDate, setSelectedDate, allowPastDates = false, hideT
                 const currentDay = day;
                 const isSelected = selectedDate && isSameDay(currentDay, selectedDate);
                 const isInRange = showPlusMinus && isPlusMinusTwo(currentDay);
-                const isCurrentMonth = isSameMonth(currentDay, currentMonth);
+                const isCurrentMonth = isSameMonth(currentDay, month);
                 const isDisabled = !allowPastDates && isBefore(currentDay, today);
+                const isRangeStart = rangeStart ? isSameDay(currentDay, rangeStart) : false;
+                const isRangeEnd = rangeEnd ? isSameDay(currentDay, rangeEnd) : false;
+                const isInSelectedRange =
+                    rangeStart &&
+                    rangeEnd &&
+                    !isRangeStart &&
+                    !isRangeEnd &&
+                    isAfter(currentDay, rangeStart) &&
+                    isBefore(currentDay, rangeEnd);
 
                 let backgroundColor = 'transparent';
-                if (isSelected) backgroundColor = 'var(--core_Orange)';
+                if (isSelected || isRangeStart || isRangeEnd) backgroundColor = 'var(--core_Orange)';
+                else if (isInSelectedRange) backgroundColor = 'var(--bgSecondary)';
                 else if (isInRange) backgroundColor = 'var(--bgSecondary)';
 
                 days.push(
@@ -185,12 +207,12 @@ const Calendar = ({ selectedDate, setSelectedDate, allowPastDates = false, hideT
                             color: isCurrentMonth
                                 ? isDisabled
                                     ? 'var(--textDisabled)'
-                                    : isSelected ? 'var(--textPrimaryB)' : 'var(--textPrimary)'
+                                    : (isSelected || isRangeStart || isRangeEnd) ? 'var(--textPrimaryB)' : 'var(--textPrimary)'
                                 : 'var(--textTertiary)',
-                            fontWeight: isSelected ? 'bold' : 'normal',
+                            fontWeight: (isSelected || isRangeStart || isRangeEnd) ? 'bold' : 'normal',
                             cursor: isDisabled ? 'not-allowed' : 'pointer',
                             opacity: isDisabled ? 0.5 : 1,
-                            borderRadius: isSelected ? 24 : 0,
+                            borderRadius: (isSelected || isRangeStart || isRangeEnd) ? 24 : 0,
                         }}
                     >
                         {format(currentDay, 'd')}
@@ -214,8 +236,22 @@ const Calendar = ({ selectedDate, setSelectedDate, allowPastDates = false, hideT
     return (
         <div className={styles.calendarWrapper} ref={calendarRef}>
             {renderHeader()}
-            {renderDays()}
-            {renderCells()}
+            <div className={`${styles.monthsGrid} ${monthsToShow > 1 ? styles.monthsGridTwo : ''}`}>
+                {Array.from({ length: monthsToShow }).map((_, i) => {
+                    const monthDate = addMonths(currentMonth, i);
+                    return (
+                        <div key={monthDate.toISOString()} className={styles.monthColumn}>
+                            {monthsToShow > 1 && (
+                                <p className={styles.monthLabel}>
+                                    {format(monthDate, 'LLLL yyyy', { locale: ru })}
+                                </p>
+                            )}
+                            {renderDays()}
+                            {renderCells(monthDate)}
+                        </div>
+                    );
+                })}
+            </div>
             {!hideToggle && (
                 <div className={styles.toggleRow}>
                     <p>±2 дня</p>

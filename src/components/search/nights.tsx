@@ -6,7 +6,7 @@ import SwitchToggle from "@/components/UI/switch";
 import Button from "@/components/UI/button";
 
 const STEP = 1;
-const MIN = 0;
+const MIN = 1;
 const MAX = 30;
 
 
@@ -27,6 +27,13 @@ const Nights = ({handleChange,value,name}) => {
             document.removeEventListener("mousedown", handleClickOutside);
         };
     }, []);
+
+    useEffect(() => {
+        const parsed = Number(String(value).split('..')[0]);
+        if (Number.isFinite(parsed) && parsed >= MIN && parsed <= MAX) {
+            setValues([parsed]);
+        }
+    }, [value]);
 
     const handleToggle = () => {
         setIsOpen(prev => !prev);

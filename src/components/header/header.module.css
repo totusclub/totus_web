@@ -33,15 +33,6 @@
   max-width: 120px;
   height: auto;
 }
-.favorite {
-  width: 48px;
-  height: 48px;
-  border-radius: 24px;
-  border: 1px solid var(--textTertiary);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
 .profileButton {
   height: 48px;
   border-radius: 24px;
