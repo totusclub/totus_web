@@ -65,7 +65,7 @@ const BookingOrderCard = ({ packageData, handleSubmit, loading, dataLoading, isF
                 <div className={styles.orderInformation}>
                     <div className={styles.orderInformationHead}>
                         <p>Туры раскупают — цены меняются</p>
-                        <Icon name={'closeLine'} />
+                        {/*<Icon name={'closeLine'} />*/}
                     </div>
                     <div className={styles.orderInformationBody}>
                         <Icon name={'travel'} size={61} />
@@ -106,7 +106,7 @@ const BookingOrderCard = ({ packageData, handleSubmit, loading, dataLoading, isF
             <div className={styles.orderInformation}>
                 <div className={styles.orderInformationHead}>
                     <p>Туры раскупают — цены меняются</p>
-                    <Icon name={'closeLine'} />
+                    {/*<Icon name={'closeLine'} />*/}
                 </div>
                 <div className={styles.orderInformationBody}>
                     <Icon name={'travel'} size={61} />
