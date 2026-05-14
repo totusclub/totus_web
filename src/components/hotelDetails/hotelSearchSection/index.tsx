@@ -5,6 +5,7 @@ import Nights from '@/components/search/nights';
 import People from '@/components/search/people';
 import Button from '@/components/UI/button';
 import { parseNightsValue } from '@/utils/hotelDetailsUtils';
+import { differenceCalendarDaysBetweenYmd, endYmdAfterNights } from '@/utils/calendarDateRange';
 import styles from './hotelSearchSection.module.css';
 
 // ============================================================================
@@ -54,6 +55,8 @@ interface HotelSearchSectionProps {
 
 interface SearchParamsState {
   departureDate: string;
+  /** Checkout / return date from calendar; nights slider does not overwrite until changed */
+  returnDate: string;
   nights: number;
   adults: number;
   kids: number;
@@ -117,6 +120,9 @@ const normalizeDate = (date: Date | string): string | null => {
   return null;
 };
 
+const endDateISOFromDepartureAndNights = (departureISO: string, nights: number): string =>
+  endYmdAfterNights(departureISO, nights);
+
 /**
  * Formats nights as range when flex_dates is enabled.
  * Example: 7 with flex_dates=2 becomes "7..9"
@@ -125,6 +131,12 @@ const formatNightsForAPI = (nights: number, flexDates: number): string => {
   return flexDates > 0 
     ? `${nights}..${nights + flexDates}`
     : nights.toString();
+};
+
+const nightsBetweenIsoOrFallback = (startIso: string, endIso: string, fallback: number): number => {
+  const d = differenceCalendarDaysBetweenYmd(startIso, endIso);
+  if (d == null || d < 1) return Math.max(1, fallback);
+  return d;
 };
 
 // ============================================================================
@@ -152,13 +164,18 @@ const HotelSearchSection: React.FC<HotelSearchSectionProps> = ({
   );
 
   // Initialize form state from sourceParams or defaults
-  const [params, setParams] = useState<SearchParamsState>(() => ({
-    departureDate: sourceParams?.start_date || getDefaultStartDate(),
-    nights: parseNightsValue(sourceParams?.nights),
-    adults: parseInt(sourceParams?.adults || String(DEFAULT_ADULTS), 10),
-    kids: parseInt(sourceParams?.kids || String(DEFAULT_KIDS), 10),
-    kidsAges: sourceParams?.kids_ages || [],
-  }));
+  const [params, setParams] = useState<SearchParamsState>(() => {
+    const initNights = parseNightsValue(String(sourceParams?.nights ?? ''));
+    const initDep = sourceParams?.start_date || getDefaultStartDate();
+    return {
+      departureDate: initDep,
+      returnDate: endDateISOFromDepartureAndNights(initDep, initNights),
+      nights: initNights,
+      adults: parseInt(sourceParams?.adults || String(DEFAULT_ADULTS), 10),
+      kids: parseInt(sourceParams?.kids || String(DEFAULT_KIDS), 10),
+      kidsAges: sourceParams?.kids_ages || [],
+    };
+  });
 
   // ==========================================================================
   // Effects
@@ -169,9 +186,11 @@ const HotelSearchSection: React.FC<HotelSearchSectionProps> = ({
   useEffect(() => {
     if (!sourceParams?.start_date || hasUserChangedParams) return;
 
+    const nights = parseNightsValue(String(sourceParams.nights ?? ''));
     const newParams = {
       departureDate: sourceParams.start_date,
-      nights: parseNightsValue(sourceParams.nights),
+      nights,
+      returnDate: endDateISOFromDepartureAndNights(sourceParams.start_date, nights),
       adults: parseInt(sourceParams.adults || String(DEFAULT_ADULTS), 10),
       kids: parseInt(sourceParams.kids || String(DEFAULT_KIDS), 10),
       kidsAges: sourceParams.kids_ages || [],
@@ -181,6 +200,7 @@ const HotelSearchSection: React.FC<HotelSearchSectionProps> = ({
       // Skip update if values haven't changed
       const hasChanged = 
         prev.departureDate !== newParams.departureDate ||
+        prev.returnDate !== newParams.returnDate ||
         prev.nights !== newParams.nights ||
         prev.adults !== newParams.adults ||
         prev.kids !== newParams.kids ||
@@ -222,10 +242,14 @@ const HotelSearchSection: React.FC<HotelSearchSectionProps> = ({
 
   const handleDateChange = useCallback((date: Date | string) => {
     const normalized = normalizeDate(date);
-    if (normalized) {
-      updateParams({ departureDate: normalized });
-    }
-  }, [updateParams]);
+    if (!normalized) return;
+    setHasUserChangedParams(true);
+    setParams((prev) => ({
+      ...prev,
+      departureDate: normalized,
+      returnDate: endDateISOFromDepartureAndNights(normalized, prev.nights),
+    }));
+  }, []);
 
   const handleNightsChange = useCallback((nightsInput: string | number) => {
     let nightsValue: number;
@@ -242,13 +266,37 @@ const HotelSearchSection: React.FC<HotelSearchSectionProps> = ({
       return;
     }
     
-    updateParams({ nights: nightsValue });
-  }, [updateParams]);
+    setHasUserChangedParams(true);
+    setParams((prev) => ({
+      ...prev,
+      nights: nightsValue,
+      returnDate: endDateISOFromDepartureAndNights(prev.departureDate, nightsValue),
+    }));
+  }, []);
 
   const handleDateFieldChange = useCallback((
-    value: Date | string | number,
+    value: Date | string | number | { start: string; end: string },
     key: string
   ) => {
+    if (key === 'sync_nights_from_dates') {
+      const n = typeof value === 'number' ? value : parseInt(String(value), 10);
+      if (!Number.isFinite(n) || n < 1) return;
+      setHasUserChangedParams(true);
+      setParams((prev) => ({
+        ...prev,
+        nights: n,
+        returnDate: endYmdAfterNights(prev.departureDate, n),
+      }));
+      return;
+    }
+    if (key === 'date_range' && typeof value === 'object' && value !== null && 'start' in value && 'end' in value) {
+      const dr = value as { start: string; end: string };
+      updateParams({
+        departureDate: dr.start,
+        returnDate: dr.end,
+      });
+      return;
+    }
     if (key === 'form_date') {
       handleDateChange(value as Date | string);
       return;
@@ -256,7 +304,7 @@ const HotelSearchSection: React.FC<HotelSearchSectionProps> = ({
     if (key === 'nights') {
       handleNightsChange(value as string | number);
     }
-  }, [handleDateChange, handleNightsChange]);
+  }, [handleDateChange, handleNightsChange, updateParams]);
 
   const handleTouristsChange = useCallback((
     value: string | number | { kids: string; kids_ages: number[] },
@@ -288,7 +336,7 @@ const HotelSearchSection: React.FC<HotelSearchSectionProps> = ({
 
   const buildSearchParams = useCallback((): Record<string, unknown> | null => {
     // Validate required parameters
-    if (!params.departureDate || params.nights <= 0 || params.adults < 1) {
+    if (!params.departureDate || !params.returnDate || params.nights <= 0 || params.adults < 1) {
       return null;
     }
 
@@ -297,11 +345,8 @@ const HotelSearchSection: React.FC<HotelSearchSectionProps> = ({
       return null;
     }
 
-    // Calculate date range
+    // Date range: explicit return from calendar; nights stay as set on the nights control
     const startDateISO = params.departureDate;
-    const startDate = new Date(startDateISO);
-    const endDate = new Date(startDate);
-    endDate.setDate(startDate.getDate() + params.nights);
 
     // Get hotel location data
     const hotelCountry = apiHotelData?.country;
@@ -309,19 +354,29 @@ const HotelSearchSection: React.FC<HotelSearchSectionProps> = ({
 
     // Hotel page should always search with ±2 nights flexibility.
     const flexDates = DEFAULT_FLEX_DATES;
-    const nightsFormatted = formatNightsForAPI(params.nights, flexDates);
+    const nightsFromDates = nightsBetweenIsoOrFallback(
+      params.departureDate,
+      params.returnDate,
+      params.nights
+    );
+    const nightsFormatted = formatNightsForAPI(nightsFromDates, flexDates);
+
+    const toCountry =
+      (sourceParams?.to_country && String(sourceParams.to_country).trim()) ||
+      hotelCountry?.iso2 ||
+      'RU';
 
     // Build search parameters
     const searchParams: Record<string, unknown> = {
       from_city: sourceParams?.from_city || DEFAULT_FROM_CITY,
       from_country: sourceParams?.from_country || DEFAULT_FROM_COUNTRY,
-      to_country: sourceParams?.to_country || hotelCountry?.iso2 || '',
+      to_country: toCountry,
       to_city: sourceParams?.to_city || hotelCity?.name_en || hotelCity?.name_ru || undefined,
       search_type: sourceParams?.search_type || DEFAULT_SEARCH_TYPE,
       flex_dates: flexDates,
       start_date: startDateISO,
       start_date_from: startDateISO,
-      end_date_till: formatDateToISO(endDate),
+      end_date_till: params.returnDate,
       nights: nightsFormatted,
       adults: params.adults.toString(),
       kids: params.kids > 0 ? params.kids.toString() : undefined,
@@ -364,6 +419,8 @@ const HotelSearchSection: React.FC<HotelSearchSectionProps> = ({
   // Render
   // ==========================================================================
 
+  const calendarRangeEnd = params.returnDate;
+
   const defaultDate = params.departureDate || new Date().toISOString().split('T')[0];
 
   return (
@@ -374,9 +431,8 @@ const HotelSearchSection: React.FC<HotelSearchSectionProps> = ({
             <div className={styles.searchGroup}>
               <SelectDate
                 handleChange={handleDateFieldChange}
-                name="form_date"
                 value={defaultDate}
-                nights={params.nights}
+                endValue={calendarRangeEnd}
                 className={styles.radioFrom}
               />
               <Nights

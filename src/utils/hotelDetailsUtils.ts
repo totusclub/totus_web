@@ -2,6 +2,8 @@
  * Utility functions for hotel details page
  */
 
+import { endYmdAfterNights } from '@/utils/calendarDateRange';
+
 /**
  * Gets default start date (7 days from today) in YYYY-MM-DD format
  */
@@ -136,18 +138,8 @@ export const buildInitialSearchParams = (
   // Hotel details room search must always use ±2 nights.
   const flexDates = 2;
   
-  // Calculate end date - use parseNightsValue to correctly handle "7..9" format
-  const startDateObj = new Date(startDate);
-  const endDateObj = new Date(startDateObj);
   const nights = parseNightsValue(nightsStr);
-  endDateObj.setDate(startDateObj.getDate() + nights);
-  
-  const formatDate = (date: Date): string => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  };
+  const endDateStr = endYmdAfterNights(startDate, nights);
 
   return {
     from_city: (query.from_city as string) || 'Moscow',
@@ -161,7 +153,7 @@ export const buildInitialSearchParams = (
       : undefined,
     start_date: startDate,
     start_date_from: startDate,
-    end_date_till: formatDate(endDateObj),
+    end_date_till: endDateStr,
     nights: formatNightsForAPI(nightsStr, flexDates), // Format as range when flex_dates > 0
     search_type: (query.search_type as string) || 'package',
     flex_dates: flexDates,

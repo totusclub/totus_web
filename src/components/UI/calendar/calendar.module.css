@@ -1,18 +1,23 @@
-.calendarWrapper{
+.calendarWrapper {
     width: 100%;
+    touch-action: manipulation;
 }
+
 .monthsGrid {
     display: grid;
     grid-template-columns: 1fr;
     gap: 16px;
 }
+
 .monthsGridTwo {
     grid-template-columns: 1fr 1fr;
     gap: 20px;
 }
+
 .monthColumn {
     min-width: 0;
 }
+
 .monthLabel {
     color: var(--textPrimary);
     font-size: 14px;
@@ -20,6 +25,7 @@
     margin-bottom: 6px;
     text-transform: capitalize;
 }
+
 .headerCalendar {
     display: flex;
     justify-content: space-between;
@@ -27,29 +33,46 @@
     height: 48px;
     position: relative;
 }
-.headerCalendar>button{
+
+.headerCalendar > button,
+.navButton {
     background: none;
     display: flex;
     align-items: center;
     justify-content: center;
     border: none;
     cursor: pointer;
+    border-radius: 8px;
+    transition: background-color 0.2s ease;
 }
-.headerCalendar>p{
+
+.navButton:hover,
+.headerCalendar > button:hover {
+    background-color: var(--bgSecondary);
+}
+
+.navButton:focus-visible,
+.headerCalendar > button:focus-visible {
+    outline: 2px solid var(--core_Orange);
+    outline-offset: 2px;
+}
+
+.headerCalendar > p {
     color: var(--textPrimary);
-    /*font-family: "Golos Text";*/
     font-size: 16px;
     font-style: normal;
     font-weight: 500;
-    line-height: 20px; /* 125% */
+    line-height: 20px;
     letter-spacing: -0.32px;
 }
+
 .headerDatePicker {
     display: flex;
     align-items: center;
     gap: 4px;
     position: relative;
 }
+
 .datePickerButton {
     background: none;
     border: none;
@@ -61,9 +84,16 @@
     border-radius: 4px;
     transition: background-color 0.2s;
 }
+
 .datePickerButton:hover {
     background-color: var(--bgSecondary);
 }
+
+.datePickerButton:focus-visible {
+    outline: 2px solid var(--core_Orange);
+    outline-offset: 2px;
+}
+
 .pickerDropdown {
     position: absolute;
     top: calc(100% + 8px);
@@ -78,11 +108,13 @@
     min-width: 120px;
     padding: 8px;
 }
+
 .yearPickerContainer {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 4px;
 }
+
 .pickerItem {
     padding: 8px 12px;
     cursor: pointer;
@@ -92,19 +124,23 @@
     font-size: 14px;
     color: var(--textPrimary);
 }
+
 .pickerItem:hover {
     background-color: var(--bgSecondary);
 }
+
 .pickerItemActive {
     background-color: var(--core_Orange);
     color: var(--textPrimaryB);
     font-weight: 500;
 }
+
 .pickerItemActive:hover {
     background-color: var(--core_Orange);
     opacity: 0.9;
 }
-.daysRow{
+
+.daysRow {
     display: flex;
     justify-content: space-between;
     font-weight: bold;
@@ -112,47 +148,154 @@
     align-items: center;
     margin: 1px 0;
 }
+
 .dayName {
     width: 14.28%;
     text-align: center;
     color: var(--textTertiary);
-    /*font-family: "Golos Text";*/
     font-size: 12px;
     font-style: normal;
     font-weight: 500;
-    line-height: 16px; /* 133.333% */
+    line-height: 16px;
     letter-spacing: -0.24px;
 }
-.weekRow{
+
+.weekRow {
     display: flex;
     justify-content: space-between;
-    /*border: 1px solid;*/
     height: 48px;
     align-items: center;
+    gap: 0;
 }
-.cell{
-    width: 48px;
+
+.cell {
+    width: 14.28%;
+    max-width: 48px;
     height: 48px;
-    /*border: 1px solid;*/
+    min-height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
-    /*border-radius: 50%;*/
-    transition: 0.2s ease;
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    transition: background-color 0.18s ease, color 0.18s ease, transform 0.15s ease;
 }
-.toggleRow{
+
+.cellInner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    border-radius: 24px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--textPrimary);
+    transition: inherit;
+}
+
+.cellButton {
+    appearance: none;
+    -webkit-tap-highlight-color: transparent;
+    font: inherit;
+    line-height: inherit;
+    border: none;
+    background: transparent;
+}
+
+.cellInteractive {
+    cursor: pointer;
+}
+
+.cellInteractive:not(:disabled):hover:not(.cellInRange):not(.cellSelected):not(.cellRangeStart):not(.cellRangeEnd):not(.cellRangeSingle):not(.cellPlusBand) .cellInner,
+.cellInteractive:not(:disabled):focus-visible:not(.cellInRange):not(.cellSelected):not(.cellRangeStart):not(.cellRangeEnd):not(.cellRangeSingle):not(.cellPlusBand) .cellInner {
+    background-color: var(--hoverPrimary);
+}
+
+.cellInteractive:not(:disabled):active .cellInner {
+    transform: scale(0.96);
+}
+
+.cellDisabled {
+    cursor: not-allowed;
+    opacity: 0.45;
+}
+
+.cellOutsideMonth .cellInner {
+    color: var(--textTertiary);
+}
+
+.cellInRange {
+    background-color: var(--bgSecondary);
+    border-radius: 0;
+}
+
+.cellInRange .cellInner {
+    background-color: transparent;
+    border-radius: 0;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+}
+
+.cellPlusBand .cellInner {
+    background-color: var(--bgSecondary);
+    opacity: 0.85;
+}
+
+.cellSelected .cellInner {
+    background-color: var(--core_Orange);
+    color: var(--textPrimaryB);
+    font-weight: 700;
+    border-radius: 24px;
+    width: 40px;
+    height: 40px;
+}
+
+.cellRangeSingle .cellInner {
+    background-color: var(--core_Orange);
+    color: var(--textPrimaryB);
+    font-weight: 700;
+    border-radius: 24px;
+    width: 40px;
+    height: 40px;
+}
+
+.cellRangeStart .cellInner,
+.cellRangeEnd .cellInner {
+    background-color: var(--core_Orange);
+    color: var(--textPrimaryB);
+    font-weight: 700;
+    border-radius: 24px;
+    width: 40px;
+    height: 40px;
+    max-width: 40px;
+}
+
+.toggleRow {
     border-top: 1px solid var(--borderTertiary);
     display: flex;
     align-items: center;
     gap: 8px;
     justify-content: flex-end;
-    /*height: 48px;*/
     margin-top: 18px;
     padding-top: 18px;
 }
+
 @media (max-width: 768px) {
     .monthsGridTwo {
         grid-template-columns: 1fr;
         gap: 12px;
+    }
+
+    .cell {
+        max-width: none;
+        flex: 1;
+        min-width: 0;
+    }
+
+    .weekRow {
+        gap: 2px;
     }
 }

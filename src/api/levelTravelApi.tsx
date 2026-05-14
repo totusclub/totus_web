@@ -3,9 +3,33 @@ import axios from 'axios';
 // const BASE_URL = 'http://192.168.1.105:3001';
 const BASE_URL = 'https://api.totus.club';
 
+/** Flatten GET params so the API receives plain strings (avoids 500s on bracket-array encoding). */
+function prepareStartSearchParams(raw: Record<string, unknown>): Record<string, string | number | boolean> {
+    const out: Record<string, string | number | boolean> = {};
+    if (!raw || typeof raw !== 'object') return out;
+
+    for (const [key, value] of Object.entries(raw)) {
+        if (value === undefined || value === null) continue;
+        if (typeof value === 'string' && value.trim() === '') continue;
+        if (Array.isArray(value)) {
+            if (value.length === 0) continue;
+            if (key === 'kids_ages' || key === 'hotel_ids') {
+                out[key] = value.map((v) => String(v)).join(',');
+            } else {
+                out[key] = value.map((v) => String(v)).join(',');
+            }
+            continue;
+        }
+        if (typeof value === 'object') continue;
+        out[key] = value as string | number | boolean;
+    }
+    return out;
+}
+
 export async function startSearch(params) {
     try {
-        const res = await axios.get(`${BASE_URL}/start-search`, { params });
+        const flat = prepareStartSearchParams(params as Record<string, unknown>);
+        const res = await axios.get(`${BASE_URL}/start-search`, { params: flat });
         return res.data;
     } catch (error) {
         console.error('Error starting search:', error);

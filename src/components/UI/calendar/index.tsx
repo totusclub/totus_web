@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import {
     addDays,
     subMonths,
@@ -14,24 +14,29 @@ import {
     isBefore,
     startOfDay,
     isAfter,
+    min as minDate,
+    max as maxDate,
 } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import Icon from "@/components/icons/Icon";
-import styles from './calendar.module.css'
+import styles from './calendar.module.css';
 import SwitchToggle from "@/components/UI/switch";
+
+export type RangeSelectionPhase = 'start' | 'end';
 
 interface CalendarProps {
     selectedDate: Date | null;
     setSelectedDate: (date: Date) => void;
-    allowPastDates?: boolean; // If true, allows selecting past dates (for date of birth, etc.)
-    hideToggle?: boolean; // If true, hides the ±2 days toggle
+    allowPastDates?: boolean;
+    hideToggle?: boolean;
     rangeStart?: Date | null;
     rangeEnd?: Date | null;
     monthsToShow?: number;
     plusMinusEnabled?: boolean;
     onPlusMinusChange?: (enabled: boolean) => void;
+    /** When set with rangeStart/rangeEnd, enables hover preview for the return-date step */
+    rangeSelectionPhase?: RangeSelectionPhase | null;
 }
-
 
 const Calendar = ({
     selectedDate,
@@ -43,16 +48,18 @@ const Calendar = ({
     monthsToShow = 1,
     plusMinusEnabled,
     onPlusMinusChange,
+    rangeSelectionPhase = null,
 }: CalendarProps) => {
-    const [currentMonth, setCurrentMonth] = useState(new Date());
+    const initialMonthSeed = rangeStart ?? selectedDate ?? new Date();
+    const [currentMonth, setCurrentMonth] = useState(() => startOfMonth(initialMonthSeed));
     const [showPlusMinus, setShowPlusMinus] = useState(false);
     const [showYearPicker, setShowYearPicker] = useState(false);
     const [showMonthPicker, setShowMonthPicker] = useState(false);
+    const [hoverDate, setHoverDate] = useState<Date | null>(null);
     const calendarRef = useRef<HTMLDivElement>(null);
 
     const today = startOfDay(new Date());
 
-    // Close pickers when clicking outside
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (calendarRef.current && !calendarRef.current.contains(event.target as Node)) {
@@ -72,10 +79,112 @@ const Calendar = ({
         }
     }, [plusMinusEnabled]);
 
-    const isPlusMinusTwo = (date: Date) => {
-        if (!selectedDate || isSameDay(date, selectedDate)) return false;
-        const diff = Math.abs(differenceInCalendarDays(date, selectedDate));
-        return diff <= 2;
+    useEffect(() => {
+        if (rangeSelectionPhase !== 'end') {
+            setHoverDate(null);
+        }
+    }, [rangeSelectionPhase]);
+
+    const isPlusMinusTwo = useCallback(
+        (date: Date) => {
+            if (!selectedDate || isSameDay(date, selectedDate)) return false;
+            const diff = Math.abs(differenceInCalendarDays(startOfDay(date), startOfDay(selectedDate)));
+            return diff <= 2;
+        },
+        [selectedDate]
+    );
+
+    const effectiveRangeBounds = useMemo(() => {
+        if (!rangeStart) return null;
+        const rs = startOfDay(rangeStart);
+
+        if (!rangeEnd) {
+            if (rangeSelectionPhase === 'end' && hoverDate) {
+                const h = startOfDay(hoverDate);
+                return { lo: minDate([rs, h]), hi: maxDate([rs, h]) };
+            }
+            return { lo: rs, hi: rs };
+        }
+
+        const re = startOfDay(rangeEnd);
+        const committedLo = minDate([rs, re]);
+        const committedHi = maxDate([rs, re]);
+
+        if (rangeSelectionPhase !== 'end' || !hoverDate) {
+            return { lo: committedLo, hi: committedHi };
+        }
+
+        const h = startOfDay(hoverDate);
+        return { lo: minDate([rs, h]), hi: maxDate([rs, h]) };
+    }, [rangeStart, rangeEnd, rangeSelectionPhase, hoverDate]);
+
+    const getDayCellProps = useCallback(
+        (currentDay: Date, month: Date) => {
+            const day = startOfDay(currentDay);
+            const isCurrentMonth = isSameMonth(currentDay, month);
+            const isDisabled = !allowPastDates && isBefore(day, today);
+
+            const matchesSelected = Boolean(selectedDate && isSameDay(day, startOfDay(selectedDate)));
+            /** While choosing return date, keep departure visible as selected even if `selectedDate` is the end. */
+            const isDepartureAnchorInEndPhase =
+                rangeSelectionPhase === 'end' &&
+                rangeStart &&
+                selectedDate &&
+                rangeEnd &&
+                isSameDay(day, startOfDay(rangeStart)) &&
+                !isSameDay(startOfDay(rangeStart), startOfDay(selectedDate));
+            const isSelected = matchesSelected || isDepartureAnchorInEndPhase;
+
+            let isRangeStart = false;
+            let isRangeEnd = false;
+            let isInSelectedRange = false;
+
+            if (effectiveRangeBounds) {
+                const { lo, hi } = effectiveRangeBounds;
+                isRangeStart = isSameDay(day, lo);
+                isRangeEnd = isSameDay(day, hi);
+                isInSelectedRange =
+                    !isRangeStart &&
+                    !isRangeEnd &&
+                    (isAfter(day, lo) && isBefore(day, hi));
+            }
+
+            const isInPlusBand = showPlusMinus && isPlusMinusTwo(day);
+
+            return {
+                day,
+                isCurrentMonth,
+                isDisabled,
+                isSelected,
+                isRangeStart,
+                isRangeEnd,
+                isInSelectedRange,
+                isInPlusBand,
+            };
+        },
+        [
+            allowPastDates,
+            today,
+            selectedDate,
+            effectiveRangeBounds,
+            showPlusMinus,
+            isPlusMinusTwo,
+            rangeSelectionPhase,
+            rangeStart,
+        ]
+    );
+
+    const handleDayPointerEnter = (day: Date, disabled: boolean) => {
+        if (disabled) return;
+        if (rangeSelectionPhase === 'end' && rangeStart) {
+            setHoverDate(startOfDay(day));
+        }
+    };
+
+    const handleGridPointerLeave = () => {
+        if (rangeSelectionPhase === 'end') {
+            setHoverDate(null);
+        }
     };
 
     const renderHeader = () => {
@@ -91,17 +200,26 @@ const Calendar = ({
 
         const months = [
             'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
-            'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
+            'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь',
         ];
 
         return (
             <div className={styles.headerCalendar}>
-                <button onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}>
+                <button
+                    type="button"
+                    className={styles.navButton}
+                    aria-label="Предыдущий месяц"
+                    onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
+                >
                     <Icon name={'leftArrow'} size={24} color="var(--textPrimary)" />
                 </button>
                 <div className={styles.headerDatePicker}>
                     <button
+                        type="button"
                         className={styles.datePickerButton}
+                        aria-expanded={showMonthPicker}
+                        aria-haspopup="listbox"
+                        aria-label="Выбор месяца"
                         onClick={(e) => {
                             e.stopPropagation();
                             setShowMonthPicker(!showMonthPicker);
@@ -111,7 +229,11 @@ const Calendar = ({
                         {months[currentMonthIndex]}
                     </button>
                     <button
+                        type="button"
                         className={styles.datePickerButton}
+                        aria-expanded={showYearPicker}
+                        aria-haspopup="listbox"
+                        aria-label="Выбор года"
                         onClick={(e) => {
                             e.stopPropagation();
                             setShowYearPicker(!showYearPicker);
@@ -121,10 +243,12 @@ const Calendar = ({
                         {currentYear}
                     </button>
                     {showMonthPicker && (
-                        <div className={styles.pickerDropdown} onClick={(e) => e.stopPropagation()}>
+                        <div className={styles.pickerDropdown} role="listbox" onClick={(e) => e.stopPropagation()}>
                             {months.map((month, index) => (
                                 <div
                                     key={index}
+                                    role="option"
+                                    aria-selected={index === currentMonthIndex}
                                     className={`${styles.pickerItem} ${index === currentMonthIndex ? styles.pickerItemActive : ''}`}
                                     onClick={() => {
                                         setCurrentMonth(new Date(currentYear, index, 1));
@@ -142,6 +266,8 @@ const Calendar = ({
                                 {years.map((year) => (
                                     <div
                                         key={year}
+                                        role="option"
+                                        aria-selected={year === currentYear}
                                         className={`${styles.pickerItem} ${year === currentYear ? styles.pickerItemActive : ''}`}
                                         onClick={() => {
                                             setCurrentMonth(new Date(year, currentMonthIndex, 1));
@@ -155,7 +281,12 @@ const Calendar = ({
                         </div>
                     )}
                 </div>
-                <button onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}>
+                <button
+                    type="button"
+                    className={styles.navButton}
+                    aria-label="Следующий месяц"
+                    onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
+                >
                     <Icon name={'rightArrow'} size={24} color="var(--textPrimary)" />
                 </button>
             </div>
@@ -166,9 +297,9 @@ const Calendar = ({
         const days = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
         return (
             <div className={styles.daysRow}>
-                {days.map((day) => (
-                    <div key={day} className={styles.dayName}>
-                        {day}
+                {days.map((d) => (
+                    <div key={d} className={styles.dayName}>
+                        {d}
                     </div>
                 ))}
             </div>
@@ -178,66 +309,71 @@ const Calendar = ({
     const renderCells = (month: Date) => {
         const monthStart = startOfMonth(month);
         const monthEnd = endOfMonth(monthStart);
-        const startDate = startOfWeek(monthStart, { locale: ru, weekStartsOn: 1 });
-        const endDate = endOfWeek(monthEnd, { locale: ru, weekStartsOn: 1 });
+        const gridStart = startOfWeek(monthStart, { locale: ru, weekStartsOn: 1 });
+        const gridEnd = endOfWeek(monthEnd, { locale: ru, weekStartsOn: 1 });
 
-        const rows = [];
-        let days = [];
-        let day = startDate;
+        const rows: React.ReactNode[] = [];
+        let cursor = gridStart;
+        let rowKey = 0;
 
-        while (day <= endDate) {
+        while (cursor <= gridEnd) {
+            const days: React.ReactNode[] = [];
             for (let i = 0; i < 7; i++) {
-                const currentDay = day;
-                const isSelected = selectedDate && isSameDay(currentDay, selectedDate);
-                const isInRange = showPlusMinus && isPlusMinusTwo(currentDay);
-                const isCurrentMonth = isSameMonth(currentDay, month);
-                const isDisabled = !allowPastDates && isBefore(currentDay, today);
-                const isRangeStart = rangeStart ? isSameDay(currentDay, rangeStart) : false;
-                const isRangeEnd = rangeEnd ? isSameDay(currentDay, rangeEnd) : false;
-                const isInSelectedRange =
-                    rangeStart &&
-                    rangeEnd &&
-                    !isRangeStart &&
-                    !isRangeEnd &&
-                    isAfter(currentDay, rangeStart) &&
-                    isBefore(currentDay, rangeEnd);
+                const currentDay = cursor;
+                const key = format(currentDay, 'yyyy-MM-dd');
+                const props = getDayCellProps(currentDay, month);
 
-                let backgroundColor = 'transparent';
-                if (isSelected || isRangeStart || isRangeEnd) backgroundColor = 'var(--core_Orange)';
-                else if (isInSelectedRange) backgroundColor = 'var(--bgSecondary)';
-                else if (isInRange) backgroundColor = 'var(--bgSecondary)';
+                const isSingleDayRange = props.isRangeStart && props.isRangeEnd;
+                const classNames = [
+                    styles.cell,
+                    styles.cellButton,
+                    props.isDisabled ? styles.cellDisabled : styles.cellInteractive,
+                    !props.isCurrentMonth ? styles.cellOutsideMonth : '',
+                    isSingleDayRange ? styles.cellRangeSingle : '',
+                    !isSingleDayRange && props.isRangeStart ? styles.cellRangeStart : '',
+                    !isSingleDayRange && props.isRangeEnd ? styles.cellRangeEnd : '',
+                    props.isInSelectedRange ? styles.cellInRange : '',
+                    props.isSelected ? styles.cellSelected : '',
+                    props.isInPlusBand &&
+                    !props.isRangeStart &&
+                    !props.isRangeEnd &&
+                    !props.isInSelectedRange
+                        ? styles.cellPlusBand
+                        : '',
+                ]
+                    .filter(Boolean)
+                    .join(' ');
+
+                const label = format(currentDay, 'd MMMM yyyy', { locale: ru });
 
                 days.push(
-                    <div
-                        key={currentDay.toString()}
-                        onClick={!isDisabled ? () => setSelectedDate(new Date(currentDay)) : undefined}
-                        className={styles.cell}
-                        style={{
-                            backgroundColor,
-                            color: isCurrentMonth
-                                ? isDisabled
-                                    ? 'var(--textDisabled)'
-                                    : (isSelected || isRangeStart || isRangeEnd) ? 'var(--textPrimaryB)' : 'var(--textPrimary)'
-                                : 'var(--textTertiary)',
-                            fontWeight: (isSelected || isRangeStart || isRangeEnd) ? 'bold' : 'normal',
-                            cursor: isDisabled ? 'not-allowed' : 'pointer',
-                            opacity: isDisabled ? 0.5 : 1,
-                            borderRadius: (isSelected || isRangeStart || isRangeEnd) ? 24 : 0,
+                    <button
+                        key={key}
+                        type="button"
+                        className={classNames}
+                        disabled={props.isDisabled}
+                        aria-label={label}
+                        tabIndex={props.isDisabled ? -1 : 0}
+                        onClick={() => {
+                            if (!props.isDisabled) {
+                                setSelectedDate(new Date(currentDay));
+                            }
                         }}
+                        onPointerEnter={() => handleDayPointerEnter(currentDay, props.isDisabled)}
+                        onFocus={() => handleDayPointerEnter(currentDay, props.isDisabled)}
                     >
-                        {format(currentDay, 'd')}
-                    </div>
+                        <span className={styles.cellInner}>{format(currentDay, 'd')}</span>
+                    </button>
                 );
 
-                day = addDays(day, 1);
+                cursor = addDays(cursor, 1);
             }
 
             rows.push(
-                <div key={day.toString() + '_row'} className={styles.weekRow}>
+                <div key={`row-${rowKey++}`} className={styles.weekRow}>
                     {days}
                 </div>
             );
-            days = [];
         }
 
         return <div>{rows}</div>;
@@ -246,7 +382,12 @@ const Calendar = ({
     return (
         <div className={styles.calendarWrapper} ref={calendarRef}>
             {renderHeader()}
-            <div className={`${styles.monthsGrid} ${monthsToShow > 1 ? styles.monthsGridTwo : ''}`}>
+            <div
+                className={`${styles.monthsGrid} ${monthsToShow > 1 ? styles.monthsGridTwo : ''}`}
+                role="region"
+                aria-label="Календарь"
+                onPointerLeave={handleGridPointerLeave}
+            >
                 {Array.from({ length: monthsToShow }).map((_, i) => {
                     const monthDate = addMonths(currentMonth, i);
                     return (
@@ -277,6 +418,5 @@ const Calendar = ({
         </div>
     );
 };
-
 
 export default Calendar;

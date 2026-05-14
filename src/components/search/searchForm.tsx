@@ -10,6 +10,17 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from 'react-redux';
 import { runFullSearchFlow, setStartSearch } from '@/store/slices/searchSlice';
 import { RootState } from '@/store';
+import { stayRangeFromDeparture } from '@/utils/calendarDateRange';
+
+/** Same as historical `calculateStayDates` return value (3 keys only; no `start_date_till`). */
+function legacyStayDatesFromRange(startDateStr: string | Date, nightCount: number) {
+    const r = stayRangeFromDeparture(startDateStr, nightCount);
+    return {
+        start_date: r.start_date,
+        start_date_from: r.start_date_from,
+        end_date_till: r.end_date_till,
+    };
+}
 
 interface SearchFormProps {
     header?: boolean;
@@ -38,6 +49,7 @@ interface SearchParams {
     sort_by: string;
 }
 
+const DEFAULT_INITIAL_NIGHTS = 7;
 
 const SearchForm = ({ header, pageName }: SearchFormProps) => {
     const { hotels, loading, headerName, startSearchValid } = useSelector((state: RootState) => state.search);
@@ -45,24 +57,30 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
 
     const dispatch = useDispatch();
     const router = useRouter();
-    const [params, setParams] = useState<SearchParams>({
-        from_city: 'Moscow',
-        from_country: 'RU',
-        // to_city: 'Kemer',
-        to_country: 'EG',
-        adults: '1',
-        start_date: '2025-07-21',
-        nights: '7',
-        flex_dates: '0',
-        start_date_from: "2025-07-21",
-        end_date_till: "2025-08-06",
-        // kids: '1',
-        // kids_ages: ['8'],
-        search_type: 'package',
-        page_limit: 20,
-        page_number: 1,
-        sort_by: 'relevance'
-        // hotel_ids:[9069464]
+    const [params, setParams] = useState<SearchParams>(() => {
+        const today = new Date();
+        const plus7 = new Date();
+        plus7.setDate(today.getDate() + 7);
+        const interval = legacyStayDatesFromRange(plus7, DEFAULT_INITIAL_NIGHTS);
+        return {
+            from_city: 'Moscow',
+            from_country: 'RU',
+            to_country: 'EG',
+            adults: '1',
+            nights: String(DEFAULT_INITIAL_NIGHTS),
+            flex_dates: '0',
+            ...interval,
+            start_date_till: '',
+            end_date_from: '',
+            to_city: '',
+            kids: '0',
+            kids_ages: [],
+            hotel_ids: [],
+            search_type: 'package',
+            page_limit: 20,
+            page_number: 1,
+            sort_by: 'relevance',
+        };
     });
 
     const getNightCount = (value: string | number | undefined) => {
@@ -75,59 +93,43 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
         return 7;
     };
 
-
-
-    useEffect(() => {
-        const today = new Date();
-        const plus7 = new Date();
-        plus7.setDate(today.getDate() + 7);
-        const interval = calculateStayDates(plus7, getNightCount(params?.nights));
-        setParams({ ...params, ...interval });
-    }, [])
-
-    function calculateStayDates(startDateStr, nightCount) {
-        const startDate = new Date(startDateStr);
-        const endDate = new Date(startDate);
-        endDate.setDate(startDate?.getDate() + nightCount);
-        const formatDate = (date) => {
-            const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const day = String(date.getDate()).padStart(2, '0');
-            return `${year}-${month}-${day}`;
-        };
-
-        return {
-            start_date: formatDate(startDate),
-            start_date_from: formatDate(startDate),
-            end_date_till: formatDate(endDate)
-        };
+    function calculateStayDates(startDateStr: string | Date, nightCount: number) {
+        return legacyStayDatesFromRange(startDateStr, nightCount);
     }
 
-
     useEffect(() => {
-        if (router.isReady && pageName === 'search' || pageName === 'home') {
-            const parsed = parseSearchParams(router.query);
+        if (!router.isReady || (pageName !== 'search' && pageName !== 'home')) return;
+
+        const parsed = parseSearchParams(router.query);
+
+        setParams((prev) => {
+            let next: SearchParams = { ...prev };
+
             if (parsed?.to_city) {
-                setParams(prev => ({ ...prev, ...parsed }));
+                next = { ...next, ...parsed };
             } else {
-                const { to_city, ...restParams } = params;
-                const { to_city: _, ...restParsed } = parsed || {};
-                setParams({ ...restParams, ...restParsed });
+                const { to_city: _pq, ...restParsed } = parsed || {};
+                const { to_city, ...restPrev } = next;
+                next = { ...restPrev, ...restParsed } as SearchParams;
             }
+
             if (parsed?.hotel_ids) {
-                // console.log(parsed?.hotel_ids);
-                setParams({ ...params, hotel_ids: parsed?.hotel_ids });
+                next = { ...next, hotel_ids: parsed.hotel_ids };
             }
-            if (Object.keys(parsed).length > 0) {
-                startSearch(parsed)
-            } else {
+
+            if (Object.keys(parsed).length === 0) {
                 const today = new Date();
                 const plus7 = new Date();
                 plus7.setDate(today.getDate() + 7);
-                const interval = calculateStayDates(plus7, getNightCount(params?.nights));
-                setParams({ ...params, ...interval });
+                next = { ...next, ...legacyStayDatesFromRange(plus7, getNightCount(next.nights)) };
             }
-        }
+
+            if (Object.keys(parsed).length > 0) {
+                queueMicrotask(() => startSearch(next));
+            }
+
+            return next;
+        });
     }, [router.isReady, pageName]);
 
     const startSearch = async (data: SearchParams) => {
@@ -163,7 +165,23 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
 
 
 
-    const handleChange = (value: string | number | number[], key: keyof SearchParams, type: string) => {
+    const handleChange = (value: any, key: keyof SearchParams | 'form_date' | 'date_range' | 'sync_nights_from_dates', type?: string) => {
+        if ((key as string) === 'sync_nights_from_dates') {
+            const n = typeof value === 'number' ? value : parseInt(String(value), 10);
+            if (!Number.isFinite(n) || n < 1) return;
+            setParams((prev) => ({ ...prev, nights: String(n) }));
+            return;
+        }
+        if ((key as string) === 'date_range' && value && typeof value === 'object' && 'start' in value && 'end' in value) {
+            const dr = value as { start: string; end: string };
+            setParams((prev) => ({
+                ...prev,
+                start_date: dr.start,
+                start_date_from: dr.start,
+                end_date_till: dr.end,
+            }));
+            return;
+        }
         if (key === 'from_city') {
             setParams((prev) => ({
                 ...prev,
@@ -194,11 +212,15 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
                 }));
             }
         } else if (key === 'form_date') {
-            const interval = calculateStayDates(value, getNightCount(params?.nights));
-            setParams({ ...params, ...interval });
+            setParams((prev) => {
+                const interval = calculateStayDates(value, getNightCount(prev?.nights));
+                return { ...prev, ...interval };
+            });
         } else if (key === 'nights') {
-            const interval = calculateStayDates(params?.start_date, +value);
-            setParams({ ...params, ...interval, nights: String(value) });
+            setParams((prev) => {
+                const interval = calculateStayDates(prev?.start_date, +value);
+                return { ...prev, ...interval, nights: String(value) };
+            });
         } else if (key === 'flex_dates') {
             setParams({ ...params, flex_dates: String(value) });
         } else if (key === 'adults') {
@@ -227,13 +249,11 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
             const startDate = params.start_date || calculateStayDates(new Date(), 7).start_date;
             const nightCount = getNightCount(params.nights);
             const dateRange = calculateStayDates(startDate, nightCount);
-            
+
             const queryParams: Record<string, string | string[]> = {
                 hotel_id: String(hotelId),
                 from_city: params.from_city || "Moscow",
                 from_country: params.from_country || "RU",
-                // When hotel is selected, to_country should be set from hotel's iso2
-                // If it's missing, we still need a value, so default to "RU"
                 to_country: params.to_country || "RU",
                 to_city: params.to_city || "",
                 adults: params.adults || "2",
@@ -245,7 +265,6 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
                 flex_dates: params.flex_dates || "0",
             };
 
-            // Add optional params if they exist
             if (params.kids) {
                 queryParams.kids = params.kids;
             }
@@ -260,9 +279,8 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
             return;
         }
 
-        // Otherwise, navigate to search page as usual
         const url = createSearchUrl(params);
-        startSearch(params)
+        startSearch(params);
         router.push(`/search?${url}`);
     };
 
@@ -270,12 +288,15 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
         const queryParams: string[] = [];
 
         Object.entries(params).forEach(([key, value]) => {
+            if (value === undefined || value === null) return;
+            if (typeof value === 'string' && value.trim() === '') return;
             if (Array.isArray(value)) {
+                if (value.length === 0) return;
                 value.forEach((val) => {
                     queryParams.push(`${encodeURIComponent(key)}=${encodeURIComponent(val)}`);
                 });
             } else {
-                queryParams.push(`${encodeURIComponent(key)}=${encodeURIComponent(value)}`);
+                queryParams.push(`${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`);
             }
         });
 
@@ -327,9 +348,8 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
                         <div className={styles.searchGroup}>
                             <SelectDate
                                 handleChange={handleChange}
-                                name={'form_date'}
                                 value={params.start_date}
-                                nights={params.nights}
+                                endValue={params.end_date_till}
                                 flexDates={params.flex_dates}
                             />
                             <Nights

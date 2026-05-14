@@ -14,6 +14,7 @@ import { useRequestIdSync } from "@/hooks/useRequestIdSync";
 import { useInitialSearchParams } from "@/hooks/useInitialSearchParams";
 import { SITE_NAME } from "@/config/seo";
 import { getAvailableStartDatesFromRooms } from "@/utils/hotelDetailsUtils";
+import { endYmdAfterNights } from "@/utils/calendarDateRange";
 import { useEffect, useRef, useState } from "react";
 
 export default function HotelDetails() {
@@ -31,13 +32,6 @@ export default function HotelDetails() {
     const initialSearchParams = useInitialSearchParams();
     const { hotel, apiHotelData, loading: hotelLoading } = useHotelDetails(hotelId, router.isReady);
     const { rooms, loading: roomsLoading } = useHotelRooms(requestId, hotelId, router.isReady);
-
-    const formatDateToISO = (date: Date) => {
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
-    };
 
     // Run initial search if needed (when coming from hot deals without request_id)
     useInitialHotelSearch(hotelId, requestId, localRequestId, router.isReady, setLocalRequestId);
@@ -151,9 +145,7 @@ export default function HotelDetails() {
 
                         const startDateFrom = snapshot.startDateISO;
                         const nights = String(snapshot.nights || 1);
-                        const endDate = new Date(startDateFrom);
-                        endDate.setDate(endDate.getDate() + (snapshot.nights || 1));
-                        const endDateTill = formatDateToISO(endDate);
+                        const endDateTill = endYmdAfterNights(startDateFrom, snapshot.nights || 1);
 
                         const currentStart = Array.isArray(router.query.start_date)
                             ? router.query.start_date[0]
