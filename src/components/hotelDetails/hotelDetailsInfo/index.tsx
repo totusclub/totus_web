@@ -7,6 +7,11 @@ import TrackPrices from "@/components/UI/trackPrices";
 import { createPackage } from "@/api/levelTravelApi";
 import { useRouter } from "next/router";
 import { findCheapestOfferForStartDate } from "@/utils/hotelDetailsUtils";
+import {
+    getOfferPriceTitle,
+    getSearchTypeFromQuery,
+    navigateAfterPackageCreate,
+} from "@/utils/bookingFlowUtils";
 import HotelFavoriteButton from "@/components/hotelDetails/HotelFavoriteButton";
 import AuthModal from "@/components/auth";
 
@@ -28,6 +33,7 @@ const HotelDetailsInfo = ({
     selectedRoomDate,
 }: HotelDetailsInfoProps) => {
     const router = useRouter();
+    const searchType = getSearchTypeFromQuery(router.query);
     const [priceTrack, setPriceTrack] = useState<boolean>(false);
     const [loading, setLoading] = useState(false);
     const [authModalOpen, setAuthModalOpen] = useState(false);
@@ -57,7 +63,7 @@ const HotelDetailsInfo = ({
         setLoading(true);
         const res = await createPackage({ request_id: router.query.request_id, tour_id: id });
         setLoading(false);
-        router.push(`/tickets?package=${res.package.id}`);
+        navigateAfterPackageCreate(router, res.package.id, searchType);
     };
     const formatDate = useMemo(() => {
         if (!highlightOffer?.start_date) return "";
@@ -86,7 +92,7 @@ const HotelDetailsInfo = ({
                                     <div className={styles.HotelDetailsInfoPriceMain}>
                                         <p className={styles.HotelDetailsInfoPriceText}>от {priceFormatted}₽</p>
                                         <div className={styles.HotelDetailsInfoDate}>
-                                            <p className={styles.HotelDetailsInfoDateTitle}>Цена за тур с перелётом</p>
+                                            <p className={styles.HotelDetailsInfoDateTitle}>{getOfferPriceTitle(searchType)}</p>
                                             <p className={styles.HotelDetailsInfoDateText}>
                                                 {formatDate}
                                                 {highlightOffer?.nights_count != null

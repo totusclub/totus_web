@@ -10,6 +10,11 @@ import { useMemo, useState } from "react";
 import { createPackage } from "@/api/levelTravelApi";
 import { useRouter } from "next/router";
 import { findCheapestOfferForStartDate } from "@/utils/hotelDetailsUtils";
+import {
+    getOfferPriceTitle,
+    getSearchTypeFromQuery,
+    navigateAfterPackageCreate,
+} from "@/utils/bookingFlowUtils";
 
 const HotelLocationMap = dynamic(() => import("./HotelLocationMap"), {
     ssr: false,
@@ -51,6 +56,7 @@ const HotelDetailsRooms = ({
     onSelectedDateChange,
 }: HotelDetailsRoomsProps) => {
     const router = useRouter();
+    const searchType = getSearchTypeFromQuery(router.query);
     const [isBooking, setIsBooking] = useState(false);
     const pricesList = useMemo((): Record<string, number> | undefined => {
         if (!rooms?.length) return undefined;
@@ -110,7 +116,7 @@ const HotelDetailsRooms = ({
         const res = await createPackage({ request_id: router.query.request_id, tour_id: id })
         // console.log('handleBook', res.package.id)
         setIsBooking(false)
-        router.push(`/tickets?package=${res.package.id}`);
+        navigateAfterPackageCreate(router, res.package.id, searchType);
     };
 
     const formatDate = useMemo(() => {
@@ -203,7 +209,7 @@ const HotelDetailsRooms = ({
                     <div className={styles.HotelDetailsInfoPrice}>
                         <p className={styles.HotelDetailsInfoPriceText}>от {priceFormatted}₽</p>
                         <div className={styles.HotelDetailsInfoDate}>
-                            <p className={styles.HotelDetailsInfoDateTitle}>Цена за тур с перелётом</p>
+                            <p className={styles.HotelDetailsInfoDateTitle}>{getOfferPriceTitle(searchType)}</p>
                             <p className={styles.HotelDetailsInfoDateText}>
                                 {formatDate}
                                 {highlightOffer?.nights_count != null ? `, ${highlightOffer.nights_count} ночей` : ""}

@@ -14,6 +14,7 @@ import { useRequestIdSync } from "@/hooks/useRequestIdSync";
 import { useInitialSearchParams } from "@/hooks/useInitialSearchParams";
 import { SITE_NAME } from "@/config/seo";
 import { getAvailableStartDatesFromRooms } from "@/utils/hotelDetailsUtils";
+import { getSearchTypeFromQuery } from "@/utils/bookingFlowUtils";
 import { endYmdAfterNights } from "@/utils/calendarDateRange";
 import { useEffect, useRef, useState } from "react";
 
@@ -30,7 +31,12 @@ export default function HotelDetails() {
     // Hooks for data fetching and state management
     const { requestId, localRequestId, setLocalRequestId } = useRequestIdSync();
     const initialSearchParams = useInitialSearchParams();
-    const { hotel, apiHotelData, loading: hotelLoading } = useHotelDetails(hotelId, router.isReady);
+    const searchType = router.isReady ? getSearchTypeFromQuery(router.query) : 'package';
+    const { hotel, apiHotelData, loading: hotelLoading } = useHotelDetails(
+        hotelId,
+        router.isReady,
+        searchType
+    );
     const { rooms, loading: roomsLoading } = useHotelRooms(requestId, hotelId, router.isReady);
 
     // Run initial search if needed (when coming from hot deals without request_id)
@@ -77,7 +83,7 @@ export default function HotelDetails() {
     if (!router.isReady) {
         return (
             <main className={'searchContainer'}>
-                <Steps active={2} />
+                <Steps activeStep="hotel" />
                 <HotelDetailsSkeleton />
             </main>
         );
@@ -87,7 +93,7 @@ export default function HotelDetails() {
     if (!hotelId) {
         return (
             <main className={'searchContainer'}>
-                <Steps active={2} />
+                <Steps activeStep="hotel" />
                 <HotelDetailsSkeleton />
             </main>
         );
@@ -96,7 +102,7 @@ export default function HotelDetails() {
     if (hotelLoading || !hotel) {
         return (
             <main className={'searchContainer'}>
-                <Steps active={2} />
+                <Steps activeStep="hotel" />
                 <HotelDetailsSkeleton />
             </main>
         );
@@ -123,7 +129,7 @@ export default function HotelDetails() {
                     {hotelDesc ? <meta property="og:description" content={hotelDesc} /> : null}
                 </Head>
             ) : null}
-            <Steps active={2} />
+            <Steps activeStep="hotel" />
             <HotelDetailsHeader info={hotel} loading={hotelLoading} />
             <HotelDetailsInfo
                 hotel={hotel}

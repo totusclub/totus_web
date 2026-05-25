@@ -5,7 +5,10 @@ export const fetchDestinations = createAsyncThunk(
     'destinations/fetchDestinations',
     async (params = {}) => {
         // query:'""',from_city:from_city,search_type:'package'
-        const res = await axios.get(`https://api.totus.club/references/autocomplete_v2?query="${params.query}"&from_city=${params?.from_city}&search_type=package` );
+        const searchType = params?.search_type === 'hotel' ? 'hotel' : 'package';
+        const res = await axios.get(
+            `https://api.totus.club/references/autocomplete_v2?query="${params.query}"&from_city=${params?.from_city}&search_type=${searchType}`
+        );
         // const res = await axios.get('https://api.totus.club/references/destinations', { params });
         return res.data;
     }

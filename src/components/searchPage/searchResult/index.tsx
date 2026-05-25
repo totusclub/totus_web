@@ -39,7 +39,7 @@ const SearchResult = ({ tickets, flights, packages, flightsFilter, setFiltersReq
                     <Filters statistics={hotels?.statistics} allFilters={hotels?.filters} selectedFilters={selectedFilters} />
                 )}
 
-                {tickets ? <ResultTicketList packages={packages} flights={flights} loading={ticketsLoading || false} /> : <ResultList data={hotels} loading={loading} tickets={hotels} setFiltersRequest={setFiltersRequest} />}
+                {tickets ? <ResultTicketList packages={packages} flights={flights} loading={ticketsLoading || false} /> : <ResultList data={hotels} loading={loading} setFiltersRequest={setFiltersRequest} />}
             </div>
         </div>
     );

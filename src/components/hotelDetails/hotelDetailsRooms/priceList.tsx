@@ -3,6 +3,11 @@ import Button from "@/components/UI/button";
 import { useRouter } from "next/router";
 import React from "react";
 import {createPackage} from "@/api/levelTravelApi";
+import {
+    getOfferPriceSubtitle,
+    getSearchTypeFromQuery,
+    navigateAfterPackageCreate,
+} from "@/utils/bookingFlowUtils";
 
 interface RoomItem {
     date: string;
@@ -25,11 +30,11 @@ interface HotelDetailsPriceListProps {
 
 const HotelDetailsPriceList: React.FC<HotelDetailsPriceListProps> = ({ item,selectedDate,selectedOperator,type }) => {
     const router = useRouter();
+    const searchType = getSearchTypeFromQuery(router.query);
 
     const handleBook =async (id) => {
       const res =  await createPackage({request_id:router.query.request_id,tour_id:id})
-        // console.log('handleBook',res.package.id)
-        router.push(`/tickets?package=${res.package.id}`);
+        navigateAfterPackageCreate(router, res.package.id, searchType);
     };
 
     const formatDate = (dateStr) => {
@@ -68,7 +73,7 @@ const HotelDetailsPriceList: React.FC<HotelDetailsPriceListProps> = ({ item,sele
                         </div>
                         <div>
                             <p>{room?.price?.toString()?.replace(/\B(?=(\d{3})+(?!\d))/g, '\u202F')}₽</p>
-                            <p>тур с перелётом</p>
+                            <p>{getOfferPriceSubtitle(searchType)}</p>
                         </div>
                         <div className={styles.mobButton}>
                             <Button

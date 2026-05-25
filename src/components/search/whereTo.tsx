@@ -26,9 +26,11 @@ interface WhereToProps {
     handleChange: (value: DestinationItem | string | number | number[], key: string, type: string) => void;
     value?: string;
     name: string;
+    searchType?: 'package' | 'hotel';
+    fromCity?: string;
 }
 
-const WhereFrom = ({ handleChange, value, name }: WhereToProps) => {
+const WhereFrom = ({ handleChange, value, name, searchType = 'package', fromCity = 'Moscow' }: WhereToProps) => {
     const dispatch = useDispatch<AppDispatch>();
     const inputRef = useRef<HTMLInputElement | null>(null);
     const wrapperRef = useRef<HTMLDivElement>(null);
@@ -52,14 +54,14 @@ const WhereFrom = ({ handleChange, value, name }: WhereToProps) => {
             dispatch(
                 fetchDestinations({
                     query: searchValue,
-                    from_city: "Moscow",
-                    search_type: "package",
+                    from_city: fromCity,
+                    search_type: searchType,
                 } as unknown as undefined)
             );
         }, 500); // debounce 500ms
 
         return () => clearTimeout(timeoutId);
-    }, [searchValue, dispatch]);
+    }, [searchValue, dispatch, fromCity, searchType]);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -108,12 +110,12 @@ const WhereFrom = ({ handleChange, value, name }: WhereToProps) => {
             dispatch(
                 fetchDestinations({
                     query: "",
-                    from_city: "Moscow",
-                    search_type: "package",
+                    from_city: fromCity,
+                    search_type: searchType,
                 } as unknown as undefined)
             );
         }
-    }, [isOpen, dispatch, searchValue]);
+    }, [isOpen, dispatch, searchValue, fromCity, searchType]);
 
     const ignorName = ['Крым', 'Донецк', 'Луганск', 'Ялта', 'Yalta']
 

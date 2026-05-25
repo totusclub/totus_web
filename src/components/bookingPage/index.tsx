@@ -2,10 +2,11 @@ import styles from './booking.module.css';
 import BookingOrderForm from "@/components/bookingPage/bookingForm";
 import BookingOrderCard from "@/components/bookingPage/orderCard";
 import { useEffect, useState, useMemo } from "react";
-import { createOrder, PackagesActualizeFlight, validateTourist } from "@/api/levelTravelApi";
+import { createOrder, PackagesActualize, PackagesActualizeFlight, validateTourist } from "@/api/levelTravelApi";
 import { useRouter } from "next/router";
 import useAuth from "@/hooks/useAuth";
 import { validateBookingForm, isBookingFormValid, type Tourist, type BookingValidationErrors } from "@/utils/bookingValidation";
+import { getSearchTypeFromQuery, isHotelOnlySearch } from "@/utils/bookingFlowUtils";
 
 type Params = {
     email: string;
@@ -29,19 +30,37 @@ const BookingCard = () => {
     });
     const [errors, setErrors] = useState<ValidationErrors>({});
     useEffect(() => {
-        if (router?.query?.package && router?.query?.flight_pair_id) {
-            setDataLoading(true);
-            PackagesActualizeFlight(router?.query?.package, router?.query?.flight_pair_id).then(e => {
-                setPackageData(e.package)
-                setDataLoading(false);
-            }).catch(() => {
-                setDataLoading(false);
-            })
-        } else {
+        const packageId = router?.query?.package;
+        if (!packageId) {
             setDataLoading(false);
+            return;
         }
 
-    }, [router]);
+        const searchType = getSearchTypeFromQuery(router.query);
+        const flightPairId = router?.query?.flight_pair_id;
+
+        setDataLoading(true);
+
+        const loadPackage = flightPairId
+            ? PackagesActualizeFlight(packageId, flightPairId)
+            : isHotelOnlySearch(searchType)
+              ? PackagesActualize(packageId, { search_type: 'hotel' })
+              : null;
+
+        if (!loadPackage) {
+            setDataLoading(false);
+            return;
+        }
+
+        loadPackage
+            .then((e) => {
+                setPackageData(e.package);
+                setDataLoading(false);
+            })
+            .catch(() => {
+                setDataLoading(false);
+            });
+    }, [router?.query?.package, router?.query?.flight_pair_id, router?.query?.search_type]);
 
     useEffect(() => {
         if (packageData) {
@@ -224,11 +243,13 @@ const BookingCard = () => {
                 return;
             }
 
-            const dataOrderCreate = {
+            const dataOrderCreate: Record<string, unknown> = {
                 ...data,
-                flight_pair_id: router?.query?.flight_pair_id,
-                user_id: user?.id
+                user_id: user?.id,
             };
+            if (router?.query?.flight_pair_id) {
+                dataOrderCreate.flight_pair_id = router.query.flight_pair_id;
+            }
 
             if (res.valid) {
                 // Create order
@@ -239,10 +260,14 @@ const BookingCard = () => {
                 const orderId = orderResult?.order?.id || orderResult?.id || orderResult?.package?.id;
 
                 if (orderId) {
-                    // Success - redirect to checkout page with order_id
+                    const checkoutQuery: Record<string, string> = { order_id: String(orderId) };
+                    const searchType = getSearchTypeFromQuery(router.query);
+                    if (isHotelOnlySearch(searchType)) {
+                        checkoutQuery.search_type = 'hotel';
+                    }
                     router.push({
                         pathname: '/checkout',
-                        query: { order_id: orderId }
+                        query: checkoutQuery,
                     });
                 } else {
                     // If order_id is not found in response, show error

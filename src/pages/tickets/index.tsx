@@ -57,7 +57,7 @@ export default function Tickets() {
     return (
         <main className={'searchContainer'}>
 
-            <Steps active={3} />
+            <Steps activeStep="flights" searchType="package" />
             <SearchResult flightsFilter={flightsFilter} packages={packages} tickets={true} flights={allFlights} setFiltersRequest={setFiltersRequest} loading={loading} />
         </main>
     );

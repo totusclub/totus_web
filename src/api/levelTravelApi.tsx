@@ -3,7 +3,6 @@ import axios from 'axios';
 // const BASE_URL = 'http://192.168.1.105:3001';
 const BASE_URL = 'https://api.totus.club';
 
-/** Flatten GET params so the API receives plain strings (avoids 500s on bracket-array encoding). */
 function prepareStartSearchParams(raw: Record<string, unknown>): Record<string, string | number | boolean> {
     const out: Record<string, string | number | boolean> = {};
     if (!raw || typeof raw !== 'object') return out;
@@ -26,7 +25,7 @@ function prepareStartSearchParams(raw: Record<string, unknown>): Record<string, 
     return out;
 }
 
-export async function startSearch(params) {
+export async function startSearch(params: Record<string, unknown>) {
     try {
         const flat = prepareStartSearchParams(params as Record<string, unknown>);
         const res = await axios.get(`${BASE_URL}/start-search`, { params: flat });
@@ -37,7 +36,7 @@ export async function startSearch(params) {
     }
 }
 
-export async function checkSearchStatus(requestId) {
+export async function checkSearchStatus(requestId: string) {
     try {
         const res = await axios.get(`${BASE_URL}/search-status`, {
             params: { request_id: requestId },
@@ -58,7 +57,7 @@ export async function getHomeData(): Promise<any> {
     }
 }
 
-export async function getGroupedHotels(params) {
+export async function getGroupedHotels(params: { request_id: never; readyOperators: never; }) {
     try {
         const sanitizedParams = Object.fromEntries(
             Object.entries(params || {}).filter(([_, value]) => {
@@ -80,7 +79,7 @@ export async function getGroupedHotels(params) {
     }
 }
 
-export async function runFullSearchFlow(searchParams, onProgress) {
+export async function runFullSearchFlow(searchParams: never, onProgress: (arg0: never) => void) {
     const { request_id } = await startSearch(searchParams);
 
     return new Promise((resolve, reject) => {
@@ -107,7 +106,7 @@ export async function runFullSearchFlow(searchParams, onProgress) {
 }
 
 
-export async function getHotelOffers(data) {
+export async function getHotelOffers(data: { request_id: never; hotel_id: never; compact: never; }) {
     if (!data.request_id || !data.hotel_id) {
         throw new Error('Missing request_id or hotel_id');
     }
@@ -129,7 +128,7 @@ export async function getHotelOffers(data) {
 };
 
 
-export async function getHotelRooms(data) {
+export async function getHotelRooms(data: { request_id: never; hotel_id: never; }) {
     if (!data.request_id && !data?.hotel_id) {
         throw new Error('Missing request_id or hotel_id');
     }
@@ -147,14 +146,17 @@ export async function getHotelRooms(data) {
     return response.data;
 };
 
-export async function getHotelInfo(data: any) {
+export async function getHotelInfo(data: {
+    hotel_id: number | string;
+    search_type?: 'package' | 'hotel';
+}) {
     if (!data.hotel_id) {
         throw new Error('Missing request_id or hotel_id');
     }
 
     const params = {
         hotel_ids: data.hotel_id,
-        search_type: 'package'
+        search_type: data.search_type === 'hotel' ? 'hotel' : 'package',
     };
 
 
@@ -167,7 +169,7 @@ export async function getHotelInfo(data: any) {
     return response.data.hotels[0];
 };
 
-export async function createPackage(data: any) {
+export async function createPackage(data: { request_id: never; tour_id: never; }) {
     if (!data.request_id || !data.tour_id) {
         throw new Error('Missing request_id or hotel_id');
     }
@@ -182,14 +184,17 @@ export async function createPackage(data: any) {
 
     return response.data;
 };
-export async function PackagesActualize(id: any) {
+export async function PackagesActualize(
+    id: never,
+    options?: { search_type?: 'package' | 'hotel' }
+) {
     if (!id) {
         throw new Error('Missing package_id');
     }
 
     const params = {
         package_id: id,
-        search_type: 'package'
+        search_type: options?.search_type === 'hotel' ? 'hotel' : 'package',
     };
     const response = await axios.get(`${BASE_URL}/packages/actualize`, {
         params,
@@ -197,22 +202,16 @@ export async function PackagesActualize(id: any) {
 
     return response.data;
 };
-export async function Packagesflights(params: any) {
+
+export async function Packagesflights(params: never) {
     if (!params) {
         throw new Error('Missing package_id');
     }
-
-    // const data = {
-    //     package_id: id,
-    // };
-    // console.log('Packagesflights',params)
-
     const response = await axios.post(`${BASE_URL}/packages/flights`, params);
-
     return response.data;
 }
 
-export async function PackagesActualizeFlight(id: any, f_id: any) {
+export async function PackagesActualizeFlight(id: never, f_id: never) {
     if (!id) {
         throw new Error('Missing package_id');
     }
@@ -229,7 +228,7 @@ export async function PackagesActualizeFlight(id: any, f_id: any) {
     return response.data;
 };
 
-export async function validateTourist(params: any) {
+export async function validateTourist(params: never) {
     try {
         if (!params) {
             throw new Error('Missing package_id');
@@ -240,7 +239,7 @@ export async function validateTourist(params: any) {
         return err
     }
 };
-export async function createOrder(params: any) {
+export async function createOrder(params: never) {
     try {
         if (!params) {
             throw new Error('Missing package_id');
@@ -252,7 +251,7 @@ export async function createOrder(params: any) {
     }
 };
 
-export async function createPay(params: any) {
+export async function createPay(params: never) {
     try {
         if (!params) {
             throw new Error('Missing package_id');
@@ -263,7 +262,7 @@ export async function createPay(params: any) {
         return err
     }
 };
-export async function checkPay(params: any) {
+export async function checkPay(params: never) {
     try {
         if (!params) {
             throw new Error('Missing package_id');
@@ -275,7 +274,7 @@ export async function checkPay(params: any) {
     }
 };
 
-export async function getOrder(id: any) {
+export async function getOrder(id: never) {
     if (!id) {
         throw new Error('Missing package_id');
     }
@@ -289,7 +288,7 @@ export async function getOrder(id: any) {
 
     return response.data;
 };
-export async function getOrdersUsers(id: any) {
+export async function getOrdersUsers(id: never) {
     if (!id) {
         throw new Error('Missing package_id');
     }

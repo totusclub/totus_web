@@ -1,55 +1,64 @@
 import styles from '../searchPage.module.css';
-import Icon from "@/components/icons/Icon";
+import Icon from '@/components/icons/Icon';
+import { useRouter } from 'next/router';
+import {
+    type BookingFlowStepId,
+    type SearchTypeValue,
+    getActiveStepIndex,
+    getFlowSteps,
+    getSearchTypeFromQuery,
+} from '@/utils/bookingFlowUtils';
 
-
-interface stepsProps {
-    active:number
+interface StepsProps {
+    /** Current step in the funnel. */
+    activeStep: BookingFlowStepId;
+    /** Override flow type; otherwise read from `search_type` in the URL. */
+    searchType?: SearchTypeValue;
 }
 
-const Steps = ({ active}: stepsProps) => {
+const Steps = ({ activeStep, searchType: searchTypeProp }: StepsProps) => {
+    const router = useRouter();
+    const searchType = searchTypeProp ?? getSearchTypeFromQuery(router.query);
+    const steps = getFlowSteps(searchType);
+    const activeIndex = getActiveStepIndex(steps, activeStep);
+
     return (
         <div className={styles.stepsWrapper}>
             <div className={'content'}>
                 <div className={styles.steps}>
-                <div className={styles.step}>
-                    <div className={styles.stepNumber} style={{backgroundColor:active>=1?'var(--core_Orange)':'var(--bgPrimary)'}}>
-                        <span style={{color:active>=1?'var(--textPrimaryB)':'var(--textTertiary)'}}>1</span>
-                    </div>
-                    <p className={styles.stepName}>Выбор туров</p>
-                    <Icon name={'line'} size={53}/>
+                    {steps.map((step, index) => {
+                        const stepNumber = index + 1;
+                        const isReached = index <= activeIndex;
+                        const isLast = index === steps.length - 1;
+
+                        return (
+                            <div key={step.id} className={styles.step}>
+                                <div
+                                    className={styles.stepNumber}
+                                    style={{
+                                        backgroundColor: isReached
+                                            ? 'var(--core_Orange)'
+                                            : 'var(--bgPrimary)',
+                                    }}
+                                >
+                                    <span
+                                        style={{
+                                            color: isReached
+                                                ? 'var(--textPrimaryB)'
+                                                : 'var(--textTertiary)',
+                                        }}
+                                    >
+                                        {stepNumber}
+                                    </span>
+                                </div>
+                                <p className={styles.stepName} style={isLast ? { marginRight: 0 } : undefined}>
+                                    {step.label}
+                                </p>
+                                {!isLast && <Icon name={'line'} size={53} />}
+                            </div>
+                        );
+                    })}
                 </div>
-                <div className={styles.step}>
-                    <div className={styles.stepNumber}
-                         style={{backgroundColor: active>=2 ? 'var(--core_Orange)' : 'var(--bgPrimary)'}}>
-                        <span style={{color: active>=2 ? 'var(--textPrimaryB)' : 'var(--textTertiary)'}}>2</span>
-                    </div>
-                    <p className={styles.stepName}>Выбор отеля и размещения</p>
-                    <Icon name={'line'} size={53}/>
-                </div>
-                <div className={styles.step}>
-                    <div className={styles.stepNumber}
-                         style={{backgroundColor: active >= 3 ? 'var(--core_Orange)' : 'var(--bgPrimary)'}}>
-                        <span style={{color: active >= 3 ? 'var(--textPrimaryB)' : 'var(--textTertiary)'}}>3</span>
-                    </div>
-                    <p className={styles.stepName}>Выбор перелёта</p>
-                    <Icon name={'line'} size={53}/>
-                </div>
-                <div className={styles.step}>
-                    <div className={styles.stepNumber}
-                         style={{backgroundColor: active >= 4 ? 'var(--core_Orange)' : 'var(--bgPrimary)'}}>
-                        <span style={{color: active >= 4 ? 'var(--textPrimaryB)' : 'var(--textTertiary)'}}>4</span>
-                    </div>
-                    <p className={styles.stepName}>Бронирование</p>
-                    <Icon name={'line'} size={53}/>
-                </div>
-                <div className={styles.step}>
-                    <div className={styles.stepNumber}
-                         style={{backgroundColor: active >=5  ? 'var(--core_Orange)' : 'var(--bgPrimary)'}}>
-                        <span style={{color: active >= 5 ? 'var(--textPrimaryB)' : 'var(--textTertiary)'}}>5</span>
-                    </div>
-                    <p className={styles.stepName} style={{marginRight:0}}>Подтверждение и оплата</p>
-                </div>
-            </div>
             </div>
         </div>
     );

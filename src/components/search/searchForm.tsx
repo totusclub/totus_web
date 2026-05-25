@@ -1,4 +1,5 @@
 import styles from './search.module.css';
+import Icon from "@/components/icons/Icon";
 import Button from "@/components/UI/button";
 import People from "@/components/search/people";
 import Nights from "@/components/search/nights";
@@ -6,7 +7,7 @@ import WhereTo from "@/components/search/whereTo";
 import WhereFrom from "@/components/search/whereFrom";
 import SelectDate from "@/components/search/date";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from 'react-redux';
 import { runFullSearchFlow, setStartSearch } from '@/store/slices/searchSlice';
 import { RootState } from '@/store';
@@ -50,6 +51,97 @@ interface SearchParams {
 }
 
 const DEFAULT_INITIAL_NIGHTS = 7;
+
+type SearchTypeValue = 'package' | 'hotel';
+
+const SEARCH_TYPE_TABS: { id: SearchTypeValue; label: string; icon: 'plane' | 'hotel' }[] = [
+    { id: 'package', label: 'Тур', icon: 'plane' },
+    { id: 'hotel', label: 'Отель', icon: 'hotel' },
+];
+
+function SearchTypeTabs({
+    value,
+    onChange,
+}: {
+    value: SearchTypeValue;
+    onChange: (type: SearchTypeValue) => void;
+}) {
+    const tabsRef = useRef<HTMLDivElement>(null);
+    const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
+    const [indicator, setIndicator] = useState({ left: 0, width: 0 });
+
+    const activeIndex = Math.max(
+        0,
+        SEARCH_TYPE_TABS.findIndex((tab) => tab.id === value)
+    );
+
+    const updateIndicator = useCallback(() => {
+        const btn = tabRefs.current[activeIndex];
+        if (!btn) return;
+        setIndicator({
+            left: btn.offsetLeft,
+            width: btn.offsetWidth,
+        });
+    }, [activeIndex]);
+
+    useEffect(() => {
+        updateIndicator();
+        const container = tabsRef.current;
+        if (!container) return;
+
+        const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(updateIndicator) : null;
+        ro?.observe(container);
+        window.addEventListener('resize', updateIndicator);
+
+        return () => {
+            ro?.disconnect();
+            window.removeEventListener('resize', updateIndicator);
+        };
+    }, [updateIndicator, value]);
+
+    return (
+        <div className={styles.searchTypeTabs} ref={tabsRef} role="tablist" aria-label="Тип поиска">
+            <div
+                className={styles.searchTypeTabIndicator}
+                style={{
+                    width: indicator.width,
+                    transform: `translateX(${indicator.left}px)`,
+                }}
+                aria-hidden
+            />
+            {SEARCH_TYPE_TABS.map((tab, index) => {
+                const isActive = value === tab.id;
+                return (
+                    <button
+                        key={tab.id}
+                        ref={(el) => {
+                            tabRefs.current[index] = el;
+                        }}
+                        type="button"
+                        role="tab"
+                        aria-selected={isActive}
+                        className={`${styles.searchTypeTab} ${isActive ? styles.searchTypeTabActive : ''}`}
+                        onClick={() => onChange(tab.id)}
+                    >
+                        <span className={styles.searchTypeTabIcon}>
+                            <Icon
+                                name={tab.icon}
+                                size={20}
+                                color={isActive ? 'var(--core_Orange)' : 'rgba(255, 255, 255, 0.95)'}
+                            />
+                        </span>
+                        <span className={styles.searchTypeTabText}>
+                            <span className={styles.searchTypeTabLabel}>{tab.label}</span>
+                            <span className={styles.searchTypeTabHint}>
+                                {tab.id === 'package' ? 'С перелётом' : 'Без перелёта'}
+                            </span>
+                        </span>
+                    </button>
+                );
+            })}
+        </div>
+    );
+}
 
 const SearchForm = ({ header, pageName }: SearchFormProps) => {
     const { hotels, loading, headerName, startSearchValid } = useSelector((state: RootState) => state.search);
@@ -146,16 +238,19 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
                     }
                 }));
             } else {
+                const filterParams: Record<string, unknown> = {
+                    filter_instant_confirm: false,
+                    page_number: data.page_number,
+                    page_limit: data.page_limit,
+                    sort_by: data?.sort_by || 'relevance',
+                };
+                if (data.search_type !== 'hotel') {
+                    filterParams.filter_stars = '3,4,5';
+                    filterParams.filter_meals = 'AI';
+                }
                 dispatch(runFullSearchFlow({
                     searchParams: data,
-                    filterParams: {
-                        filter_instant_confirm: false,
-                        page_number: data.page_number,
-                        page_limit: data.page_limit,
-                        filter_stars: '3,4,5',
-                        filter_meals: 'AI',
-                        sort_by: data?.sort_by || 'relevance'
-                    }
+                    filterParams,
                 }));
             }
             dispatch(setStartSearch(false))
@@ -240,6 +335,14 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
         }
     };
 
+    const handleSearchTypeChange = (searchType: SearchTypeValue) => {
+        setParams((prev) => ({
+            ...prev,
+            search_type: searchType,
+            ...(searchType === 'package' ? { hotel_ids: [] } : {}),
+        }));
+    };
+
     const handleClick = () => {
         // If hotel is selected and we're on homepage, navigate to hotel details
         if (params.hotel_ids && params.hotel_ids.length > 0 && pageName === 'home') {
@@ -313,6 +416,9 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
             if (key === 'kids_ages' || key === 'hotel_ids') {
                 const arrayValues = Array.isArray(value) ? value : [value];
                 parsed[key as keyof SearchParams] = arrayValues.map(Number);
+            } else if (key === 'search_type') {
+                const raw = Array.isArray(value) ? value[0] : value;
+                parsed.search_type = raw === 'hotel' ? 'hotel' : 'package';
             } else {
                 // Everything else is a string
                 parsed[key as keyof SearchParams] = Array.isArray(value) ? value[0] : value;
@@ -322,7 +428,7 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
         return parsed;
     };
 
-    function formatDateToRussian(dateStr) {
+    function formatDateToRussian(dateStr: string) {
         const russianMonths = [
             'января', 'февраля', 'марта', 'апреля', 'мая', 'июня',
             'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'
@@ -334,48 +440,69 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
         return `${parseInt(day, 10)} ${monthName}`;
     }
 
-    // useEffect(() => {
+  // useEffect(() => {
     //     console.log('searchValue',searchValue);
     //     setHeaderName(searchValue)
     // }, [searchValue]);
+    const showSearchForm = pageName === 'search' || pageName === 'home';
+    const isHotelSearch = params.search_type === 'hotel';
 
     return (
         <>
-            {pageName === 'search' || pageName === 'home' && (
-                <div className={`${styles.searchForm} ${header && styles.searchFormM}`}>
-                    <div className={styles.searchFields}>
-                        <WhereTo handleChange={handleChange} name={'to_city'} value={params.to_city} />
-                        <div className={styles.searchGroup}>
-                            <SelectDate
+            {showSearchForm && (
+                <div className={styles.searchFormBlock}>
+                    {!header && (
+                        <SearchTypeTabs
+                            value={(params.search_type === 'hotel' ? 'hotel' : 'package') as SearchTypeValue}
+                            onChange={handleSearchTypeChange}
+                        />
+                    )}
+                    <div className={`${styles.searchForm} ${header && styles.searchFormM}`}>
+                        <div className={styles.searchFields}>
+                            <WhereTo
                                 handleChange={handleChange}
-                                value={params.start_date}
-                                endValue={params.end_date_till}
-                                flexDates={params.flex_dates}
+                                name={'to_city'}
+                                value={params.to_city}
+                                searchType={params.search_type as SearchTypeValue}
+                                fromCity={params.from_city}
                             />
-                            <Nights
+                            <div className={styles.searchGroup}>
+                                <SelectDate
+                                    handleChange={handleChange}
+                                    value={params.start_date}
+                                    endValue={params.end_date_till}
+                                    flexDates={params.flex_dates}
+                                />
+                                <Nights
+                                    handleChange={handleChange}
+                                    name={'nights'}
+                                    value={params.nights}
+                                    flexDates={params.flex_dates}
+                                />
+                            </div>
+                            <People
                                 handleChange={handleChange}
-                                name={'nights'}
-                                value={params.nights}
-                                flexDates={params.flex_dates}
+                                value={{ adults: params.adults, kids: params.kids, kids_ages: params.kids_ages }}
+                                className={isHotelSearch ? styles.whereFrom : undefined}
                             />
+                            {!isHotelSearch && (
+                                <WhereFrom handleChange={handleChange} name={'from_city'} value={params.from_city} />
+                            )}
                         </div>
-                        <People handleChange={handleChange}
-                            value={{ adults: params.adults, kids: params.kids, kids_ages: params.kids_ages }} />
-                        <WhereFrom handleChange={handleChange} name={'from_city'} value={params.from_city} />
+                        <Button
+                            br={16}
+                            icon={'search'}
+                            title={header ? '' : 'Найти'}
+                            onClick={handleClick}
+                        />
                     </div>
-                    <Button
-                        br={16}
-                        icon={'search'}
-                        title={header ? '' : 'Найти'}
-                        onClick={handleClick}
-                    />
                 </div>
             )}
 
             {header && (
                 <div className={styles.selectdFormM}>
                     <p className={styles.mytextHeader}>{headerName || ''}</p>
-                    <p>{formatDateToRussian(params?.start_date)} , {params?.nights} ночей, {parseInt(params?.adults || 0) + parseInt(params?.kids || 0)} туриста</p>
+                    <p>{formatDateToRussian(params?.start_date)} , {params?.nights} ночей, {parseInt(params?.adults || '0', 10) + parseInt(params?.kids || '0', 10)} туриста</p>
                 </div>
             )}
         </>

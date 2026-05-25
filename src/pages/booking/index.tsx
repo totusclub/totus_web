@@ -4,7 +4,7 @@ import BookingCard from "@/components/bookingPage";
 export default function Booking() {
     return (
         <main className={'searchContainer'}>
-            <Steps active={4}/>
+            <Steps activeStep="booking" />
             <BookingCard/>
         </main>
     );
