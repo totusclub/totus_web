@@ -2,7 +2,7 @@ import styles from './booking.module.css';
 import BookingOrderForm from "@/components/bookingPage/bookingForm";
 import BookingOrderCard from "@/components/bookingPage/orderCard";
 import { useEffect, useState, useMemo } from "react";
-import { createOrder, PackagesActualize, PackagesActualizeFlight, validateTourist } from "@/api/levelTravelApi";
+import { createOrder, getOrdersUsers, PackagesActualize, PackagesActualizeFlight, validateTourist } from "@/api/levelTravelApi";
 import { useRouter } from "next/router";
 import useAuth from "@/hooks/useAuth";
 import { validateBookingForm, isBookingFormValid, type Tourist, type BookingValidationErrors } from "@/utils/bookingValidation";
@@ -15,6 +15,43 @@ type Params = {
 };
 
 type ValidationErrors = BookingValidationErrors;
+
+const extractOrderIdFromResponse = (payload: any): string | null => {
+    const direct =
+        payload?.order?.id ||
+        payload?.order_id ||
+        payload?.id ||
+        payload?.package?.order_id ||
+        payload?.package?.id;
+
+    if (direct !== undefined && direct !== null && String(direct).trim() !== '') {
+        return String(direct);
+    }
+
+    return null;
+};
+
+const pickLatestOrderId = (orders: any[]): string | null => {
+    if (!Array.isArray(orders) || orders.length === 0) return null;
+
+    const normalized = [...orders].sort((a, b) => {
+        const dateA = Date.parse(a?.created_at || a?.createdAt || '') || 0;
+        const dateB = Date.parse(b?.created_at || b?.createdAt || '') || 0;
+        if (dateA !== dateB) return dateB - dateA;
+        const idA = Number(a?.order_id || a?.id || 0);
+        const idB = Number(b?.order_id || b?.id || 0);
+        return idB - idA;
+    });
+
+    for (const item of normalized) {
+        const id = item?.order_id || item?.id || item?.order?.id;
+        if (id !== undefined && id !== null && String(id).trim() !== '') {
+            return String(id);
+        }
+    }
+
+    return null;
+};
 
 
 const BookingCard = () => {
@@ -237,7 +274,12 @@ const BookingCard = () => {
 
             const res = await validateTourist(data);
 
-            if (!res?.valid) {
+            const touristValidationFailed =
+                res?.valid === false ||
+                res?.is_valid === false ||
+                res?.success === false;
+
+            if (touristValidationFailed) {
                 setErrors({ general: 'Пожалуйста, введите корректные данные туриста' });
                 setLoading(false);
                 return;
@@ -251,32 +293,33 @@ const BookingCard = () => {
                 dataOrderCreate.flight_pair_id = router.query.flight_pair_id;
             }
 
-            if (res.valid) {
-                // Create order
-                const orderResult = await createOrder(dataOrderCreate);
+            // Create order after successful tourists validation
+            const orderResult = await createOrder(dataOrderCreate);
 
-                // Extract order_id from response
-                // Response structure: { order: { id: ... } } or { id: ... } or { package: { id: ... } }
-                const orderId = orderResult?.order?.id || orderResult?.id || orderResult?.package?.id;
+            // Extract order id from different backend response shapes
+            let orderId = extractOrderIdFromResponse(orderResult);
 
-                if (orderId) {
-                    const checkoutQuery: Record<string, string> = { order_id: String(orderId) };
-                    const searchType = getSearchTypeFromQuery(router.query);
-                    if (isHotelOnlySearch(searchType)) {
-                        checkoutQuery.search_type = 'hotel';
-                    }
-                    router.push({
-                        pathname: '/checkout',
-                        query: checkoutQuery,
-                    });
-                } else {
-                    // If order_id is not found in response, show error
-                    setErrors({ general: 'Заказ создан, но не удалось получить номер заказа. Пожалуйста, проверьте заказы в профиле.' });
-                    setLoading(false);
-                }
-            } else {
-                setLoading(false);
+            // Fallback: some backend responses create order but don't return id
+            if (!orderId && user?.id) {
+                const userOrders = await getOrdersUsers(user.id);
+                orderId = pickLatestOrderId(userOrders || []);
             }
+
+            if (!orderId) {
+                setErrors({ general: 'Заказ создан, но не удалось получить номер заказа. Пожалуйста, проверьте заказы в профиле.' });
+                setLoading(false);
+                return;
+            }
+
+            const checkoutQuery: Record<string, string> = { order_id: String(orderId) };
+            const searchType = getSearchTypeFromQuery(router.query);
+            if (isHotelOnlySearch(searchType)) {
+                checkoutQuery.search_type = 'hotel';
+            }
+            await router.push({
+                pathname: '/checkout',
+                query: checkoutQuery,
+            });
         } catch (error: any) {
             // Handle errors
             const errorMessage = error?.response?.data?.message || error?.message || 'Произошла ошибка при отправке заказа. Пожалуйста, попробуйте еще раз.';

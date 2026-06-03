@@ -2,6 +2,8 @@ import React, { useMemo } from 'react';
 import { useRouter } from 'next/router';
 import styles from './orderDetails.module.css';
 import Icon from '@/components/icons/Icon';
+import OrderSbpPayButton from '@/components/profile/OrderSbpPayButton';
+import { isOrderAwaitingPayment } from '@/utils/orderPayment';
 
 interface OrderDetailsHeaderProps {
   order: any;
@@ -54,7 +56,7 @@ const OrderDetailsHeader: React.FC<OrderDetailsHeaderProps> = ({ order, pkg, hot
           className={styles.orderDetailsStatus}
           style={{ backgroundColor: statusInfo.color }}
         >
-          {statusInfo.text}
+          {pkg?.status_for_client ?? order?.package?.status_for_client ?? statusInfo.text}
         </span>
       </div>
 
@@ -69,7 +71,9 @@ const OrderDetailsHeader: React.FC<OrderDetailsHeaderProps> = ({ order, pkg, hot
         <div className={styles.orderDetailsDivider}></div>
 
         <div className={styles.orderDetailsSection}>
-          <p className={styles.orderDetailsSectionTitle}>Оплачено</p>
+          <p className={styles.orderDetailsSectionTitle}>
+            {isOrderAwaitingPayment(order) ? 'К оплате' : 'Оплачено'}
+          </p>
           <p className={styles.orderDetailsSectionSubtitle}>
             {hotelName ? `Тур в ${hotelName}` : 'Данные уточняются'}
             {destination ? `, ${destination}` : ''}
@@ -80,10 +84,15 @@ const OrderDetailsHeader: React.FC<OrderDetailsHeaderProps> = ({ order, pkg, hot
         <div className={styles.orderDetailsDivider}></div>
 
         <div className={styles.orderDetailsSectionLast}>
-          {/* <p className={styles.orderDetailsSectionTitle}>Итого</p> */}
           <p className={styles.orderDetailsAmount}>Итого {price} ₽</p>
         </div>
       </div>
+
+      {isOrderAwaitingPayment(order) && (
+        <div className={styles.orderDetailsPayWrap}>
+          <OrderSbpPayButton order={order} />
+        </div>
+      )}
     </div>
   );
 };

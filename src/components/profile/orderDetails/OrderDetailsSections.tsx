@@ -1,10 +1,10 @@
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useState } from 'react';
 import styles from './orderDetails.module.css';
 import Icon from '@/components/icons/Icon';
 import InfoRow from './InfoRow';
 import DocumentsModal from './DocumentsModal';
 import TicketModal from '@/components/modals/ticketModal';
-import { Packagesflights } from '@/api/levelTravelApi';
+import { getOrderFlightData } from '@/utils/orderPayment';
 
 interface OrderDetailsSectionsProps {
   pkg: any;
@@ -21,8 +21,11 @@ const OrderDetailsSections: React.FC<OrderDetailsSectionsProps> = ({
 }) => {
   const [documentsModalVisible, setDocumentsModalVisible] = useState(false);
   const [modalTicket, setModalTicket] = useState(false);
-  const [flightData, setFlightData] = useState<any>(null);
-  const [loadingFlight, setLoadingFlight] = useState<boolean>(false);
+
+  const flightData = useMemo(
+    () => getOrderFlightData(order, pkg),
+    [order, pkg],
+  );
 
   const documents = useMemo(() => {
     if (!order) return [];
@@ -101,42 +104,6 @@ const OrderDetailsSections: React.FC<OrderDetailsSectionsProps> = ({
       return dateString;
     }
   };
-
-  // Extract flight data from order or fetch it
-  useEffect(() => {
-    if (!order) return;
-
-    // First, try to get flight data from order
-    const orderFlightData = order?.package?.flight ||
-      order?.package?.flight_pair ||
-      order?.flight ||
-      order?.flight_pair;
-
-    if (orderFlightData) {
-      setFlightData(orderFlightData);
-    } else if (pkg?.id || order?.package?.id) {
-      // If flight data is not in order, fetch it using package_id
-      const packageId = pkg?.id || order?.package?.id;
-      setLoadingFlight(true);
-      Packagesflights({ package_id: packageId })
-        .then((response) => {
-          // Find the selected flight from the flights array
-          const selectedFlight = response?.flights?.find(
-            (flight: any) => flight.flight_pair_id === (order?.package?.flight_pair_id || pkg?.flight_pair_id)
-          ) || response?.flights?.[0];
-
-          if (selectedFlight) {
-            setFlightData(selectedFlight);
-          }
-        })
-        .catch((err) => {
-          console.error('Failed to fetch flight data:', err);
-        })
-        .finally(() => {
-          setLoadingFlight(false);
-        });
-    }
-  }, [order, pkg]);
 
   return (
     <>

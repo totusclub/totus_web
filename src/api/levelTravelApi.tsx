@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-// const BASE_URL = 'http://192.168.1.105:3001';
-const BASE_URL = 'https://api.totus.club';
+const BASE_URL = 'http://192.168.123.37:3001';
+// const BASE_URL = 'https://api.totus.club';
 
 function prepareStartSearchParams(raw: Record<string, unknown>): Record<string, string | number | boolean> {
     const out: Record<string, string | number | boolean> = {};
@@ -251,7 +251,13 @@ export async function createOrder(params: never) {
     }
 };
 
-export async function createPay(params: never) {
+export async function createPay(params: {
+    orderId: string;
+    orderName: string;
+    expire: Date;
+    amount: { value: any; code: string };
+    returnUrl: string
+}) {
     try {
         if (!params) {
             throw new Error('Missing package_id');

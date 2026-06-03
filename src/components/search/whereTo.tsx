@@ -109,7 +109,7 @@ const WhereFrom = ({ handleChange, value, name, searchType = 'package', fromCity
         if (isOpen && !searchValue) {
             dispatch(
                 fetchDestinations({
-                    query: "",
+                    query: " ",
                     from_city: fromCity,
                     search_type: searchType,
                 } as unknown as undefined)

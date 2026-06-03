@@ -7,7 +7,7 @@ export const fetchDestinations = createAsyncThunk(
         // query:'""',from_city:from_city,search_type:'package'
         const searchType = params?.search_type === 'hotel' ? 'hotel' : 'package';
         const res = await axios.get(
-            `https://api.totus.club/references/autocomplete_v2?query="${params.query}"&from_city=${params?.from_city}&search_type=${searchType}`
+            `http://192.168.123.37:3001/references/autocomplete_v2?query="${params.query}"&from_city=${params?.from_city}&search_type=${searchType}`
         );
         // const res = await axios.get('https://api.totus.club/references/destinations', { params });
         return res.data;

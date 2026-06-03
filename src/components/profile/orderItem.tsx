@@ -1,6 +1,8 @@
 import styles from './profile.module.css'
 import { useMemo } from "react";
 import { useRouter } from "next/router";
+import OrderSbpPayButton from "@/components/profile/OrderSbpPayButton";
+import { getPaymentMethodLabel, isOrderAwaitingPayment } from "@/utils/orderPayment";
 
 const OrderItem = ({ item }: any) => {
     const router = useRouter();
@@ -56,12 +58,12 @@ const OrderItem = ({ item }: any) => {
         >
             <div className={styles.orderItemHead}>
                 <div className={styles.orderItemHeadLeft}>
-                    <p>Тур <span className={styles.orderItemId}>№ {item?.order_id}</span> <span style={{ backgroundColor: statusColor[item.package.state] }} className={styles.orderItemStatus}>{statusText[item.package.state]}</span></p>
+                    <p>Тур <span className={styles.orderItemId}>№ {item?.order_id}</span> <span style={{ backgroundColor: statusColor[item.package.state] }} className={styles.orderItemStatus}>{item?.package?.status_for_client}</span></p>
                     <p className={styles.orderItemDate}>От 12 июня</p>
                 </div>
                 <div className={styles.orderItemPrices}>
                     <p className={styles.orderItemPrice}>{item?.package?.price.toString()?.replace(/\B(?=(\d{3})+(?!\d))/g, '\u202F')} ₽</p>
-                    <p>Банковская карта</p>
+                    <p>{getPaymentMethodLabel(item)}</p>
                 </div>
             </div>
             <div className={styles.orderItemInfo}>
@@ -75,6 +77,8 @@ const OrderItem = ({ item }: any) => {
 
                 </p>
             </div>
+
+            {isOrderAwaitingPayment(item) && <OrderSbpPayButton order={item} />}
 
         </div>
     );

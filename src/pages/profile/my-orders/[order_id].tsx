@@ -16,7 +16,7 @@ const OrderDetails = () => {
             setLoading(true);
             getOrder(order_id as string)
                 .then((response) => {
-                    setOrder(response?.package || response);
+                    setOrder(response);
                     setLoading(false);
                 })
                 .catch((err) => {

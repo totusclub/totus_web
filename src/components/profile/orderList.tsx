@@ -104,7 +104,7 @@ const OrderList = (show:boolean) => {
                     </div>
                     <div className={styles.orderListWrap}>
                         {orders.map((item: any) => (
-                            <OrderItem item={item}/>
+                            <OrderItem key={item?.id ?? item?.order_id} item={item}/>
                         ))}
                     </div>
                 </div>
