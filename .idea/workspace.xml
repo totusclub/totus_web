@@ -4,40 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9b054eca-f19d-4e8b-ba86-c2382a8c8a86" name="Changes" comment="small chnages">
+    <list default="true" id="9b054eca-f19d-4e8b-ba86-c2382a8c8a86" name="Changes" comment="integration sbp">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/UI/calendar/calendar.module.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/UI/calendar/calendar.module.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/UI/calendar/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/UI/calendar/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/UI/galleryModal/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/UI/galleryModal/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/UI/select/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/UI/select/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/UI/smallSlide/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/UI/smallSlide/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/UI/verticalSlide/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/UI/verticalSlide/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/UI/verticalSlide/verticalSlide.module.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/UI/verticalSlide/verticalSlide.module.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/checkoutPage/checkOutCard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/checkoutPage/checkOutCard.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/footer/footer.module.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/footer/footer.module.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/footer/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/footer/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/header/header.module.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/header/header.module.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/header/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/header/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/hotelDetails/hotelDetails.module.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/hotelDetails/hotelDetails.module.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/hotelDetails/hotelDetailsInfo/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/hotelDetails/hotelDetailsInfo/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/hotelDetails/hotelDetailsRooms/datesPrice.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/hotelDetails/hotelDetailsRooms/datesPrice.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/hotelDetails/hotelDetailsRooms/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/hotelDetails/hotelDetailsRooms/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/hotelDetails/hotelDetailsRooms/roomItem.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/hotelDetails/hotelDetailsRooms/roomItem.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/hotelDetails/hotelSearchSection/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/hotelDetails/hotelSearchSection/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/icons/heart.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/icons/heart.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/profile/menu.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/profile/menu.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/search/date.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/search/date.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/search/nights.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/search/nights.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/search/search.module.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/search/search.module.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/search/searchForm.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/search/searchForm.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hooks/useInitialHotelSearch.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/useInitialHotelSearch.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hooks/useRequestIdSync.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/useRequestIdSync.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pages/_app.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/_app.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pages/hotel-details/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/hotel-details/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pages/privacy-policy/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/privacy-policy/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pages/privacy-policy/privace-police.module.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/privacy-policy/privace-police.module.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils/hotelDetailsUtils.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/hotelDetailsUtils.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -253,6 +221,12 @@
       <workItem from="1777914918717" duration="14449000" />
       <workItem from="1777975887400" duration="600000" />
       <workItem from="1777999522901" duration="981000" />
+      <workItem from="1779996688956" duration="693000" />
+      <workItem from="1780062911182" duration="847000" />
+      <workItem from="1780143310697" duration="10000" />
+      <workItem from="1780144695401" duration="1594000" />
+      <workItem from="1780311699230" duration="1266000" />
+      <workItem from="1780490731677" duration="8991000" />
     </task>
     <task id="LOCAL-00001" summary="added font">
       <option name="closed" value="true" />
@@ -446,7 +420,15 @@
       <option name="project" value="LOCAL" />
       <updated>1768850240748</updated>
     </task>
-    <option name="localTasksCounter" value="25" />
+    <task id="LOCAL-00025" summary="integration sbp">
+      <option name="closed" value="true" />
+      <created>1780508046118</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1780508046118</updated>
+    </task>
+    <option name="localTasksCounter" value="26" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -473,7 +455,8 @@
     <MESSAGE value="small style change" />
     <MESSAGE value="yandex metrika" />
     <MESSAGE value="small chnages" />
-    <option name="LAST_COMMIT_MESSAGE" value="small chnages" />
+    <MESSAGE value="integration sbp" />
+    <option name="LAST_COMMIT_MESSAGE" value="integration sbp" />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>
