@@ -6,17 +6,21 @@ import HotelDetailsDesc from "@/components/hotelDetails/hotelDetailsDesc";
 import HotelDetailsRooms from "@/components/hotelDetails/hotelDetailsRooms";
 import HotelDetailsSkeleton from "@/components/hotelDetails/hotelDetailsSkeleton";
 import HotelSearchSection from "@/components/hotelDetails/hotelSearchSection";
+import HotelReviewsModal from "@/components/hotelDetails/HotelReviewsModal";
 import { useRouter } from "next/router";
 import { useHotelDetails } from "@/hooks/useHotelDetails";
+import { useHotelReviews } from "@/hooks/useHotelReviews";
 import { useHotelRooms } from "@/hooks/useHotelRooms";
 import { useInitialHotelSearch } from "@/hooks/useInitialHotelSearch";
 import { useRequestIdSync } from "@/hooks/useRequestIdSync";
 import { useInitialSearchParams } from "@/hooks/useInitialSearchParams";
 import { SITE_NAME } from "@/config/seo";
-import { getAvailableStartDatesFromRooms } from "@/utils/hotelDetailsUtils";
+import { getAvailableStartDatesFromRooms, resolveHotelDisplayMeta } from "@/utils/hotelDetailsUtils";
 import { getSearchTypeFromQuery } from "@/utils/bookingFlowUtils";
 import { endYmdAfterNights } from "@/utils/calendarDateRange";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/store";
 
 export default function HotelDetails() {
     const router = useRouter();
@@ -26,6 +30,7 @@ export default function HotelDetails() {
         : router.query.start_date;
     const [activeStartDate, setActiveStartDate] = useState<string | undefined>(undefined);
     const [selectedRoomDate, setSelectedRoomDate] = useState<string>("");
+    const [reviewsModalOpen, setReviewsModalOpen] = useState(false);
     const prevActiveStartRef = useRef<string | undefined>(undefined);
 
     // Hooks for data fetching and state management
@@ -38,6 +43,35 @@ export default function HotelDetails() {
         searchType
     );
     const { rooms, loading: roomsLoading } = useHotelRooms(requestId, hotelId, router.isReady);
+
+    const {
+        reviews,
+        loading: reviewsLoading,
+        loadingMore: reviewsLoadingMore,
+        hasMore: reviewsHasMore,
+        error: reviewsError,
+        hotelRating,
+        loadMore: loadMoreReviews,
+    } = useHotelReviews(hotelId, router.isReady);
+
+    const searchHotelItem = useSelector((state: RootState) =>
+        (state.search.allMyHotels || []).find(
+            (item: { hotel?: { id?: number | string } }) =>
+                String(item?.hotel?.id) === String(hotelId),
+        ),
+    );
+
+    const displayHotel = useMemo(() => {
+        if (!hotel) return null;
+        const meta = resolveHotelDisplayMeta(hotel, {
+            queryReviewsCount: router.query.reviews_count,
+            queryRating: router.query.rating,
+            searchHotelItem,
+            reviewsApiRating: hotelRating,
+            loadedReviewsCount: reviews.length,
+        });
+        return { ...hotel, ...meta };
+    }, [hotel, router.query.reviews_count, router.query.rating, searchHotelItem, hotelRating, reviews.length]);
 
     // Run initial search if needed (when coming from hot deals without request_id)
     useInitialHotelSearch(hotelId, requestId, localRequestId, router.isReady, setLocalRequestId);
@@ -130,7 +164,23 @@ export default function HotelDetails() {
                 </Head>
             ) : null}
             <Steps activeStep="hotel" />
-            <HotelDetailsHeader info={hotel} loading={hotelLoading} />
+            <HotelDetailsHeader
+                info={displayHotel ?? hotel}
+                loading={hotelLoading}
+                onReviewsClick={() => setReviewsModalOpen(true)}
+            />
+            <HotelReviewsModal
+                isOpen={reviewsModalOpen}
+                onClose={() => setReviewsModalOpen(false)}
+                reviews={reviews}
+                loading={reviewsLoading}
+                loadingMore={reviewsLoadingMore}
+                hasMore={reviewsHasMore}
+                error={reviewsError}
+                reviewsCount={displayHotel?.reviews_count ?? 0}
+                rating={displayHotel?.rating ?? 0}
+                onLoadMore={loadMoreReviews}
+            />
             <HotelDetailsInfo
                 hotel={hotel}
                 hotelId={hotelId}

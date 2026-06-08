@@ -57,6 +57,12 @@ const HotelCard = ({ item, request_id, lazy }: HotelCardState) => {
                 ? router.query.kids_ages
                 : [router.query.kids_ages as string];
         }
+        if (hotel?.reviews_count) {
+            queryParams.reviews_count = String(hotel.reviews_count);
+        }
+        if (hotel?.rating) {
+            queryParams.rating = String(hotel.rating);
+        }
 
         router.push({
             pathname: '/hotel-details',

@@ -208,3 +208,45 @@ export const parseHotelId = (hotelId: string | undefined): number | null => {
   return isNaN(parsed) ? null : parsed;
 };
 
+function parseOptionalNumber(value: unknown): number | null {
+  if (value == null || value === '') return null;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+/** Merge reviews/rating from hotel info, URL, search results, and reviews API. */
+export function resolveHotelDisplayMeta(
+  hotel: Record<string, unknown> | null | undefined,
+  options: {
+    queryReviewsCount?: unknown;
+    queryRating?: unknown;
+    searchHotelItem?: { hotel?: { reviews_count?: number; rating?: number } } | null;
+    reviewsApiRating?: number | null;
+    loadedReviewsCount?: number;
+  } = {},
+): { reviews_count: number; rating: number } {
+  const queryReviews = parseOptionalNumber(options.queryReviewsCount);
+  const queryRating = parseOptionalNumber(options.queryRating);
+  const searchReviews = parseOptionalNumber(options.searchHotelItem?.hotel?.reviews_count);
+  const searchRating = parseOptionalNumber(options.searchHotelItem?.hotel?.rating);
+  const hotelReviews = parseOptionalNumber(hotel?.reviews_count ?? hotel?.reviews);
+  const hotelRating = parseOptionalNumber(hotel?.rating);
+
+  const reviews_count =
+    hotelReviews ??
+    queryReviews ??
+    searchReviews ??
+    (options.loadedReviewsCount && options.loadedReviewsCount > 0
+      ? options.loadedReviewsCount
+      : 0);
+
+  const rating =
+    hotelRating ??
+    queryRating ??
+    searchRating ??
+    options.reviewsApiRating ??
+    0;
+
+  return { reviews_count, rating };
+}
+

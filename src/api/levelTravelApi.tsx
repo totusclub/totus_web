@@ -169,6 +169,50 @@ export async function getHotelInfo(data: {
     return response.data.hotels[0];
 };
 
+export interface HotelReview {
+    id: number;
+    average_rating: number;
+    name: string;
+    author: number;
+    avatar_url: string;
+    title: string;
+    content: string;
+    answer?: string;
+    created_at: string;
+}
+
+export interface HotelReviewsResponse {
+    success: boolean;
+    hotel: {
+        id: number;
+        rating: number;
+        name: string;
+    };
+    reviews: HotelReview[];
+}
+
+export async function getHotelReviews(data: {
+    hotel_id: number | string;
+    page?: number;
+    per_page?: number;
+}): Promise<HotelReviewsResponse> {
+    if (!data.hotel_id) {
+        throw new Error('Missing hotel_id');
+    }
+
+    const response = await axios.get<HotelReviewsResponse>(
+        `${BASE_URL}/references/hotel_reviews/${data.hotel_id}`,
+        {
+            params: {
+                page: data.page ?? 1,
+                per_page: data.per_page ?? 10,
+            },
+        },
+    );
+
+    return response.data;
+}
+
 export async function createPackage(data: { request_id: never; tour_id: never; }) {
     if (!data.request_id || !data.tour_id) {
         throw new Error('Missing request_id or hotel_id');
