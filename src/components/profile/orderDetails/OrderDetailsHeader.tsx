@@ -4,6 +4,7 @@ import styles from './orderDetails.module.css';
 import Icon from '@/components/icons/Icon';
 import OrderSbpPayButton from '@/components/profile/OrderSbpPayButton';
 import { isOrderAwaitingPayment } from '@/utils/orderPayment';
+import { getStatusColor, getStatusLabel } from '@/utils/orderDisplay';
 
 interface OrderDetailsHeaderProps {
   order: any;
@@ -12,32 +13,35 @@ interface OrderDetailsHeaderProps {
   destination?: string;
 }
 
-const OrderDetailsHeader: React.FC<OrderDetailsHeaderProps> = ({ order, pkg, hotelName = '', destination = '' }) => {
+const OrderDetailsHeader: React.FC<OrderDetailsHeaderProps> = ({
+  order,
+  pkg,
+  hotelName = '',
+  destination = '',
+}) => {
   const router = useRouter();
   const orderId = order?.order_id ?? order?.id ?? '—';
 
-  const statusInfo = useMemo(() => {
-    const status = pkg?.status_for_client ??
-      pkg?.state ??
-      order?.package?.state ??
-      order?.state ??
-      'pending';
+  const statusColor = useMemo(
+    () => getStatusColor(order?.package ?? pkg, order),
+    [order, pkg],
+  );
 
-    const statusMap: Record<string, { text: string; color: string }> = {
-      pending: { text: 'В обработке', color: 'var(--primary_blue)' },
-      approved: { text: 'Подтверждено', color: 'var(--primary_green)' },
-      confirm: { text: 'Подтверждено', color: 'var(--primary_green)' },
-      cancel: { text: 'Отменено', color: 'var(--bgTertiary)' },
-      cancelled: { text: 'Отменено', color: 'var(--bgTertiary)' },
-    };
-
-    return statusMap[status] || { text: 'В обработке', color: 'var(--primary_blue)' };
-  }, [pkg, order]);
+  const statusLabel = useMemo(
+    () => getStatusLabel(order, pkg),
+    [order, pkg],
+  );
 
   const price = useMemo(() => {
-    const amount = pkg?.price ?? pkg?.full_price ?? order?.package?.price ?? 0;
-    return amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '\u202F');
+    const amount = order?.package?.price ?? order?.package?.full_price ?? pkg?.price ?? 0;
+    return Number(amount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '\u202F');
   }, [pkg, order]);
+
+  const clientEmail =
+    order?.package?.client?.email ??
+    order?.client?.email ??
+    pkg?.client?.email ??
+    '—';
 
   return (
     <div className={styles.orderDetailsCard}>
@@ -54,9 +58,9 @@ const OrderDetailsHeader: React.FC<OrderDetailsHeaderProps> = ({ order, pkg, hot
         </div>
         <span
           className={styles.orderDetailsStatus}
-          style={{ backgroundColor: statusInfo.color }}
+          style={{ backgroundColor: statusColor }}
         >
-          {pkg?.status_for_client ?? order?.package?.status_for_client ?? statusInfo.text}
+          {statusLabel}
         </span>
       </div>
 
@@ -64,7 +68,7 @@ const OrderDetailsHeader: React.FC<OrderDetailsHeaderProps> = ({ order, pkg, hot
         <div className={styles.orderDetailsSection}>
           <p className={styles.orderDetailsSectionTitle}>Получение заказа</p>
           <p className={styles.orderDetailsSectionSubtitle}>
-            Отправим документы на {order?.package?.client?.email || order?.client?.email || pkg?.client?.email || '—'}
+            Отправим документы на {clientEmail}
           </p>
         </div>
 
@@ -98,4 +102,3 @@ const OrderDetailsHeader: React.FC<OrderDetailsHeaderProps> = ({ order, pkg, hot
 };
 
 export default OrderDetailsHeader;
-

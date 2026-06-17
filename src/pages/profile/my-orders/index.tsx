@@ -77,4 +77,4 @@ const MyOrders = ()=> {
         </main>
     );
 }
-export default MyOrders
+export default withAuth(MyOrders);

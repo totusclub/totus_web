@@ -2,6 +2,7 @@ import React from 'react';
 import AppModal from '@/components/UI/modal';
 import styles from './hotelReviewsModal.module.css';
 import { HotelReview } from '@/api/levelTravelApi';
+import LogoIcon from '@/components/icons/logo';
 
 interface HotelReviewsModalProps {
     isOpen: boolean;
@@ -66,15 +67,9 @@ const HotelReviewsModal: React.FC<HotelReviewsModalProps> = ({
                         {reviews.map((review) => (
                             <div key={review.id} className={styles.reviewCard}>
                                 <div className={styles.reviewHeader}>
-                                    {review.avatar_url ? (
-                                        <img
-                                            src={review.avatar_url}
-                                            alt={review.name}
-                                            className={styles.avatar}
-                                        />
-                                    ) : (
-                                        <div className={styles.avatarPlaceholder} />
-                                    )}
+                                    <div className={styles.avatarPlaceholder}>
+                                        <LogoIcon className={styles.avatarLogo} />
+                                    </div>
                                     <div className={styles.reviewMeta}>
                                         <div className={styles.reviewAuthorRow}>
                                             <span className={styles.authorName}>{review.name}</span>

@@ -2,6 +2,7 @@ import React from 'react';
 import styles from './orderDetails.module.css';
 import Icon from '@/components/icons/Icon';
 import AppModal from '@/components/UI/modal';
+import { resolveDocumentUrl } from '@/utils/orderDisplay';
 
 interface Document {
     name: string;
@@ -14,14 +15,15 @@ interface DocumentsModalProps {
     documents: Document[];
 }
 
-const DocumentsModal: React.FC<DocumentsModalProps> = ({ 
-    visible, 
-    onClose, 
-    documents 
+const DocumentsModal: React.FC<DocumentsModalProps> = ({
+    visible,
+    onClose,
+    documents,
 }) => {
     const handleDownload = (url: string) => {
-        if (url) {
-            window.open(url, '_blank');
+        const resolved = resolveDocumentUrl(url);
+        if (resolved) {
+            window.open(resolved, '_blank', 'noopener,noreferrer');
         }
     };
 
@@ -39,8 +41,8 @@ const DocumentsModal: React.FC<DocumentsModalProps> = ({
                 ) : (
                     <div className={styles.documentsCard}>
                         {documents.map((doc, index) => (
-                            <React.Fragment key={index}>
-                                <div 
+                            <React.Fragment key={`${doc.url}-${index}`}>
+                                <div
                                     className={styles.documentRow}
                                     onClick={() => handleDownload(doc.url)}
                                 >
@@ -48,7 +50,7 @@ const DocumentsModal: React.FC<DocumentsModalProps> = ({
                                         <Icon name="card" size={24} color="var(--textPrimary)" />
                                     </div>
                                     <p className={styles.documentName}>{doc.name}</p>
-                                    <div 
+                                    <div
                                         className={styles.downloadButton}
                                         onClick={(e) => {
                                             e.stopPropagation();
@@ -71,4 +73,3 @@ const DocumentsModal: React.FC<DocumentsModalProps> = ({
 };
 
 export default DocumentsModal;
-

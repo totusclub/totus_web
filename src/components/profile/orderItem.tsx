@@ -3,46 +3,27 @@ import { useMemo } from "react";
 import { useRouter } from "next/router";
 import OrderSbpPayButton from "@/components/profile/OrderSbpPayButton";
 import { getPaymentMethodLabel, isOrderAwaitingPayment } from "@/utils/orderPayment";
+import {
+    formatDepartureLine,
+    formatOrderPrice,
+    formatOrderStartLabel,
+    formatTravelPeriod,
+    getNestedPackage,
+    getStatusColor,
+    getStatusCssKey,
+    getStatusLabel,
+} from "@/utils/orderDisplay";
 
 const OrderItem = ({ item }: any) => {
     const router = useRouter();
-
-
-    const statusColor: Record<string, string> = {
-        pending: 'var(--primary_blue)',
-        approved: 'var(--primary_green)',
-        cancel: 'var(--bgTertiary)',
-    }
-    const statusText: Record<string, string> = {
-        pending: 'В обработке',
-        approved: 'Потверждено',
-        cancel: 'Отменено',
-    }
-    const formatDate = useMemo(() => {
-        if (item) {
-            const startDate = new Date(item?.package?.package?.dates_info?.start_date);
-            const endDate = new Date(item?.package?.package?.dates_info?.end_date);
-
-            const formatter = new Intl.DateTimeFormat("ru-RU", {
-                day: "numeric",
-                month: "long"
-            });
-
-            const weekdayFormatter = new Intl.DateTimeFormat("ru-RU", {
-                weekday: "short"
-            });
-
-            const startDay = formatter.format(startDate);
-            const startWeekday = weekdayFormatter.format(startDate);
-
-            const endDay = formatter.format(endDate);
-            const endWeekday = weekdayFormatter.format(endDate);
-            return `${startDay}, ${startWeekday} – ${endDay}, ${endWeekday}`;
-        }
-
-    }, [item])
-
-    // console.log('item.package.status',item)
+    const nestedPkg = useMemo(() => getNestedPackage(item), [item]);
+    const statusClass = useMemo(() => getStatusCssKey(item?.package, item), [item]);
+    const statusColor = useMemo(() => getStatusColor(item?.package, item), [item]);
+    const statusLabel = useMemo(() => getStatusLabel(item, item?.package), [item]);
+    const orderDateLabel = useMemo(() => formatOrderStartLabel(item), [item]);
+    const travelPeriod = useMemo(() => formatTravelPeriod(nestedPkg), [nestedPkg]);
+    const departureLine = useMemo(() => formatDepartureLine(nestedPkg), [nestedPkg]);
+    const tourists = item?.package?.tourists ?? [];
 
     const handleClick = () => {
         if (item?.order_id) {
@@ -50,36 +31,55 @@ const OrderItem = ({ item }: any) => {
         }
     };
 
+    const city = nestedPkg?.hotel?.city;
+    const country = nestedPkg?.hotel?.country;
+
     return (
         <div
-            className={`${styles.orderItem} ${styles[item.package.status]}`}
+            className={`${styles.orderItem} ${styles[statusClass] || ''}`}
             onClick={handleClick}
             style={{ cursor: 'pointer' }}
         >
             <div className={styles.orderItemHead}>
                 <div className={styles.orderItemHeadLeft}>
-                    <p>Тур <span className={styles.orderItemId}>№ {item?.order_id}</span> <span style={{ backgroundColor: statusColor[item.package.state] }} className={styles.orderItemStatus}>{item?.package?.status_for_client}</span></p>
-                    <p className={styles.orderItemDate}>От 12 июня</p>
+                    <p>
+                        Тур <span className={styles.orderItemId}>№ {item?.order_id}</span>{' '}
+                        <span
+                            style={{ backgroundColor: statusColor }}
+                            className={styles.orderItemStatus}
+                        >
+                            {statusLabel}
+                        </span>
+                    </p>
+                    {orderDateLabel ? (
+                        <p className={styles.orderItemDate}>{orderDateLabel}</p>
+                    ) : null}
                 </div>
                 <div className={styles.orderItemPrices}>
-                    <p className={styles.orderItemPrice}>{item?.package?.price.toString()?.replace(/\B(?=(\d{3})+(?!\d))/g, '\u202F')} ₽</p>
+                    <p className={styles.orderItemPrice}>{formatOrderPrice(item)}</p>
                     <p>{getPaymentMethodLabel(item)}</p>
                 </div>
             </div>
             <div className={styles.orderItemInfo}>
-                <p>{item.package.package.hotel.city}, {item.package.package.hotel.country}</p>
-                <p>{formatDate}</p>
-                <p>{item.flight}</p>
-                <p>Туристы:
-                    {item.package.tourists.map((t: any, index: number) => (
-                        <span key={index}>{t.name} {t.surname}{index < item.package?.tourists?.length - 1 && ', '}</span>
-                    ))}
-
-                </p>
+                {(city || country) ? (
+                    <p>{[city, country].filter(Boolean).join(', ')}</p>
+                ) : null}
+                {travelPeriod !== '—' ? <p>{travelPeriod}</p> : null}
+                {departureLine ? <p>{departureLine}</p> : null}
+                {tourists.length > 0 ? (
+                    <p>
+                        Туристы:{' '}
+                        {tourists.map((t: any, index: number) => (
+                            <span key={index}>
+                                {t.name} {t.surname}
+                                {index < tourists.length - 1 ? ', ' : ''}
+                            </span>
+                        ))}
+                    </p>
+                ) : null}
             </div>
 
             {isOrderAwaitingPayment(item) && <OrderSbpPayButton order={item} />}
-
         </div>
     );
 };

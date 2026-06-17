@@ -5,12 +5,19 @@ import InfoRow from './InfoRow';
 import DocumentsModal from './DocumentsModal';
 import TicketModal from '@/components/modals/ticketModal';
 import { getOrderFlightData } from '@/utils/orderPayment';
+import { collectOrderDocuments, formatTravelPeriod } from '@/utils/orderDisplay';
 
 interface OrderDetailsSectionsProps {
   pkg: any;
   hotelName: string;
   destination: string;
   order: any;
+  apiDocuments?: Array<{
+    title?: string;
+    public_url?: string;
+    source_url?: string;
+    url?: string;
+  }>;
 }
 
 const OrderDetailsSections: React.FC<OrderDetailsSectionsProps> = ({
@@ -18,6 +25,7 @@ const OrderDetailsSections: React.FC<OrderDetailsSectionsProps> = ({
   hotelName,
   destination,
   order,
+  apiDocuments = [],
 }) => {
   const [documentsModalVisible, setDocumentsModalVisible] = useState(false);
   const [modalTicket, setModalTicket] = useState(false);
@@ -27,83 +35,41 @@ const OrderDetailsSections: React.FC<OrderDetailsSectionsProps> = ({
     [order, pkg],
   );
 
-  const documents = useMemo(() => {
-    if (!order) return [];
+  const documents = useMemo(
+    () => collectOrderDocuments(order, apiDocuments),
+    [order, apiDocuments],
+  );
 
-    const docs: Array<{ name: string; url: string }> = [];
-    const orderData = order as any;
-    const packageData = orderData?.package || {};
-    const nestedPackage = packageData?.package || {};
-
-    const agreementDoc = orderData?.agreement_doc || packageData?.agreement_doc || nestedPackage?.agreement_doc;
-    const agreementLicense = orderData?.agreement_license || packageData?.agreement_license || nestedPackage?.agreement_license;
-    const voucher = orderData?.voucher || packageData?.voucher || nestedPackage?.voucher;
-    const ticket = orderData?.ticket || packageData?.ticket || nestedPackage?.ticket;
-
-    if (agreementDoc) {
-      docs.push({ name: 'Договор оферты.pdf', url: agreementDoc });
-    }
-    if (agreementLicense) {
-      docs.push({ name: 'Лицензионный договор.pdf', url: agreementLicense });
-    }
-    if (voucher) {
-      docs.push({ name: 'Ваучер на отель.pdf', url: voucher });
-    }
-    if (ticket) {
-      docs.push({ name: 'Авиабилет.pdf', url: ticket });
-    }
-
-    return docs;
-  }, [order]);
-
-  const formatFlightDate = useMemo(() => {
-    if (pkg?.dates_info?.start_date && pkg?.dates_info?.end_date) {
-      const startDate = new Date(pkg.dates_info.start_date);
-      const endDate = new Date(pkg.dates_info.end_date);
-
-      const formatter = new Intl.DateTimeFormat("ru-RU", {
-        day: "numeric",
-        month: "long"
-      });
-
-      const weekdayFormatter = new Intl.DateTimeFormat("ru-RU", {
-        weekday: "short"
-      });
-
-      const startDay = formatter.format(startDate);
-      const startWeekday = weekdayFormatter.format(startDate);
-      const endDay = formatter.format(endDate);
-      const endWeekday = weekdayFormatter.format(endDate);
-
-      return `${startDay}, ${startWeekday} – ${endDay}, ${endWeekday}`;
-    }
-    return '—';
-  }, [pkg]);
+  const formatFlightDate = useMemo(() => formatTravelPeriod(pkg), [pkg]);
 
   const formatTouristDate = (dateString: string) => {
     if (!dateString) return '';
     try {
-      // Handle different date formats
       let date: Date;
       if (dateString.includes('.')) {
-        // Format: DD.MM.YYYY
         const [day, month, year] = dateString.split('.');
-        date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+        date = new Date(parseInt(year, 10), parseInt(month, 10) - 1, parseInt(day, 10));
       } else {
         date = new Date(dateString);
       }
 
-      const formatter = new Intl.DateTimeFormat("ru-RU", {
-        day: "numeric",
-        month: "long",
-        year: "numeric"
-      });
-
-      return formatter.format(date);
-    } catch (e) {
+      return new Intl.DateTimeFormat('ru-RU', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      }).format(date);
+    } catch {
       return dateString;
     }
   };
+
+  const tourists =
+    order?.package?.tourists ?? order?.tourists ?? pkg?.tourists ?? [];
+
+  const documentsDescription =
+    documents.length > 0
+      ? `${documents.length} ${documents.length === 1 ? 'документ' : documents.length < 5 ? 'документа' : 'документов'} доступно для скачивания`
+      : 'Документы по заказу появятся здесь после подтверждения тура';
 
   return (
     <>
@@ -122,9 +88,7 @@ const OrderDetailsSections: React.FC<OrderDetailsSectionsProps> = ({
                 <Icon name="rightArrow" size={20} color="var(--textPrimary)" />
               </div>
             </div>
-            <p className={styles.documentsDescription}>
-              Документы по заказу можно будет скачать перед началом тура
-            </p>
+            <p className={styles.documentsDescription}>{documentsDescription}</p>
           </div>
         </div>
 
@@ -134,8 +98,8 @@ const OrderDetailsSections: React.FC<OrderDetailsSectionsProps> = ({
             <InfoRow
               label="Даты перелёта"
               value={formatFlightDate}
-              showArrow={true}
-              onClick={() => setModalTicket(true)}
+              showArrow={Boolean(flightData)}
+              onClick={flightData ? () => setModalTicket(true) : undefined}
             />
             <div className={styles.divider}></div>
             <InfoRow
@@ -192,21 +156,31 @@ const OrderDetailsSections: React.FC<OrderDetailsSectionsProps> = ({
         <div className={styles.sectionWrapper}>
           <p className={styles.sectionHeader}>Туристы</p>
           <div className={styles.infoPanel}>
-            {(order?.package?.tourists || order?.tourists || pkg?.tourists || []).map((tourist: any, index: number) => (
-              <React.Fragment key={index}>
-                <div className={styles.touristRow}>
-                  <p className={styles.touristName}>{tourist.name} {tourist.surname}</p>
-                  <p className={styles.touristDetails}>
-                    {tourist.birthday ? formatTouristDate(tourist.birthday) : ''}
-                    {tourist.birthday && (tourist.passport || tourist.document_number) ? ', ' : ''}
-                    {tourist.passport || tourist.document_number ? `загран. паспорт ${tourist.passport || tourist.document_number}` : ''}
-                  </p>
-                </div>
-                {index < (order?.package?.tourists || order?.tourists || pkg?.tourists || []).length - 1 && (
-                  <div className={styles.divider}></div>
-                )}
-              </React.Fragment>
-            ))}
+            {tourists.length === 0 ? (
+              <p className={styles.touristDetails}>—</p>
+            ) : (
+              tourists.map((tourist: any, index: number) => (
+                <React.Fragment key={index}>
+                  <div className={styles.touristRow}>
+                    <p className={styles.touristName}>
+                      {tourist.name} {tourist.surname}
+                    </p>
+                    <p className={styles.touristDetails}>
+                      {tourist.birthday ? formatTouristDate(tourist.birthday) : ''}
+                      {tourist.birthday && (tourist.passport || tourist.document_number)
+                        ? ', '
+                        : ''}
+                      {tourist.passport || tourist.document_number
+                        ? `загран. паспорт ${tourist.passport || tourist.document_number}`
+                        : ''}
+                    </p>
+                  </div>
+                  {index < tourists.length - 1 && (
+                    <div className={styles.divider}></div>
+                  )}
+                </React.Fragment>
+              ))
+            )}
           </div>
         </div>
       </div>
@@ -223,4 +197,3 @@ const OrderDetailsSections: React.FC<OrderDetailsSectionsProps> = ({
 };
 
 export default OrderDetailsSections;
-

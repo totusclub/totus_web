@@ -338,6 +338,19 @@ export async function getOrder(id: never) {
 
     return response.data;
 };
+
+export async function getOrderDocuments(orderId: string | number) {
+    if (!orderId) {
+        throw new Error('Missing order_id');
+    }
+
+    const response = await axios.get(`${BASE_URL}/orders/documents`, {
+        params: { order_id: orderId },
+    });
+
+    return response.data;
+}
+
 export async function getOrdersUsers(id: never) {
     if (!id) {
         throw new Error('Missing package_id');
