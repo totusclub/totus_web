@@ -155,18 +155,19 @@ export default function HotDealsSlide({ slidesToShow, title, recomendHotels }: {
             <div className={styles.recomendlistMob}>
                 <Slider {...settings}>
                     {recomendHotels?.map((item: HotelItem, index: number) => (
-                        <HotelBoxCard
-                            key={item.id ?? index}
-                            id={typeof item.id === 'number' ? item.id : Number(item.id) || 0}
-                            name={item.name || ''}
-                            rate={item.rate || 0}
-                            city={item.city || ''}
-                            price={item.price || 0}
-                            review={item.review || 0}
-                            image={item.image || ''}
-                            url=""
-                            onClick={() => handlePressHotel(item.id)}
-                        />
+                        <div key={item.id ?? index} className={styles.hotDealSlide}>
+                            <HotelBoxCard
+                                id={typeof item.id === 'number' ? item.id : Number(item.id) || 0}
+                                name={item.name || ''}
+                                rate={item.rate || 0}
+                                city={item.city || ''}
+                                price={item.price || 0}
+                                review={item.review || 0}
+                                image={item.image || ''}
+                                url=""
+                                onClick={() => handlePressHotel(item.id)}
+                            />
+                        </div>
                     ))}
                 </Slider>
             </div>

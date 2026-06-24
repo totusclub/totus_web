@@ -21,7 +21,10 @@ interface ResultListProps {
 const ResultList = ({ tickets, loading, data, setFiltersRequest }: ResultListProps) => {
     const dispatch = useDispatch();
     const router = useRouter();
-    const { allMyHotels, hotels } = useSelector((state: RootState) => state.search);
+    const { allMyHotels, hotels, loadMore } = useSelector((state: RootState) => state.search);
+    // Show skeletons (and hide the old list) only for a fresh search/filter/sort,
+    // not while appending more results during infinite scroll.
+    const showSkeleton = loading && !loadMore;
     const [allHotels, setAllHotels] = useState<any[]>([]);
     const [hasMore, setHasMore] = useState(true);
     const [loadingMore, setLoadingMore] = useState(false);
@@ -243,7 +246,7 @@ const ResultList = ({ tickets, loading, data, setFiltersRequest }: ResultListPro
             )}
 
             <div className={styles.resultListItems}>
-                {loading && (
+                {showSkeleton && (
                     <>
                         <HotelCard lazy request_id={data?.request_id} item={null} />
                         <HotelCard lazy request_id={data?.request_id} item={null} />
@@ -251,16 +254,9 @@ const ResultList = ({ tickets, loading, data, setFiltersRequest }: ResultListPro
                     </>
                 )}
 
-                {allMyHotels?.map((item, index) => (
+                {!showSkeleton && allMyHotels?.map((item) => (
                     <div key={item.id}>
                         <HotelCard request_id={data?.request_id} item={item} />
-                        {index === 4 && (
-                            <TrackPrices
-                                text={'Получайте автоматические оповещения при изменении цен.'}
-                                priceTrack={priceTrack}
-                                setPriceTrack={setPriceTrack}
-                            />
-                        )}
                     </div>
                 ))}
 

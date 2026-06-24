@@ -1,8 +1,7 @@
 .collapse {
-    /*border: 1px solid #ccc;*/
     border-radius: 20px;
     margin-bottom: 10px;
-    overflow: hidden;
+    flex-shrink: 0;
 }
 
 .collapseHeader {
@@ -17,7 +16,9 @@
     cursor: pointer;
     font-size: 16px;
     height: 56px;
-
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
 }
 .collapseTitle{
     color: var(--textPrimary);
@@ -31,8 +32,13 @@
 }
 .contentWrapper {
     overflow: hidden;
-    transition: height 0.3s ease;
+    max-height: 0;
+    transition: max-height 0.3s ease;
+}
 
+.contentWrapperOpen {
+    max-height: 3000px;
+    overflow: visible;
 }
 
 .content {

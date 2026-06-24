@@ -14,6 +14,15 @@ interface RangeInputProps {
     name: string;
 }
 
+// Add a space as the thousands separator for readability, e.g. 1 886 300.
+const formatNumber = (value: number) => {
+    const num = Number(value);
+    if (!Number.isFinite(num)) return String(value ?? '');
+    return Math.round(num)
+        .toString()
+        .replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+};
+
 export default function RangeInput({ setValues, values, title ,symbol,step,min,max,name,onChangeComplete}: RangeInputProps) {
 
     return (
@@ -21,7 +30,7 @@ export default function RangeInput({ setValues, values, title ,symbol,step,min,m
             <div className={styles.rangeInputHead}>
                 <p>{title}</p>
                 <div className={styles.rangeInputBadge}>
-                    <p>{`От ${min}${symbol} – До ${max}${symbol}`}</p>
+                    <p>{`От ${formatNumber(min)}${symbol} – До ${formatNumber(max)}${symbol}`}</p>
                 </div>
             </div>
             <RangeStep step={step} min={min} max={max} values={values} onChangeComplete={(e)=>onChangeComplete(name,e)} setValues={(e)=>setValues(e)}/>

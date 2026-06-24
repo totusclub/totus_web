@@ -224,38 +224,42 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
         });
     }, [router.isReady, pageName]);
 
-    const startSearch = async (data: SearchParams) => {
-        // console.log('data',data,params?.hotel_ids?.length> 0);
-        if (+data?.page_number === 1 && startSearchValid) {
-            if (data?.hotel_ids?.length > 0) {
-                dispatch(runFullSearchFlow({
-                    searchParams: data,
-                    filterParams: {
-                        filter_instant_confirm: false,
-                        page_number: data.page_number,
-                        page_limit: data.page_limit,
-                        sort_by: data?.sort_by || 'relevance'
-                    }
-                }));
-            } else {
-                const filterParams: Record<string, unknown> = {
+    // Core search dispatch — always runs (used by explicit user clicks).
+    const dispatchSearch = (data: SearchParams) => {
+        if (data?.hotel_ids?.length > 0) {
+            dispatch(runFullSearchFlow({
+                searchParams: data,
+                filterParams: {
                     filter_instant_confirm: false,
                     page_number: data.page_number,
                     page_limit: data.page_limit,
-                    sort_by: data?.sort_by || 'relevance',
-                };
-                if (data.search_type !== 'hotel') {
-                    filterParams.filter_stars = '3,4,5';
-                    filterParams.filter_meals = 'AI';
+                    sort_by: data?.sort_by || 'relevance'
                 }
-                dispatch(runFullSearchFlow({
-                    searchParams: data,
-                    filterParams,
-                }));
+            }));
+        } else {
+            const filterParams: Record<string, unknown> = {
+                filter_instant_confirm: false,
+                page_number: data.page_number,
+                page_limit: data.page_limit,
+                sort_by: data?.sort_by || 'relevance',
+            };
+            if (data.search_type !== 'hotel') {
+                filterParams.filter_stars = '3,4,5';
+                filterParams.filter_meals = 'AI';
             }
-            dispatch(setStartSearch(false))
+            dispatch(runFullSearchFlow({
+                searchParams: data,
+                filterParams,
+            }));
         }
+    };
 
+    // Guarded auto-search — runs only once per navigation (used by the query-param effect).
+    const startSearch = async (data: SearchParams) => {
+        if (+data?.page_number === 1 && startSearchValid) {
+            dispatchSearch(data);
+            dispatch(setStartSearch(false));
+        }
     }
 
 
@@ -382,8 +386,13 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
             return;
         }
 
-        const url = createSearchUrl(params);
-        startSearch(params);
+        // Explicit user click: always run a fresh search (page 1), even if a
+        // previous search already disabled the auto-search guard.
+        const searchParams = { ...params, page_number: 1 };
+        const url = createSearchUrl(searchParams);
+        dispatchSearch(searchParams);
+        // Keep the guard disabled so the /search query-param effect doesn't run it again.
+        dispatch(setStartSearch(false));
         router.push(`/search?${url}`);
     };
 

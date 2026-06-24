@@ -159,13 +159,23 @@ const HotelCard = ({ item, request_id, lazy }: HotelCardState) => {
                     return `${value}-я линия`;
                 }
                 if (key === 'beach_surface') {
-                    if (value === 'PEBBLE') {
-                        return 'Галька'
-                    } else if (value === 'SAND+PEBBLE') {
-                        return 'Песок с галькой'
-                    } else {
-                        return `${value}-${key}`;
-                    }
+                    const beachSurfaceMap: Record<string, string> = {
+                        SAND: 'Песчаный пляж',
+                        PEBBLE: 'Галька',
+                        GRAVEL: 'Мелкая галька',
+                        'SAND+PEBBLE': 'Песок с галькой',
+                        'SAND+GRAVEL': 'Песок с галькой',
+                        ROCK: 'Скалистый пляж',
+                        ROCKY: 'Скалистый пляж',
+                        CORAL: 'Коралловый риф',
+                        CORAL_REEF: 'Коралловый риф',
+                        SHELL: 'Ракушечник',
+                        CONCRETE: 'Бетонная платформа',
+                        CONCRETE_PLATFORM: 'Бетонная платформа',
+                        PLATFORM: 'Платформа',
+                    };
+                    const normalized = String(value).toUpperCase();
+                    return beachSurfaceMap[normalized] || label;
                 }
 
                 const unit = units[key] || '';

@@ -20,7 +20,7 @@ interface CheckboxGroupProps {
 
 export default function CheckboxGroup({options, selected, onChange,name,pk,netPrice}: CheckboxGroupProps) {
     const getOptionValue = (item: any) =>
-        item?.id ?? item?.luggage_type ?? item?.flight_class ?? item?.number ?? item?.flight_type;
+        item?.id ?? item?.luggage_type ?? item?.flight_class ?? item?.number ?? item?.flight_type ?? item?.interval;
 
     useEffect(() => {
         if(selected){
@@ -65,9 +65,21 @@ export default function CheckboxGroup({options, selected, onChange,name,pk,netPr
             name==='filter_hotel_type' ||
             name==='filter_operators' ||
             name === 'forward_airlines' ||
+            name === 'backward_airlines' ||
+            name === 'arrival_airports' ||
+            name === 'departure_airports' ||
             name === 'operators'
         ) {
             return item.name;
+        }else if(name==='forward_departure_intervals' || name==='backward_departure_intervals'){
+            const intervalMap: Record<string, string> = {
+                night: 'Ночь',
+                evening: 'Вечер',
+                morning: 'Утро',
+                midday: 'День',
+                afternoon: 'День',
+            };
+            return intervalMap[item.interval] || item.interval;
         }else if( name === 'luggage_types'){
             if(item.luggage_type === 'all'){
                 return 'Все'
@@ -109,7 +121,7 @@ export default function CheckboxGroup({options, selected, onChange,name,pk,netPr
     return (
         <div className={styles.wrapperGroupCheckbox}>
             {allOptions?.map((option) => !option.disabled && (
-                <div key={option.id} className={styles.checkboxItem} >
+                <div key={String(getOptionValue(option))} className={styles.checkboxItem} >
                     <Checkbox option={option} handleToggle={handleToggle} />
                     {/*<Icon name={option.selected? 'checkBoxActive':'checkBox'} size={24} onClick={() => handleToggle(option.id || option.luggage_type || option.flight_class || option.number || option.flight_type)} />*/}
                     <div>
@@ -117,7 +129,7 @@ export default function CheckboxGroup({options, selected, onChange,name,pk,netPr
                         {!pk && (
                             <span> {option?.hotel_count} отелей от {option?.min_price?.toString()?.replace(/\B(?=(\d{3})+(?!\d))/g, '\u202F')}₽</span>
                         )}
-                        {pk && (
+                        {pk && option?.suitable_flights != null && (
                             <span> {option?.suitable_flights} рейса от {(netPrice+option?.min_fuel_charge)?.toString()?.replace(/\B(?=(\d{3})+(?!\d))/g, '\u202F')}₽</span>
                         )}
                     </div>

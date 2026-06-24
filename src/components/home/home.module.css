@@ -230,6 +230,18 @@
   justify-content: space-between;
   gap: 16px;
 }
+.recomendlist > * {
+  flex: 1 1 0;
+  min-width: 0;
+}
+.hotDealSlide {
+  padding: 0 12px;
+  box-sizing: border-box;
+  height: 100%;
+}
+.recomendlistMob .slick-list {
+  margin: 0 -12px;
+}
 /*.serviceListWrap{*/
 /*    border: 1px solid;*/
 /*    display: flex;*/
@@ -391,7 +403,8 @@
   height: 823px;
   position: relative;
   font-family: "Georgia", serif;
-  width: 1280px;
+  width: 100%;
+  max-width: 1280px;
   margin: 0 auto;
   overflow: hidden;
 }
@@ -745,15 +758,17 @@
   display: none;
 }
 .contentFull {
-  width: 1280px;
+  width: 100%;
+  max-width: 1280px;
   margin: 0 auto;
+  padding: 0 20px;
 }
 
 .popularDestinationsWrapper {
-  width: 1280px;
+  width: 100%;
+  max-width: 1280px;
   margin: 0 auto;
-  padding-top: 60px;
-  padding-bottom: 60px;
+  padding: 60px 20px;
 }
 
 .partnerListMob {
@@ -817,6 +832,15 @@
   }
   .recomendlistMob {
     display: block;
+  }
+  .recomendlistMob .slick-slider {
+    margin: 0 16px;
+  }
+  .recomendlistMob .slick-slide > div {
+    height: 100%;
+  }
+  .recomendlistMob .slick-dots {
+    bottom: -30px;
   }
   .contentFull {
     padding-left: 0;

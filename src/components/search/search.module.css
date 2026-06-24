@@ -22,9 +22,20 @@
 }
 .searchFormBlock {
   width: 100%;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+
+/* Allow the header search form and its fields to shrink instead of pushing
+   neighbouring header items (e.g. the login button) off-screen on tablets. */
+.searchFormM,
+.searchFormM .searchFields,
+.searchFormM .searchGroup,
+.searchFormM .searchField,
+.searchFormM .searchFieldInfo {
+  min-width: 0;
 }
 .searchTypeTabs {
   position: relative;
@@ -206,6 +217,10 @@
   font-weight: 400;
   line-height: 16px;
   letter-spacing: -0.24px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 .searchFieldsValue {
   color: var(--textPrimary);
@@ -219,6 +234,9 @@
   outline: none;
   width: 100%;
   background: transparent;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .searchFieldsValue::placeholder {
   color: var(--textTertiary);
@@ -646,6 +664,114 @@
 .logoHomeM {
   display: none;
 }
+
+/* iPad / tablet landscape: stacked search form instead of cramped horizontal bar */
+@media (max-width: 1280px) {
+  .search {
+    padding: 32px 20px;
+  }
+
+  .searchForm {
+    height: auto;
+    flex-direction: column;
+    padding: 0;
+    background: none;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .searchFields {
+    flex-direction: column;
+    height: auto;
+    background-color: var(--bgPrimary);
+    overflow: hidden;
+    border-radius: 16px;
+  }
+
+  .whereFrom,
+  .searchField {
+    border-left: none;
+    border-top: none;
+    border-radius: 0;
+    border-right: none;
+  }
+
+  .whereFrom:last-child {
+    border-bottom: none;
+    border-top: 1px solid var(--borderSecondary);
+  }
+
+  .whereFrom > svg,
+  .searchField > svg {
+    display: none;
+  }
+
+  .searchField {
+    padding: 15px;
+  }
+
+  .people:not(.whereFrom) {
+    border: none;
+  }
+
+  .searchGroup {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: 100%;
+    gap: 0;
+  }
+
+  .searchGroup > div {
+    flex: none;
+  }
+
+  .searchGroup > div:first-child {
+    border-right: 1px solid var(--borderSecondary);
+    border-bottom: 1px solid var(--borderSecondary);
+  }
+
+  .searchGroup > div:nth-child(2) {
+    border-bottom: 1px solid var(--borderSecondary);
+  }
+
+  .searchGroup > div:last-child:nth-child(3) {
+    grid-column: 1;
+  }
+
+  .searchGroup > div :global(.searchField),
+  .searchGroup > div :global(.radioFrom),
+  .searchGroup > div :global(.people),
+  .searchGroup > div :global(.whereFrom) {
+    border-left: none !important;
+    border-right: none !important;
+    border-top: none !important;
+    border-bottom: none !important;
+    border-radius: 0 !important;
+  }
+
+  .radioFrom {
+    border-bottom-left-radius: 0 !important;
+    border-top-left-radius: 0 !important;
+    border-left: none;
+  }
+
+  .searchForm :global(.button) {
+    width: 100%;
+  }
+
+  .searchField,
+  .searchFieldInfo {
+    min-width: 0;
+  }
+
+  .searchFieldsLabel,
+  .searchFieldsValue {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+  }
+}
+
 @media (max-width: 1024px) {
   .logoHomeM {
     display: flex;
@@ -820,9 +946,20 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: calc(100% - 50px);
-    margin-left: 40px;
-    /*border: 1px solid red;*/
+    justify-content: center;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: calc(100% - 96px);
+    margin: 0;
+    text-align: center;
+    pointer-events: none;
+  }
+  .selectdFormM > p {
+    width: 100%;
+    margin: 0;
+    text-align: center;
   }
   .selectdFormM > p:nth-child(2) {
     color: var(--textTertiary);
@@ -869,10 +1006,11 @@
     margin-top: 15px;
   }
   .mytextHeader {
-    white-space: nowrap; /* Keep text in one line */
-    overflow: hidden; /* Hide the extra text */
+    white-space: nowrap;
+    overflow: hidden;
     text-overflow: ellipsis;
-    width: 60%;
+    width: 100%;
+    max-width: 100%;
     text-align: center;
   }
 }

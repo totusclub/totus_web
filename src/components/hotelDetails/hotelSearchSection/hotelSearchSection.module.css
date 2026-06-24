@@ -69,7 +69,7 @@
 }
 
 /* Mobile styles - same as home page */
-@media (max-width: 1024px) {
+@media (max-width: 1280px) {
   .hotelSearchSection {
     margin: 16px 0;
   }
@@ -109,8 +109,8 @@
     border-bottom: 1px solid var(--borderSecondary);
   }
 
-  /* Second row: People takes left column */
-  .searchGroup > div:last-child {
+  /* Only when People is the 3rd child inside the group */
+  .searchGroup > div:last-child:nth-child(3) {
     grid-column: 1;
   }
 

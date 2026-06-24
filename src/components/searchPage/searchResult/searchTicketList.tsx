@@ -55,13 +55,7 @@ const ResultTicketList = ({ flights, packages, loading }: any) => {
                 {!loading && flights && flights.length > 0 && (
                     <>
                         {flights.map((item, index) => (
-                            <>
-                                <TicketItem lazy={false} price={packages.price} item={item} green={index === 0} />
-                                {index === 4 && (
-                                    <TrackPrices text={'Получайте автоматические оповещения при изменении цен.'}
-                                        priceTrack={priceTrack} setPriceTrack={setPriceTrack} />
-                                )}
-                            </>
+                            <TicketItem key={index} lazy={false} price={packages.price} item={item} green={index === 0} />
                         ))}
                     </>
                 )}

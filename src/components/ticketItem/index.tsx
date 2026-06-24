@@ -42,11 +42,6 @@ const TicketItem: FC<TicketItemProps> = ({ green, item, price, lazy }) => {
                         style={{ border: green ? 'none' : '1px solid var(--borderTertiary)' }}
                     >
                         <div className={styles.ticketItemInfo}>
-                            <div className={styles.ticketItemBadge}>
-                                <p>Лучший выбор</p>
-                            </div>
-
-
                             <div className={styles.ticketItemLine}>
                                 <div className={styles.ticketItemLineItem}>
                                     <div className={styles.ticketItemLogo}>

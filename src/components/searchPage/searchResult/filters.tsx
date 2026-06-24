@@ -1,6 +1,7 @@
 import styles from '../searchPage.module.css';
 import ItemSwitch from "@/components/UI/itemSwitch";
 import { useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import Collapse from "@/components/UI/collapse";
 import CheckboxGroup from "@/components/UI/checkboxGroup";
 import RangeInput from "@/components/UI/rangeInput";
@@ -50,12 +51,37 @@ const Filters = ({ selectedFilters, allFilters, statistics }: any) => {
     // Detect mobile screen
     useEffect(() => {
         const checkMobile = () => {
-            setIsMobile(window.innerWidth <= 768);
+            setIsMobile(window.innerWidth <= 1024);
         };
         checkMobile();
         window.addEventListener('resize', checkMobile);
         return () => window.removeEventListener('resize', checkMobile);
     }, []);
+
+    useEffect(() => {
+        if (!mobileModal || !isMobile) return;
+
+        const scrollY = window.scrollY;
+        const previousBodyPosition = document.body.style.position;
+        const previousBodyTop = document.body.style.top;
+        const previousBodyWidth = document.body.style.width;
+        const previousHtmlOverflow = document.documentElement.style.overflow;
+
+        document.body.style.position = 'fixed';
+        document.body.style.top = `-${scrollY}px`;
+        document.body.style.width = '100%';
+        document.documentElement.style.overflow = 'hidden';
+        document.body.classList.add('filter-modal-open');
+
+        return () => {
+            document.body.style.position = previousBodyPosition;
+            document.body.style.top = previousBodyTop;
+            document.body.style.width = previousBodyWidth;
+            document.documentElement.style.overflow = previousHtmlOverflow;
+            document.body.classList.remove('filter-modal-open');
+            window.scrollTo(0, scrollY);
+        };
+    }, [mobileModal, isMobile]);
 
 
 
@@ -244,19 +270,22 @@ const Filters = ({ selectedFilters, allFilters, statistics }: any) => {
         }
     }, [router.query]);
 
+    const usePendingState = isMobile && mobileModal;
+    const activeFilterValues = usePendingState ? pendingFilters : filters;
 
-    return (
-        <>
-            <div className={styles.buttonFilterMob} onClick={() => setMobileModal(true)}>
-                <Icon name={'filter'} />
+    const filtersPanel = (
+        <div className={`${styles.filters} ${usePendingState ? styles.activeModal : ''}`}>
+            <div className={styles.mobileFilterHeader}>
+                <p>Фильтры</p>
+                <p onClick={handleCancel}>Отменить</p>
             </div>
-            <div className={`${styles.filters} ${mobileModal && styles.activeModal}`}>
-                <div className={styles.mobileFilterHeader}>
-                    <p>Фильтры</p>
-                    <p onClick={handleCancel} >Отменить</p>
-                </div>
-                <ItemSwitch name={'filter_instant_confirm'} title={'Быстрое подтверждение'} setIsOn={onChangeFilters}
-                    isOn={instantConfirm} />
+            <div className={styles.mobileFilterBody}>
+                <ItemSwitch
+                    name={'filter_instant_confirm'}
+                    title={'Быстрое подтверждение'}
+                    setIsOn={onChangeFilters}
+                    isOn={instantConfirm}
+                />
                 {allFilters?.prices && filters?.filter_price_min > 0 && (
                     <Collapse title={'Стоимость, ₽'} open={true}>
                         <RangeInput
@@ -278,9 +307,9 @@ const Filters = ({ selectedFilters, allFilters, statistics }: any) => {
                             name={'filter_hotel_type'}
                             options={getOptionsWithSelected(
                                 allFilters?.hotel_type || [],
-                                isMobile && mobileModal ? pendingFilters?.filter_hotel_type : filters?.filter_hotel_type
+                                activeFilterValues?.filter_hotel_type
                             )}
-                            selected={isMobile && mobileModal ? pendingFilters?.filter_hotel_type : filters?.filter_hotel_type}
+                            selected={activeFilterValues?.filter_hotel_type}
                             onChange={onChangeFilters}
                         />
                     </Collapse>
@@ -291,9 +320,9 @@ const Filters = ({ selectedFilters, allFilters, statistics }: any) => {
                             name={'filter_meals'}
                             options={getOptionsWithSelected(
                                 allFilters?.meals || [],
-                                isMobile && mobileModal ? pendingFilters?.filter_meals : filters?.filter_meals
+                                activeFilterValues?.filter_meals
                             )}
-                            selected={isMobile && mobileModal ? pendingFilters?.filter_meals : filters?.filter_meals}
+                            selected={activeFilterValues?.filter_meals}
                             onChange={onChangeFilters}
                         />
                     </Collapse>
@@ -304,9 +333,9 @@ const Filters = ({ selectedFilters, allFilters, statistics }: any) => {
                             name={'filter_stars'}
                             options={getOptionsWithSelected(
                                 (allFilters?.stars || []).filter((star) => String(star?.id) !== '0'),
-                                isMobile && mobileModal ? pendingFilters?.filter_stars : filters?.filter_stars
+                                activeFilterValues?.filter_stars
                             )}
-                            selected={isMobile && mobileModal ? pendingFilters?.filter_stars : filters?.filter_stars}
+                            selected={activeFilterValues?.filter_stars}
                             onChange={onChangeFilters}
                         />
                     </Collapse>
@@ -317,9 +346,9 @@ const Filters = ({ selectedFilters, allFilters, statistics }: any) => {
                             name={'filter_regions'}
                             options={getOptionsWithSelected(
                                 allFilters?.regions || [],
-                                isMobile && mobileModal ? pendingFilters?.filter_regions : filters?.filter_regions
+                                activeFilterValues?.filter_regions
                             )}
-                            selected={isMobile && mobileModal ? pendingFilters?.filter_regions : filters?.filter_regions}
+                            selected={activeFilterValues?.filter_regions}
                             onChange={onChangeFilters}
                         />
                     </Collapse>
@@ -330,9 +359,9 @@ const Filters = ({ selectedFilters, allFilters, statistics }: any) => {
                             name={'filter_line'}
                             options={getOptionsWithSelected(
                                 allFilters?.line || [],
-                                isMobile && mobileModal ? pendingFilters?.filter_line : filters?.filter_line
+                                activeFilterValues?.filter_line
                             )}
-                            selected={isMobile && mobileModal ? pendingFilters?.filter_line : filters?.filter_line}
+                            selected={activeFilterValues?.filter_line}
                             onChange={onChangeFilters}
                         />
                     </Collapse>
@@ -343,19 +372,31 @@ const Filters = ({ selectedFilters, allFilters, statistics }: any) => {
                             name={'filter_operators'}
                             options={getOptionsWithSelected(
                                 allFilters?.operators || [],
-                                isMobile && mobileModal ? pendingFilters?.filter_operators : filters?.filter_operators
+                                activeFilterValues?.filter_operators
                             )}
-                            selected={isMobile && mobileModal ? pendingFilters?.filter_operators : filters?.filter_operators}
+                            selected={activeFilterValues?.filter_operators}
                             onChange={onChangeFilters}
                         />
                     </Collapse>
                 )}
-                <div className={styles.mobileFilterFooter}>
-                    <Button title={'Применять'} full={true} onClick={applyFilters} />
-                </div>
             </div>
-        </>
+            <div className={styles.mobileFilterFooter}>
+                <Button title={'Применять'} full={true} onClick={applyFilters} />
+            </div>
+        </div>
+    );
 
+    return (
+        <>
+            <div className={styles.buttonFilterMob} onClick={() => setMobileModal(true)}>
+                <Icon name={'filter'} />
+            </div>
+            {isMobile
+                ? (mobileModal && typeof document !== 'undefined'
+                    ? createPortal(filtersPanel, document.body)
+                    : null)
+                : filtersPanel}
+        </>
     );
 };
 

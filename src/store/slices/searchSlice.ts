@@ -307,7 +307,9 @@ const searchSlice = createSlice({
             .addCase(runFullSearchFlow.pending, (state) => {
                 state.loading = true;
                 state.error = null;
-                // state.hotels = null;
+                // New search started: clear the previous list so only skeletons show.
+                state.hotels = null;
+                state.allMyHotels = [];
                 state.progress = {};
             })
             .addCase(runFullSearchFlow.fulfilled, (state, action) => {

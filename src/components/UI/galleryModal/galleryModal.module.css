@@ -33,6 +33,7 @@
   align-items: center;
   padding: 0;
   outline: none;
+  overflow: hidden;
 }
 
 /* Header with Close Button */
@@ -82,16 +83,19 @@
   align-items: center;
   justify-content: center;
   flex: 1;
+  min-height: 0;
   padding: 40px 20px;
+  overflow: hidden;
 }
 
 /* Desktop: Left Thumbnail Slider (Vertical) - Show 3 at a time */
 .thumbnailSliderWrapperDesktop {
   width: 260px;
-  height: calc(260px * 3 + 16px); /* 3 thumbnails + gaps */
+  height: calc((260px + 16px) * 3);
   position: relative;
   display: block;
   overflow: hidden;
+  flex-shrink: 0;
 }
 
 .thumbnailSliderWrapperMobile {
@@ -112,6 +116,7 @@
   transition: border 0.2s ease;
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
   display: block;
+  box-sizing: border-box;
 }
 
 .thumbnailDesktop:hover {

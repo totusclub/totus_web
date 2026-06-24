@@ -32,11 +32,12 @@ export default function Checkbox({ option, handleToggle }: CheckboxGroupProps) {
             size={24}
             onClick={() =>
                 handleChange(
-                    option.id ||
-                    option.luggage_type ||
-                    option.flight_class ||
-                    option.number ||
-                    option.flight_type
+                    option.id ??
+                    option.luggage_type ??
+                    option.flight_class ??
+                    option.number ??
+                    option.flight_type ??
+                    option.interval
                 )
             }
         />
