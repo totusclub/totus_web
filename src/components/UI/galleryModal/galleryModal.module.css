@@ -7,7 +7,7 @@
   justify-content: center;
   align-items: flex-start;
   z-index: 999999999;
-  overflow-y: auto;
+  overflow: hidden;
 }
 
 .galleryModal {

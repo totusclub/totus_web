@@ -11,6 +11,7 @@ import { setAuth } from "@/store/slices/authSlice";
 import { useDispatch } from "react-redux";
 import MobileBottomBar from "@/components/mobileBottomBar";
 import SiteSeo from "@/components/seo/SiteSeo";
+import CookieConsent from "@/components/cookieConsent";
 // import ScrollRestoration from '@/components/ScrollRestoration';
 
 function MyApp({ Component, pageProps }: AppProps) {
@@ -73,6 +74,7 @@ function MyApp({ Component, pageProps }: AppProps) {
                 <Component {...pageProps} />
                 <Footer />
                 <MobileBottomBar />
+                <CookieConsent />
             </div>
         </>
     );
