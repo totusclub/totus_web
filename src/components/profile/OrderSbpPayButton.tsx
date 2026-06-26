@@ -5,6 +5,7 @@ import {
   canPayWithSbp,
   getOrderIdForPay,
   getOrderPayAmount,
+  getOrderPaymentPurpose,
   isOrderAwaitingPayment,
 } from '@/utils/orderPayment';
 import styles from './profile.module.css';
@@ -33,6 +34,7 @@ const OrderSbpPayButton = ({ order, fullWidth = true }: Props) => {
       const payInfo = await createPay({
         orderId: `ORDER${orderId}`,
         orderName: `Заказ №${orderId}`,
+        paymentPurpose: getOrderPaymentPurpose(order),
         expire: expireDate,
         amount: {
           value: amount,

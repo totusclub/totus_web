@@ -11,7 +11,17 @@ export function getLtOrderPackage(order: any) {
   return root;
 }
 
-export function getOrderIdForPay(order: any): string | number | null {
+export function getOrderPaymentPurpose(order: any): string | undefined {
+  const lt = getLtOrderPackage(order);
+  const value =
+    lt?.description_for_client ??
+    order?.description_for_client ??
+    order?.package?.description_for_client;
+  if (value == null) return undefined;
+  const text = String(value).trim();
+  return text || undefined;
+}
+
   if (!order) return null;
   return order.order_id ?? order.id ?? order.package?.id ?? null;
 }

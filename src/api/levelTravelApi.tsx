@@ -300,7 +300,8 @@ export async function createPay(params: {
     orderName: string;
     expire: Date;
     amount: { value: any; code: string };
-    returnUrl: string
+    returnUrl: string;
+    paymentPurpose?: string;
 }) {
     try {
         if (!params) {

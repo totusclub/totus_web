@@ -19,6 +19,7 @@ const CheckoutCard = ({ order }) => {
             const payInfo = await createPay({
                 orderId: `ORDER${order.id}`,
                 orderName: `Заказ №${order.id}`,
+                paymentPurpose: order?.description_for_client,
                 expire: expireDate,
                 amount: {
                     value: order?.full_price,
