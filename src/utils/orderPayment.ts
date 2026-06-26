@@ -22,6 +22,7 @@ export function getOrderPaymentPurpose(order: any): string | undefined {
   return text || undefined;
 }
 
+export function getOrderIdForPay(order: any): string | number | null {
   if (!order) return null;
   return order.order_id ?? order.id ?? order.package?.id ?? null;
 }
