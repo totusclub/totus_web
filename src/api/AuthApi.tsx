@@ -1,7 +1,7 @@
 import axios from 'axios';
+import { API_BASE_URL } from '@/config/api';
 
-const BASE_URL = 'https://api.totus.club';
-// const BASE_URL = 'http://192.168.123.37:3001';
+const BASE_URL = API_BASE_URL;
 
 
 export async function SignInRequest(params: any) {

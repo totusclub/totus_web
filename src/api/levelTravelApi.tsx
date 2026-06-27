@@ -1,7 +1,7 @@
 import axios from 'axios';
+import { API_BASE_URL } from '@/config/api';
 
-// const BASE_URL = 'http://192.168.123.37:3001';
-const BASE_URL = 'https://api.totus.club';
+const BASE_URL = API_BASE_URL;
 
 function prepareStartSearchParams(raw: Record<string, unknown>): Record<string, string | number | boolean> {
     const out: Record<string, string | number | boolean> = {};

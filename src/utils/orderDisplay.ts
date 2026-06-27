@@ -3,11 +3,38 @@ import { getLtOrderPackage } from '@/utils/orderPayment';
 
 export type OrderDocument = { name: string; url: string };
 
+function isLocalApiHost(hostname: string): boolean {
+  return hostname === 'localhost' || hostname === '127.0.0.1';
+}
+
+function isLevelTravelDocumentUrl(url: string): boolean {
+  return /level\.travel/i.test(url) && !url.includes('/uploads/');
+}
+
 export function resolveDocumentUrl(url: string | undefined | null): string {
   if (!url) return '';
   const value = String(url).trim();
-  if (/^https?:\/\//i.test(value)) return value;
-  if (value.startsWith('//')) return `https:${value}`;
+  if (!value) return '';
+
+  if (isLevelTravelDocumentUrl(value)) return '';
+
+  if (/^https?:\/\//i.test(value)) {
+    try {
+      const parsed = new URL(value);
+      if (parsed.pathname.startsWith('/uploads/') && isLocalApiHost(parsed.hostname)) {
+        return `${API_BASE_URL}${parsed.pathname}${parsed.search}`;
+      }
+    } catch {
+      return value;
+    }
+    return value;
+  }
+
+  if (value.startsWith('//')) {
+    const protocolRelative = `https:${value}`;
+    return isLevelTravelDocumentUrl(protocolRelative) ? '' : protocolRelative;
+  }
+
   const path = value.startsWith('/') ? value : `/${value}`;
   return `${API_BASE_URL}${path}`;
 }
@@ -91,12 +118,7 @@ export function collectOrderDocuments(
   }
 
   for (const item of apiDocuments) {
-    pushDocument(
-      docs,
-      seen,
-      item?.public_url ?? item?.url ?? item?.source_url,
-      item?.title,
-    );
+    pushDocument(docs, seen, item?.public_url ?? item?.url, item?.title);
   }
 
   return docs;

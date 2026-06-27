@@ -1,3 +1,3 @@
-/** Local backend default — set PORT=3001 when running kedam_API, or override via .env.local */
+/** Override via NEXT_PUBLIC_API_BASE_URL in .env.local for local dev (e.g. http://localhost:3001) */
 export const API_BASE_URL =
-    process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001';
+    process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.totus.club';
