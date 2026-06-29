@@ -17,7 +17,8 @@ const MIN_POLLS_BEFORE_FALLBACK = 3; // Try fetching after 3 failed status check
 export const useHotelRooms = (
   requestId: string | null | undefined,
   hotelId: string | undefined,
-  isReady: boolean
+  isReady: boolean,
+  refreshKey = 0,
 ): UseHotelRoomsResult => {
   const [rooms, setRooms] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
@@ -123,7 +124,7 @@ export const useHotelRooms = (
         clearTimeout(pollTimeout);
       }
     };
-  }, [isReady, requestId, hotelId]);
+  }, [isReady, requestId, hotelId, refreshKey]);
 
   return { rooms, loading };
 };

@@ -5,7 +5,7 @@ import { createPortal } from "react-dom";
 import Collapse from "@/components/UI/collapse";
 import CheckboxGroup from "@/components/UI/checkboxGroup";
 import RangeInput from "@/components/UI/rangeInput";
-import { searchFilters, setAllMyHotels, setLoadMore } from '@/store/slices/searchSlice';
+import { searchFilters, setAllMyHotels } from '@/store/slices/searchSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import Icon from "@/components/icons/Icon";
 import Button from "@/components/UI/button";
@@ -13,7 +13,7 @@ import { useRouter } from 'next/router';
 import { RootState } from '@/store';
 
 const Filters = ({ selectedFilters, allFilters, statistics }: any) => {
-    const { hotels, loading, startSearchValid, loadMore } = useSelector((state: RootState) => state.search);
+    const { hotels, loading, startSearchValid } = useSelector((state: RootState) => state.search);
     const router = useRouter();
     const dispatch = useDispatch();
     const [mobileModal, setMobileModal] = useState(false);
@@ -104,10 +104,10 @@ const Filters = ({ selectedFilters, allFilters, statistics }: any) => {
     }, [allFilters, statistics, priceBounds.min, priceBounds.max])
 
 
-
-
     // Apply filters function - used on mobile when Apply button is clicked
     const applyFilters = () => {
+        if (!selectedFilters?.request_id) return;
+
         // Include current price state if it was changed
         const filtersToApply = {
             ...pendingFilters,
@@ -162,6 +162,8 @@ const Filters = ({ selectedFilters, allFilters, statistics }: any) => {
         }
 
         // Desktop or mobile outside modal: apply immediately
+        if (!selectedFilters?.request_id) return;
+
         if (key === 'price' && Array.isArray(value)) {
             const priceUpdate = {
                 ...filters,
@@ -251,24 +253,6 @@ const Filters = ({ selectedFilters, allFilters, statistics }: any) => {
             return allFilters?.instant_confirm.find(item => item.selected).id
         }
     }, [allFilters, filters, pendingFilters, isMobile, mobileModal])
-
-
-    useEffect(() => {
-        if (!router.isReady) return;
-        const pageNumber = parseInt((router.query.page_number as string) || "1", 10);
-        if (pageNumber > 1 && loadMore) {
-            let paramsFilter: any = { ...filters, ...selectedFilters, page_limit: 20, page_number: pageNumber }
-
-            // Preserve sort_by if it exists in URL
-            if (router.query.sort_by) {
-                paramsFilter.sort_by = router.query.sort_by;
-            }
-
-            setFilters(paramsFilter)
-            dispatch(searchFilters(paramsFilter))
-            dispatch(setLoadMore(false))
-        }
-    }, [router.query]);
 
     const usePendingState = isMobile && mobileModal;
     const activeFilterValues = usePendingState ? pendingFilters : filters;

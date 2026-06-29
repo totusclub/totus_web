@@ -168,6 +168,16 @@
 // // store/slices/searchSlice.ts
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import {checkSearchStatus, getGroupedHotels, startSearch} from "@/api/levelTravelApi";
+import { mergeHotelPages, normalizePageNumber } from '@/utils/searchResults';
+
+let activeSearchPoll: ReturnType<typeof setInterval> | null = null;
+
+function clearActiveSearchPoll() {
+    if (activeSearchPoll) {
+        clearInterval(activeSearchPoll);
+        activeSearchPoll = null;
+    }
+}
 
 interface SearchState {
     hotels: any;
@@ -203,14 +213,19 @@ export const runFullSearchFlow = createAsyncThunk(
         }: { searchParams: any | null; filterParams?: any | null },
         { rejectWithValue, dispatch }
     ) => {
+        clearActiveSearchPoll();
+
         try {
             const { request_id } = await startSearch(searchParams);
 
+            if (!request_id) {
+                return rejectWithValue('Missing request_id from search');
+            }
+
             return await new Promise(async (resolve, reject) => {
-                const interval = setInterval(async () => {
+                activeSearchPoll = setInterval(async () => {
                     try {
                         const statusMap = await checkSearchStatus(request_id);
-                        console.log('statusMap',statusMap);
 
                         dispatch(updateProgress(statusMap));
 
@@ -219,7 +234,7 @@ export const runFullSearchFlow = createAsyncThunk(
                             .map(([id]) => id);
 
                         if (readyOperators.length > 0) {
-                            clearInterval(interval);
+                            clearActiveSearchPoll();
                             let filters = { request_id, readyOperators };
                             if (filterParams && typeof filterParams === 'object') {
                                 filters = { ...filters, ...filterParams };
@@ -229,12 +244,13 @@ export const runFullSearchFlow = createAsyncThunk(
                             resolve({...hotels,...filters});
                         }
                     } catch (err) {
-                        clearInterval(interval);
+                        clearActiveSearchPoll();
                         reject(err);
                     }
                 }, 3000);
             });
         } catch (err: any) {
+            clearActiveSearchPoll();
             return rejectWithValue(err.message || 'Failed to complete search');
         }
     }
@@ -244,6 +260,10 @@ export const runFullSearchFlow = createAsyncThunk(
 export const searchFilters = createAsyncThunk(
     'search/filters',
     async (params: any, { rejectWithValue }) => {
+        if (!params?.request_id) {
+            return rejectWithValue('Missing request_id');
+        }
+
         try {
             return await getGroupedHotels(params);
         } catch (err: any) {
@@ -305,8 +325,10 @@ const searchSlice = createSlice({
     extraReducers: (builder) => {
         builder
             .addCase(runFullSearchFlow.pending, (state) => {
+                clearActiveSearchPoll();
                 state.loading = true;
                 state.error = null;
+                state.loadMore = false;
                 // New search started: clear the previous list so only skeletons show.
                 state.hotels = null;
                 state.allMyHotels = [];
@@ -315,35 +337,40 @@ const searchSlice = createSlice({
             .addCase(runFullSearchFlow.fulfilled, (state, action) => {
                 state.hotels = action.payload;
                 state.loading = false;
-                state.allMyHotels = action.payload.hotels;
+                state.loadMore = false;
+                state.allMyHotels = action.payload.hotels || [];
             })
             .addCase(runFullSearchFlow.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload as string;
             })
-            .addCase(searchFilters.pending, (state) => {
+            .addCase(searchFilters.pending, (state, action) => {
                 state.loading = true;
                 state.error = null;
-                // state.hotels = null;
                 state.progress = {};
+                const pageNumber = normalizePageNumber(action.meta?.arg?.page_number);
+                if (pageNumber === 1 && !state.loadMore) {
+                    state.allMyHotels = [];
+                }
             })
             .addCase(searchFilters.fulfilled, (state, action) => {
                 state.hotels = action.payload;
                 state.loading = false;
-                // If page_number is 1, replace hotels. Otherwise append for pagination
-                const pageNumber = action.payload.page_number || 1;
+                state.loadMore = false;
+                const pageNumber = normalizePageNumber(
+                    action.meta?.arg?.page_number ?? action.payload.page_number,
+                );
                 const hotels = action.payload.hotels || [];
-                
+
                 if (pageNumber === 1) {
-                    // Replace the entire list for new searches/filters/sorts
                     state.allMyHotels = hotels;
                 } else {
-                    // Append for pagination
-                    state.allMyHotels = [...(state.allMyHotels || []), ...hotels];
+                    state.allMyHotels = mergeHotelPages(state.allMyHotels || [], hotels);
                 }
             })
             .addCase(searchFilters.rejected, (state, action) => {
                 state.loading = false;
+                state.loadMore = false;
                 state.error = action.payload as string;
             })
     },

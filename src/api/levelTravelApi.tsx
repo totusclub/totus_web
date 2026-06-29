@@ -57,14 +57,18 @@ export async function getHomeData(): Promise<any> {
     }
 }
 
-export async function getGroupedHotels(params: { request_id: never; readyOperators: never; }) {
+export async function getGroupedHotels(params: { request_id?: string; readyOperators?: string[] | string; [key: string]: unknown }) {
     try {
+        if (!params?.request_id) {
+            throw new Error('Missing request_id');
+        }
+
         const sanitizedParams = Object.fromEntries(
-            Object.entries(params || {}).filter(([_, value]) => {
+            Object.entries(params || {}).filter(([key, value]) => {
+                if (key === 'request_id' && !value) return false;
                 if (value === null || value === undefined) return false;
                 if (typeof value === 'string') return value.trim() !== '';
                 if (Array.isArray(value)) return value.length > 0;
-                // Keep valid falsy values like 0 and false.
                 return true;
             })
         );

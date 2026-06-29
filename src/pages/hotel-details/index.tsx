@@ -31,6 +31,7 @@ export default function HotelDetails() {
     const [activeStartDate, setActiveStartDate] = useState<string | undefined>(undefined);
     const [selectedRoomDate, setSelectedRoomDate] = useState<string>("");
     const [reviewsModalOpen, setReviewsModalOpen] = useState(false);
+    const [roomsSearchKey, setRoomsSearchKey] = useState(0);
     const prevActiveStartRef = useRef<string | undefined>(undefined);
 
     // Hooks for data fetching and state management
@@ -42,7 +43,12 @@ export default function HotelDetails() {
         router.isReady,
         searchType
     );
-    const { rooms, loading: roomsLoading } = useHotelRooms(requestId, hotelId, router.isReady);
+    const { rooms, loading: roomsLoading } = useHotelRooms(
+        requestId,
+        hotelId,
+        router.isReady,
+        roomsSearchKey,
+    );
 
     const {
         reviews,
@@ -78,6 +84,7 @@ export default function HotelDetails() {
 
     const handleSearchComplete = (newRequestId: string) => {
         setLocalRequestId(newRequestId);
+        setRoomsSearchKey((key) => key + 1);
         const newQuery = { ...router.query, request_id: newRequestId };
         router.replace(
             { pathname: router.pathname, query: newQuery },

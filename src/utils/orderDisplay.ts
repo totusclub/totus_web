@@ -169,29 +169,49 @@ export function getStatusLabel(order: any, pkg?: any): string {
   );
 }
 
+export function getOrderCreatedAt(order: any): Date | null {
+  const raw =
+    order?.c_date ??
+    order?.created_at ??
+    order?.createdAt ??
+    order?.package?.c_date ??
+    order?.package?.created_at ??
+    order?.package?.createdAt;
+
+  if (raw == null || raw === '') return null;
+
+  if (typeof raw === 'number') {
+    const date = new Date(raw > 1e12 ? raw : raw * 1000);
+    return Number.isNaN(date.getTime()) ? null : date;
+  }
+
+  const date = new Date(raw);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+export function sortOrdersByNewest(orders: any[]): any[] {
+  if (!Array.isArray(orders)) return [];
+
+  return [...orders].sort((a, b) => {
+    const dateA = getOrderCreatedAt(a)?.getTime() ?? 0;
+    const dateB = getOrderCreatedAt(b)?.getTime() ?? 0;
+    if (dateA !== dateB) return dateB - dateA;
+
+    const idA = Number(a?.order_id ?? a?.id ?? 0);
+    const idB = Number(b?.order_id ?? b?.id ?? 0);
+    return idB - idA;
+  });
+}
+
 export function formatOrderStartLabel(order: any): string {
-  const nested = order?.package?.package ?? order?.package;
-  const start = nested?.dates_info?.start_date;
-  if (start) {
-    return `От ${new Intl.DateTimeFormat('ru-RU', {
-      day: 'numeric',
-      month: 'long',
-    }).format(new Date(start))}`;
-  }
+  const created = getOrderCreatedAt(order);
+  if (!created) return '';
 
-  const created = order?.c_date ?? order?.package?.c_date;
-  if (created) {
-    const date =
-      typeof created === 'number' ? new Date(created * 1000) : new Date(created);
-    if (!Number.isNaN(date.getTime())) {
-      return new Intl.DateTimeFormat('ru-RU', {
-        day: 'numeric',
-        month: 'long',
-      }).format(date);
-    }
-  }
-
-  return '';
+  return new Intl.DateTimeFormat('ru-RU', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  }).format(created);
 }
 
 export function formatTravelPeriod(pkg: any): string {

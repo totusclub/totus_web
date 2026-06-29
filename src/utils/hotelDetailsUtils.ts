@@ -29,28 +29,52 @@ export interface ParsedSearchParams {
   kids?: string;
   kids_ages?: number[];
   start_date?: string;
+  end_date_till?: string;
   nights?: string;
   search_type?: string;
   flex_dates?: string;
 }
 
+function queryParam(
+  query: Record<string, string | string[] | undefined>,
+  key: string,
+): string | undefined {
+  const value = query[key];
+  if (Array.isArray(value)) return value[0];
+  return value;
+}
+
+export function normalizeQueryDate(value: unknown): string | undefined {
+  if (value == null || value === '') return undefined;
+  const raw = Array.isArray(value) ? value[0] : value;
+  const s = String(raw).trim();
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+  const parsed = new Date(s);
+  if (Number.isNaN(parsed.getTime())) return undefined;
+  const year = parsed.getFullYear();
+  const month = String(parsed.getMonth() + 1).padStart(2, '0');
+  const day = String(parsed.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
 export const parseSearchParamsFromQuery = (query: Record<string, string | string[] | undefined>): ParsedSearchParams | null => {
   return {
-    from_city: query.from_city as string,
-    from_country: query.from_country as string,
-    to_country: query.to_country as string,
-    to_city: query.to_city as string,
-    adults: query.adults as string,
-    kids: query.kids as string,
+    from_city: queryParam(query, 'from_city'),
+    from_country: queryParam(query, 'from_country'),
+    to_country: queryParam(query, 'to_country'),
+    to_city: queryParam(query, 'to_city'),
+    adults: queryParam(query, 'adults'),
+    kids: queryParam(query, 'kids'),
     kids_ages: query.kids_ages
       ? (Array.isArray(query.kids_ages)
           ? query.kids_ages.map(Number)
           : [Number(query.kids_ages)])
       : undefined,
-    start_date: query.start_date as string,
-    nights: query.nights as string,
-    search_type: query.search_type as string,
-    flex_dates: query.flex_dates 
+    start_date: queryParam(query, 'start_date'),
+    end_date_till: queryParam(query, 'end_date_till'),
+    nights: queryParam(query, 'nights'),
+    search_type: queryParam(query, 'search_type'),
+    flex_dates: query.flex_dates
       ? (typeof query.flex_dates === 'string' ? query.flex_dates : String(query.flex_dates))
       : undefined,
   };
@@ -119,11 +143,103 @@ export const findCheapestOfferForStartDate = (
  * Formats nights as range when flex_dates is enabled.
  * Example: 7 with flex_dates=2 becomes "7..9"
  */
-const formatNightsForAPI = (nightsStr: string, flexDates: number): string => {
-  const nights = parseNightsValue(nightsStr);
-  return flexDates > 0 
-    ? `${nights}..${nights + flexDates}`
-    : nights.toString();
+export const formatNightsForAPI = (nights: number | string, flexDates: number): string => {
+  const base = typeof nights === 'number' ? nights : parseNightsValue(nights);
+  return flexDates > 0
+    ? `${base}..${base + flexDates}`
+    : String(base);
+};
+
+/**
+ * Builds start-search params for the hotel details form (defaults + URL + user edits).
+ */
+export function buildHotelSearchParamsFromForm(
+  hotelId: string,
+  source: {
+    query?: ParsedSearchParams | null;
+    apiHotelData?: {
+      country?: { iso2?: string };
+      city?: { name_en?: string; name_ru?: string; name?: string };
+    } | null;
+    departureDate?: string;
+    returnDate?: string;
+    nights?: number;
+    adults?: number;
+    kids?: number;
+    kidsAges?: number[];
+  },
+): Record<string, unknown> | null {
+  const parsedHotelId = parseHotelId(hotelId);
+  if (!parsedHotelId) return null;
+
+  const q = source.query || {};
+  const departureDate =
+    normalizeQueryDate(source.departureDate) ||
+    normalizeQueryDate(q.start_date) ||
+    getDefaultStartDate();
+  const nights =
+    source.nights && source.nights > 0
+      ? source.nights
+      : parseNightsValue(String(q.nights ?? ''));
+  const returnDate =
+    normalizeQueryDate(source.returnDate) ||
+    normalizeQueryDate(q.end_date_till) ||
+    endYmdAfterNights(departureDate, nights);
+  const adults =
+    source.adults && source.adults >= 1
+      ? source.adults
+      : parseInt(String(q.adults || '2'), 10) || 2;
+  const kids = source.kids ?? parseInt(String(q.kids || '0'), 10) || 0;
+  const flexDates = 2;
+
+  const hotelCountry = source.apiHotelData?.country;
+  const hotelCity = source.apiHotelData?.city;
+
+  const toCountry =
+    (q.to_country && String(q.to_country).trim()) ||
+    hotelCountry?.iso2 ||
+    'RU';
+
+  const toCity =
+    (q.to_city && q.to_city !== 'null' && String(q.to_city).trim()) ||
+    hotelCity?.name_en ||
+    hotelCity?.name_ru ||
+    hotelCity?.name ||
+    undefined;
+
+  const searchParams: Record<string, unknown> = {
+    from_city: q.from_city || 'Moscow',
+    from_country: q.from_country || 'RU',
+    to_country: toCountry,
+    to_city: toCity,
+    search_type: q.search_type || 'package',
+    flex_dates: flexDates,
+    start_date: departureDate,
+    start_date_from: departureDate,
+    end_date_till: returnDate,
+    nights: formatNightsForAPI(nights, flexDates),
+    adults: String(adults),
+    kids: kids > 0 ? String(kids) : undefined,
+    kids_ages:
+      kids > 0
+        ? (source.kidsAges?.length ? source.kidsAges : q.kids_ages)
+        : undefined,
+    hotel_ids: [parsedHotelId],
+    page_number: 1,
+    page_limit: 20,
+    sort_by: 'relevance',
+  };
+
+  const requiredFields = ['from_city', 'from_country', 'to_country', 'start_date', 'nights', 'adults', 'search_type'];
+  const isValid = requiredFields.every((field) => searchParams[field]);
+  return isValid ? searchParams : null;
+}
+
+/**
+ * Formats nights as range when flex_dates is enabled (legacy helper for URL builder).
+ */
+const formatNightsForAPIFromString = (nightsStr: string, flexDates: number): string => {
+  return formatNightsForAPI(nightsStr, flexDates);
 };
 
 /**
@@ -154,7 +270,7 @@ export const buildInitialSearchParams = (
     start_date: startDate,
     start_date_from: startDate,
     end_date_till: endDateStr,
-    nights: formatNightsForAPI(nightsStr, flexDates), // Format as range when flex_dates > 0
+    nights: formatNightsForAPIFromString(nightsStr, flexDates), // Format as range when flex_dates > 0
     search_type: (query.search_type as string) || 'package',
     flex_dates: flexDates,
     hotel_ids: [Number(hotelId)],

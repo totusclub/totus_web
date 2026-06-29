@@ -3,6 +3,7 @@ import Select from "@/components/UI/select";
 import {useState,useEffect} from "react";
 import OrderItem from "@/components/profile/orderItem";
 import {getOrdersUsers} from "@/api/levelTravelApi";
+import { sortOrdersByNewest } from "@/utils/orderDisplay";
 import useAuth from "@/hooks/useAuth";
 
 const options = [{value:'RUB',name:'Сначала новые'}];
@@ -84,7 +85,7 @@ const OrderList = (show:boolean) => {
         if(user){
             getOrdersUsers(user?.id).then(res=>{
                 // console.log('getOrdersUsers',res)
-                setOrders(res || [])
+                setOrders(sortOrdersByNewest(res || []))
             })
         }
 

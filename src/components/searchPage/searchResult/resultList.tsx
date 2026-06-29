@@ -2,10 +2,11 @@ import styles from '../searchPage.module.css';
 import Progress from "@/components/UI/progress";
 import HotelCard from "@/components/hotelCard";
 import TrackPrices from "@/components/UI/trackPrices";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef, useCallback } from "react";
 import { useRouter } from 'next/router';
 import { useDispatch, useSelector } from 'react-redux';
 import { setLoadMore, searchFilters, setAllMyHotels } from '@/store/slices/searchSlice';
+import { getHotelListItemKey } from '@/utils/searchResults';
 import { RootState } from '@/store';
 import Select from '@/components/UI/select';
 import Icon from "@/components/icons/Icon";
@@ -18,17 +19,46 @@ interface ResultListProps {
     setFiltersRequest?: any;
 }
 
+const PAGE_LIMIT = 20;
+
 const ResultList = ({ tickets, loading, data, setFiltersRequest }: ResultListProps) => {
     const dispatch = useDispatch();
     const router = useRouter();
-    const { allMyHotels, hotels, loadMore } = useSelector((state: RootState) => state.search);
-    // Show skeletons (and hide the old list) only for a fresh search/filter/sort,
-    // not while appending more results during infinite scroll.
-    const showSkeleton = loading && !loadMore;
-    const [allHotels, setAllHotels] = useState<any[]>([]);
-    const [hasMore, setHasMore] = useState(true);
-    const [loadingMore, setLoadingMore] = useState(false);
+    const { allMyHotels, hotels, loadMore, loading: storeLoading, error, startSearchValid } = useSelector(
+        (state: RootState) => state.search,
+    );
+    const isLoading = loading ?? storeLoading;
+
+    const hasSearchQuery = useMemo(() => {
+        if (!router.isReady) return false;
+        const q = router.query;
+        const keys = ['to_city', 'to_country', 'from_city', 'start_date', 'hotel_ids'];
+        return keys.some((key) => {
+            const value = q[key];
+            if (Array.isArray(value)) return value.length > 0 && String(value[0]).trim() !== '';
+            return value != null && String(value).trim() !== '';
+        });
+    }, [router.isReady, router.query]);
+
+    const hasSearchFinished = hotels != null;
+    const expectsSearch = hasSearchQuery || !startSearchValid;
+    const isSearching = isLoading || (expectsSearch && !hasSearchFinished && !error);
+
+    // Show skeletons only for a fresh search/filter/sort, not while appending more results.
+    const showSkeleton = isSearching && !loadMore;
     const [priceTrack, setPriceTrack] = useState(false);
+    const loadMoreRef = useRef(false);
+    const sentinelRef = useRef<HTMLDivElement | null>(null);
+
+    const totalHotelsCount = Number(data?.hotels_count ?? hotels?.hotels_count ?? 0);
+    const shownHotelsCount = allMyHotels?.length ?? 0;
+    const lastPageSize = Number(data?.hotels?.length ?? hotels?.hotels?.length ?? 0);
+    const hasMore =
+        shownHotelsCount > 0 &&
+        (totalHotelsCount > 0
+            ? shownHotelsCount < totalHotelsCount
+            : lastPageSize >= PAGE_LIMIT);
+    const isLoadingMore = loadMore && storeLoading;
 
     const options = [
         { value: 'relevance', name: 'По рекомендации', icon: 'recomand' },
@@ -41,9 +71,9 @@ const ResultList = ({ tickets, loading, data, setFiltersRequest }: ResultListPro
 
     // Get selectedFilters from hotels (request_id and readyOperators) - same pattern as filters.tsx
     const selectedFilters = useMemo(() => {
-        if (hotels) {
+        if (hotels?.request_id) {
             return {
-                request_id: hotels?.request_id,
+                request_id: hotels.request_id,
                 readyOperators: hotels?.readyOperators,
             };
         }
@@ -156,85 +186,97 @@ const ResultList = ({ tickets, loading, data, setFiltersRequest }: ResultListPro
         );
     };
 
-    // Note: Pagination is handled by filters.tsx component, not here
-    // This prevents duplicate requests
+    const buildFilterParams = useCallback(
+        (pageNumber: number) => {
+            const sortBy =
+                (router.query.sort_by as string) ||
+                data?.sort_by ||
+                currentFilters?.sort_by ||
+                'relevance';
 
-    // ✅ Handle incoming data and merge into state
-    useEffect(() => {
-        if (!data?.hotels || data?.hotels.length === 0) return;
+            return {
+                ...currentFilters,
+                ...selectedFilters,
+                page_limit: PAGE_LIMIT,
+                page_number: pageNumber,
+                sort_by: sortBy,
+            };
+        },
+        [router.query.sort_by, data?.sort_by, currentFilters, selectedFilters],
+    );
 
-        const currentPage = parseInt((router.query.page_number as string) || "1", 10);
-        const pageLimit = parseInt((router.query.page_limit as string) || "20", 10);
-
-        let updatedHotels: any[] = [];
-
-        if (currentPage === 1) {
-            updatedHotels = data.hotels;
-        } else {
-            updatedHotels = [...allHotels, ...data.hotels];
+    const loadNextPage = useCallback(() => {
+        if (
+            loadMoreRef.current ||
+            storeLoading ||
+            !hasMore ||
+            !selectedFilters?.request_id ||
+            tickets
+        ) {
+            return;
         }
 
-        setAllHotels(updatedHotels);
-        setHasMore(data.hotels.length === pageLimit);
-        setLoadingMore(false);
-    }, [data]);
+        const nextPage = Math.floor(shownHotelsCount / PAGE_LIMIT) + 1;
+        loadMoreRef.current = true;
 
-    // ✅ Infinite scroll handler
-    useEffect(() => {
-        const handleScroll = () => {
-            if (loadingMore || !hasMore) return;
-
-            const scrollY = window.scrollY || window.pageYOffset;
-            const viewportHeight = window.innerHeight;
-            const fullHeight = document.documentElement.scrollHeight;
-
-            if (scrollY + viewportHeight >= fullHeight - 300) {
-                loadNextPage();
-            }
-        };
-
-        window.addEventListener("scroll", handleScroll);
-        return () => window.removeEventListener("scroll", handleScroll);
-    }, [loadingMore, hasMore, router.query]);
-
-
-    const loadNextPage = () => {
-        if (loadingMore || !hasMore) return;
-
-        const currentPage = parseInt((router.query.page_number as string) || "1", 10);
-        const nextPage = currentPage + 1;
-
-        setLoadingMore(true);
         dispatch(setLoadMore(true));
-        const queryParams: any = { ...router.query, page_number: nextPage };
-        // const sortByToUse = data?.sort_by || selected || router.query.sort_by;
-        // if (sortByToUse && sortByToUse !== 'relevance') {
-        //     queryParams.sort_by = sortByToUse;
-        // }
+        dispatch(searchFilters(buildFilterParams(nextPage)) as any);
+    }, [
+        storeLoading,
+        hasMore,
+        selectedFilters,
+        tickets,
+        shownHotelsCount,
+        dispatch,
+        buildFilterParams,
+    ]);
 
-        router.push(
-            {
-                pathname: router.pathname,
-                query: { ...queryParams },
+    useEffect(() => {
+        if (!storeLoading) {
+            loadMoreRef.current = false;
+        }
+    }, [storeLoading]);
+
+    useEffect(() => {
+        if (!hasMore || showSkeleton || isLoadingMore) return;
+
+        const sentinel = sentinelRef.current;
+        if (!sentinel) return;
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                if (entries[0]?.isIntersecting) {
+                    loadNextPage();
+                }
             },
-            undefined,
-            { scroll: false }
+            { rootMargin: '300px 0px' },
         );
-    };
+
+        observer.observe(sentinel);
+        return () => observer.disconnect();
+    }, [hasMore, showSkeleton, isLoadingMore, loadNextPage]);
+
+    const showEmptyState =
+        !isLoading && hasSearchFinished && !error && (allMyHotels?.length || 0) === 0;
+    const showErrorState = !isLoading && !!error;
 
     return (
         <div className={styles.resultList}>
-            <Progress title={'Ищем подходящие туры'} loading={loading} />
+            <Progress title={'Ищем подходящие туры'} loading={isSearching} />
 
-            {loading && (
+            {isSearching && (
                 <div className={styles.resultListSorting}>
                     <div className={styles.animationTextlazy} style={{ width: '30%', height: '16px' }}></div>
                 </div>
             )}
 
-            {!loading && (
+            {!isSearching && hasSearchFinished && (
                 <div className={styles.resultListSorting}>
-                    <p>Найдено {data?.hotels_count || 0} отеля</p>
+                    <p>
+                        {hasMore
+                            ? `Показано ${shownHotelsCount} из ${totalHotelsCount} отелей`
+                            : `Найдено ${totalHotelsCount} отелей`}
+                    </p>
                     <Select
                         type={'designMob'}
                         options={options}
@@ -254,18 +296,32 @@ const ResultList = ({ tickets, loading, data, setFiltersRequest }: ResultListPro
                     </>
                 )}
 
-                {!showSkeleton && allMyHotels?.map((item) => (
-                    <div key={item.id}>
+                {!showSkeleton && !showErrorState && allMyHotels?.map((item, index) => (
+                    <div key={getHotelListItemKey(item) ?? `hotel-${index}`}>
                         <HotelCard request_id={data?.request_id} item={item} />
                     </div>
                 ))}
 
-                {!loading && (allMyHotels?.length || 0) === 0 && (
+                {showErrorState && (
                     <div className={styles.emptyState}>
                         <div className={styles.emptyStateIconWrap}>
                             <Icon name="tourist" size={80} color="var(--core_Orange)" />
                         </div>
                         <h3 className={styles.emptyStateTitle}>Ошибка</h3>
+                        <p className={styles.emptyStateText}>
+                            Не удалось загрузить туры. Пожалуйста, попробуйте изменить параметры поиска
+                            или повторите попытку позже.
+                        </p>
+                        <Button title={'Сбросить фильтры'} onClick={handleResetFilters} />
+                    </div>
+                )}
+
+                {showEmptyState && (
+                    <div className={styles.emptyState}>
+                        <div className={styles.emptyStateIconWrap}>
+                            <Icon name="tourist" size={80} color="var(--core_Orange)" />
+                        </div>
+                        <h3 className={styles.emptyStateTitle}>Туры не найдены</h3>
                         <p className={styles.emptyStateText}>
                             К сожалению, не найдено ни одного тура, соответствующего вашим критериям.
                             Пожалуйста, попробуйте изменить параметры поиска или вернитесь позже.
@@ -275,10 +331,15 @@ const ResultList = ({ tickets, loading, data, setFiltersRequest }: ResultListPro
                 )}
             </div>
 
-            {loadingMore && (
-                <p style={{ textAlign: 'center', padding: '10px' }}>
-                    Загрузка...
-                </p>
+            {hasMore && !showSkeleton && !showErrorState && (
+                <div className={styles.loadMoreSection}>
+                    <Button
+                        title={isLoadingMore ? 'Загрузка...' : 'Показать ещё'}
+                        onClick={loadNextPage}
+                        disabled={isLoadingMore}
+                    />
+                    <div ref={sentinelRef} className={styles.loadMoreSentinel} aria-hidden />
+                </div>
             )}
         </div>
     );

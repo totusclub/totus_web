@@ -48,8 +48,29 @@ export function canPayWithSbp(order: any): boolean {
   return sbp ? sbp.enable !== false : true;
 }
 
+export function isOrderCancelled(order: any): boolean {
+  if (!order) return false;
+
+  const lt = getLtOrderPackage(order);
+  const state = String(
+    lt?.state ?? order?.order_state ?? order?.state ?? '',
+  ).toLowerCase();
+
+  if (state.includes('cancel')) return true;
+
+  const statusForClient = String(
+    lt?.status_for_client ??
+    order?.package?.status_for_client ??
+    order?.status_for_client ??
+    '',
+  ).toLowerCase();
+
+  return statusForClient.includes('отмен');
+}
+
 export function isOrderAwaitingPayment(order: any): boolean {
   if (!order) return false;
+  if (isOrderCancelled(order)) return false;
 
   const payStatus = String(order.pay_status ?? '').toUpperCase();
   if (payStatus === 'RECONCILED') return false;

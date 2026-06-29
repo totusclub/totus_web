@@ -6,7 +6,7 @@ import styles from './home.module.css'
 import Icon from "@/components/icons/Icon";
 import { useRouter } from "next/router";
 import { useDispatch } from "react-redux";
-import { runFullSearchFlow, setHeaderName } from "@/store/slices/searchSlice";
+import { runFullSearchFlow, setHeaderName, setStartSearch } from "@/store/slices/searchSlice";
 import { AppDispatch } from "@/store";
 import { stayRangeFromDeparture } from "@/utils/calendarDateRange";
 
@@ -73,49 +73,47 @@ export default function PopularDestinations({ popularDestinations }: { popularDe
                 return;
             }
 
-            // Calculate date range (similar to searchForm)
-            // Parse nights from "7..9" format or use default
+            const toCountry = String(item?.iso2 || item?.to_country || '').trim();
+            if (!toCountry) {
+                return;
+            }
+
             const nightsValue = "7..9";
             const nightCount = parseInt(nightsValue.split('..')[0] || "7", 10);
             const dateRange = calculateStayDates(date, nightCount);
 
-            // Build params object matching SearchParams interface (same as searchForm)
             const params = {
                 from_city: "Moscow",
                 from_country: "RU",
-                to_country: item?.iso2 || item?.to_country || "",
-                to_city: "", // Empty string, not undefined
+                to_country: toCountry,
                 adults: "1",
-                kids: "0", // Default to "0" if not provided
-                kids_ages: [] as number[], // Empty array
+                kids: "0",
                 start_date: date,
-                nights: nightsValue, // "7..9" format
-                flex_dates: "2",
                 start_date_from: dateRange.start_date_from,
                 end_date_till: dateRange.end_date_till,
+                nights: nightsValue,
+                flex_dates: "2",
                 search_type: "package",
                 page_number: 1,
                 page_limit: 20,
-                sort_by: "relevance"
-                // hotel_ids is optional, not included for country search
+                sort_by: "relevance",
             };
 
-            // Build search params for Redux action (convert to proper types)
             const searchParams = {
                 from_city: params.from_city,
                 from_country: params.from_country,
                 to_country: params.to_country,
-                to_city: params.to_city || undefined,
                 adults: params.adults,
                 kids: params.kids,
-                kids_ages: params.kids_ages,
                 start_date: params.start_date,
+                start_date_from: params.start_date_from,
+                end_date_till: params.end_date_till,
                 nights: params.nights,
                 search_type: params.search_type,
                 flex_dates: Number(params.flex_dates),
                 page_number: params.page_number,
                 page_limit: params.page_limit,
-                sort_by: params.sort_by
+                sort_by: params.sort_by,
             };
 
             const filterParams = {
@@ -124,14 +122,12 @@ export default function PopularDestinations({ popularDestinations }: { popularDe
                 page_limit: 20,
                 sort_by: "relevance",
                 filter_stars: "3,4,5",
-                filter_meals: "AI"
+                filter_meals: "AI",
             };
 
-            // Set header name with destination name
             const destinationName = item?.name || item?.name_ru || item?.name_en || '';
             dispatch(setHeaderName(destinationName));
-
-            // Dispatch search flow
+            dispatch(setStartSearch(false));
             dispatch(
                 runFullSearchFlow({
                     searchParams,
@@ -139,12 +135,8 @@ export default function PopularDestinations({ popularDestinations }: { popularDe
                 })
             );
 
-            // Create URL with query params and navigate (like searchForm)
-            // Use the same params object for URL (createSearchUrl handles arrays and encoding)
             const url = createSearchUrl(params);
-            setTimeout(() => {
-                router.push(`/search?${url}`);
-            }, 500);
+            router.push(`/search?${url}`);
         },
         [router, date, dispatch]
     );
