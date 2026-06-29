@@ -5,6 +5,7 @@ import OrderItem from "@/components/profile/orderItem";
 import {useEffect, useState} from "react";
 import useAuth from "@/hooks/useAuth";
 import {getOrdersUsers} from "@/api/levelTravelApi";
+import { sortOrdersByNewest } from "@/utils/orderDisplay";
 
 
 const MyOrders = ()=> {
@@ -18,7 +19,7 @@ const MyOrders = ()=> {
         if(user){
             setLoading(true);
             getOrdersUsers(user?.id).then(res=>{
-                setOrders(res || [])
+                setOrders(sortOrdersByNewest(res || []))
                 setLoading(false);
             }).catch(() => {
                 setLoading(false);
@@ -65,8 +66,8 @@ const MyOrders = ()=> {
                                     </div>
                                 ))
                             ) : (
-                                orders.map((item: any, index: number) => (
-                                    <OrderItem key={index} item={item}/>
+                                orders.map((item: any) => (
+                                    <OrderItem key={item?.order_id ?? item?.id} item={item}/>
                                 ))
                             )}
                         </div>
