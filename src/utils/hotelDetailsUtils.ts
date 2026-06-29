@@ -189,7 +189,7 @@ export function buildHotelSearchParamsFromForm(
     source.adults && source.adults >= 1
       ? source.adults
       : parseInt(String(q.adults || '2'), 10) || 2;
-  const kids = source.kids ?? parseInt(String(q.kids || '0'), 10) || 0;
+  const kids = source.kids ?? (parseInt(String(q.kids || '0'), 10) || 0);
   const flexDates = 2;
 
   const hotelCountry = source.apiHotelData?.country;
