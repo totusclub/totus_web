@@ -3,17 +3,21 @@ import styles from '../hotelDetails.module.css';
 import VerticalSlider from "@/components/UI/verticalSlide";
 import Button from "@/components/UI/button";
 import Icon from "@/components/icons/Icon";
-import TrackPrices from "@/components/UI/trackPrices";
-import { createPackage } from "@/api/levelTravelApi";
 import { useRouter } from "next/router";
-import { findCheapestOfferForStartDate } from "@/utils/hotelDetailsUtils";
+import { findCheapestOfferForStartDate, getSearchNightsFromQuery } from "@/utils/hotelDetailsUtils";
 import {
     getOfferPriceTitle,
     getSearchTypeFromQuery,
-    navigateAfterPackageCreate,
 } from "@/utils/bookingFlowUtils";
 import HotelFavoriteButton from "@/components/hotelDetails/HotelFavoriteButton";
 import AuthModal from "@/components/auth";
+
+const CHOOSE_ROOM_SECTION_ID = "choose-room";
+
+const scrollToChooseRoomSection = () => {
+    const section = document.getElementById(CHOOSE_ROOM_SECTION_ID);
+    section?.scrollIntoView({ behavior: "smooth", block: "start" });
+};
 
 type HotelDetailsInfoProps = {
     hotel?: Record<string, unknown> | null;
@@ -34,8 +38,6 @@ const HotelDetailsInfo = ({
 }: HotelDetailsInfoProps) => {
     const router = useRouter();
     const searchType = getSearchTypeFromQuery(router.query);
-    const [priceTrack, setPriceTrack] = useState<boolean>(false);
-    const [loading, setLoading] = useState(false);
     const [authModalOpen, setAuthModalOpen] = useState(false);
 
     const resolvedHotelId =
@@ -54,17 +56,20 @@ const HotelDetailsInfo = ({
         return null;
     }, [hotel]);
 
-    const highlightOffer = useMemo(
-        () => findCheapestOfferForStartDate(rooms as any[], selectedRoomDate),
-        [rooms, selectedRoomDate]
+    const searchNights = useMemo(
+        () => getSearchNightsFromQuery(router.query),
+        [router.query],
     );
 
-    const handleBook = async (id: any) => {
-        setLoading(true);
-        const res = await createPackage({ request_id: router.query.request_id, tour_id: id });
-        setLoading(false);
-        navigateAfterPackageCreate(router, res.package.id, searchType);
+    const highlightOffer = useMemo(
+        () => findCheapestOfferForStartDate(rooms as any[], selectedRoomDate, searchNights),
+        [rooms, selectedRoomDate, searchNights],
+    );
+
+    const handleChooseRoomClick = () => {
+        scrollToChooseRoomSection();
     };
+
     const formatDate = useMemo(() => {
         if (!highlightOffer?.start_date) return "";
         const date = new Date(highlightOffer.start_date);
@@ -113,9 +118,7 @@ const HotelDetailsInfo = ({
                                     ) : null}
                                 </div>
                                 <Button
-                                    loading={loading}
-                                    disabled={highlightOffer?.id == null}
-                                    onClick={() => highlightOffer?.id != null && handleBook(highlightOffer.id)}
+                                    onClick={handleChooseRoomClick}
                                     title={"Выбрать номер"}
                                     full={true}
                                 />
@@ -129,11 +132,6 @@ const HotelDetailsInfo = ({
                                     помочь вам осуществить вашу мечту о путешествии!
                                 </p>
                             </div>
-                            <TrackPrices
-                                text={"Автоматические оповещения \n при изменении цен."}
-                                priceTrack={priceTrack}
-                                setPriceTrack={setPriceTrack}
-                            />
                         </div>
                     </div>
                 </div>

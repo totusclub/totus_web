@@ -1,14 +1,10 @@
 import styles from '../searchPage.module.css';
-import { useState } from "react";
-import TrackPrices from "@/components/UI/trackPrices";
 import TicketItem from "@/components/ticketItem";
 import SelectedTour from "@/components/selectedTour";
 import Progress from '@/components/UI/progress';
 
 
 const ResultTicketList = ({ flights, packages, loading }: any) => {
-    const [priceTrack, setPriceTrack] = useState(false);
-
     return (
         <div className={styles.resultList}>
             <Progress title={'Ищем подходящие туры'} loading={loading} />

@@ -168,15 +168,18 @@
 // // store/slices/searchSlice.ts
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import {checkSearchStatus, getGroupedHotels, startSearch} from "@/api/levelTravelApi";
-import { mergeHotelPages, normalizePageNumber } from '@/utils/searchResults';
+import { mergeHotelPages, parseUiPageNumber } from '@/utils/searchResults';
 
 let activeSearchPoll: ReturnType<typeof setInterval> | null = null;
+let activeSearchPollAttempts = 0;
+const MAX_SEARCH_POLL_ATTEMPTS = 40;
 
 function clearActiveSearchPoll() {
     if (activeSearchPoll) {
         clearInterval(activeSearchPoll);
         activeSearchPoll = null;
     }
+    activeSearchPollAttempts = 0;
 }
 
 interface SearchState {
@@ -223,8 +226,16 @@ export const runFullSearchFlow = createAsyncThunk(
             }
 
             return await new Promise(async (resolve, reject) => {
+                activeSearchPollAttempts = 0;
                 activeSearchPoll = setInterval(async () => {
                     try {
+                        activeSearchPollAttempts += 1;
+                        if (activeSearchPollAttempts > MAX_SEARCH_POLL_ATTEMPTS) {
+                            clearActiveSearchPoll();
+                            reject(new Error('Search timed out'));
+                            return;
+                        }
+
                         const statusMap = await checkSearchStatus(request_id);
 
                         dispatch(updateProgress(statusMap));
@@ -240,7 +251,11 @@ export const runFullSearchFlow = createAsyncThunk(
                                 filters = { ...filters, ...filterParams };
                             }
 
-                            const hotels = await getGroupedHotels({...filters});
+                            const hotels = await getGroupedHotels({
+                                ...filters,
+                                page_number: parseUiPageNumber(filters.page_number),
+                                page_limit: Math.max(1, Number(filters.page_limit) || 20),
+                            });
                             resolve({...hotels,...filters});
                         }
                     } catch (err) {
@@ -260,12 +275,18 @@ export const runFullSearchFlow = createAsyncThunk(
 export const searchFilters = createAsyncThunk(
     'search/filters',
     async (params: any, { rejectWithValue }) => {
+        clearActiveSearchPoll();
+
         if (!params?.request_id) {
             return rejectWithValue('Missing request_id');
         }
 
         try {
-            return await getGroupedHotels(params);
+            return await getGroupedHotels({
+                ...params,
+                page_number: parseUiPageNumber(params?.page_number),
+                page_limit: Math.max(1, Number(params?.page_limit) || 20),
+            });
         } catch (err: any) {
             return rejectWithValue(err.message || 'Failed to fetch grouped hotels');
         }
@@ -345,10 +366,11 @@ const searchSlice = createSlice({
                 state.error = action.payload as string;
             })
             .addCase(searchFilters.pending, (state, action) => {
+                clearActiveSearchPoll();
                 state.loading = true;
                 state.error = null;
                 state.progress = {};
-                const pageNumber = normalizePageNumber(action.meta?.arg?.page_number);
+                const pageNumber = parseUiPageNumber(action.meta?.arg?.page_number);
                 if (pageNumber === 1 && !state.loadMore) {
                     state.allMyHotels = [];
                 }
@@ -357,8 +379,8 @@ const searchSlice = createSlice({
                 state.hotels = action.payload;
                 state.loading = false;
                 state.loadMore = false;
-                const pageNumber = normalizePageNumber(
-                    action.meta?.arg?.page_number ?? action.payload.page_number,
+                const pageNumber = parseUiPageNumber(
+                    action.meta?.arg?.page_number ?? action.payload.ui_page_number,
                 );
                 const hotels = action.payload.hotels || [];
 

@@ -1,15 +1,52 @@
 import styles from './selectedtour.module.css';
 import Icon from "@/components/icons/Icon";
 import TourModel from "@/components/modals/tourModal";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { formatPrice } from '@/utils/formatPrice';
 
-
-
+const formatTourPrice = (amount: number) => `${formatPrice(amount)}₽`;
 
 const SelectedTour = ({ packages }: any) => {
     const [open, setOpen] = useState(false);
+    const [initialTotal, setInitialTotal] = useState<number | null>(null);
 
     const [timeLeft, setTimeLeft] = useState(15 * 60); // 15 minutes in seconds
+
+    useEffect(() => {
+        if (!packages) return;
+
+        const total =
+            (Number(packages.price) || 0) + (Number(packages.predicted_surcharge) || 0);
+
+        setInitialTotal((prev) => (prev == null ? total : prev));
+    }, [packages]);
+
+    const { totalPrice, oldTotal, showPriceComparison } = useMemo(() => {
+        const basePrice = Number(packages?.price) || 0;
+        const surcharge = Number(packages?.predicted_surcharge) || 0;
+        const total = basePrice + surcharge;
+
+        const apiOldCandidates = [
+            packages?.crossed_price,
+            packages?.old_price,
+            packages?.initial_price,
+            packages?.price_before,
+        ]
+            .map((value) => Number(value))
+            .filter((value) => Number.isFinite(value) && value > 0);
+
+        const apiOldTotal = apiOldCandidates.find((value) => value !== total) ?? null;
+        const initialOldTotal =
+            initialTotal != null && initialTotal !== total ? initialTotal : null;
+
+        const previousTotal = apiOldTotal ?? initialOldTotal;
+
+        return {
+            totalPrice: total,
+            oldTotal: previousTotal,
+            showPriceComparison: previousTotal != null && previousTotal !== total,
+        };
+    }, [packages, initialTotal]);
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -94,23 +131,18 @@ const SelectedTour = ({ packages }: any) => {
                             <p className={styles.actualePackageLable}>Гарантия лучшей цены <Icon name={'help'} size={14} /></p>
 
                             {/* Total Price (price + surcharge) */}
-                            <p className={styles.actualePackageTotal}>{(packages?.price + packages?.predicted_surcharge).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '\u202F')}₽</p>
+                            <p className={styles.actualePackageTotal}>{formatTourPrice(totalPrice)}</p>
 
-                            {/* Price Comparison (old price → new price) */}
-                            <div className={styles.actualePackageParices}>
-                                <del>{(packages?.price + packages?.predicted_surcharge).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '\u202F')}₽</del>
-
-                                <Icon name={'prev'} size={16} />
-                                {/* Old Price (crossed out) */}
-                                <p>{packages?.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '\u202F')}₽</p>
-                                {/* Arrow Icon */}
-
-                                {/* New Price */}
-
-                            </div>
+                            {showPriceComparison && oldTotal != null && (
+                                <div className={styles.actualePackageParices}>
+                                    <del>{formatTourPrice(oldTotal)}</del>
+                                    <Icon name={'prev'} size={16} />
+                                    <p>{formatTourPrice(totalPrice)}</p>
+                                </div>
+                            )}
 
                             {/* Additional Fees Text */}
-                            <p className={styles.feesText}>Доплаты и сборы +{packages?.predicted_surcharge.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '\u202F')}₽</p>
+                            <p className={styles.feesText}>Доплаты и сборы +{(Number(packages?.predicted_surcharge) || 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '\u202F')}₽</p>
 
                             {/* Price Check Countdown Timer */}
                             <div className={styles.timeDown}>

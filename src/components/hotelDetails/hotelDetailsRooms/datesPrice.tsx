@@ -1,5 +1,6 @@
 import styles from '../hotelDetails.module.css';
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
+import { formatPriceFromLabel } from '@/utils/formatPrice';
 
 interface DatesPriceProps {
     dates: Record<string, number | string>;
@@ -34,10 +35,21 @@ const DatesPrice = ({ dates,selectedDate, setSelectedDate }: DatesPriceProps) =>
     const handleDateChange = (date: string) => {
         setSelectedDate(date);
     };
+
+    const dateTabs = useMemo(
+        () =>
+            Object.entries(dates || {}).map(([date, price]) => ({
+                date,
+                label: formatDateToRussian(new Date(date)),
+                priceLabel: formatPriceFromLabel(price),
+            })),
+        [dates],
+    );
+
     return (
         <>
             <div className={styles.HotelDetailsDatePrices}>
-                {Object.entries(dates)?.map(([date, price], index) => (
+                {dateTabs.map(({ date, label, priceLabel }, index) => (
                     <div
                         onClick={() => handleDateChange(date)}
                         className={styles.HotelDetailsDatePrice}
@@ -46,7 +58,7 @@ const DatesPrice = ({ dates,selectedDate, setSelectedDate }: DatesPriceProps) =>
                                 selectedDate === date ? '--core_Orange' : '--bgSecondary'
                             })`,
                         }}
-                        key={index}
+                        key={date || index}
                     >
                         <p
                             style={{
@@ -55,16 +67,17 @@ const DatesPrice = ({ dates,selectedDate, setSelectedDate }: DatesPriceProps) =>
                                 })`,
                             }}
                         >
-                            {formatDateToRussian(new Date(date))}
+                            {label}
                         </p>
                         <p
+                            className={styles.HotelDetailsDatePriceValue}
                             style={{
                                 color: `var(${
                                     selectedDate === date ? '--textPrimaryB' : '--textTertiary'
                                 })`,
                             }}
                         >
-                            от {price} ₽
+                            {priceLabel}
                         </p>
                     </div>
                 ))}
@@ -72,7 +85,7 @@ const DatesPrice = ({ dates,selectedDate, setSelectedDate }: DatesPriceProps) =>
             </div>
             <div className={styles.HotelDetailsDatePricesMob}>
                 <div className={styles.HotelDetailsDatePricesMobRows}>
-                    {Object.entries(dates)?.map(([date, price], index) => (
+                    {dateTabs.map(({ date, label, priceLabel }, index) => (
                         <div
                             onClick={() => handleDateChange(date)}
                             className={styles.HotelDetailsDatePriceMob}
@@ -81,7 +94,7 @@ const DatesPrice = ({ dates,selectedDate, setSelectedDate }: DatesPriceProps) =>
                                     selectedDate === date ? '--core_Orange' : '--bgSecondary'
                                 })`,
                             }}
-                            key={index}
+                            key={date || index}
                         >
                             <p
                                 style={{
@@ -90,16 +103,17 @@ const DatesPrice = ({ dates,selectedDate, setSelectedDate }: DatesPriceProps) =>
                                     })`,
                                 }}
                             >
-                                {formatDateToRussian(new Date(date))}
+                                {label}
                             </p>
                             <p
+                                className={styles.HotelDetailsDatePriceValue}
                                 style={{
                                     color: `var(${
                                         selectedDate === date ? '--textPrimaryB' : '--textTertiary'
                                     })`,
                                 }}
                             >
-                                от {price} ₽
+                                {priceLabel}
                             </p>
                         </div>
                     ))}

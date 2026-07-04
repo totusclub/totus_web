@@ -9,7 +9,8 @@ import Image from "next/image";
 import { useMemo, useState } from "react";
 import { createPackage } from "@/api/levelTravelApi";
 import { useRouter } from "next/router";
-import { findCheapestOfferForStartDate } from "@/utils/hotelDetailsUtils";
+import { findCheapestOfferForStartDate, getSearchNightsFromQuery, offerMatchesSearchNights } from "@/utils/hotelDetailsUtils";
+import { formatPrice } from "@/utils/formatPrice";
 import {
     getOfferPriceTitle,
     getSearchTypeFromQuery,
@@ -57,6 +58,10 @@ const HotelDetailsRooms = ({
 }: HotelDetailsRoomsProps) => {
     const router = useRouter();
     const searchType = getSearchTypeFromQuery(router.query);
+    const searchNights = useMemo(
+        () => getSearchNightsFromQuery(router.query),
+        [router.query],
+    );
     const [isBooking, setIsBooking] = useState(false);
     const pricesList = useMemo((): Record<string, number> | undefined => {
         if (!rooms?.length) return undefined;
@@ -67,9 +72,10 @@ const HotelDetailsRooms = ({
             const offers = room?.offers || {};
             Object.values(offers).forEach((offerList) => {
                 if (!Array.isArray(offerList)) return;
-                offerList.forEach((item: { start_date?: string; analytics_price?: number }) => {
+                offerList.forEach((item: { start_date?: string; analytics_price?: number; nights_count?: number }) => {
                     const { start_date, analytics_price } = item;
                     if (!start_date || analytics_price == null) return;
+                    if (!offerMatchesSearchNights(item, searchNights)) return;
                     if (
                         grouped[start_date] === undefined ||
                         analytics_price < grouped[start_date]
@@ -86,11 +92,11 @@ const HotelDetailsRooms = ({
                 acc[date] = price;
                 return acc;
             }, {});
-    }, [rooms]);
+    }, [rooms, searchNights]);
 
     const highlightOffer = useMemo(
-        () => findCheapestOfferForStartDate(rooms, selectedDate),
-        [rooms, selectedDate]
+        () => findCheapestOfferForStartDate(rooms, selectedDate, searchNights),
+        [rooms, selectedDate, searchNights],
     );
 
     const roomTypeName = {
@@ -130,9 +136,7 @@ const HotelDetailsRooms = ({
     }, [highlightOffer?.start_date]);
 
     const priceFormatted =
-        highlightOffer?.price != null
-            ? String(highlightOffer.price).replace(/\B(?=(\d{3})+(?!\d))/g, "\u202F")
-            : "—";
+        highlightOffer?.price != null ? formatPrice(highlightOffer.price) : "—";
 
     const hotelCoords = resolveHotelCoords(hotelMap);
     const mapBalloon = [hotelMap?.name, hotelMap?.address].filter(Boolean).join(" — ");
@@ -159,7 +163,7 @@ const HotelDetailsRooms = ({
         <div className={'content'}>
             <div className={styles.HotelDetailsRoomsRow}>
                 <div className={styles.HotelDetailsRooms}>
-                    <div className={styles.HotelDetailsRoomsHead}>
+                    <div id="choose-room" className={styles.HotelDetailsRoomsHead}>
                         <p>Выберите номер</p>
                     </div>
                     <DatesPrice
@@ -207,7 +211,7 @@ const HotelDetailsRooms = ({
                         </div>
                     </div>
                     <div className={styles.HotelDetailsInfoPrice}>
-                        <p className={styles.HotelDetailsInfoPriceText}>от {priceFormatted}₽</p>
+                        <p className={styles.HotelDetailsInfoPriceText}>от {priceFormatted} ₽</p>
                         <div className={styles.HotelDetailsInfoDate}>
                             <p className={styles.HotelDetailsInfoDateTitle}>{getOfferPriceTitle(searchType)}</p>
                             <p className={styles.HotelDetailsInfoDateText}>

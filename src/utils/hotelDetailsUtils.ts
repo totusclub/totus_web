@@ -96,6 +96,23 @@ export const parseNightsValue = (nightsStr: string): number => {
   return isNaN(parsed) ? 7 : parsed;
 };
 
+export function getSearchNightsFromQuery(
+  query: Record<string, string | string[] | undefined>,
+): number | null {
+  const nightsRaw = Array.isArray(query.nights) ? query.nights[0] : query.nights;
+  if (!nightsRaw) return null;
+  const parsed = parseNightsValue(String(nightsRaw));
+  return parsed > 0 ? parsed : null;
+}
+
+export function offerMatchesSearchNights(
+  offer: { nights_count?: number | string | null },
+  searchNights: number | null,
+): boolean {
+  if (searchNights == null) return true;
+  return Number(offer?.nights_count) === searchNights;
+}
+
 /** All distinct offer start_date values from room list, sorted ascending */
 export const getAvailableStartDatesFromRooms = (rooms: any[] | undefined | null): string[] => {
   const set = new Set<string>();
@@ -114,7 +131,8 @@ export const getAvailableStartDatesFromRooms = (rooms: any[] | undefined | null)
 /** Cheapest offer (by analytics_price) for a given start_date across all rooms */
 export const findCheapestOfferForStartDate = (
   rooms: any[] | undefined | null,
-  startDate: string
+  startDate: string,
+  nightsCount?: number | null,
 ): any | null => {
   if (!rooms?.length || !startDate) return null;
   let best: any = null;
@@ -126,7 +144,8 @@ export const findCheapestOfferForStartDate = (
       if (!Array.isArray(offerList)) return;
       offerList.forEach((offer: any) => {
         if (offer?.start_date !== startDate) return;
-        const price = Number(offer.analytics_price);
+        if (!offerMatchesSearchNights(offer, nightsCount ?? null)) return;
+        const price = Number(offer.analytics_price ?? offer.price);
         const p = Number.isFinite(price) ? price : Infinity;
         if (p < bestPrice) {
           bestPrice = p;

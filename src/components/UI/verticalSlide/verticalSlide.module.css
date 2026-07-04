@@ -6,13 +6,33 @@
 
 .sliderWrapper {
   width: 92px;
-  height: 568px;
+  height: 480px;
+  position: relative;
+}
+
+.sliderWrapper :global(.slick-slider),
+.sliderWrapper :global(.slick-list),
+.sliderWrapper :global(.slick-track) {
+  height: 480px !important;
+}
+
+.sliderWrapper :global(.slick-list) {
+  overflow: hidden;
+}
+
+.sliderWrapper :global(.slick-slide) {
+  height: 80px !important;
+}
+
+.sliderWrapper :global(.slick-slide > div) {
+  height: 80px;
 }
 
 .thumbnail {
   cursor: pointer;
   width: 88px;
-  height: 88px;
+  height: 80px;
+  object-fit: cover;
   border: 2px solid transparent;
   transition: border 0.3s;
   border-radius: 8px;
@@ -31,7 +51,7 @@
 
 .selectedImage {
   width: 560px;
-  height: 556px;
+  height: 480px;
   object-fit: cover;
   border-radius: 13.666px;
   transition: opacity 0.2s ease;
@@ -63,13 +83,13 @@
 }
 .arrowTop,
 .arrowBottom {
-  left: 32%;
+  left: 50% !important;
+  right: auto !important;
   position: absolute;
-  z-index: 1;
+  z-index: 2;
   background: var(--bgPrimary);
   box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.12),
     0px 4px 12px 0px rgba(0, 0, 0, 0.12);
-  /*padding: 12px;*/
   display: flex;
   width: 32px;
   height: 32px;
@@ -77,16 +97,30 @@
   cursor: pointer;
   align-items: center;
   justify-content: center;
-  transform: translateY(-50%);
+  transform: translateX(-50%);
   transition: background-color 0.2s ease;
 }
 
+.sliderWrapper :global(.slick-prev),
+.sliderWrapper :global(.slick-next) {
+  width: 32px;
+  height: 32px;
+}
+
+.sliderWrapper :global(.slick-prev:before),
+.sliderWrapper :global(.slick-next:before) {
+  content: none;
+  display: none;
+}
+
 .arrowTop {
-  /*top: -20px;*/
+  top: 8px !important;
+  bottom: auto !important;
 }
 
 .arrowBottom {
-  bottom: -0px;
+  top: auto !important;
+  bottom: 8px !important;
 }
 #root:global(.slick-slide) {
   outline: none !important;
@@ -110,7 +144,7 @@
 /* Desktop skeleton styles */
 .image_placeholder {
   width: 560px;
-  height: 556px;
+  height: 480px;
   background: linear-gradient(90deg, var(--bgSecondary) 25%, var(--bgTertiary) 37%, var(--bgSecondary) 63%);
   background-size: 400% 100%; /* Important for shimmer effect */
   animation: placeholderShimmer 1.5s ease-in-out infinite;
@@ -123,6 +157,22 @@
   .sliderWrapper {
     width: 100%;
     height: 300px;
+  }
+  .sliderWrapper :global(.slick-slider),
+  .sliderWrapper :global(.slick-list),
+  .sliderWrapper :global(.slick-track) {
+    height: 300px !important;
+  }
+  .sliderWrapper :global(.slick-list) {
+    overflow: hidden;
+  }
+  .sliderWrapper :global(.slick-prev),
+  .sliderWrapper :global(.slick-next) {
+    display: none !important;
+  }
+  .sliderWrapper :global(.slick-slide),
+  .sliderWrapper :global(.slick-slide > div) {
+    height: 300px !important;
   }
   .showAllButton {
     display: none;

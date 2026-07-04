@@ -20,14 +20,14 @@ const SearchResult = ({ tickets, flights, packages, flightsFilter, setFiltersReq
     const { hotels, loading } = useSelector((state: RootState) => state.search);
 
     const selectedFilters = useMemo(() => {
-        if (!loading && hotels?.request_id) {
+        if (hotels?.request_id) {
             return {
                 request_id: hotels.request_id,
                 readyOperators: hotels?.readyOperators,
             };
         }
         return null;
-    }, [hotels, loading]);
+    }, [hotels?.request_id, hotels?.readyOperators]);
 
     return (
         <div className={'content'}>

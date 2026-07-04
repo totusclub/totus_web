@@ -1,0 +1,55 @@
+.mapRoot {
+  position: relative;
+  width: 100%;
+  height: 184px;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.mapRootExpanded {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  width: 100vw;
+  height: 100vh;
+  border-radius: 0;
+  background: var(--bgPrimary);
+}
+
+.mapSurface {
+  position: absolute;
+  inset: 0;
+}
+
+.fullscreenButton {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  color: var(--textPrimary);
+}
+
+.fullscreenButton:hover {
+  background: #fff;
+}
+
+.fullscreenButton svg {
+  width: 18px;
+  height: 18px;
+}
+
+.mapRootExpanded .fullscreenButton {
+  top: 16px;
+  right: 16px;
+}

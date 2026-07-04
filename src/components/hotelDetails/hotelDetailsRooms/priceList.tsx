@@ -8,6 +8,7 @@ import {
     getSearchTypeFromQuery,
     navigateAfterPackageCreate,
 } from "@/utils/bookingFlowUtils";
+import { formatPriceRub } from '@/utils/formatPrice';
 
 interface RoomItem {
     date: string;
@@ -39,7 +40,7 @@ const HotelDetailsPriceList: React.FC<HotelDetailsPriceListProps> = ({ item,sele
 
     const formatDate = (dateStr) => {
         const [year, month, day] = dateStr.split('-');
-        return `до ${day}.${month}`;
+        return `С ${day}.${month}`;
     };
     const roomTypeName= {
         BB:'Завтрак',
@@ -72,7 +73,7 @@ const HotelDetailsPriceList: React.FC<HotelDetailsPriceListProps> = ({ item,sele
                             <p>{room?.operator_name}</p>
                         </div>
                         <div>
-                            <p>{room?.price?.toString()?.replace(/\B(?=(\d{3})+(?!\d))/g, '\u202F')}₽</p>
+                            <p>{formatPriceRub(room?.price)}</p>
                             <p>{getOfferPriceSubtitle(searchType)}</p>
                         </div>
                         <div className={styles.mobButton}>

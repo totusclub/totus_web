@@ -1,6 +1,6 @@
 import styles from '../searchPage.module.css';
 import ItemSwitch from "@/components/UI/itemSwitch";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import Collapse from "@/components/UI/collapse";
 import CheckboxGroup from "@/components/UI/checkboxGroup";
@@ -10,7 +10,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import Icon from "@/components/icons/Icon";
 import Button from "@/components/UI/button";
 import { useRouter } from 'next/router';
-import { RootState } from '@/store';
+import { parseUiPageNumber } from '@/utils/searchResults';
 
 const Filters = ({ selectedFilters, allFilters, statistics }: any) => {
     const { hotels, loading, startSearchValid } = useSelector((state: RootState) => state.search);
@@ -18,7 +18,8 @@ const Filters = ({ selectedFilters, allFilters, statistics }: any) => {
     const dispatch = useDispatch();
     const [mobileModal, setMobileModal] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
-    const [price, setPrice] = useState([20, 100]);
+    const [price, setPrice] = useState<number[]>([0, 0]);
+    const [priceReady, setPriceReady] = useState(false);
     const [km, setKm] = useState([20, 60]);
     const [meter, setMeter] = useState([20, 60]);
     const [filters, setFilters] = useState({
@@ -31,6 +32,10 @@ const Filters = ({ selectedFilters, allFilters, statistics }: any) => {
         filter_stars: '3,4,5',
         sort_by: 'relevance'
     })
+    const priceInitializedRef = useRef(false);
+    const lastRequestIdRef = useRef<string | null>(null);
+    const lastFilterRequestKeyRef = useRef<string | null>(null);
+    const filtersSyncedRef = useRef(false);
 
     const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max);
 
@@ -40,13 +45,96 @@ const Filters = ({ selectedFilters, allFilters, statistics }: any) => {
         return { min, max: max >= min ? max : min };
     }, [allFilters?.prices?.min, allFilters?.prices?.max]);
 
-    const safePrice = useMemo(() => {
-        const min = priceBounds.min;
-        const max = priceBounds.max;
-        const left = clamp(Number(price?.[0] ?? min), min, max);
-        const right = clamp(Number(price?.[1] ?? max), min, max);
-        return [Math.min(left, right), Math.max(left, right)];
-    }, [price, priceBounds]);
+    const setPriceRange = (next: number[]) => {
+        const left = clamp(Number(next?.[0] ?? priceBounds.min), priceBounds.min, priceBounds.max);
+        const right = clamp(Number(next?.[1] ?? priceBounds.max), priceBounds.min, priceBounds.max);
+        setPrice([Math.min(left, right), Math.max(left, right)]);
+    };
+
+    const priceStep = useMemo(() => {
+        const span = priceBounds.max - priceBounds.min;
+        if (span <= 0) return 1;
+        if (span <= 10_000) return 100;
+        if (span <= 100_000) return 1_000;
+        if (span <= 500_000) return 5_000;
+        return 10_000;
+    }, [priceBounds.min, priceBounds.max]);
+
+    const getSearchBaseParams = () => {
+        const requestId = hotels?.request_id ?? selectedFilters?.request_id;
+        const readyOperators = hotels?.readyOperators ?? selectedFilters?.readyOperators;
+        if (!requestId) return null;
+        return { request_id: requestId, readyOperators };
+    };
+
+    const getMergedFilterParams = (overrides: Record<string, unknown> = {}) => {
+        const searchBase = getSearchBaseParams();
+        if (!searchBase) return null;
+
+        const merged = {
+            filter_instant_confirm: filters.filter_instant_confirm ?? hotels?.filter_instant_confirm ?? false,
+            filter_stars: filters.filter_stars ?? hotels?.filter_stars,
+            filter_meals: filters.filter_meals ?? hotels?.filter_meals,
+            filter_hotel_type: filters.filter_hotel_type ?? hotels?.filter_hotel_type,
+            filter_regions: filters.filter_regions ?? hotels?.filter_regions,
+            filter_line: filters.filter_line ?? hotels?.filter_line,
+            filter_operators: filters.filter_operators ?? hotels?.filter_operators,
+            filter_price_min: filters.filter_price_min ?? hotels?.filter_price_min ?? priceBounds.min,
+            filter_price_max: filters.filter_price_max ?? hotels?.filter_price_max ?? priceBounds.max,
+            sort_by: filters.sort_by ?? hotels?.sort_by ?? router.query.sort_by ?? 'relevance',
+            page_limit: 20,
+            page_number: 1,
+            ...searchBase,
+            ...overrides,
+        };
+
+        return {
+            ...merged,
+            page_number: parseUiPageNumber(merged.page_number),
+            page_limit: Math.max(1, Number(merged.page_limit) || 20),
+        };
+    };
+
+    const dispatchFilterSearch = (params: Record<string, unknown> | null) => {
+        if (!params?.request_id) return;
+
+        const requestKey = JSON.stringify(params);
+        if (requestKey === lastFilterRequestKeyRef.current) return;
+
+        lastFilterRequestKeyRef.current = requestKey;
+
+        const {
+            request_id: _requestId,
+            readyOperators: _readyOperators,
+            page_limit: _pageLimit,
+            page_number: _pageNumber,
+            ...filterFields
+        } = params;
+
+        setFilters((prev) => ({ ...prev, ...filterFields }));
+        dispatch(setAllMyHotels([]));
+        dispatch(searchFilters(params));
+    };
+
+    useEffect(() => {
+        if (!hotels?.request_id) return;
+
+        lastFilterRequestKeyRef.current = null;
+        filtersSyncedRef.current = false;
+
+        setFilters((prev) => ({
+            ...prev,
+            filter_instant_confirm: hotels.filter_instant_confirm ?? prev.filter_instant_confirm,
+            filter_stars: hotels.filter_stars ?? prev.filter_stars,
+            filter_meals: hotels.filter_meals ?? prev.filter_meals,
+            filter_hotel_type: hotels.filter_hotel_type ?? prev.filter_hotel_type,
+            filter_regions: hotels.filter_regions ?? prev.filter_regions,
+            filter_line: hotels.filter_line ?? prev.filter_line,
+            filter_operators: hotels.filter_operators ?? prev.filter_operators,
+            sort_by: hotels.sort_by ?? prev.sort_by,
+        }));
+        filtersSyncedRef.current = true;
+    }, [hotels?.request_id]);
 
     // Detect mobile screen
     useEffect(() => {
@@ -86,63 +174,54 @@ const Filters = ({ selectedFilters, allFilters, statistics }: any) => {
 
 
     useEffect(() => {
-        if (allFilters) {
-            const updatedFilters = {
-                ...filters,
-                filter_price_min: priceBounds.min,
-                filter_price_max: priceBounds.max
-            }
-            setFilters(updatedFilters)
-            setPendingFilters(updatedFilters)
+        if (!allFilters?.prices) return;
+
+        const requestId = selectedFilters?.request_id ?? null;
+        if (requestId !== lastRequestIdRef.current) {
+            lastRequestIdRef.current = requestId;
+            priceInitializedRef.current = false;
+            setPriceReady(false);
         }
-        const rawMin = Number(statistics?.shown_min_price ?? priceBounds.min);
-        const rawMax = Number(statistics?.shown_max_price ?? priceBounds.max);
-        setPrice([
-            clamp(rawMin, priceBounds.min, priceBounds.max),
-            clamp(rawMax, priceBounds.min, priceBounds.max),
-        ]);
-    }, [allFilters, statistics, priceBounds.min, priceBounds.max])
+
+        if (!priceInitializedRef.current) {
+            const initialMin = priceBounds.min;
+            const initialMax = priceBounds.max;
+
+            setPrice([initialMin, initialMax]);
+            setFilters((prev) => ({
+                ...prev,
+                filter_price_min: initialMin,
+                filter_price_max: initialMax,
+            }));
+            setPendingFilters((prev) => ({
+                ...prev,
+                filter_price_min: initialMin,
+                filter_price_max: initialMax,
+            }));
+            priceInitializedRef.current = true;
+            setPriceReady(true);
+        }
+    }, [allFilters?.prices?.min, allFilters?.prices?.max, priceBounds.min, priceBounds.max, selectedFilters?.request_id])
 
 
     // Apply filters function - used on mobile when Apply button is clicked
     const applyFilters = () => {
-        if (!selectedFilters?.request_id) return;
-
-        // Include current price state if it was changed
-        const filtersToApply = {
-            ...pendingFilters,
-            ...selectedFilters,
+        const filtersToApply = getMergedFilterParams({
             filter_price_min: price[0],
             filter_price_max: price[1],
-            page_limit: 20,
-            page_number: 1
-        }
+        });
+        if (!filtersToApply) return;
 
-        setFilters(filtersToApply)
-        dispatch(setAllMyHotels([]))
-        dispatch(searchFilters(filtersToApply))
-
-        const newQuery = {
-            ...router.query,
-            page_number: 1,
-        };
-
-        router.push(
-            {
-                pathname: router.pathname,
-                query: newQuery,
-            },
-            undefined,
-            { scroll: false }
-        );
-
-        setMobileModal(false)
+        setPendingFilters((prev) => ({ ...prev, ...filtersToApply }));
+        dispatchFilterSearch(filtersToApply);
+        setMobileModal(false);
     }
 
     const onChangeFilters = (key: string, value: string | boolean | number[]) => {
         // On mobile with modal open: only update pendingFilters, don't apply
         if (isMobile && mobileModal) {
             if (key === 'price' && Array.isArray(value)) {
+                setPriceRange(value);
                 setPendingFilters(prev => ({
                     ...prev,
                     filter_price_min: value[0],
@@ -162,40 +241,16 @@ const Filters = ({ selectedFilters, allFilters, statistics }: any) => {
         }
 
         // Desktop or mobile outside modal: apply immediately
-        if (!selectedFilters?.request_id) return;
-
         if (key === 'price' && Array.isArray(value)) {
-            const priceUpdate = {
-                ...filters,
-                ...selectedFilters,
+            setPriceRange(value);
+            dispatchFilterSearch(getMergedFilterParams({
                 filter_price_min: value[0],
                 filter_price_max: value[1],
-                page_limit: 20,
-                page_number: 1
-            }
-            dispatch(setAllMyHotels([]))
-            setFilters(priceUpdate)
-            dispatch(searchFilters(priceUpdate))
-        } else {
-            const paramsFilter = { ...filters, ...selectedFilters, [key]: value, page_limit: 20, page_number: 1 }
-            setFilters(paramsFilter)
-            dispatch(setAllMyHotels([]))
-            dispatch(searchFilters(paramsFilter))
+            }));
+            return;
         }
-        const newQuery = {
-            ...router.query,
-            page_number: 1,
-        };
 
-        router.push(
-            {
-                pathname: router.pathname,
-                query: newQuery,
-            },
-            undefined,
-            { scroll: false }
-        );
-
+        dispatchFilterSearch(getMergedFilterParams({ [key]: value }));
     }
 
     // Sync pendingFilters when opening modal on mobile
@@ -205,7 +260,7 @@ const Filters = ({ selectedFilters, allFilters, statistics }: any) => {
             setPendingFilters({ ...filters })
             // Also sync price state if filters have price values
             if (filters?.filter_price_min !== undefined && filters?.filter_price_max !== undefined) {
-                setPrice([filters.filter_price_min, filters.filter_price_max])
+                setPriceRange([filters.filter_price_min, filters.filter_price_max])
             }
         }
     }, [mobileModal, isMobile])
@@ -270,14 +325,14 @@ const Filters = ({ selectedFilters, allFilters, statistics }: any) => {
                     setIsOn={onChangeFilters}
                     isOn={instantConfirm}
                 />
-                {allFilters?.prices && filters?.filter_price_min > 0 && (
+                {allFilters?.prices && priceBounds.max >= priceBounds.min && priceReady && (
                     <Collapse title={'Стоимость, ₽'} open={true}>
                         <RangeInput
-                            step={1}
+                            step={priceStep}
                             min={priceBounds.min}
                             max={priceBounds.max}
-                            values={safePrice}
-                            setValues={setPrice}
+                            values={price}
+                            setValues={setPriceRange}
                             onChangeComplete={onChangeFilters}
                             name={'price'}
                             title={'Цена'}

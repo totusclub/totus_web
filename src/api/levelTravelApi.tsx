@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { API_BASE_URL } from '@/config/api';
+import { parseUiPageNumber, toApiPageNumber } from '@/utils/searchResults';
 
 const BASE_URL = API_BASE_URL;
 
@@ -20,6 +21,14 @@ function prepareStartSearchParams(raw: Record<string, unknown>): Record<string, 
             continue;
         }
         if (typeof value === 'object') continue;
+        if (key === 'page_number') {
+            out[key] = toApiPageNumber(value);
+            continue;
+        }
+        if (key === 'page_limit') {
+            out[key] = Math.max(1, Number(value) || 20);
+            continue;
+        }
         out[key] = value as string | number | boolean;
     }
     return out;
@@ -70,13 +79,23 @@ export async function getGroupedHotels(params: { request_id?: string; readyOpera
                 if (typeof value === 'string') return value.trim() !== '';
                 if (Array.isArray(value)) return value.length > 0;
                 return true;
+            }).map(([key, value]) => {
+                if (key === 'page_number') {
+                    return [key, toApiPageNumber(value)];
+                }
+                if (key === 'page_limit') {
+                    return [key, Math.max(1, Number(value) || 20)];
+                }
+                return [key, value];
             })
         );
+
+        const uiPageNumber = parseUiPageNumber(params?.page_number);
 
         const res = await axios.get(`${BASE_URL}/grouped-hotels`, {
             params: sanitizedParams,
         });
-        return { ...res.data, ...sanitizedParams };
+        return { ...res.data, ...sanitizedParams, ui_page_number: uiPageNumber };
     } catch (error) {
         console.error('Error getting grouped hotels:', error);
         throw error;

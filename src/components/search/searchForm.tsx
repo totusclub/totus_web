@@ -12,6 +12,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { runFullSearchFlow, setStartSearch } from '@/store/slices/searchSlice';
 import { RootState } from '@/store';
 import { stayRangeFromDeparture } from '@/utils/calendarDateRange';
+import { parseUiPageNumber } from '@/utils/searchResults';
 
 /** Same as historical `calculateStayDates` return value (3 keys only; no `start_date_till`). */
 function legacyStayDatesFromRange(startDateStr: string | Date, nightCount: number) {
@@ -149,6 +150,7 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
 
     const dispatch = useDispatch();
     const router = useRouter();
+    const lastAutoSearchKeyRef = useRef<string | null>(null);
     const [params, setParams] = useState<SearchParams>(() => {
         const today = new Date();
         const plus7 = new Date();
@@ -158,7 +160,7 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
             from_city: 'Moscow',
             from_country: 'RU',
             to_country: 'EG',
-            adults: '1',
+            adults: '2',
             nights: String(DEFAULT_INITIAL_NIGHTS),
             flex_dates: '0',
             ...interval,
@@ -189,10 +191,58 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
         return legacyStayDatesFromRange(startDateStr, nightCount);
     }
 
+    const parseSearchParams = (query: Record<string, string | string[]>): Partial<SearchParams> => {
+        const parsed: Partial<SearchParams> = {};
+
+        for (const key in query) {
+            const value = query[key];
+
+            if (key === 'kids_ages' || key === 'hotel_ids') {
+                const arrayValues = Array.isArray(value) ? value : [value];
+                parsed[key as keyof SearchParams] = arrayValues.map(Number);
+            } else if (key === 'search_type') {
+                const raw = Array.isArray(value) ? value[0] : value;
+                parsed.search_type = raw === 'hotel' ? 'hotel' : 'package';
+            } else if (key === 'page_number') {
+                parsed.page_number = parseUiPageNumber(Array.isArray(value) ? value[0] : value);
+            } else if (key === 'page_limit') {
+                parsed.page_limit = Math.max(1, Number(Array.isArray(value) ? value[0] : value) || 20);
+            } else {
+                parsed[key as keyof SearchParams] = Array.isArray(value) ? value[0] : value;
+            }
+        }
+
+        return parsed;
+    };
+
+    function getAutoSearchKey(query: Record<string, string | string[]>) {
+        const parsed = parseSearchParams(query);
+        const { page_number, page_limit, sort_by, ...coreSearchParams } = parsed as Record<string, unknown>;
+        return JSON.stringify(coreSearchParams);
+    }
+
+    useEffect(() => {
+        if (!router.isReady || pageName !== 'search') return;
+
+        const rawPage = router.query.page_number;
+        const pageValue = Array.isArray(rawPage) ? rawPage[0] : rawPage;
+        if (pageValue === '0' || Number(pageValue) <= 0) {
+            router.replace(
+                {
+                    pathname: router.pathname,
+                    query: { ...router.query, page_number: 1 },
+                },
+                undefined,
+                { shallow: true, scroll: false },
+            );
+        }
+    }, [router.isReady, router.query.page_number, pageName, router]);
+
     useEffect(() => {
         if (!router.isReady || (pageName !== 'search' && pageName !== 'home')) return;
 
         const parsed = parseSearchParams(router.query);
+        const autoSearchKey = getAutoSearchKey(router.query);
 
         setParams((prev) => {
             let next: SearchParams = { ...prev };
@@ -216,13 +266,20 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
                 next = { ...next, ...legacyStayDatesFromRange(plus7, getNightCount(next.nights)) };
             }
 
-            if (Object.keys(parsed).length > 0) {
-                queueMicrotask(() => startSearch(next));
+            if (
+                Object.keys(parsed).length > 0 &&
+                autoSearchKey !== lastAutoSearchKeyRef.current
+            ) {
+                lastAutoSearchKeyRef.current = autoSearchKey;
+                queueMicrotask(() => {
+                    dispatchSearch(next);
+                    dispatch(setStartSearch(false));
+                });
             }
 
             return next;
         });
-    }, [router.isReady, pageName]);
+    }, [router.isReady, router.query, pageName]);
 
     // Core search dispatch — always runs (used by explicit user clicks).
     const dispatchSearch = (data: SearchParams) => {
@@ -231,16 +288,16 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
                 searchParams: data,
                 filterParams: {
                     filter_instant_confirm: false,
-                    page_number: data.page_number,
-                    page_limit: data.page_limit,
+                    page_number: parseUiPageNumber(data.page_number),
+                    page_limit: Math.max(1, Number(data.page_limit) || 20),
                     sort_by: data?.sort_by || 'relevance'
                 }
             }));
         } else {
             const filterParams: Record<string, unknown> = {
                 filter_instant_confirm: false,
-                page_number: data.page_number,
-                page_limit: data.page_limit,
+                page_number: parseUiPageNumber(data.page_number),
+                page_limit: Math.max(1, Number(data.page_limit) || 20),
                 sort_by: data?.sort_by || 'relevance',
             };
             if (data.search_type !== 'hotel') {
@@ -254,15 +311,13 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
         }
     };
 
-    // Guarded auto-search — runs only once per navigation (used by the query-param effect).
+    // Guarded auto-search — kept for explicit flows that still call it.
     const startSearch = async (data: SearchParams) => {
         if (+data?.page_number === 1 && startSearchValid) {
             dispatchSearch(data);
             dispatch(setStartSearch(false));
         }
-    }
-
-
+    };
 
     const handleChange = (value: any, key: keyof SearchParams | 'form_date' | 'date_range' | 'sync_nights_from_dates', type?: string) => {
         if ((key as string) === 'sync_nights_from_dates') {
@@ -389,6 +444,8 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
         // Explicit user click: always run a fresh search (page 1), even if a
         // previous search already disabled the auto-search guard.
         const searchParams = { ...params, page_number: 1 };
+        const { page_number, page_limit, sort_by, ...coreSearchParams } = searchParams;
+        lastAutoSearchKeyRef.current = JSON.stringify(coreSearchParams);
         const url = createSearchUrl(searchParams);
         dispatchSearch(searchParams);
         // Keep the guard disabled so the /search query-param effect doesn't run it again.
@@ -413,28 +470,6 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
         });
 
         return queryParams.join('&');
-    };
-
-    const parseSearchParams = (query: Record<string, string | string[]>): Partial<SearchParams> => {
-        const parsed: Partial<SearchParams> = {};
-
-        for (const key in query) {
-            const value = query[key];
-
-            // Fields that are expected to be arrays
-            if (key === 'kids_ages' || key === 'hotel_ids') {
-                const arrayValues = Array.isArray(value) ? value : [value];
-                parsed[key as keyof SearchParams] = arrayValues.map(Number);
-            } else if (key === 'search_type') {
-                const raw = Array.isArray(value) ? value[0] : value;
-                parsed.search_type = raw === 'hotel' ? 'hotel' : 'package';
-            } else {
-                // Everything else is a string
-                parsed[key as keyof SearchParams] = Array.isArray(value) ? value[0] : value;
-            }
-        }
-
-        return parsed;
     };
 
     function formatDateToRussian(dateStr: string) {

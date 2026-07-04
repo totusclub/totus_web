@@ -4,8 +4,12 @@ import React from 'react';
 interface InputProps {
     value: string | number;
     onChange: (value: string | number) => void;
+    onFocus?: () => void;
+    onBlur?: () => void;
+    onKeyDown?: React.KeyboardEventHandler<HTMLInputElement>;
     placeholder?: string;
-    type?: 'text' | 'number' | 'email' | 'tel' | 'password'; // more specific types
+    type?: 'text' | 'number' | 'email' | 'tel' | 'password';
+    inputMode?: React.HTMLAttributes<HTMLInputElement>['inputMode'];
     label?: string;
     min?: number;
     max?: number;
@@ -18,8 +22,12 @@ interface InputProps {
 const Input: React.FC<InputProps> = ({
     value,
     onChange,
+    onFocus,
+    onBlur,
+    onKeyDown,
     placeholder,
     type = 'text',
+    inputMode,
     label,
     min,
     max,
@@ -61,9 +69,13 @@ const Input: React.FC<InputProps> = ({
                 {label && <label>{label}</label>}
                 <input
                     type={type}
+                    inputMode={inputMode}
                     value={value}
                     placeholder={placeholder}
                     onChange={handleChange}
+                    onFocus={onFocus}
+                    onBlur={onBlur}
+                    onKeyDown={onKeyDown}
                     min={type === 'number' && min !== undefined ? min : undefined}
                     max={type === 'number' && max !== undefined ? max : undefined}
                     maxLength={maxLength}

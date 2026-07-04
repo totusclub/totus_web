@@ -1,12 +1,11 @@
 import styles from '../searchPage.module.css';
 import Progress from "@/components/UI/progress";
 import HotelCard from "@/components/hotelCard";
-import TrackPrices from "@/components/UI/trackPrices";
 import { useEffect, useState, useMemo, useRef, useCallback } from "react";
 import { useRouter } from 'next/router';
 import { useDispatch, useSelector } from 'react-redux';
 import { setLoadMore, searchFilters, setAllMyHotels } from '@/store/slices/searchSlice';
-import { getHotelListItemKey } from '@/utils/searchResults';
+import { getHotelListItemKey, getNextPageNumber, hasMoreHotelResults, parseUiPageNumber } from '@/utils/searchResults';
 import { RootState } from '@/store';
 import Select from '@/components/UI/select';
 import Icon from "@/components/icons/Icon";
@@ -46,18 +45,19 @@ const ResultList = ({ tickets, loading, data, setFiltersRequest }: ResultListPro
 
     // Show skeletons only for a fresh search/filter/sort, not while appending more results.
     const showSkeleton = isSearching && !loadMore;
-    const [priceTrack, setPriceTrack] = useState(false);
     const loadMoreRef = useRef(false);
+    const autoLoadPageRef = useRef(1);
     const sentinelRef = useRef<HTMLDivElement | null>(null);
 
     const totalHotelsCount = Number(data?.hotels_count ?? hotels?.hotels_count ?? 0);
     const shownHotelsCount = allMyHotels?.length ?? 0;
     const lastPageSize = Number(data?.hotels?.length ?? hotels?.hotels?.length ?? 0);
-    const hasMore =
-        shownHotelsCount > 0 &&
-        (totalHotelsCount > 0
-            ? shownHotelsCount < totalHotelsCount
-            : lastPageSize >= PAGE_LIMIT);
+    const hasMore = hasMoreHotelResults({
+        shownCount: shownHotelsCount,
+        totalCount: totalHotelsCount,
+        lastPageSize,
+        pageLimit: PAGE_LIMIT,
+    });
     const isLoadingMore = loadMore && storeLoading;
 
     const options = [
@@ -198,7 +198,7 @@ const ResultList = ({ tickets, loading, data, setFiltersRequest }: ResultListPro
                 ...currentFilters,
                 ...selectedFilters,
                 page_limit: PAGE_LIMIT,
-                page_number: pageNumber,
+                page_number: parseUiPageNumber(pageNumber),
                 sort_by: sortBy,
             };
         },
@@ -216,8 +216,11 @@ const ResultList = ({ tickets, loading, data, setFiltersRequest }: ResultListPro
             return;
         }
 
-        const nextPage = Math.floor(shownHotelsCount / PAGE_LIMIT) + 1;
+        const nextPage = getNextPageNumber(shownHotelsCount, PAGE_LIMIT);
+        if (autoLoadPageRef.current >= nextPage) return;
+
         loadMoreRef.current = true;
+        autoLoadPageRef.current = nextPage;
 
         dispatch(setLoadMore(true));
         dispatch(searchFilters(buildFilterParams(nextPage)) as any);
@@ -236,6 +239,10 @@ const ResultList = ({ tickets, loading, data, setFiltersRequest }: ResultListPro
             loadMoreRef.current = false;
         }
     }, [storeLoading]);
+
+    useEffect(() => {
+        autoLoadPageRef.current = 1;
+    }, [hotels?.request_id, hotels?.filter_price_min, hotels?.filter_price_max, hotels?.sort_by]);
 
     useEffect(() => {
         if (!hasMore || showSkeleton || isLoadingMore) return;

@@ -29,7 +29,7 @@ const getAgeOptions = () => {
 };
 
 const People = ({ handleChange, value, className }: { handleChange: any; value: any; className?: string }) => {
-    const [adults, setAdults] = useState<number>(1);
+    const [adults, setAdults] = useState<number>(2);
     const [children, setChildren] = useState<number>(0);
     const [childrenAges, setChildrenAges] = useState<number[]>([]);
     const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -42,7 +42,7 @@ const People = ({ handleChange, value, className }: { handleChange: any; value: 
     // Initialize from value prop if provided
     useEffect(() => {
         if (value?.adults) {
-            setAdults(parseInt(value.adults) || 1);
+            setAdults(parseInt(value.adults) || 2);
         }
         if (value?.kids) {
             const kidsCount = parseInt(value.kids) || 0;

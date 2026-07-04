@@ -86,7 +86,7 @@ export default function PopularDestinations({ popularDestinations }: { popularDe
                 from_city: "Moscow",
                 from_country: "RU",
                 to_country: toCountry,
-                adults: "1",
+                adults: "2",
                 kids: "0",
                 start_date: date,
                 start_date_from: dateRange.start_date_from,
