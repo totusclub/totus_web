@@ -305,7 +305,7 @@ const ResultList = ({ tickets, loading, data, setFiltersRequest }: ResultListPro
 
                 {!showSkeleton && !showErrorState && allMyHotels?.map((item, index) => (
                     <div key={getHotelListItemKey(item) ?? `hotel-${index}`}>
-                        <HotelCard request_id={data?.request_id} item={item} />
+                        <HotelCard request_id={data?.request_id ?? hotels?.request_id} item={item} />
                     </div>
                 ))}
 

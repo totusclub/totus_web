@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { startSearch } from '@/api/levelTravelApi';
 import SelectDate from '@/components/search/date';
 import Nights from '@/components/search/nights';
 import People from '@/components/search/people';
 import Button from '@/components/UI/button';
-import { parseNightsValue, buildHotelSearchParamsFromForm, normalizeQueryDate, getDefaultStartDate } from '@/utils/hotelDetailsUtils';
+import { parseNightsValue, buildHotelSearchParamsFromForm, normalizeQueryDate, getDefaultStartDate, parseFlexDatesValue, HOTEL_DETAILS_DEFAULT_FLEX_DATES } from '@/utils/hotelDetailsUtils';
 import { endYmdAfterNights } from '@/utils/calendarDateRange';
 import styles from './hotelSearchSection.module.css';
 
@@ -25,6 +25,7 @@ interface ApiHotelData {
 interface SearchParamsSnapshot {
   startDateISO: string;
   nights: number;
+  flexDates: number;
   adults: number;
   kids: number;
   kidsAges: number[];
@@ -48,9 +49,10 @@ interface InitialSearchParams {
 interface HotelSearchSectionProps {
   hotelId: string | null;
   apiHotelData?: ApiHotelData | null;
-  onSearchComplete?: (requestId: string) => void;
-  onParamsChange?: (snapshot: SearchParamsSnapshot) => void;
+  onSearchComplete?: (requestId: string, snapshot: SearchParamsSnapshot) => void;
   initialSearchParams?: InitialSearchParams | null;
+  /** Current search session — resets the form when URL request_id changes (e.g. browser back). */
+  searchSessionKey?: string | null;
   runStart?: boolean;
 }
 
@@ -59,6 +61,7 @@ interface SearchParamsState {
   /** Checkout / return date from calendar; nights slider does not overwrite until changed */
   returnDate: string;
   nights: number;
+  flexDates: number;
   adults: number;
   kids: number;
   kidsAges: number[];
@@ -71,16 +74,38 @@ interface SearchParamsState {
 const DEFAULT_ADULTS = 2;
 const DEFAULT_KIDS = 0;
 
+function buildParamsFromSource(source: InitialSearchParams | null): SearchParamsState {
+  const initNights = parseNightsValue(String(source?.nights ?? ''));
+  const initDep =
+    normalizeQueryDate(source?.start_date) || getDefaultStartDate();
+  return {
+    departureDate: initDep,
+    returnDate:
+      normalizeQueryDate(source?.end_date_till) ||
+      endYmdAfterNights(initDep, initNights),
+    nights: initNights,
+    flexDates: parseFlexDatesValue(
+      source?.flex_dates,
+      HOTEL_DETAILS_DEFAULT_FLEX_DATES,
+    ),
+    adults: parseInt(source?.adults || String(DEFAULT_ADULTS), 10) || DEFAULT_ADULTS,
+    kids: parseInt(source?.kids || String(DEFAULT_KIDS), 10) || DEFAULT_KIDS,
+    kidsAges: source?.kids_ages || [],
+  };
+}
+
 // ============================================================================
 // Component
 // ============================================================================
+
+export type { SearchParamsSnapshot };
 
 const HotelSearchSection: React.FC<HotelSearchSectionProps> = ({
   hotelId,
   apiHotelData,
   onSearchComplete,
-  onParamsChange,
   initialSearchParams,
+  searchSessionKey,
   runStart = false,
 }) => {
   // ==========================================================================
@@ -89,6 +114,10 @@ const HotelSearchSection: React.FC<HotelSearchSectionProps> = ({
   
   const [isSearching, setIsSearching] = useState(false);
   const [hasUserChangedParams, setHasUserChangedParams] = useState(false);
+  const paramsRef = useRef<SearchParamsState | null>(null);
+  const prevHotelIdRef = useRef<string | null>(null);
+  const prevSearchSessionRef = useRef<string | null>(null);
+  const searchInFlightRef = useRef(false);
   
   const sourceParams = useMemo(
     () => initialSearchParams || null,
@@ -96,70 +125,52 @@ const HotelSearchSection: React.FC<HotelSearchSectionProps> = ({
   );
 
   // Initialize form state from sourceParams or defaults
-  const [params, setParams] = useState<SearchParamsState>(() => {
-    const initNights = parseNightsValue(String(sourceParams?.nights ?? ''));
-    const initDep =
-      normalizeQueryDate(sourceParams?.start_date) || getDefaultStartDate();
-    return {
-      departureDate: initDep,
-      returnDate:
-        normalizeQueryDate(sourceParams?.end_date_till) ||
-        endYmdAfterNights(initDep, initNights),
-      nights: initNights,
-      adults: parseInt(sourceParams?.adults || String(DEFAULT_ADULTS), 10) || DEFAULT_ADULTS,
-      kids: parseInt(sourceParams?.kids || String(DEFAULT_KIDS), 10) || DEFAULT_KIDS,
-      kidsAges: sourceParams?.kids_ages || [],
-    };
-  });
+  const [params, setParams] = useState<SearchParamsState>(() =>
+    buildParamsFromSource(sourceParams),
+  );
+
+  paramsRef.current = params;
 
   // ==========================================================================
   // Effects
   // ==========================================================================
 
-  // Sync params with sourceParams when they change externally
-  // Only syncs if user hasn't made manual changes
+  // Reset form when hotel or search session (request_id) changes — e.g. browser back.
   useEffect(() => {
-    if (!sourceParams?.start_date || hasUserChangedParams) return;
+    if (!hotelId || !sourceParams?.start_date) return;
 
-    const nights = parseNightsValue(String(sourceParams.nights ?? ''));
-    const departureDate = normalizeQueryDate(sourceParams.start_date) || getDefaultStartDate();
-    const newParams = {
-      departureDate,
-      nights,
-      returnDate:
-        normalizeQueryDate(sourceParams.end_date_till) ||
-        endYmdAfterNights(departureDate, nights),
-      adults: parseInt(sourceParams.adults || String(DEFAULT_ADULTS), 10) || DEFAULT_ADULTS,
-      kids: parseInt(sourceParams.kids || String(DEFAULT_KIDS), 10) || DEFAULT_KIDS,
-      kidsAges: sourceParams.kids_ages || [],
-    };
+    const isNewHotel = prevHotelIdRef.current !== hotelId;
+    const isNewSession =
+      searchSessionKey != null && prevSearchSessionRef.current !== searchSessionKey;
 
-    setParams(prev => {
-      // Skip update if values haven't changed
-      const hasChanged = 
-        prev.departureDate !== newParams.departureDate ||
-        prev.returnDate !== newParams.returnDate ||
-        prev.nights !== newParams.nights ||
-        prev.adults !== newParams.adults ||
-        prev.kids !== newParams.kids ||
-        JSON.stringify(prev.kidsAges) !== JSON.stringify(newParams.kidsAges);
+    if (isNewHotel) {
+      prevHotelIdRef.current = hotelId;
+    }
+    if (isNewSession) {
+      prevSearchSessionRef.current = searchSessionKey ?? null;
+    }
 
-      return hasChanged ? newParams : prev;
-    });
-  }, [sourceParams, hasUserChangedParams]);
+    if (isNewHotel || isNewSession) {
+      setParams(buildParamsFromSource(sourceParams));
+      setHasUserChangedParams(false);
+      return;
+    }
 
-  // Notify parent of param changes
-  useEffect(() => {
-    if (onParamsChange && params.departureDate) {
-      onParamsChange({
-        startDateISO: params.departureDate,
-        nights: params.nights,
-        adults: params.adults,
-        kids: params.kids,
-        kidsAges: params.kidsAges,
+    if (!hasUserChangedParams) {
+      const next = buildParamsFromSource(sourceParams);
+      setParams((prev) => {
+        const changed =
+          prev.departureDate !== next.departureDate ||
+          prev.returnDate !== next.returnDate ||
+          prev.nights !== next.nights ||
+          prev.flexDates !== next.flexDates ||
+          prev.adults !== next.adults ||
+          prev.kids !== next.kids ||
+          JSON.stringify(prev.kidsAges) !== JSON.stringify(next.kidsAges);
+        return changed ? next : prev;
       });
     }
-  }, [params, onParamsChange]);
+  }, [hotelId, searchSessionKey, sourceParams, hasUserChangedParams]);
 
   // Auto-trigger search when runStart is true
   useEffect(() => {
@@ -241,6 +252,11 @@ const HotelSearchSection: React.FC<HotelSearchSectionProps> = ({
     }
     if (key === 'nights') {
       handleNightsChange(value as string | number);
+      return;
+    }
+    if (key === 'flex_dates') {
+      const flexDates = parseFlexDatesValue(value, 0);
+      updateParams({ flexDates });
     }
   }, [handleDateChange, handleNightsChange, updateParams]);
 
@@ -272,41 +288,58 @@ const HotelSearchSection: React.FC<HotelSearchSectionProps> = ({
   // Search Logic
   // ==========================================================================
 
-  const buildSearchParams = useCallback((): Record<string, unknown> | null => {
+  const buildSearchParams = useCallback((
+    current: SearchParamsState,
+  ): Record<string, unknown> | null => {
     if (!hotelId) return null;
 
     return buildHotelSearchParamsFromForm(hotelId, {
       query: sourceParams,
       apiHotelData,
-      departureDate: params.departureDate,
-      returnDate: params.returnDate,
-      nights: params.nights,
-      adults: params.adults,
-      kids: params.kids,
-      kidsAges: params.kidsAges,
+      departureDate: current.departureDate,
+      returnDate: current.returnDate,
+      nights: current.nights,
+      flexDates: current.flexDates,
+      adults: current.adults,
+      kids: current.kids,
+      kidsAges: current.kidsAges,
     });
-  }, [params, hotelId, apiHotelData, sourceParams]);
+  }, [hotelId, apiHotelData, sourceParams]);
 
   const handleSearch = useCallback(async () => {
-    const searchParams = buildSearchParams();
+    if (searchInFlightRef.current) return;
+
+    const current = paramsRef.current ?? params;
+    const searchParams = buildSearchParams(current);
 
     if (!searchParams) {
       return;
     }
 
+    const snapshot: SearchParamsSnapshot = {
+      startDateISO: current.departureDate,
+      nights: current.nights,
+      flexDates: current.flexDates,
+      adults: current.adults,
+      kids: current.kids,
+      kidsAges: current.kidsAges,
+    };
+
     try {
+      searchInFlightRef.current = true;
       setIsSearching(true);
       const response = await startSearch(searchParams);
 
       if (response?.request_id && onSearchComplete) {
-        onSearchComplete(response.request_id);
+        onSearchComplete(response.request_id, snapshot);
       }
     } catch (error) {
       console.error('[HotelSearchSection] Error starting search:', error);
     } finally {
+      searchInFlightRef.current = false;
       setIsSearching(false);
     }
-  }, [buildSearchParams, onSearchComplete]);
+  }, [params, buildSearchParams, onSearchComplete]);
 
   // ==========================================================================
   // Render
@@ -326,12 +359,15 @@ const HotelSearchSection: React.FC<HotelSearchSectionProps> = ({
                 handleChange={handleDateFieldChange}
                 value={defaultDate}
                 endValue={calendarRangeEnd}
+                flexDates={params.flexDates}
+                departureOnlyLabel
                 className={styles.radioFrom}
               />
               <Nights
-                handleChange={handleNightsChange}
+                handleChange={handleDateFieldChange}
                 name="nights"
                 value={params.nights.toString()}
+                flexDates={String(params.flexDates)}
               />
               <People
                 handleChange={handleTouristsChange}

@@ -2,7 +2,8 @@
  * Utility functions for hotel details page
  */
 
-import { endYmdAfterNights } from '@/utils/calendarDateRange';
+import { endYmdAfterNights, listFlexDepartureDates } from '@/utils/calendarDateRange';
+import { getSearchTypeFromQuery } from '@/utils/bookingFlowUtils';
 
 /**
  * Gets default start date (7 days from today) in YYYY-MM-DD format
@@ -57,7 +58,15 @@ export function normalizeQueryDate(value: unknown): string | undefined {
   return `${year}-${month}-${day}`;
 }
 
-export const parseSearchParamsFromQuery = (query: Record<string, string | string[] | undefined>): ParsedSearchParams | null => {
+export const parseSearchParamsFromQuery = (
+  query: Record<string, string | string[] | undefined>,
+  options?: NightsConstraintOptions,
+): ParsedSearchParams | null => {
+  const defaultFlex = options?.defaultFlexDates;
+  const flexRaw = query.flex_dates
+    ? (typeof query.flex_dates === 'string' ? query.flex_dates : String(query.flex_dates))
+    : undefined;
+
   return {
     from_city: queryParam(query, 'from_city'),
     from_country: queryParam(query, 'from_country'),
@@ -74,9 +83,12 @@ export const parseSearchParamsFromQuery = (query: Record<string, string | string
     end_date_till: queryParam(query, 'end_date_till'),
     nights: queryParam(query, 'nights'),
     search_type: queryParam(query, 'search_type'),
-    flex_dates: query.flex_dates
-      ? (typeof query.flex_dates === 'string' ? query.flex_dates : String(query.flex_dates))
-      : undefined,
+    flex_dates:
+      flexRaw != null && flexRaw !== ''
+        ? flexRaw
+        : defaultFlex != null
+          ? String(defaultFlex)
+          : undefined,
   };
 };
 
@@ -105,12 +117,272 @@ export function getSearchNightsFromQuery(
   return parsed > 0 ? parsed : null;
 }
 
+export function parseNightsRange(nightsStr: string): { min: number; max: number } {
+  const rangeMatch = nightsStr.match(/^(\d+)\.\.(\d+)$/);
+  if (rangeMatch) {
+    const min = parseInt(rangeMatch[1], 10);
+    const max = parseInt(rangeMatch[2], 10);
+    if (Number.isFinite(min) && Number.isFinite(max)) {
+      return { min: Math.min(min, max), max: Math.max(min, max) };
+    }
+  }
+
+  const single = parseNightsValue(nightsStr);
+  return { min: single, max: single };
+}
+
+/** Hotel details page defaults to ±2 nights / dates when flex_dates is absent from the URL. */
+export const HOTEL_DETAILS_DEFAULT_FLEX_DATES = 2;
+
+export function parseFlexDatesValue(
+  value: unknown,
+  defaultWhenMissing = 0,
+): number {
+  if (value == null || value === '') return defaultWhenMissing;
+  const parsed = parseInt(String(value), 10);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
+}
+
+function getFlexDatesFromQuery(
+  query: Record<string, string | string[] | undefined>,
+  defaultWhenMissing = 0,
+): number {
+  const flexRaw = Array.isArray(query.flex_dates) ? query.flex_dates[0] : query.flex_dates;
+  return parseFlexDatesValue(flexRaw, defaultWhenMissing);
+}
+
+export function getSearchNightsRangeFromQuery(
+  query: Record<string, string | string[] | undefined>,
+  defaultFlexDates = 0,
+): { min: number; max: number } | null {
+  const nightsRaw = Array.isArray(query.nights) ? query.nights[0] : query.nights;
+  if (!nightsRaw) return null;
+
+  const nightsStr = String(nightsRaw);
+  if (/^\d+\.\.\d+$/.test(nightsStr)) {
+    return parseNightsRange(nightsStr);
+  }
+
+  const baseNights = parseNightsValue(nightsStr);
+  const flexDates = getFlexDatesFromQuery(query, defaultFlexDates);
+  if (flexDates > 0) {
+    return { min: baseNights, max: baseNights + flexDates };
+  }
+
+  return { min: baseNights, max: baseNights };
+}
+
 export function offerMatchesSearchNights(
   offer: { nights_count?: number | string | null },
   searchNights: number | null,
+  nightsRange?: { min: number; max: number } | null,
 ): boolean {
+  const nights = Number(offer?.nights_count);
+
+  if (!Number.isFinite(nights)) {
+    return searchNights == null && !nightsRange;
+  }
+
+  if (nightsRange) {
+    return nights >= nightsRange.min && nights <= nightsRange.max;
+  }
+
   if (searchNights == null) return true;
-  return Number(offer?.nights_count) === searchNights;
+  return nights === searchNights;
+}
+
+/** Match only the exact nights from the search request (ignores flex_dates range). */
+export function matchesExactSearchNights(
+  offer: { nights_count?: number | string | null },
+  searchNights: number | null,
+): boolean {
+  return offerMatchesSearchNights(offer, searchNights, null);
+}
+
+export type NightsConstraint = {
+  searchNights: number | null;
+  nightsRange: { min: number; max: number } | null;
+};
+
+export type NightsConstraintOptions = {
+  /** Applied when `flex_dates` is missing from the query (hotel page uses 2). */
+  defaultFlexDates?: number;
+};
+
+/** Room display matches nights + flex_dates from the URL (exact or range). */
+export function getNightsConstraintFromQuery(
+  query: Record<string, string | string[] | undefined>,
+  options?: NightsConstraintOptions,
+): NightsConstraint {
+  const defaultFlex = options?.defaultFlexDates ?? 0;
+  const searchNights = getSearchNightsFromQuery(query);
+  const nightsRange = getSearchNightsRangeFromQuery(query, defaultFlex);
+  return { searchNights, nightsRange };
+}
+
+export function offerMatchesNightsConstraint(
+  offer: { nights_count?: number | string | null },
+  constraint: NightsConstraint,
+): boolean {
+  return offerMatchesSearchNights(offer, constraint.searchNights, constraint.nightsRange);
+}
+
+export function filterRoomsByNightsConstraint(
+  rooms: unknown[] | null | undefined,
+  constraint: NightsConstraint,
+): unknown[] {
+  return filterRoomsByOfferNights(rooms, constraint.searchNights, constraint.nightsRange);
+}
+
+/** Keep only offers that match the nights constraint. */
+export function filterRoomsByOfferNights(
+  rooms: unknown[] | null | undefined,
+  searchNights: number | null,
+  nightsRange?: { min: number; max: number } | null,
+): unknown[] {
+  if (!rooms?.length) return [];
+  if (searchNights == null && !nightsRange) return rooms;
+
+  return rooms
+    .map((room) => {
+      const roomRecord = room as { offers?: Record<string, unknown[]> };
+      const filteredOffers: Record<string, unknown[]> = {};
+
+      Object.entries(roomRecord.offers ?? {}).forEach(([mealType, offerList]) => {
+        const offers = (offerList ?? []).filter((offer) =>
+          offerMatchesSearchNights(
+            offer as { nights_count?: number | string | null },
+            searchNights,
+            nightsRange ?? null,
+          ),
+        );
+
+        if (offers.length > 0) {
+          filteredOffers[mealType] = offers;
+        }
+      });
+
+      if (Object.keys(filteredOffers).length === 0) return null;
+      return { ...roomRecord, offers: filteredOffers };
+    })
+    .filter(Boolean);
+}
+
+export function getOfferPriceValue(offer: {
+  analytics_price?: number | string | null;
+  price?: number | string | null;
+}): number | null {
+  const value = Number(offer.analytics_price ?? offer.price);
+  return Number.isFinite(value) ? value : null;
+}
+
+/** Collect sorted start dates from room offers that match the nights constraint. */
+export function getAvailableDatesFromFilteredRooms(
+  rooms: unknown[] | null | undefined,
+  searchNights: number | null,
+  nightsRange?: { min: number; max: number } | null,
+): string[] {
+  const dates = new Set<string>();
+
+  rooms?.forEach((room) => {
+    const offers = (room as { offers?: Record<string, unknown[]> })?.offers ?? {};
+    Object.values(offers).forEach((offerList) => {
+      if (!Array.isArray(offerList)) return;
+      offerList.forEach((offer) => {
+        const record = offer as { start_date?: string; nights_count?: number | string | null };
+        if (!record.start_date) return;
+        if (!offerMatchesSearchNights(record, searchNights, nightsRange)) return;
+        dates.add(String(record.start_date));
+      });
+    });
+  });
+
+  return Array.from(dates).sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
+}
+
+export function getSearchStartDateFromQuery(
+  query: Record<string, string | string[] | undefined>,
+): string | null {
+  return normalizeQueryDate(queryParam(query, 'start_date')) ?? null;
+}
+
+/** Departure dates in the ±flex_dates window from the URL search date. */
+export function getFlexDepartureDatesFromQuery(
+  query: Record<string, string | string[] | undefined>,
+  defaultFlexDates = 0,
+): string[] {
+  const startDate = getSearchStartDateFromQuery(query);
+  if (!startDate) return [];
+  const flex = getFlexDatesFromQuery(query, defaultFlexDates);
+  return listFlexDepartureDates(startDate, flex);
+}
+
+/**
+ * Room date tabs: show full ±flex_dates window when a departure date is known.
+ */
+export function getAvailableDepartureDatesForHotelRooms(
+  rooms: unknown[] | null | undefined,
+  query: Record<string, string | string[] | undefined>,
+  defaultFlexDates = HOTEL_DETAILS_DEFAULT_FLEX_DATES,
+  overrides?: { startDate?: string | null; flexDates?: number },
+): string[] {
+  const startDate = overrides?.startDate ?? getSearchStartDateFromQuery(query);
+  const flex =
+    overrides?.flexDates ??
+    getFlexDatesFromQuery(query, defaultFlexDates);
+
+  if (startDate && flex > 0) {
+    return listFlexDepartureDates(startDate, flex);
+  }
+
+  const constraint = getNightsConstraintFromQuery(query, { defaultFlexDates });
+  return getAvailableDatesFromFilteredRooms(
+    rooms,
+    constraint.searchNights,
+    constraint.nightsRange,
+  );
+}
+
+/** Cheapest offer price per start date (undefined when no matching offers). */
+export function buildMinOfferPricesByDate(
+  rooms: unknown[] | null | undefined,
+  dates: string[],
+  searchNights: number | null,
+  nightsRange?: { min: number; max: number } | null,
+): Record<string, number | undefined> {
+  const dateSet = new Set(dates);
+  const grouped: Record<string, number | undefined> = {};
+  dates.forEach((date) => {
+    grouped[date] = undefined;
+  });
+
+  rooms?.forEach((room) => {
+    const offers = (room as { offers?: Record<string, unknown[]> })?.offers ?? {};
+    Object.values(offers).forEach((offerList) => {
+      if (!Array.isArray(offerList)) return;
+      offerList.forEach((offer) => {
+        const record = offer as {
+          start_date?: string;
+          nights_count?: number | string | null;
+          analytics_price?: number;
+          price?: number;
+        };
+        const { start_date } = record;
+        if (!start_date || !dateSet.has(start_date)) return;
+        if (!offerMatchesSearchNights(record, searchNights, nightsRange)) return;
+
+        const offerPrice = getOfferPriceValue(record);
+        if (offerPrice == null) return;
+
+        const current = grouped[start_date];
+        if (current === undefined || offerPrice < current) {
+          grouped[start_date] = offerPrice;
+        }
+      });
+    });
+  });
+
+  return grouped;
 }
 
 /** All distinct offer start_date values from room list, sorted ascending */
@@ -133,6 +405,7 @@ export const findCheapestOfferForStartDate = (
   rooms: any[] | undefined | null,
   startDate: string,
   nightsCount?: number | null,
+  nightsRange?: { min: number; max: number } | null,
 ): any | null => {
   if (!rooms?.length || !startDate) return null;
   let best: any = null;
@@ -144,11 +417,11 @@ export const findCheapestOfferForStartDate = (
       if (!Array.isArray(offerList)) return;
       offerList.forEach((offer: any) => {
         if (offer?.start_date !== startDate) return;
-        if (!offerMatchesSearchNights(offer, nightsCount ?? null)) return;
-        const price = Number(offer.analytics_price ?? offer.price);
-        const p = Number.isFinite(price) ? price : Infinity;
-        if (p < bestPrice) {
-          bestPrice = p;
+        if (!offerMatchesSearchNights(offer, nightsCount ?? null, nightsRange)) return;
+        const price = getOfferPriceValue(offer);
+        if (price == null) return;
+        if (price < bestPrice) {
+          bestPrice = price;
           best = offer;
         }
       });
@@ -186,6 +459,7 @@ export function buildHotelSearchParamsFromForm(
     adults?: number;
     kids?: number;
     kidsAges?: number[];
+    flexDates?: number;
   },
 ): Record<string, unknown> | null {
   const parsedHotelId = parseHotelId(hotelId);
@@ -209,7 +483,10 @@ export function buildHotelSearchParamsFromForm(
       ? source.adults
       : parseInt(String(q.adults || '2'), 10) || 2;
   const kids = source.kids ?? (parseInt(String(q.kids || '0'), 10) || 0);
-  const flexDates = 2;
+  const flexDates =
+    source.flexDates != null
+      ? source.flexDates
+      : parseFlexDatesValue(q.flex_dates, HOTEL_DETAILS_DEFAULT_FLEX_DATES);
 
   const hotelCountry = source.apiHotelData?.country;
   const hotelCity = source.apiHotelData?.city;
@@ -270,8 +547,7 @@ export const buildInitialSearchParams = (
 ): Record<string, unknown> => {
   const startDate = (query.start_date as string) || getDefaultStartDate();
   const nightsStr = (query.nights as string) || '7';
-  // Hotel details room search must always use ±2 nights.
-  const flexDates = 2;
+  const flexDates = getFlexDatesFromQuery(query, HOTEL_DETAILS_DEFAULT_FLEX_DATES);
   
   const nights = parseNightsValue(nightsStr);
   const endDateStr = endYmdAfterNights(startDate, nights);
@@ -321,7 +597,7 @@ export function buildHotelDetailsDeepLinkQuery(hotelId: string | number): Record
     start_date: String(built.start_date),
     start_date_from: String(built.start_date_from),
     end_date_till: String(built.end_date_till),
-    nights: String(built.nights),
+    nights: String(parseNightsValue(String(base.nights ?? '7'))),
     search_type: String(built.search_type),
     flex_dates: String(built.flex_dates),
   };

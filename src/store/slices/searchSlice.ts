@@ -169,17 +169,39 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import {checkSearchStatus, getGroupedHotels, startSearch} from "@/api/levelTravelApi";
 import { mergeHotelPages, parseUiPageNumber } from '@/utils/searchResults';
+import {
+    getReadySearchOperators,
+    shouldStopSearchPolling,
+} from '@/utils/searchStatus';
 
-let activeSearchPoll: ReturnType<typeof setInterval> | null = null;
+let activeSearchPoll: ReturnType<typeof setTimeout> | null = null;
 let activeSearchPollAttempts = 0;
+let activeSearchPollReject: ((reason: Error) => void) | null = null;
 const MAX_SEARCH_POLL_ATTEMPTS = 40;
+const SEARCH_POLL_DELAY_MS = 3000;
+export const SEARCH_POLL_CANCELLED = 'SEARCH_POLL_CANCELLED';
 
 function clearActiveSearchPoll() {
     if (activeSearchPoll) {
-        clearInterval(activeSearchPoll);
+        clearTimeout(activeSearchPoll);
         activeSearchPoll = null;
     }
     activeSearchPollAttempts = 0;
+    activeSearchPollReject = null;
+}
+
+export function stopActiveSearchPoll() {
+    if (activeSearchPoll) {
+        clearTimeout(activeSearchPoll);
+        activeSearchPoll = null;
+    }
+    activeSearchPollAttempts = 0;
+
+    if (activeSearchPollReject) {
+        const reject = activeSearchPollReject;
+        activeSearchPollReject = null;
+        reject(new Error(SEARCH_POLL_CANCELLED));
+    }
 }
 
 interface SearchState {
@@ -227,42 +249,77 @@ export const runFullSearchFlow = createAsyncThunk(
 
             return await new Promise(async (resolve, reject) => {
                 activeSearchPollAttempts = 0;
-                activeSearchPoll = setInterval(async () => {
+                activeSearchPollReject = reject;
+                let pollingStopped = false;
+
+                const scheduleNextPoll = () => {
+                    if (pollingStopped) return;
+                    activeSearchPoll = setTimeout(() => {
+                        activeSearchPoll = null;
+                        void pollOnce();
+                    }, SEARCH_POLL_DELAY_MS);
+                };
+
+                const pollOnce = async () => {
+                    if (pollingStopped) return;
+
+                    activeSearchPollAttempts += 1;
+                    if (activeSearchPollAttempts > MAX_SEARCH_POLL_ATTEMPTS) {
+                        pollingStopped = true;
+                        clearActiveSearchPoll();
+                        reject(new Error('Search timed out'));
+                        return;
+                    }
+
                     try {
-                        activeSearchPollAttempts += 1;
-                        if (activeSearchPollAttempts > MAX_SEARCH_POLL_ATTEMPTS) {
-                            clearActiveSearchPoll();
-                            reject(new Error('Search timed out'));
+                        const searchStatus = await checkSearchStatus(request_id);
+
+                        if (!searchStatus) {
+                            scheduleNextPoll();
                             return;
                         }
 
-                        const statusMap = await checkSearchStatus(request_id);
+                        const { status: statusMap, completeness } = searchStatus;
 
                         dispatch(updateProgress(statusMap));
 
-                        const readyOperators = Object.entries(statusMap)
-                            .filter(([_, status]) => status === 'completed' || status === 'cached')
-                            .map(([id]) => id);
-
-                        if (readyOperators.length > 0) {
-                            clearActiveSearchPoll();
-                            let filters = { request_id, readyOperators };
-                            if (filterParams && typeof filterParams === 'object') {
-                                filters = { ...filters, ...filterParams };
-                            }
-
-                            const hotels = await getGroupedHotels({
-                                ...filters,
-                                page_number: parseUiPageNumber(filters.page_number),
-                                page_limit: Math.max(1, Number(filters.page_limit) || 20),
-                            });
-                            resolve({...hotels,...filters});
+                        if (!shouldStopSearchPolling(statusMap, completeness)) {
+                            scheduleNextPoll();
+                            return;
                         }
+
+                        pollingStopped = true;
+                        clearActiveSearchPoll();
+
+                        const readyOperators = getReadySearchOperators(statusMap);
+
+                        let filters: Record<string, unknown> = { request_id };
+                        if (readyOperators.length > 0) {
+                            filters.readyOperators = readyOperators;
+                        }
+                        if (filterParams && typeof filterParams === 'object') {
+                            filters = { ...filters, ...filterParams };
+                        }
+
+                        const hotels = await getGroupedHotels({
+                            ...filters,
+                            page_number: parseUiPageNumber(filters.page_number),
+                            page_limit: Math.max(1, Number(filters.page_limit) || 20),
+                        });
+                        resolve({
+                            ...hotels,
+                            request_id,
+                            readyOperators,
+                            ...filterParams,
+                        });
                     } catch (err) {
+                        pollingStopped = true;
                         clearActiveSearchPoll();
                         reject(err);
                     }
-                }, 3000);
+                };
+
+                void pollOnce();
             });
         } catch (err: any) {
             clearActiveSearchPoll();
@@ -363,6 +420,9 @@ const searchSlice = createSlice({
             })
             .addCase(runFullSearchFlow.rejected, (state, action) => {
                 state.loading = false;
+                if (action.error?.message === SEARCH_POLL_CANCELLED) {
+                    return;
+                }
                 state.error = action.payload as string;
             })
             .addCase(searchFilters.pending, (state, action) => {

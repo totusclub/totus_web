@@ -1,5 +1,4 @@
 import styles from '../hotelDetails.module.css';
-import TourAgents from "@/components/hotelDetails/hotelDetailsRooms/tourAgents";
 import HotelDetailsPriceList from "@/components/hotelDetails/hotelDetailsRooms/priceList";
 import SmallSlider from "@/components/UI/smallSlide";
 import GalleryModal from "@/components/UI/galleryModal";
@@ -7,8 +6,9 @@ import RoomImagePlaceholder from "@/components/hotelDetails/hotelDetailsRooms/Ro
 import React, { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/router";
 import {
-    getSearchNightsFromQuery,
-    offerMatchesSearchNights,
+    getNightsConstraintFromQuery,
+    offerMatchesNightsConstraint,
+    HOTEL_DETAILS_DEFAULT_FLEX_DATES,
 } from "@/utils/hotelDetailsUtils";
 
 type RoomImage = {
@@ -17,11 +17,12 @@ type RoomImage = {
 
 const HotelDetailsRoomItem = ({ item, selectedDate }: any) => {
     const router = useRouter();
-    const searchNights = useMemo(
-        () => getSearchNightsFromQuery(router.query),
+    const nightsConstraint = useMemo(
+        () => getNightsConstraintFromQuery(router.query, {
+            defaultFlexDates: HOTEL_DETAILS_DEFAULT_FLEX_DATES,
+        }),
         [router.query],
     );
-    const [selectedOperator, setSelectedOperator] = useState<number | null>(null);
     const [isRoomGalleryOpen, setIsRoomGalleryOpen] = useState(false);
     const [imageError, setImageError] = useState(false);
 
@@ -33,40 +34,23 @@ const HotelDetailsRoomItem = ({ item, selectedDate }: any) => {
         [item?.room?.images],
     );
 
-    const roomItems = useMemo(() => {
-        if (selectedDate && item?.offers) {
-            const filteredOffers = Object.entries(item.offers)
-                .flatMap(([type, offers]) =>
-                    (offers as any[])
-                        .filter(
-                            (offer) =>
-                                offer.start_date === selectedDate &&
-                                offerMatchesSearchNights(offer, searchNights),
-                        )
-                        .map((offer) => ({ type, ...offer })),
-                );
+    const offersForDate = useMemo(() => {
+        if (!selectedDate || !item?.offers) return [];
 
-            const seen = new Set<number>();
-            const uniqueOperators = filteredOffers.filter((offer) => {
-                if (seen.has(offer.operator_id)) return false;
-                seen.add(offer.operator_id);
-                return true;
-            });
-
-            const simplified = uniqueOperators.map((offer) => ({
-                id: offer.operator_id,
-                name: offer.operator_name,
-            }));
-
-            setSelectedOperator(simplified[0]?.id ?? null);
-            return { offersRoom: filteredOffers, operators: simplified };
-        }
-        return undefined;
-    }, [selectedDate, item?.offers, searchNights]);
+        return Object.entries(item.offers).flatMap(([type, offers]) =>
+            (offers as any[])
+                .filter(
+                    (offer) =>
+                        offer.start_date === selectedDate &&
+                        offerMatchesNightsConstraint(offer, nightsConstraint),
+                )
+                .map((offer) => ({ type, ...offer })),
+        );
+    }, [selectedDate, item?.offers, nightsConstraint]);
 
     const visibleOfferTypes = useMemo(
-        () => Array.from(new Set(roomItems?.offersRoom?.map((offer) => offer.type) ?? [])),
-        [roomItems?.offersRoom],
+        () => Array.from(new Set(offersForDate.map((offer) => offer.type))),
+        [offersForDate],
     );
 
     useEffect(() => {
@@ -103,6 +87,10 @@ const HotelDetailsRoomItem = ({ item, selectedDate }: any) => {
         );
     };
 
+    if (visibleOfferTypes.length === 0) {
+        return null;
+    }
+
     return (
         <div className={styles.HotelDetailsRoomItem}>
             <div className={styles.HotelDetailsRoom}>
@@ -125,18 +113,11 @@ const HotelDetailsRoomItem = ({ item, selectedDate }: any) => {
                 </div>
             </div>
 
-            <TourAgents
-                agents={roomItems?.operators}
-                selectedOperator={selectedOperator}
-                setSelectedOperator={setSelectedOperator}
-            />
-
             {visibleOfferTypes.map((type) => (
                 <HotelDetailsPriceList
                     key={type}
-                    selectedOperator={selectedOperator}
                     selectedDate={selectedDate}
-                    item={roomItems?.offersRoom}
+                    item={offersForDate}
                     type={type}
                 />
             ))}

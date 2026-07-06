@@ -1,10 +1,10 @@
 import styles from '../hotelDetails.module.css';
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { formatPriceFromLabel } from '@/utils/formatPrice';
 
 interface DatesPriceProps {
-    dates: Record<string, number | string>;
-    selectedDate: string;
+    dates: Record<string, number | string | undefined>;
+    selectedDate?: string;
     setSelectedDate: (date: string) => void;
 }
 
@@ -19,19 +19,7 @@ function formatDateToRussian(date: Date): string {
 
     return `${day} ${month}, ${weekday}`;
 }
-const DatesPrice = ({ dates,selectedDate, setSelectedDate }: DatesPriceProps) => {
-
-
-    useEffect(() => {
-        const dateKeys = Object.keys(dates || {});
-        if (dateKeys.length === 0) return;
-
-        // Select first tab by default, and recover if current selection disappears
-        if (!selectedDate || !dateKeys.includes(selectedDate)) {
-            setSelectedDate(dateKeys[0]);
-        }
-    }, [dates, selectedDate, setSelectedDate]);
-
+const DatesPrice = ({ dates, selectedDate, setSelectedDate }: DatesPriceProps) => {
     const handleDateChange = (date: string) => {
         setSelectedDate(date);
     };

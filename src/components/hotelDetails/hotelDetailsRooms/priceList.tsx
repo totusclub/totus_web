@@ -9,27 +9,17 @@ import {
     navigateAfterPackageCreate,
 } from "@/utils/bookingFlowUtils";
 import { formatPriceRub } from '@/utils/formatPrice';
-
-interface RoomItem {
-    date: string;
-    tourAgent: string;
-    price: string | number;
-}
-
-interface HotelDetailsItem {
-    title: string;
-    description: string;
-    items: RoomItem[];
-}
+import { getOfferConfirmabilityDisplayLabel } from '@/utils/roomFilters';
+import { getOfferDisplayInfo, OFFER_TAG_BEST_PRICE } from '@/utils/offerDisplay';
+import Icon from '@/components/icons/Icon';
 
 interface HotelDetailsPriceListProps {
-    item: HotelDetailsItem;
-    type:string;
-    selectedDate:any;
-    selectedOperator:any
+    item: any[];
+    type: string;
+    selectedDate: any;
 }
 
-const HotelDetailsPriceList: React.FC<HotelDetailsPriceListProps> = ({ item,selectedDate,selectedOperator,type }) => {
+const HotelDetailsPriceList: React.FC<HotelDetailsPriceListProps> = ({ item, type }) => {
     const router = useRouter();
     const searchType = getSearchTypeFromQuery(router.query);
 
@@ -65,16 +55,65 @@ const HotelDetailsPriceList: React.FC<HotelDetailsPriceListProps> = ({ item,sele
                 {item?.description?.length > 1 && <p>{item?.description}</p>}
             </div>
             <div className={styles.HotelDetailsPriceListItems}>
-                {item?.map((room, index) =>
-                    room.operator_id === selectedOperator ? (
-                    <div key={index} className={styles.HotelDetailsPriceListItem}>
+                {item
+                    ?.filter((room) => room.type === type)
+                    .map((room) => {
+                        const confirmabilityLabel = getOfferConfirmabilityDisplayLabel(room);
+                        const displayInfo = getOfferDisplayInfo(room);
+                        const secondaryTags = displayInfo.tags.filter(
+                            (tag) => tag !== confirmabilityLabel,
+                        );
+                        const hasBestPrice = secondaryTags.includes(OFFER_TAG_BEST_PRICE);
+                        const otherTags = secondaryTags.filter(
+                            (tag) => tag !== OFFER_TAG_BEST_PRICE,
+                        );
+
+                        return (
+                    <div key={room.id} className={styles.HotelDetailsPriceListItem}>
                         <div>
-                            <p>{room.nights_count} ночей  {formatDate(room?.start_date)}</p>
+                            <p className={styles.HotelDetailsPriceListItemMeta}>
+                                {hasBestPrice ? (
+                                    <span className={styles.HotelDetailsOfferBestPriceBadge}>
+                                        <span className={styles.HotelDetailsOfferBestPriceIcon}>
+                                            <Icon name="star" size={10} color="#FFFFFF" />
+                                        </span>
+                                        <span className={styles.HotelDetailsOfferBestPriceText}>
+                                            {OFFER_TAG_BEST_PRICE}
+                                        </span>
+                                    </span>
+                                ) : null}
+                                <span>
+                                    {room.nights_count} ночей  {formatDate(room?.start_date)}
+                                </span>
+                            </p>
                             <p>{room?.operator_name}</p>
+                            {confirmabilityLabel ? (
+                                <p className={styles.HotelDetailsOfferConfirmability}>
+                                    {confirmabilityLabel}
+                                </p>
+                            ) : null}
+                            {otherTags.length > 0 ? (
+                                <div className={styles.HotelDetailsOfferTags}>
+                                    {otherTags.map((tag) => (
+                                        <span key={tag} className={styles.HotelDetailsOfferTag}>
+                                            {tag}
+                                        </span>
+                                    ))}
+                                </div>
+                            ) : null}
                         </div>
-                        <div>
-                            <p>{formatPriceRub(room?.price)}</p>
-                            <p>{getOfferPriceSubtitle(searchType)}</p>
+                        <div className={styles.HotelDetailsPriceListPriceCol}>
+                            <div className={styles.HotelDetailsPriceListPriceBlock}>
+                                <p className={styles.HotelDetailsPriceListPriceValue}>
+                                    {formatPriceRub(room?.price)}
+                                </p>
+                                <p>{getOfferPriceSubtitle(searchType)}</p>
+                                {room.price_per_night ? (
+                                    <p className={styles.HotelDetailsOfferPerNight}>
+                                        {formatPriceRub(room.price_per_night)} / ночь
+                                    </p>
+                                ) : null}
+                            </div>
                         </div>
                         <div className={styles.mobButton}>
                             <Button
@@ -86,7 +125,8 @@ const HotelDetailsPriceList: React.FC<HotelDetailsPriceListProps> = ({ item,sele
                             />
                         </div>
                     </div>
-                ):null)}
+                        );
+                    })}
             </div>
         </div>
     );

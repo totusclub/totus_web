@@ -1,13 +1,11 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store';
 
 /**
- * Hook to manage request_id from multiple sources:
- * 1. Local state (updated when new search is triggered)
- * 2. URL query (when coming from hotels list)
- * 3. Redux store (fallback)
+ * Keeps `request_id` aligned with the URL (back/forward) while allowing a brief
+ * local override until `router.replace` finishes after a new hotel search.
  */
 export const useRequestIdSync = (): {
   requestId: string | null | undefined;
@@ -20,39 +18,49 @@ export const useRequestIdSync = (): {
   const rawRequestId = router.query.request_id;
   const existingRequestId = Array.isArray(rawRequestId) ? rawRequestId[0] : rawRequestId;
   const initialRequestId = storeRequestId || null;
-  const [localRequestId, setLocalRequestId] = useState<string | null>(null);
+  const [localRequestId, setLocalRequestIdState] = useState<string | null>(null);
+  const pendingRequestIdRef = useRef<string | null>(null);
 
   const rawHotelId = router.query.hotel_id;
   const hotelIdInUrl = Array.isArray(rawHotelId) ? rawHotelId[0] : rawHotelId;
   const hotelOnlyDeepLink = Boolean(hotelIdInUrl) && !existingRequestId;
 
-  // Sync localRequestId from URL when coming from hotel list
-  useEffect(() => {
-    if (router.isReady && existingRequestId && !localRequestId) {
-      setLocalRequestId(existingRequestId);
-    }
-  }, [router.isReady, existingRequestId, localRequestId]);
+  const setLocalRequestId = useCallback((id: string) => {
+    pendingRequestIdRef.current = id;
+    setLocalRequestIdState(id);
+  }, []);
 
-  // Sync localRequestId from Redux when it changes externally (but only if no URL request_id).
-  // Skip when URL is a deep hotel link (hotel_id without request_id): a new search will run;
-  // a stale Redux request_id would load wrong rooms for this hotel.
+  // Follow URL on back/forward and after shallow replace completes.
   useEffect(() => {
     if (!router.isReady) return;
-    if (hotelOnlyDeepLink && initialRequestId) {
+
+    if (!existingRequestId) {
+      if (!pendingRequestIdRef.current) {
+        setLocalRequestIdState(null);
+      }
       return;
     }
-    if (initialRequestId && initialRequestId !== localRequestId && !localRequestId && !existingRequestId) {
-      setLocalRequestId(initialRequestId);
-    }
-  }, [router.isReady, hotelOnlyDeepLink, initialRequestId, localRequestId, existingRequestId]);
 
-  // Prefer URL/local. On deep hotel links (hotel_id, no request_id), ignore Redux — wrong search for this hotel.
+    if (pendingRequestIdRef.current) {
+      if (pendingRequestIdRef.current === existingRequestId) {
+        pendingRequestIdRef.current = null;
+      }
+      setLocalRequestIdState(existingRequestId);
+      return;
+    }
+
+    setLocalRequestIdState(existingRequestId);
+  }, [router.isReady, existingRequestId]);
+
   const requestId = useMemo(() => {
-    if (localRequestId) return localRequestId;
+    if (pendingRequestIdRef.current) {
+      return pendingRequestIdRef.current;
+    }
     if (existingRequestId) return existingRequestId;
+    if (localRequestId) return localRequestId;
     if (hotelOnlyDeepLink) return undefined;
     return initialRequestId ?? undefined;
-  }, [localRequestId, existingRequestId, hotelOnlyDeepLink, initialRequestId]);
+  }, [existingRequestId, localRequestId, hotelOnlyDeepLink, initialRequestId]);
 
   return {
     requestId,

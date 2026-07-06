@@ -12,10 +12,12 @@ import { useDispatch } from "react-redux";
 import MobileBottomBar from "@/components/mobileBottomBar";
 import SiteSeo from "@/components/seo/SiteSeo";
 import CookieConsent from "@/components/cookieConsent";
+import { useStopSearchPollOnLeave } from '@/hooks/useStopSearchPollOnLeave';
 // import ScrollRestoration from '@/components/ScrollRestoration';
 
 function MyApp({ Component, pageProps }: AppProps) {
     const dispatch = useDispatch();
+    useStopSearchPollOnLeave();
 
     useEffect(() => {
         const token = loadToken();

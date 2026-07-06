@@ -4,7 +4,7 @@ import VerticalSlider from "@/components/UI/verticalSlide";
 import Button from "@/components/UI/button";
 import Icon from "@/components/icons/Icon";
 import { useRouter } from "next/router";
-import { findCheapestOfferForStartDate, getSearchNightsFromQuery } from "@/utils/hotelDetailsUtils";
+import { findCheapestOfferForStartDate, getNightsConstraintFromQuery, HOTEL_DETAILS_DEFAULT_FLEX_DATES } from "@/utils/hotelDetailsUtils";
 import {
     getOfferPriceTitle,
     getSearchTypeFromQuery,
@@ -56,14 +56,22 @@ const HotelDetailsInfo = ({
         return null;
     }, [hotel]);
 
-    const searchNights = useMemo(
-        () => getSearchNightsFromQuery(router.query),
+    const nightsConstraint = useMemo(
+        () => getNightsConstraintFromQuery(router.query, {
+            defaultFlexDates: HOTEL_DETAILS_DEFAULT_FLEX_DATES,
+        }),
         [router.query],
     );
 
     const highlightOffer = useMemo(
-        () => findCheapestOfferForStartDate(rooms as any[], selectedRoomDate, searchNights),
-        [rooms, selectedRoomDate, searchNights],
+        () =>
+            findCheapestOfferForStartDate(
+                rooms as any[],
+                selectedRoomDate,
+                nightsConstraint.searchNights,
+                nightsConstraint.nightsRange,
+            ),
+        [rooms, selectedRoomDate, nightsConstraint],
     );
 
     const handleChooseRoomClick = () => {

@@ -3,19 +3,24 @@ import DatesPrice from "@/components/hotelDetails/hotelDetailsRooms/datesPrice";
 import HotelDetailsRoomItem from "@/components/hotelDetails/hotelDetailsRooms/roomItem";
 import RoomsSkeleton from "@/components/hotelDetails/hotelDetailsRooms/roomsSkeleton";
 import Icon from "@/components/icons/Icon";
-import Button from "@/components/UI/button";
 import dynamic from "next/dynamic";
 import Image from "next/image";
-import { useMemo, useState } from "react";
-import { createPackage } from "@/api/levelTravelApi";
+import RoomFilters from "@/components/hotelDetails/hotelDetailsRooms/roomFilters";
+import { useMemo, useState, useEffect, useRef } from "react";
+import { getHotelRooms } from "@/api/levelTravelApi";
 import { useRouter } from "next/router";
-import { findCheapestOfferForStartDate, getSearchNightsFromQuery, offerMatchesSearchNights } from "@/utils/hotelDetailsUtils";
-import { formatPrice } from "@/utils/formatPrice";
+import { buildMinOfferPricesByDate, filterRoomsByNightsConstraint, getAvailableDepartureDatesForHotelRooms, getNightsConstraintFromQuery, offerMatchesNightsConstraint, HOTEL_DETAILS_DEFAULT_FLEX_DATES, parseFlexDatesValue } from "@/utils/hotelDetailsUtils";
 import {
-    getOfferPriceTitle,
-    getSearchTypeFromQuery,
-    navigateAfterPackageCreate,
-} from "@/utils/bookingFlowUtils";
+    applyRoomFilters,
+    buildHotelRoomsQueryParams,
+    clearRoomFilters,
+    enrichRoomFilterOptions,
+    hasActiveRoomFilters,
+    hasHotelRoomsQueryParams,
+    mergeRoomFiltersWithOperators,
+    resolveDisplayRooms,
+    type HotelRoomFilters,
+} from "@/utils/roomFilters";
 
 const HotelLocationMap = dynamic(() => import("./HotelLocationMap"), {
     ssr: false,
@@ -43,100 +48,250 @@ function resolveHotelCoords(info?: HotelDetailsMapInfo): { lat: number; lng: num
 
 interface HotelDetailsRoomsProps {
     rooms: any[];
+    roomFilters?: HotelRoomFilters | null;
     loading?: boolean;
     hotelMap?: HotelDetailsMapInfo;
     selectedDate: string;
     onSelectedDateChange: (date: string) => void;
+    /** Preferred departure date for ±flex date tabs (falls back to URL). */
+    departureDate?: string;
+    flexDates?: number;
 }
 
 const HotelDetailsRooms = ({
     rooms,
+    roomFilters: roomFiltersFromApi,
     loading = false,
     hotelMap,
     selectedDate,
     onSelectedDateChange,
+    departureDate,
+    flexDates: flexDatesProp,
 }: HotelDetailsRoomsProps) => {
     const router = useRouter();
-    const searchType = getSearchTypeFromQuery(router.query);
-    const searchNights = useMemo(
-        () => getSearchNightsFromQuery(router.query),
+    const nightsConstraint = useMemo(
+        () => getNightsConstraintFromQuery(router.query, {
+            defaultFlexDates: HOTEL_DETAILS_DEFAULT_FLEX_DATES,
+        }),
         [router.query],
     );
-    const [isBooking, setIsBooking] = useState(false);
-    const pricesList = useMemo((): Record<string, number> | undefined => {
-        if (!rooms?.length) return undefined;
 
-        const grouped: Record<string, number> = {};
-
-        rooms.forEach((room) => {
-            const offers = room?.offers || {};
-            Object.values(offers).forEach((offerList) => {
-                if (!Array.isArray(offerList)) return;
-                offerList.forEach((item: { start_date?: string; analytics_price?: number; nights_count?: number }) => {
-                    const { start_date, analytics_price } = item;
-                    if (!start_date || analytics_price == null) return;
-                    if (!offerMatchesSearchNights(item, searchNights)) return;
-                    if (
-                        grouped[start_date] === undefined ||
-                        analytics_price < grouped[start_date]
-                    ) {
-                        grouped[start_date] = analytics_price;
-                    }
-                });
-            });
-        });
-
-        return Object.entries(grouped)
-            .sort(([dateA], [dateB]) => new Date(dateA).getTime() - new Date(dateB).getTime())
-            .reduce<Record<string, number>>((acc, [date, price]) => {
-                acc[date] = price;
-                return acc;
-            }, {});
-    }, [rooms, searchNights]);
-
-    const highlightOffer = useMemo(
-        () => findCheapestOfferForStartDate(rooms, selectedDate, searchNights),
-        [rooms, selectedDate, searchNights],
+    const toNightFilteredRooms = useMemo(
+        () => (roomList: any[]) =>
+            filterRoomsByNightsConstraint(roomList, nightsConstraint) as any[],
+        [nightsConstraint],
     );
 
-    const roomTypeName = {
-        BB: 'Завтрак',
-        RO: 'Без питания',
-        AI: 'Всё включено',
-        UAI: 'Ультра всё включено',
-        HB: 'Завтрак и ужин',
-        FB: 'Завтрак, обед, ужин',
-        HBD: 'Завтрак и ужин',
-        AI24: 'Всё включено 24 часа',
-        DNR: 'Ужин',
-        AIL: 'Всё включено с ограничениями',
-        'FB+': 'Завтрак, обед, ужин +',
-        'HB+': 'Завтрак и ужин +',
-        HBL: 'Завтрак и обед'
-    }
+    const canonicalRooms = useMemo(
+        () => toNightFilteredRooms(rooms),
+        [rooms, toNightFilteredRooms],
+    );
+    const [activeRoomFilters, setActiveRoomFilters] = useState<HotelRoomFilters | null>(null);
+    const [filterApiRooms, setFilterApiRooms] = useState<any[] | null>(null);
+    const [filtersLoading, setFiltersLoading] = useState(false);
+    const prevBaseRoomsKeyRef = useRef<string | null>(null);
+    const lastFilterRequestKeyRef = useRef<string | null>(null);
+    const filterRequestSeqRef = useRef(0);
 
+    const requestId = Array.isArray(router.query.request_id)
+        ? router.query.request_id[0]
+        : router.query.request_id;
+    const hotelIdFromQuery = Array.isArray(router.query.hotel_id)
+        ? router.query.hotel_id[0]
+        : router.query.hotel_id;
 
+    const baseRoomsKey = useMemo(
+        () => `${rooms.length}:${rooms[0]?.room?.id ?? ""}`,
+        [rooms],
+    );
 
-    const handleBook = async (id: any) => {
-        setIsBooking(true)
-        const res = await createPackage({ request_id: router.query.request_id, tour_id: id })
-        // console.log('handleBook', res.package.id)
-        setIsBooking(false)
-        navigateAfterPackageCreate(router, res.package.id, searchType);
+    useEffect(() => {
+        const isNewRoomSet =
+            prevBaseRoomsKeyRef.current !== null && prevBaseRoomsKeyRef.current !== baseRoomsKey;
+        prevBaseRoomsKeyRef.current = baseRoomsKey;
+
+        setFilterApiRooms(null);
+        lastFilterRequestKeyRef.current = null;
+
+        setActiveRoomFilters((previous) =>
+            mergeRoomFiltersWithOperators(
+                roomFiltersFromApi,
+                canonicalRooms,
+                isNewRoomSet ? null : previous,
+                canonicalRooms,
+            ),
+        );
+    }, [roomFiltersFromApi, baseRoomsKey, canonicalRooms]);
+
+    const handleFilterChange = (
+        next: HotelRoomFilters | ((current: HotelRoomFilters) => HotelRoomFilters),
+    ) => {
+        setActiveRoomFilters((current) => {
+            if (!current) return current;
+            return typeof next === "function" ? next(current) : next;
+        });
     };
 
-    const formatDate = useMemo(() => {
-        if (!highlightOffer?.start_date) return "";
-        const date = new Date(highlightOffer.start_date);
-        const formatter = new Intl.DateTimeFormat("ru-RU", {
-            day: "numeric",
-            month: "long",
-        });
-        return `с ${formatter.format(date)}`;
-    }, [highlightOffer?.start_date]);
+    const filterQueryParams = useMemo(
+        () => buildHotelRoomsQueryParams(activeRoomFilters),
+        [activeRoomFilters],
+    );
 
-    const priceFormatted =
-        highlightOffer?.price != null ? formatPrice(highlightOffer.price) : "—";
+    const filterQueryKey = useMemo(
+        () => JSON.stringify(filterQueryParams),
+        [filterQueryParams],
+    );
+
+    const hasActiveFilters = hasActiveRoomFilters(activeRoomFilters);
+
+    useEffect(() => {
+        if (!hasActiveFilters) {
+            setFilterApiRooms(null);
+            lastFilterRequestKeyRef.current = null;
+            setFiltersLoading(false);
+            return;
+        }
+
+        if (!requestId || !hotelIdFromQuery || !activeRoomFilters) return;
+        if (!hasHotelRoomsQueryParams(filterQueryParams)) return;
+        if (filterQueryKey === lastFilterRequestKeyRef.current) return;
+
+        setFiltersLoading(true);
+
+        const requestSeq = ++filterRequestSeqRef.current;
+
+        const timer = window.setTimeout(async () => {
+            lastFilterRequestKeyRef.current = filterQueryKey;
+
+            try {
+                const response = await getHotelRooms({
+                    request_id: String(requestId),
+                    hotel_id: String(hotelIdFromQuery),
+                    ...filterQueryParams,
+                });
+
+                if (requestSeq !== filterRequestSeqRef.current) return;
+
+                const apiRooms = Array.isArray(response?.result) ? response.result : [];
+                const exactNightApiRooms = toNightFilteredRooms(apiRooms);
+                setFilterApiRooms(exactNightApiRooms);
+
+                setActiveRoomFilters((previous) =>
+                    mergeRoomFiltersWithOperators(
+                        response?.filters,
+                        exactNightApiRooms.length > 0 ? exactNightApiRooms : canonicalRooms,
+                        previous,
+                        canonicalRooms,
+                    ),
+                );
+            } catch (error) {
+                if (requestSeq !== filterRequestSeqRef.current) return;
+                console.error("[HotelDetailsRooms] Failed to fetch filtered rooms:", error);
+                lastFilterRequestKeyRef.current = null;
+                setFilterApiRooms(null);
+            } finally {
+                if (requestSeq === filterRequestSeqRef.current) {
+                    setFiltersLoading(false);
+                }
+            }
+        }, 300);
+
+        return () => {
+            window.clearTimeout(timer);
+        };
+    }, [
+        activeRoomFilters,
+        filterQueryKey,
+        filterQueryParams,
+        hasActiveFilters,
+        hotelIdFromQuery,
+        requestId,
+        rooms,
+        canonicalRooms,
+        toNightFilteredRooms,
+    ]);
+
+    const displayBaseRooms = useMemo(() => {
+        if (!hasActiveFilters) return canonicalRooms;
+        if (filtersLoading) return canonicalRooms;
+        return filterApiRooms ?? canonicalRooms;
+    }, [canonicalRooms, hasActiveFilters, filtersLoading, filterApiRooms]);
+
+    const roomsMatchingFilters = useMemo(() => {
+        if (!hasActiveFilters) return canonicalRooms;
+        return applyRoomFilters(displayBaseRooms, activeRoomFilters) as any[];
+    }, [canonicalRooms, displayBaseRooms, activeRoomFilters, hasActiveFilters]);
+
+    const roomFlexDates = useMemo(
+        () =>
+            flexDatesProp ??
+            parseFlexDatesValue(
+                Array.isArray(router.query.flex_dates)
+                    ? router.query.flex_dates[0]
+                    : router.query.flex_dates,
+                HOTEL_DETAILS_DEFAULT_FLEX_DATES,
+            ),
+        [flexDatesProp, router.query.flex_dates],
+    );
+
+    const allAvailableDates = useMemo(
+        () =>
+            getAvailableDepartureDatesForHotelRooms(
+                canonicalRooms,
+                router.query,
+                HOTEL_DETAILS_DEFAULT_FLEX_DATES,
+                {
+                    startDate: departureDate,
+                    flexDates: roomFlexDates,
+                },
+            ),
+        [canonicalRooms, router.query, departureDate, roomFlexDates],
+    );
+
+    const effectiveSelectedDate = useMemo(() => {
+        if (!allAvailableDates.length) return undefined;
+        if (selectedDate && allAvailableDates.includes(selectedDate)) return selectedDate;
+        return allAvailableDates[0];
+    }, [allAvailableDates, selectedDate]);
+
+    useEffect(() => {
+        if (!effectiveSelectedDate || effectiveSelectedDate === selectedDate) return;
+        onSelectedDateChange(effectiveSelectedDate);
+    }, [effectiveSelectedDate, selectedDate, onSelectedDateChange]);
+
+    const filteredRooms = useMemo(
+        () =>
+            resolveDisplayRooms(
+                roomsMatchingFilters,
+                null,
+                effectiveSelectedDate,
+                nightsConstraint.searchNights,
+                (offer) => offerMatchesNightsConstraint(offer, nightsConstraint),
+            ) as any[],
+        [roomsMatchingFilters, effectiveSelectedDate, nightsConstraint],
+    );
+
+    const displayRoomFilters = useMemo(
+        () => enrichRoomFilterOptions(canonicalRooms, activeRoomFilters),
+        [canonicalRooms, activeRoomFilters],
+    );
+
+    const pricesList = useMemo((): Record<string, number | undefined> | undefined => {
+        if (!allAvailableDates.length) return undefined;
+
+        const priceSource = hasActiveFilters ? roomsMatchingFilters : canonicalRooms;
+        const prices = buildMinOfferPricesByDate(
+            priceSource,
+            allAvailableDates,
+            nightsConstraint.searchNights,
+            nightsConstraint.nightsRange,
+        );
+
+        return allAvailableDates.reduce<Record<string, number | undefined>>((acc, date) => {
+            acc[date] = prices[date];
+            return acc;
+        }, {});
+    }, [allAvailableDates, canonicalRooms, roomsMatchingFilters, hasActiveFilters, nightsConstraint]);
 
     const hotelCoords = resolveHotelCoords(hotelMap);
     const mapBalloon = [hotelMap?.name, hotelMap?.address].filter(Boolean).join(" — ");
@@ -145,7 +300,7 @@ const HotelDetailsRooms = ({
         return <RoomsSkeleton />;
     }
 
-    if (!rooms || rooms.length === 0) {
+    if (!rooms || rooms.length === 0 || canonicalRooms.length === 0) {
         return (
             <div className={'content'}>
                 <div className={styles.HotelDetailsRoomsRow}>
@@ -159,6 +314,14 @@ const HotelDetailsRooms = ({
         );
     }
 
+    const showFilteredEmpty =
+        hasActiveFilters &&
+        !filtersLoading &&
+        roomsMatchingFilters.length === 0;
+    const showNoRoomsForDate =
+        !filtersLoading &&
+        canonicalRooms.length > 0 &&
+        filteredRooms.length === 0;
     return (
         <div className={'content'}>
             <div className={styles.HotelDetailsRoomsRow}>
@@ -168,12 +331,46 @@ const HotelDetailsRooms = ({
                     </div>
                     <DatesPrice
                         dates={pricesList ?? {}}
-                        selectedDate={selectedDate}
+                        selectedDate={effectiveSelectedDate}
                         setSelectedDate={onSelectedDateChange}
                     />
-                    {rooms.map((r, i) => (
-                        <HotelDetailsRoomItem key={i} item={r} selectedDate={selectedDate} />
-                    ))}
+                    <RoomFilters
+                        filters={displayRoomFilters}
+                        hasActiveFilters={hasActiveFilters}
+                        loading={filtersLoading}
+                        onChange={handleFilterChange}
+                        onClear={() => {
+                            if (!activeRoomFilters) return;
+                            lastFilterRequestKeyRef.current = null;
+                            setFilterApiRooms(null);
+                            setActiveRoomFilters(clearRoomFilters(activeRoomFilters));
+                        }}
+                    />
+                    {showFilteredEmpty ? (
+                        <div className={styles.HotelDetailsRoomsEmpty}>
+                            <p>По выбранным фильтрам номера не найдены</p>
+                            <button
+                                type="button"
+                                className={styles.HotelDetailsRoomFiltersClear}
+                                onClick={() => {
+                                    if (!activeRoomFilters) return;
+                                    lastFilterRequestKeyRef.current = null;
+                                    setFilterApiRooms(null);
+                                    setActiveRoomFilters(clearRoomFilters(activeRoomFilters));
+                                }}
+                            >
+                                Сбросить фильтры
+                            </button>
+                        </div>
+                    ) : showNoRoomsForDate ? (
+                        <div className={styles.HotelDetailsRoomsEmpty}>
+                            <p>На выбранную дату нет номеров по этим фильтрам</p>
+                        </div>
+                    ) : (
+                        filteredRooms.map((r, i) => (
+                            <HotelDetailsRoomItem key={i} item={r} selectedDate={effectiveSelectedDate} />
+                        ))
+                    )}
 
                 </div>
                 <div className={styles.HotelDetailsMap}>
@@ -209,23 +406,6 @@ const HotelDetailsRooms = ({
                                 </p>
                             )}
                         </div>
-                    </div>
-                    <div className={styles.HotelDetailsInfoPrice}>
-                        <p className={styles.HotelDetailsInfoPriceText}>от {priceFormatted} ₽</p>
-                        <div className={styles.HotelDetailsInfoDate}>
-                            <p className={styles.HotelDetailsInfoDateTitle}>{getOfferPriceTitle(searchType)}</p>
-                            <p className={styles.HotelDetailsInfoDateText}>
-                                {formatDate}
-                                {highlightOffer?.nights_count != null ? `, ${highlightOffer.nights_count} ночей` : ""}
-                            </p>
-                        </div>
-                        <Button
-                            loading={isBooking}
-                            disabled={highlightOffer?.id == null}
-                            onClick={() => highlightOffer?.id != null && handleBook(highlightOffer.id)}
-                            title={"Выбрать номер"}
-                            full={true}
-                        />
                     </div>
 
                 </div>

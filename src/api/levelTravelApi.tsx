@@ -1,6 +1,10 @@
 import axios from 'axios';
 import { API_BASE_URL } from '@/config/api';
 import { parseUiPageNumber, toApiPageNumber } from '@/utils/searchResults';
+import {
+    getReadySearchOperators,
+    shouldStopSearchPolling,
+} from '@/utils/searchStatus';
 
 const BASE_URL = API_BASE_URL;
 
@@ -45,15 +49,29 @@ export async function startSearch(params: Record<string, unknown>) {
     }
 }
 
-export async function checkSearchStatus(requestId: string) {
+export interface SearchStatusResult {
+    status: Record<string, string>;
+    completeness: number;
+}
+
+export async function checkSearchStatus(
+    requestId: string,
+): Promise<SearchStatusResult | null> {
+    if (!requestId) return null;
+
     try {
         const res = await axios.get(`${BASE_URL}/search-status`, {
             params: { request_id: requestId },
         });
-        return res.data.status; // Object: {1: 'completed', 2: 'performing', ...}
+        const status = res.data?.status;
+        if (!status || typeof status !== 'object') return null;
+        return {
+            status: status as Record<string, string>,
+            completeness: Number(res.data?.completeness) || 0,
+        };
     } catch (error) {
-        console.error('Error checking search status:', error);
-        throw error;
+        console.warn('[checkSearchStatus] Failed to check search status:', error);
+        return null;
     }
 }
 
@@ -94,6 +112,9 @@ export async function getGroupedHotels(params: { request_id?: string; readyOpera
 
         const res = await axios.get(`${BASE_URL}/grouped-hotels`, {
             params: sanitizedParams,
+            paramsSerializer: {
+                indexes: null,
+            },
         });
         return { ...res.data, ...sanitizedParams, ui_page_number: uiPageNumber };
     } catch (error) {
@@ -108,18 +129,24 @@ export async function runFullSearchFlow(searchParams: never, onProgress: (arg0: 
     return new Promise((resolve, reject) => {
         const interval = setInterval(async () => {
             try {
-                const statusMap = await checkSearchStatus(request_id);
+                const searchStatus = await checkSearchStatus(request_id);
+                if (!searchStatus) return;
+
+                const { status: statusMap, completeness } = searchStatus;
                 onProgress?.(statusMap);
 
-                const readyOperators = Object.entries(statusMap)
-                    .filter(([_, status]) => status === 'completed' || status === 'cached')
-                    .map(([id]) => id);
+                if (!shouldStopSearchPolling(statusMap, completeness)) return;
 
+                clearInterval(interval);
+                const readyOperators = getReadySearchOperators(statusMap);
+
+                const groupedParams: Record<string, unknown> = { request_id };
                 if (readyOperators.length > 0) {
-                    clearInterval(interval);
-                    const hotels = await getGroupedHotels(request_id, readyOperators);
-                    resolve(hotels);
+                    groupedParams.readyOperators = readyOperators;
                 }
+
+                const hotels = await getGroupedHotels(groupedParams);
+                resolve(hotels);
             } catch (err) {
                 clearInterval(interval);
                 reject(err);
@@ -151,16 +178,27 @@ export async function getHotelOffers(data: { request_id: never; hotel_id: never;
 };
 
 
-export async function getHotelRooms(data: { request_id: never; hotel_id: never; }) {
-    if (!data.request_id && !data?.hotel_id) {
+export async function getHotelRooms(data: {
+    request_id: string;
+    hotel_id: string | number;
+    meals?: string;
+    free_cancel?: boolean | string;
+    confirmability?: string;
+    operators?: string;
+}) {
+    if (!data.request_id || !data?.hotel_id) {
         throw new Error('Missing request_id or hotel_id');
     }
 
-    const params = {
+    const params: Record<string, string | number | boolean> = {
         request_id: data.request_id,
         hotel_id: data.hotel_id,
     };
 
+    if (data.meals) params.meals = data.meals;
+    if (data.confirmability) params.confirmability = data.confirmability;
+    if (data.operators) params.operators = data.operators;
+    if (data.free_cancel !== undefined) params.free_cancel = data.free_cancel;
 
     const response = await axios.get(`${BASE_URL}/hotels-rooms`, {
         params,

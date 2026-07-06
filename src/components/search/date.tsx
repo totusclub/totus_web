@@ -13,6 +13,8 @@ type SelectDateProps = {
     flexDates?: string | number;
     /** ISO end date from parent (e.g. `end_date_till`) — calendar return date */
     endValue?: string;
+    /** Show only departure date in the closed field (hotel page). */
+    departureOnlyLabel?: boolean;
 };
 
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
@@ -54,6 +56,7 @@ const SelectDate = ({
     className,
     flexDates = 0,
     endValue,
+    departureOnlyLabel = false,
 }: SelectDateProps) => {
     const [selectedDate, setSelectedDate] = useState<Date | null>(() => {
         const r = rangeFromProps(value, endValue);
@@ -150,12 +153,12 @@ const SelectDate = ({
     const dateLabel = useMemo(() => {
         if (!selectedDate) return '--.--.--';
         const start = format(selectedDate, 'd MMM', { locale: ru }).toLowerCase();
-        if (!selectedEndDate) {
-            return `${start} – …`;
+        if (departureOnlyLabel || !selectedEndDate) {
+            return start;
         }
         const end = format(selectedEndDate, 'd MMM', { locale: ru }).toLowerCase();
         return `${start} - ${end}`;
-    }, [selectedDate, selectedEndDate]);
+    }, [selectedDate, selectedEndDate, departureOnlyLabel]);
 
     const syncRangeToParent = (start: Date, end: Date) => {
         const normalizedStart = startOfDay(start);

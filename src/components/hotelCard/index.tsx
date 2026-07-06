@@ -45,8 +45,15 @@ const HotelCard = ({ item, request_id, lazy }: HotelCardState) => {
             start_date: (router.query.start_date as string) || '',
             nights: (router.query.nights as string) || '7',
             search_type: (router.query.search_type as string) || 'package',
-            flex_dates: (router.query.flex_dates as string) || '2',
+            flex_dates: (router.query.flex_dates as string) ?? '2',
         };
+
+        if (router.query.start_date_from) {
+            queryParams.start_date_from = router.query.start_date_from as string;
+        }
+        if (router.query.end_date_till) {
+            queryParams.end_date_till = router.query.end_date_till as string;
+        }
 
         // Add optional params if they exist
         if (router.query.kids) {

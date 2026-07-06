@@ -88,11 +88,6 @@ const RoomsSkeleton = () => {
               <div className={styles.image_placeholder} style={{ width: '100%', height: '184px' }}></div>
             </div>
           </div>
-          <div className={styles.HotelDetailsInfoPrice}>
-            <div className={styles.animationTextlazy1}></div>
-            <div className={styles.animationTextlazy2}></div>
-            <div className={styles.animationButtonLazy}></div>
-          </div>
         </div>
       </div>
     </div>

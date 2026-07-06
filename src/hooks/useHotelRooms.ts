@@ -1,131 +1,222 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { getHotelRooms, checkSearchStatus } from '@/api/levelTravelApi';
+import type { HotelRoomFilters } from '@/utils/roomFilters';
+import { cloneRoomFilters } from '@/utils/roomFilters';
+import { isStaleSearchRequestError } from '@/utils/hotelSearchRefresh';
+import { shouldStopSearchPolling } from '@/utils/searchStatus';
+import { stopActiveSearchPoll } from '@/store/slices/searchSlice';
 
 interface UseHotelRoomsResult {
   rooms: any[];
+  roomFilters: HotelRoomFilters | null;
   loading: boolean;
 }
 
-const MAX_POLLS = 10; // Max 10 polls (30 seconds)
-const POLL_DELAY = 3000; // 3 seconds between polls
-const MIN_POLLS_BEFORE_FALLBACK = 3; // Try fetching after 3 failed status checks
+interface UseHotelRoomsOptions {
+  onRequestIdStale?: (failedRequestId: string) => void;
+}
+
+const MAX_POLLS = 10;
+const POLL_DELAY = 2500;
+const STATUS_FAIL_POLLS_BEFORE_STALE = 3;
 
 /**
- * Hook to fetch hotel rooms with search status polling
- * Waits for search to complete before fetching rooms
+ * Fetch hotel rooms for a hotel-details search.
+ * If the request_id is expired or APIs fail, calls onRequestIdStale so the page can start a new search.
  */
 export const useHotelRooms = (
   requestId: string | null | undefined,
   hotelId: string | undefined,
   isReady: boolean,
   refreshKey = 0,
+  options?: UseHotelRoomsOptions,
 ): UseHotelRoomsResult => {
   const [rooms, setRooms] = useState<any[]>([]);
+  const [roomFilters, setRoomFilters] = useState<HotelRoomFilters | null>(null);
   const [loading, setLoading] = useState(false);
+  const onRequestIdStaleRef = useRef(options?.onRequestIdStale);
+  const staleNotifiedRef = useRef(false);
 
   useEffect(() => {
-    // Clear rooms when requestId changes (new search started)
+    onRequestIdStaleRef.current = options?.onRequestIdStale;
+  }, [options?.onRequestIdStale]);
+
+  useEffect(() => {
     setRooms([]);
-    
+    setRoomFilters(null);
+    staleNotifiedRef.current = false;
+
     if (!isReady || !requestId || !hotelId) {
       setLoading(false);
       return;
     }
 
-    // Start loading immediately when we have a requestId
+    stopActiveSearchPoll();
     setLoading(true);
 
     let isMounted = true;
-    let pollTimeout: NodeJS.Timeout | null = null;
-    let hasFetched = false;
+    let pollTimeout: ReturnType<typeof setTimeout> | null = null;
+    let pollStopped = false;
+    let searchCompleted = false;
     let pollCount = 0;
 
-    const fetchRooms = async (): Promise<void> => {
-      if (hasFetched || !isMounted) return;
-      hasFetched = true;
-
+    const clearPollTimeout = () => {
       if (pollTimeout) {
         clearTimeout(pollTimeout);
         pollTimeout = null;
       }
+    };
+
+    const finishLoading = () => {
+      if (isMounted) {
+        setLoading(false);
+      }
+    };
+
+    const fetchRooms = async (): Promise<{ gotRooms: boolean; requestFailed: boolean }> => {
       try {
-        const roomParams = {
+        const allRooms = await getHotelRooms({
           request_id: requestId,
           hotel_id: hotelId,
-        };
+        });
 
-        const allRooms = await getHotelRooms(roomParams);
-        
-        if (isMounted) {
-          setRooms(allRooms?.result || []);
+        const result = allRooms?.result || [];
+
+        if (!isMounted) {
+          return { gotRooms: result.length > 0, requestFailed: false };
+        }
+
+        setRooms(result);
+        setRoomFilters(cloneRoomFilters(allRooms?.filters ?? null));
+
+        if (result.length > 0) {
           setLoading(false);
         }
+
+        return { gotRooms: result.length > 0, requestFailed: false };
       } catch (err) {
         console.error('[useHotelRooms] Failed to fetch hotel rooms:', err);
         if (isMounted) {
           setRooms([]);
-          setLoading(false);
+          setRoomFilters(null);
         }
+        return { gotRooms: false, requestFailed: isStaleSearchRequestError(err) };
       }
+    };
+
+    const completeSearchAndFetchRooms = async () => {
+      searchCompleted = true;
+      pollStopped = true;
+      clearPollTimeout();
+      await fetchRooms();
+      finishLoading();
+    };
+
+    const tryCompleteFromStatus = async (): Promise<boolean> => {
+      const searchStatus = await checkSearchStatus(requestId);
+      if (!searchStatus) return false;
+      if (!shouldStopSearchPolling(searchStatus.status, searchStatus.completeness)) {
+        return false;
+      }
+      if (!isMounted) return true;
+      await completeSearchAndFetchRooms();
+      return true;
+    };
+
+    const notifyStaleRequestId = async () => {
+      if (!isMounted || staleNotifiedRef.current || searchCompleted) return;
+      if (await tryCompleteFromStatus()) return;
+
+      staleNotifiedRef.current = true;
+      pollStopped = true;
+      clearPollTimeout();
+      finishLoading();
+      onRequestIdStaleRef.current?.(requestId);
+    };
+
+    const scheduleNextPoll = () => {
+      if (searchCompleted || pollStopped) return;
+      clearPollTimeout();
+      pollTimeout = setTimeout(() => {
+        if (isMounted && !pollStopped && !searchCompleted) {
+          void pollForSearchCompletion();
+        }
+      }, POLL_DELAY);
     };
 
     const pollForSearchCompletion = async () => {
-      if (hasFetched || !isMounted) return;
+      if (!isMounted || pollStopped || searchCompleted) return;
 
-      pollCount++;
+      pollCount += 1;
 
-      // Max polls reached, try fetching anyway
       if (pollCount > MAX_POLLS) {
-        console.warn('[useHotelRooms] Max polls reached, attempting to fetch rooms anyway');
+        if (await tryCompleteFromStatus()) return;
+
+        pollStopped = true;
+        clearPollTimeout();
         await fetchRooms();
+        finishLoading();
         return;
       }
 
-      try {
-        const statusMap = await checkSearchStatus(requestId);
-        const readyOperators = Object.entries(statusMap)
-          .filter(([_, status]) => status === 'completed' || status === 'cached')
-          .map(([id]) => id);
+      const searchStatus = await checkSearchStatus(requestId);
 
-        if (readyOperators.length > 0) {
-          // Search is complete, fetch rooms
-          await fetchRooms();
-        } else {
-          // Search not ready yet, poll again
-          pollTimeout = setTimeout(() => {
-            if (isMounted && !hasFetched) {
-              pollForSearchCompletion();
-            }
-          }, POLL_DELAY);
+      if (!searchStatus) {
+        if (pollCount >= STATUS_FAIL_POLLS_BEFORE_STALE) {
+          if (await tryCompleteFromStatus()) return;
+
+          const { gotRooms, requestFailed } = await fetchRooms();
+          if (requestFailed || !gotRooms) {
+            await notifyStaleRequestId();
+          } else {
+            finishLoading();
+          }
+          return;
         }
-      } catch (err) {
-        console.error('[useHotelRooms] Error checking search status:', err);
-        // After a few failed attempts, try to fetch rooms anyway (might be cached)
-        if (pollCount >= MIN_POLLS_BEFORE_FALLBACK) {
-          await fetchRooms();
-        } else {
-          pollTimeout = setTimeout(() => {
-            if (isMounted && !hasFetched) {
-              pollForSearchCompletion();
-            }
-          }, POLL_DELAY);
-        }
+
+        scheduleNextPoll();
+        return;
       }
+
+      if (shouldStopSearchPolling(searchStatus.status, searchStatus.completeness)) {
+        if (!isMounted) return;
+        await completeSearchAndFetchRooms();
+        return;
+      }
+
+      scheduleNextPoll();
     };
 
-    // Start polling immediately
-    pollForSearchCompletion();
+    const loadRooms = async () => {
+      if (await tryCompleteFromStatus()) return;
+
+      const { gotRooms, requestFailed } = await fetchRooms();
+
+      if (!isMounted || pollStopped) return;
+
+      if (requestFailed) {
+        if (await tryCompleteFromStatus()) return;
+        await notifyStaleRequestId();
+        return;
+      }
+
+      if (gotRooms) {
+        finishLoading();
+        return;
+      }
+
+      void pollForSearchCompletion();
+    };
+
+    void loadRooms();
 
     return () => {
       isMounted = false;
-      hasFetched = false;
+      pollStopped = true;
       pollCount = 0;
-      if (pollTimeout) {
-        clearTimeout(pollTimeout);
-      }
+      clearPollTimeout();
     };
   }, [isReady, requestId, hotelId, refreshKey]);
 
-  return { rooms, loading };
+  return { rooms, roomFilters, loading };
 };
-

@@ -60,3 +60,36 @@ export function stayRangeFromDeparture(departure: string | Date, nightCount: num
         end_date_till: formatYmd(end),
     };
 }
+
+/** Departure window for `flex_dates` (±N calendar days around preferred departure). */
+export function flexDepartureDateRange(departureYmd: string, flexDays: number) {
+    const base = parseLocalYmdInput(departureYmd);
+    const sd = formatYmd(base);
+    if (!Number.isFinite(flexDays) || flexDays <= 0) {
+        return { start_date: sd, start_date_from: sd, start_date_till: sd };
+    }
+    const from = new Date(base);
+    from.setDate(base.getDate() - flexDays);
+    const till = new Date(base);
+    till.setDate(base.getDate() + flexDays);
+    return {
+        start_date: sd,
+        start_date_from: formatYmd(from),
+        start_date_till: formatYmd(till),
+    };
+}
+
+/** Sorted YYYY-MM-DD list for departure ± flexDays (inclusive). */
+export function listFlexDepartureDates(departureYmd: string, flexDays: number): string[] {
+    const base = parseLocalYmdInput(departureYmd);
+    const sd = formatYmd(base);
+    if (!Number.isFinite(flexDays) || flexDays <= 0) return [sd];
+
+    const dates: string[] = [];
+    for (let offset = -flexDays; offset <= flexDays; offset += 1) {
+        const d = new Date(base);
+        d.setDate(base.getDate() + offset);
+        dates.push(formatYmd(d));
+    }
+    return dates;
+}
