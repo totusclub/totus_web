@@ -1,5 +1,5 @@
-import { FooterStaticPlaceholder } from "@/components/staticInfoPage/FooterStaticPlaceholder";
+import { CmsStaticPage } from '@/components/staticInfoPage/CmsStaticPage';
 
-export default function AdvertisePage() {
-    return <FooterStaticPlaceholder slug="advertise" />;
+export default function Page() {
+    return <CmsStaticPage slug="advertise" />;
 }

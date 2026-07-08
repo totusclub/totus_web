@@ -1,5 +1,5 @@
-import { FooterStaticPlaceholder } from "@/components/staticInfoPage/FooterStaticPlaceholder";
+import { CmsStaticPage } from '@/components/staticInfoPage/CmsStaticPage';
 
-export default function LowFareTipsPage() {
-    return <FooterStaticPlaceholder slug="low-fare-tips" />;
+export default function Page() {
+    return <CmsStaticPage slug="low-fare-tips" />;
 }

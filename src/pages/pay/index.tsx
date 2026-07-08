@@ -2,6 +2,7 @@ import {useEffect,useState} from 'react'
 import {checkPay} from "@/api/levelTravelApi";
 import {useRouter} from "next/router";
 import Button from "@/components/UI/button";
+import { isSbpPaymentPaid } from '@/utils/sbpPayment';
 
 
 export default function Pay() {
@@ -18,11 +19,7 @@ export default function Pay() {
                 : null;
 
         checkPay({ orderId, ...(qrcId ? { qrcId } : {}) }).then((e) => {
-            const paid =
-                e?.paid === true ||
-                e?.status === "RECONCILED" ||
-                e?.status === "PAID";
-            setStatus(paid ? "RECONCILED" : e?.status);
+            setStatus(isSbpPaymentPaid(e) ? "RECONCILED" : e?.status);
         });
     },[router])
 

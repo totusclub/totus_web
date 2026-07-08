@@ -1,5 +1,5 @@
-import { FooterStaticPlaceholder } from "@/components/staticInfoPage/FooterStaticPlaceholder";
+import { CmsStaticPage } from '@/components/staticInfoPage/CmsStaticPage';
 
-export default function SecurityPage() {
-    return <FooterStaticPlaceholder slug="security" />;
+export default function Page() {
+    return <CmsStaticPage slug="security" />;
 }

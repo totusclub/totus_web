@@ -1,5 +1,5 @@
-import { FooterStaticPlaceholder } from "@/components/staticInfoPage/FooterStaticPlaceholder";
+import { CmsStaticPage } from '@/components/staticInfoPage/CmsStaticPage';
 
-export default function BranchesPage() {
-    return <FooterStaticPlaceholder slug="branches" />;
+export default function Page() {
+    return <CmsStaticPage slug="branches" />;
 }

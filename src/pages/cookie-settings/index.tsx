@@ -1,5 +1,5 @@
-import { FooterStaticPlaceholder } from "@/components/staticInfoPage/FooterStaticPlaceholder";
+import { CmsStaticPage } from '@/components/staticInfoPage/CmsStaticPage';
 
-export default function CookieSettingsPage() {
-    return <FooterStaticPlaceholder slug="cookie-settings" />;
+export default function Page() {
+    return <CmsStaticPage slug="cookie-settings" />;
 }

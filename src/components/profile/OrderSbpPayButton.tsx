@@ -1,6 +1,5 @@
-import { useState } from 'react';
 import { SbpPayButton } from '@/components/UI/SbpPayButton';
-import { createPay } from '@/api/levelTravelApi';
+import SbpQrModal from '@/components/UI/SbpPayButton/SbpQrModal';
 import {
   canPayWithSbp,
   getOrderIdForPay,
@@ -8,6 +7,7 @@ import {
   getOrderPaymentPurpose,
   isOrderAwaitingPayment,
 } from '@/utils/orderPayment';
+import { useSbpPay } from '@/hooks/useSbpPay';
 import styles from './profile.module.css';
 
 type Props = {
@@ -16,7 +16,7 @@ type Props = {
 };
 
 const OrderSbpPayButton = ({ order, fullWidth = true }: Props) => {
-  const [loading, setLoading] = useState(false);
+  const { loading, pay, qrModal, closeQrModal } = useSbpPay();
 
   if (!order || !isOrderAwaitingPayment(order) || !canPayWithSbp(order)) {
     return null;
@@ -25,53 +25,40 @@ const OrderSbpPayButton = ({ order, fullWidth = true }: Props) => {
   const orderId = getOrderIdForPay(order);
   const amount = getOrderPayAmount(order);
 
-  const handlePay = async () => {
-    if (!orderId || loading) return;
-    setLoading(true);
-    try {
-      const expireDate = new Date(Date.now() + 20 * 60 * 1000);
-      const returnUrl = `https://totus.club/pay?orderId=${orderId}`;
-      const payInfo = await createPay({
-        orderId: `ORDER${orderId}`,
-        orderName: `Заказ №${orderId}`,
-        paymentPurpose: getOrderPaymentPurpose(order),
-        expire: expireDate,
-        amount: {
-          value: amount,
-          code: 'RUB',
-        },
-        returnUrl,
-      });
-
-      const sbpUrl =
-        payInfo?.data?.payload ||
-        payInfo?.payload ||
-        payInfo?.payUrl ||
-        payInfo?.object?.payUrl;
-      const qrcId = payInfo?.data?.qrcId || payInfo?.qrcId;
-      if (qrcId && typeof window !== 'undefined') {
-        sessionStorage.setItem(`sbp_qrc_${orderId}`, qrcId);
-      }
-      if (sbpUrl) {
-        window.location.href = sbpUrl;
-      }
-    } finally {
-      setLoading(false);
-    }
+  const handlePay = () => {
+    if (!orderId) return;
+    pay({
+      orderId,
+      amount,
+      paymentPurpose: getOrderPaymentPurpose(order),
+    });
   };
 
   return (
-    <div
-      className={styles.orderItemPayWrap}
-      onClick={(e) => e.stopPropagation()}
-    >
-      <SbpPayButton
-        fullWidth={fullWidth}
-        onClick={handlePay}
-        loading={loading}
-        disabled={loading}
-      />
-    </div>
+    <>
+      <div
+        className={styles.orderItemPayWrap}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <SbpPayButton
+          fullWidth={fullWidth}
+          onClick={handlePay}
+          loading={loading}
+          disabled={loading}
+        />
+      </div>
+      {qrModal ? (
+        <SbpQrModal
+          isOpen={qrModal.isOpen}
+          qrSrc={qrModal.qrSrc}
+          orderId={qrModal.orderId}
+          qrcId={qrModal.qrcId}
+          returnUrl={qrModal.returnUrl}
+          amount={qrModal.amount}
+          onClose={closeQrModal}
+        />
+      ) : null}
+    </>
   );
 };
 
