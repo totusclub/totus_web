@@ -1,8 +1,12 @@
 /**
  * Utility functions for hotel details page
+ *
+ * ±2 flex dates/nights (flex_dates=2, departure ±2 days, nights 7..9):
+ * DISABLED on website — fixed date and exact nights only.
+ * Search commented blocks with "±flex" to re-enable.
  */
 
-import { endYmdAfterNights, listFlexDepartureDates } from '@/utils/calendarDateRange';
+import { endYmdAfterNights /* , listFlexDepartureDates */ } from '@/utils/calendarDateRange';
 import { getSearchTypeFromQuery } from '@/utils/bookingFlowUtils';
 
 /**
@@ -131,8 +135,9 @@ export function parseNightsRange(nightsStr: string): { min: number; max: number 
   return { min: single, max: single };
 }
 
-/** Hotel details page defaults to ±2 nights / dates when flex_dates is absent from the URL. */
-export const HOTEL_DETAILS_DEFAULT_FLEX_DATES = 2;
+/** Hotel details page: ±2 nights/dates disabled — use exact date only (was 2). */
+export const HOTEL_DETAILS_DEFAULT_FLEX_DATES = 0;
+// export const HOTEL_DETAILS_DEFAULT_FLEX_DATES = 2; // ±2 flex window
 
 export function parseFlexDatesValue(
   value: unknown,
@@ -164,10 +169,11 @@ export function getSearchNightsRangeFromQuery(
   }
 
   const baseNights = parseNightsValue(nightsStr);
-  const flexDates = getFlexDatesFromQuery(query, defaultFlexDates);
-  if (flexDates > 0) {
-    return { min: baseNights, max: baseNights + flexDates };
-  }
+  // ±flex_dates nights range (disabled — exact nights only)
+  // const flexDates = getFlexDatesFromQuery(query, defaultFlexDates);
+  // if (flexDates > 0) {
+  //   return { min: baseNights, max: baseNights + flexDates };
+  // }
 
   return { min: baseNights, max: baseNights };
 }
@@ -313,12 +319,14 @@ export function getFlexDepartureDatesFromQuery(
 ): string[] {
   const startDate = getSearchStartDateFromQuery(query);
   if (!startDate) return [];
-  const flex = getFlexDatesFromQuery(query, defaultFlexDates);
-  return listFlexDepartureDates(startDate, flex);
+  // ±flex_dates window (disabled — fixed departure date only)
+  // const flex = getFlexDatesFromQuery(query, defaultFlexDates);
+  // return listFlexDepartureDates(startDate, flex);
+  return [startDate];
 }
 
 /**
- * Room date tabs: show full ±flex_dates window when a departure date is known.
+ * Room date tabs: fixed departure date only (±flex_dates window disabled).
  */
 export function getAvailableDepartureDatesForHotelRooms(
   rooms: unknown[] | null | undefined,
@@ -327,20 +335,31 @@ export function getAvailableDepartureDatesForHotelRooms(
   overrides?: { startDate?: string | null; flexDates?: number },
 ): string[] {
   const startDate = overrides?.startDate ?? getSearchStartDateFromQuery(query);
-  const flex =
-    overrides?.flexDates ??
-    getFlexDatesFromQuery(query, defaultFlexDates);
-
-  if (startDate && flex > 0) {
-    return listFlexDepartureDates(startDate, flex);
-  }
-
-  const constraint = getNightsConstraintFromQuery(query, { defaultFlexDates });
-  return getAvailableDatesFromFilteredRooms(
+  const constraint = getNightsConstraintFromQuery(query, { defaultFlexDates: 0 });
+  const datesFromRooms = getAvailableDatesFromFilteredRooms(
     rooms,
     constraint.searchNights,
     constraint.nightsRange,
   );
+
+  // Prefer real offer dates from API so all rooms stay visible after refresh.
+  if (datesFromRooms.length > 0) {
+    return datesFromRooms;
+  }
+
+  // ±flex_dates date tabs (disabled — fixed departure fallback)
+  // const flex =
+  //   overrides?.flexDates ??
+  //   getFlexDatesFromQuery(query, defaultFlexDates);
+  // if (startDate && flex > 0) {
+  //   return listFlexDepartureDates(startDate, flex);
+  // }
+
+  if (startDate) {
+    return [startDate];
+  }
+
+  return [];
 }
 
 /** Cheapest offer price per start date (undefined when no matching offers). */
@@ -483,10 +502,12 @@ export function buildHotelSearchParamsFromForm(
       ? source.adults
       : parseInt(String(q.adults || '2'), 10) || 2;
   const kids = source.kids ?? (parseInt(String(q.kids || '0'), 10) || 0);
-  const flexDates =
-    source.flexDates != null
-      ? source.flexDates
-      : parseFlexDatesValue(q.flex_dates, HOTEL_DETAILS_DEFAULT_FLEX_DATES);
+  // ±flex_dates / nights range (disabled — exact nights only)
+  // const flexDates =
+  //   source.flexDates != null
+  //     ? source.flexDates
+  //     : parseFlexDatesValue(q.flex_dates, HOTEL_DETAILS_DEFAULT_FLEX_DATES);
+  const flexDates = 0;
 
   const hotelCountry = source.apiHotelData?.country;
   const hotelCity = source.apiHotelData?.city;
@@ -513,7 +534,8 @@ export function buildHotelSearchParamsFromForm(
     start_date: departureDate,
     start_date_from: departureDate,
     end_date_till: returnDate,
-    nights: formatNightsForAPI(nights, flexDates),
+    nights: String(nights),
+    // nights: formatNightsForAPI(nights, flexDates), // ±2 range when flex enabled
     adults: String(adults),
     kids: kids > 0 ? String(kids) : undefined,
     kids_ages:
@@ -547,7 +569,8 @@ export const buildInitialSearchParams = (
 ): Record<string, unknown> => {
   const startDate = (query.start_date as string) || getDefaultStartDate();
   const nightsStr = (query.nights as string) || '7';
-  const flexDates = getFlexDatesFromQuery(query, HOTEL_DETAILS_DEFAULT_FLEX_DATES);
+  // const flexDates = getFlexDatesFromQuery(query, HOTEL_DETAILS_DEFAULT_FLEX_DATES);
+  const flexDates = 0;
   
   const nights = parseNightsValue(nightsStr);
   const endDateStr = endYmdAfterNights(startDate, nights);
@@ -565,7 +588,8 @@ export const buildInitialSearchParams = (
     start_date: startDate,
     start_date_from: startDate,
     end_date_till: endDateStr,
-    nights: formatNightsForAPIFromString(nightsStr, flexDates), // Format as range when flex_dates > 0
+    nights: String(nights),
+    // nights: formatNightsForAPIFromString(nightsStr, flexDates),
     search_type: (query.search_type as string) || 'package',
     flex_dates: flexDates,
     hotel_ids: [Number(hotelId)],
@@ -585,7 +609,8 @@ export function buildHotelDetailsDeepLinkQuery(hotelId: string | number): Record
     start_date: getDefaultStartDate(),
     nights: "7",
     search_type: "package",
-    flex_dates: "2",
+    // flex_dates: "2", // ±2 dates disabled
+    flex_dates: "0",
   };
   const built = buildInitialSearchParams(base, String(hotelId));
   const out: Record<string, string> = {

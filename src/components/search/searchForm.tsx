@@ -14,6 +14,8 @@ import { RootState } from '@/store';
 import { stayRangeFromDeparture } from '@/utils/calendarDateRange';
 import { parseUiPageNumber } from '@/utils/searchResults';
 
+// ±2 flex dates/nights UI disabled on main search form — fixed date only.
+
 /** Same as historical `calculateStayDates` return value (3 keys only; no `start_date_till`). */
 function legacyStayDatesFromRange(startDateStr: string | Date, nightCount: number) {
     const r = stayRangeFromDeparture(startDateStr, nightCount);
@@ -515,13 +517,15 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
                                     handleChange={handleChange}
                                     value={params.start_date}
                                     endValue={params.end_date_till}
-                                    flexDates={params.flex_dates}
+                                    // flexDates={params.flex_dates} // ±2 disabled
+                                    flexDates="0"
                                 />
                                 <Nights
                                     handleChange={handleChange}
                                     name={'nights'}
                                     value={params.nights}
-                                    flexDates={params.flex_dates}
+                                    // flexDates={params.flex_dates} // ±2 disabled
+                                    flexDates="0"
                                 />
                             </div>
                             <People

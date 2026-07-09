@@ -26,6 +26,8 @@ type HotelDetailsInfoProps = {
     rooms: unknown[];
     panding: boolean;
     selectedRoomDate: string;
+    /** True after hotel-scoped room search has finished. */
+    searchAttempted?: boolean;
 };
 
 const HotelDetailsInfo = ({
@@ -35,6 +37,7 @@ const HotelDetailsInfo = ({
     rooms,
     panding,
     selectedRoomDate,
+    searchAttempted = false,
 }: HotelDetailsInfoProps) => {
     const router = useRouter();
     const searchType = getSearchTypeFromQuery(router.query);
@@ -93,6 +96,8 @@ const HotelDetailsInfo = ({
             ? String(highlightOffer.price).replace(/\B(?=(\d{3})+(?!\d))/g, "\u202F")
             : "—";
 
+    const showNoRoomsPrice = searchAttempted && !panding && !highlightOffer;
+
     return (
         <>
             {!panding ? (
@@ -103,16 +108,34 @@ const HotelDetailsInfo = ({
                             <div className={styles.HotelDetailsInfoPrice}>
                                 <div className={styles.HotelDetailsInfoPriceTop}>
                                     <div className={styles.HotelDetailsInfoPriceMain}>
-                                        <p className={styles.HotelDetailsInfoPriceText}>от {priceFormatted}₽</p>
-                                        <div className={styles.HotelDetailsInfoDate}>
-                                            <p className={styles.HotelDetailsInfoDateTitle}>{getOfferPriceTitle(searchType)}</p>
-                                            <p className={styles.HotelDetailsInfoDateText}>
-                                                {formatDate}
-                                                {highlightOffer?.nights_count != null
-                                                    ? `, ${highlightOffer.nights_count} ночей`
-                                                    : ""}
-                                            </p>
-                                        </div>
+                                        {showNoRoomsPrice ? (
+                                            <>
+                                                <p className={styles.HotelDetailsInfoPriceEmptyTitle}>
+                                                    Номера не найдены
+                                                </p>
+                                                <div className={styles.HotelDetailsInfoDate}>
+                                                    <p className={styles.HotelDetailsInfoDateTitle}>
+                                                        По выбранным параметрам поиска
+                                                    </p>
+                                                    <p className={styles.HotelDetailsInfoDateText}>
+                                                        Нет доступных номеров на эти даты и количество ночей
+                                                    </p>
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <p className={styles.HotelDetailsInfoPriceText}>от {priceFormatted}₽</p>
+                                                <div className={styles.HotelDetailsInfoDate}>
+                                                    <p className={styles.HotelDetailsInfoDateTitle}>{getOfferPriceTitle(searchType)}</p>
+                                                    <p className={styles.HotelDetailsInfoDateText}>
+                                                        {formatDate}
+                                                        {highlightOffer?.nights_count != null
+                                                            ? `, ${highlightOffer.nights_count} ночей`
+                                                            : ""}
+                                                    </p>
+                                                </div>
+                                            </>
+                                        )}
                                     </div>
                                     {hotelPayload && resolvedHotelId ? (
                                         <div className={styles.HotelDetailsInfoPriceFav}>

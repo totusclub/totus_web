@@ -55,5 +55,17 @@ export async function createHotelSearchRequest(
 ): Promise<string | null> {
     const searchParams = buildInitialSearchParams(query, hotelId);
     const response = await startSearch(searchParams);
-    return response?.request_id ? String(response.request_id) : null;
+    const requestId = response?.request_id ? String(response.request_id) : null;
+    if (requestId && typeof window !== 'undefined') {
+        sessionStorage.setItem(`hotel_scoped_rid_${hotelId}`, requestId);
+    }
+    return requestId;
+}
+
+export function isHotelScopedRequestId(
+    hotelId: string | undefined,
+    requestId: string | null | undefined,
+): boolean {
+    if (!hotelId || !requestId || typeof window === 'undefined') return false;
+    return sessionStorage.getItem(`hotel_scoped_rid_${hotelId}`) === String(requestId);
 }

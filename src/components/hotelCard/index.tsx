@@ -36,7 +36,6 @@ const HotelCard = ({ item, request_id, lazy }: HotelCardState) => {
         // Get all search params from current URL query
         const queryParams: Record<string, string | string[]> = {
             hotel_id: String(item?.hotel?.id),
-            request_id: request_id || '',
             from_city: (router.query.from_city as string) || 'Moscow',
             from_country: (router.query.from_country as string) || 'RU',
             to_country: (router.query.to_country as string) || '',
@@ -45,7 +44,8 @@ const HotelCard = ({ item, request_id, lazy }: HotelCardState) => {
             start_date: (router.query.start_date as string) || '',
             nights: (router.query.nights as string) || '7',
             search_type: (router.query.search_type as string) || 'package',
-            flex_dates: (router.query.flex_dates as string) ?? '2',
+            // flex_dates: (router.query.flex_dates as string) ?? '2', // ±2 dates disabled
+            flex_dates: (router.query.flex_dates as string) ?? '0',
         };
 
         if (router.query.start_date_from) {

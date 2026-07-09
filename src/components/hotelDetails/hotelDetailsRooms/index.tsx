@@ -1,15 +1,16 @@
 import styles from '../hotelDetails.module.css';
-import DatesPrice from "@/components/hotelDetails/hotelDetailsRooms/datesPrice";
+// import DatesPrice from "@/components/hotelDetails/hotelDetailsRooms/datesPrice"; // date tabs removed
 import HotelDetailsRoomItem from "@/components/hotelDetails/hotelDetailsRooms/roomItem";
 import RoomsSkeleton from "@/components/hotelDetails/hotelDetailsRooms/roomsSkeleton";
 import Icon from "@/components/icons/Icon";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import RoomFilters from "@/components/hotelDetails/hotelDetailsRooms/roomFilters";
+import RoomsEmptyState from "@/components/hotelDetails/hotelDetailsRooms/RoomsEmptyState";
 import { useMemo, useState, useEffect, useRef } from "react";
 import { getHotelRooms } from "@/api/levelTravelApi";
 import { useRouter } from "next/router";
-import { buildMinOfferPricesByDate, filterRoomsByNightsConstraint, getAvailableDepartureDatesForHotelRooms, getNightsConstraintFromQuery, offerMatchesNightsConstraint, HOTEL_DETAILS_DEFAULT_FLEX_DATES, parseFlexDatesValue } from "@/utils/hotelDetailsUtils";
+import { filterRoomsByNightsConstraint, getAvailableDepartureDatesForHotelRooms, getNightsConstraintFromQuery, offerMatchesNightsConstraint, HOTEL_DETAILS_DEFAULT_FLEX_DATES, parseFlexDatesValue } from "@/utils/hotelDetailsUtils";
 import {
     applyRoomFilters,
     buildHotelRoomsQueryParams,
@@ -50,6 +51,8 @@ interface HotelDetailsRoomsProps {
     rooms: any[];
     roomFilters?: HotelRoomFilters | null;
     loading?: boolean;
+    /** True after hotel-scoped search has run (or is in progress with a request_id). */
+    searchAttempted?: boolean;
     hotelMap?: HotelDetailsMapInfo;
     selectedDate: string;
     onSelectedDateChange: (date: string) => void;
@@ -62,6 +65,7 @@ const HotelDetailsRooms = ({
     rooms,
     roomFilters: roomFiltersFromApi,
     loading = false,
+    searchAttempted = false,
     hotelMap,
     selectedDate,
     onSelectedDateChange,
@@ -276,38 +280,55 @@ const HotelDetailsRooms = ({
         [canonicalRooms, activeRoomFilters],
     );
 
-    const pricesList = useMemo((): Record<string, number | undefined> | undefined => {
-        if (!allAvailableDates.length) return undefined;
-
-        const priceSource = hasActiveFilters ? roomsMatchingFilters : canonicalRooms;
-        const prices = buildMinOfferPricesByDate(
-            priceSource,
-            allAvailableDates,
-            nightsConstraint.searchNights,
-            nightsConstraint.nightsRange,
-        );
-
-        return allAvailableDates.reduce<Record<string, number | undefined>>((acc, date) => {
-            acc[date] = prices[date];
-            return acc;
-        }, {});
-    }, [allAvailableDates, canonicalRooms, roomsMatchingFilters, hasActiveFilters, nightsConstraint]);
+    // Date/price tabs removed — pricesList was only used by DatesPrice
+    // const pricesList = useMemo((): Record<string, number | undefined> | undefined => {
+    //     if (!allAvailableDates.length) return undefined;
+    //
+    //     const priceSource = hasActiveFilters ? roomsMatchingFilters : canonicalRooms;
+    //     const prices = buildMinOfferPricesByDate(
+    //         priceSource,
+    //         allAvailableDates,
+    //         nightsConstraint.searchNights,
+    //         nightsConstraint.nightsRange,
+    //     );
+    //
+    //     return allAvailableDates.reduce<Record<string, number | undefined>>((acc, date) => {
+    //         acc[date] = prices[date];
+    //         return acc;
+    //     }, {});
+    // }, [allAvailableDates, canonicalRooms, roomsMatchingFilters, hasActiveFilters, nightsConstraint]);
 
     const hotelCoords = resolveHotelCoords(hotelMap);
     const mapBalloon = [hotelMap?.name, hotelMap?.address].filter(Boolean).join(" — ");
 
-    if (loading) {
+    if (loading || !searchAttempted) {
         return <RoomsSkeleton />;
     }
 
-    if (!rooms || rooms.length === 0 || canonicalRooms.length === 0) {
+    if (!rooms || rooms.length === 0) {
         return (
             <div className={'content'}>
                 <div className={styles.HotelDetailsRoomsRow}>
                     <div className={styles.HotelDetailsRooms}>
-                        <div className={styles.HotelDetailsRoomsHead}>
-                            <p>Номера не найдены</p>
-                        </div>
+                        <RoomsEmptyState
+                            title="Номера не найдены"
+                            description="Попробуйте изменить даты поиска или количество ночей и выполните поиск снова."
+                        />
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    if (canonicalRooms.length === 0) {
+        return (
+            <div className={'content'}>
+                <div className={styles.HotelDetailsRoomsRow}>
+                    <div className={styles.HotelDetailsRooms}>
+                        <RoomsEmptyState
+                            title="Нет номеров на выбранные даты и количество ночей"
+                            description="Измените параметры поиска, чтобы увидеть доступные варианты."
+                        />
                     </div>
                 </div>
             </div>
@@ -329,11 +350,13 @@ const HotelDetailsRooms = ({
                     <div id="choose-room" className={styles.HotelDetailsRoomsHead}>
                         <p>Выберите номер</p>
                     </div>
+                    {/* Date/price tabs removed
                     <DatesPrice
                         dates={pricesList ?? {}}
                         selectedDate={effectiveSelectedDate}
                         setSelectedDate={onSelectedDateChange}
                     />
+                    */}
                     <RoomFilters
                         filters={displayRoomFilters}
                         hasActiveFilters={hasActiveFilters}
@@ -347,8 +370,11 @@ const HotelDetailsRooms = ({
                         }}
                     />
                     {showFilteredEmpty ? (
-                        <div className={styles.HotelDetailsRoomsEmpty}>
-                            <p>По выбранным фильтрам номера не найдены</p>
+                        <RoomsEmptyState
+                            compact
+                            title="По выбранным фильтрам номера не найдены"
+                            description="Сбросьте фильтры или выберите другие параметры."
+                        >
                             <button
                                 type="button"
                                 className={styles.HotelDetailsRoomFiltersClear}
@@ -361,11 +387,12 @@ const HotelDetailsRooms = ({
                             >
                                 Сбросить фильтры
                             </button>
-                        </div>
+                        </RoomsEmptyState>
                     ) : showNoRoomsForDate ? (
-                        <div className={styles.HotelDetailsRoomsEmpty}>
-                            <p>На выбранную дату нет номеров по этим фильтрам</p>
-                        </div>
+                        <RoomsEmptyState
+                            compact
+                            title="На выбранную дату нет номеров по этим фильтрам"
+                        />
                     ) : (
                         filteredRooms.map((r, i) => (
                             <HotelDetailsRoomItem key={i} item={r} selectedDate={effectiveSelectedDate} />

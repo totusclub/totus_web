@@ -136,6 +136,14 @@
   letter-spacing: -0.64px;
   margin-left: 16px;
 }
+.HotelDetailsInfoPriceEmptyTitle {
+  color: var(--textPrimary);
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 28px;
+  letter-spacing: -0.44px;
+  margin: 0 0 0 16px;
+}
 .HotelDetailsInfoDate {
   display: flex;
   height: 64px;
@@ -515,15 +523,66 @@
 .HotelDetailsRoomsEmpty {
   display: flex;
   width: 100%;
-  padding: 32px 16px;
+  padding: 32px 16px 40px;
   flex-direction: column;
   align-items: center;
   gap: 12px;
   border-bottom: 1px solid var(--borderTertiary);
+  text-align: center;
 }
 .HotelDetailsRoomsEmpty > p {
   color: var(--textTertiary);
   font-size: 16px;
+  line-height: 20px;
+}
+.HotelDetailsRoomsNotFound {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 48px 24px 56px;
+  text-align: center;
+  background: var(--bgPrimary);
+}
+.HotelDetailsRoomsNotFoundIllustration {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: min(240px, 100%);
+  height: auto;
+}
+.HotelDetailsRoomsNotFoundIllustration svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+.HotelDetailsRoomsNotFoundTitle {
+  margin: 0;
+  color: var(--textPrimary);
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 28px;
+  letter-spacing: -0.04em;
+}
+.HotelDetailsRoomsNotFoundText {
+  margin: 0;
+  max-width: 380px;
+  color: var(--textSecondary);
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 22px;
+  letter-spacing: -0.02em;
+}
+.HotelDetailsRoomsEmpty .HotelDetailsRoomsNotFoundIllustration {
+  width: min(180px, 72%);
+}
+.HotelDetailsRoomsEmpty .HotelDetailsRoomsNotFoundTitle {
+  font-size: 18px;
+  line-height: 24px;
+}
+.HotelDetailsRoomsEmpty .HotelDetailsRoomsNotFoundText {
+  font-size: 14px;
   line-height: 20px;
 }
 .HotelDetailsDatePrices {

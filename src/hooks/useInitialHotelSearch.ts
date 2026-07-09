@@ -1,58 +1,74 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import {
     buildHotelSearchQueryUpdate,
     createHotelSearchRequest,
 } from '@/utils/hotelSearchRefresh';
 
+export type InitialHotelSearchState = {
+    searching: boolean;
+    settled: boolean;
+};
+
 /**
- * Runs startSearch when there is a hotel_id but no request_id yet.
- * `buildInitialSearchParams` fills defaults (dates, Moscow, adults, …) so deep links work:
- * favorites, share, refresh on `/hotel-details?hotel_id=…` only.
+ * Runs hotel-scoped startSearch when there is a hotel_id but no request_id yet.
+ * Deep links, favorites, and navigation from search results (without listing request_id).
  */
 export const useInitialHotelSearch = (
   hotelId: string | undefined,
   requestId: string | null | undefined,
   localRequestId: string | null,
   isReady: boolean,
-  setLocalRequestId: (id: string) => void
-): void => {
+  setLocalRequestId: (id: string) => void,
+): InitialHotelSearchState => {
   const router = useRouter();
+  const [searching, setSearching] = useState(false);
+  const [settled, setSettled] = useState(false);
 
   useEffect(() => {
     if (!isReady || !hotelId) return;
 
-    const query = router.query;
-
-    // Keep the list search request_id when navigating from search results.
+    // URL already has request_id (e.g. page refresh) — use it; stale IDs refresh via useHotelRooms.
     if (requestId || localRequestId) {
+      setSettled(true);
       return;
     }
 
     let isMounted = true;
 
     const runInitialSearch = async () => {
+      setSearching(true);
       try {
-        const newRequestId = await createHotelSearchRequest(query, hotelId);
+        const newRequestId = await createHotelSearchRequest(router.query, hotelId);
 
         if (isMounted && newRequestId) {
           setLocalRequestId(newRequestId);
 
-          const newQuery = buildHotelSearchQueryUpdate(query, hotelId, newRequestId);
+          const newQuery = buildHotelSearchQueryUpdate(router.query, hotelId, newRequestId);
 
-          router.replace({ pathname: router.pathname, query: newQuery }, undefined, { shallow: true });
+          await router.replace(
+            { pathname: router.pathname, query: newQuery },
+            undefined,
+            { shallow: true },
+          );
         }
       } catch (error) {
-        console.error("[useInitialHotelSearch] Failed to start hotel search", error);
+        console.error('[useInitialHotelSearch] Failed to start hotel search', error);
+      } finally {
+        if (isMounted) {
+          setSearching(false);
+          setSettled(true);
+        }
       }
     };
 
-    runInitialSearch();
+    void runInitialSearch();
 
     return () => {
       isMounted = false;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isReady, hotelId, requestId, localRequestId, setLocalRequestId]);
-};
 
+  return { searching, settled };
+};

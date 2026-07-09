@@ -403,6 +403,7 @@ const Calendar = ({
                     );
                 })}
             </div>
+            {/* ±2 days toggle disabled — fixed departure date only
             {!hideToggle && (
                 <div className={styles.toggleRow}>
                     <p>±2 дня</p>
@@ -415,6 +416,7 @@ const Calendar = ({
                     />
                 </div>
             )}
+            */}
         </div>
     );
 };

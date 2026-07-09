@@ -73,7 +73,6 @@ export default function HotDealsSlide({ slidesToShow, title, recomendHotels }: {
                 start_date: date,
                 nights: "7",
                 search_type: "package",
-                flex_dates: "2",
             };
 
             // Navigate to hotel-details with search params using object format

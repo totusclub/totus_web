@@ -6,6 +6,8 @@ import { addDays, differenceInCalendarDays, format, parseISO, startOfDay } from 
 import { ru } from "date-fns/locale";
 import Button from "@/components/UI/button";
 
+// ±2 departure date toggle (calendar ±2 days) disabled — fixed date only.
+
 type SelectDateProps = {
     handleChange: any;
     value: any;
@@ -239,8 +241,11 @@ const SelectDate = ({
                         rangeSelectionPhase={nextPickIsEnd ? 'end' : 'start'}
                         monthsToShow={2}
                         allowPastDates={true}
-                        plusMinusEnabled={Number(flexDates) === 2}
-                        onPlusMinusChange={(enabled) => handleChange(enabled ? '2' : '0', 'flex_dates')}
+                        hideToggle={true}
+                        // ±2 dates UI disabled
+                        // plusMinusEnabled={Number(flexDates) === 2}
+                        // onPlusMinusChange={(enabled) => handleChange(enabled ? '2' : '0', 'flex_dates')}
+                        // plusMinusEnabled={false}
                     />
                     <div className={styles.dateFooter}>
                         <Button onClick={closeModal} full={true} title={'Готово'} />

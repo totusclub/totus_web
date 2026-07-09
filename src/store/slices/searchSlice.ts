@@ -419,10 +419,10 @@ const searchSlice = createSlice({
                 state.allMyHotels = action.payload.hotels || [];
             })
             .addCase(runFullSearchFlow.rejected, (state, action) => {
-                state.loading = false;
                 if (action.error?.message === SEARCH_POLL_CANCELLED) {
                     return;
                 }
+                state.loading = false;
                 state.error = action.payload as string;
             })
             .addCase(searchFilters.pending, (state, action) => {

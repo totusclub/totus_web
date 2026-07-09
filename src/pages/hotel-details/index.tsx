@@ -23,6 +23,8 @@ import { useSelector } from "react-redux";
 import type { RootState } from "@/store";
 import { useStaleHotelSearchRefresh } from "@/hooks/useStaleHotelSearchRefresh";
 
+// ±2 flex_dates auto-inject disabled — fixed departure date only (see commented useEffect below).
+
 export default function HotelDetails() {
     const router = useRouter();
     const hotelId = router.query.hotel_id as string;
@@ -35,6 +37,8 @@ export default function HotelDetails() {
     const [roomsSearchKey, setRoomsSearchKey] = useState(0);
     const [lastSearchSnapshot, setLastSearchSnapshot] = useState<SearchParamsSnapshot | null>(null);
     const prevActiveStartRef = useRef<string | undefined>(undefined);
+
+    const [hotelSearchSearching, setHotelSearchSearching] = useState(false);
 
     const { requestId, localRequestId, setLocalRequestId } = useRequestIdSync();
 
@@ -65,13 +69,18 @@ export default function HotelDetails() {
         }
 
         setLocalRequestId(newRequestId);
+        setRoomsSearchKey((key) => key + 1);
+
+        if (typeof window !== 'undefined') {
+            sessionStorage.setItem(`hotel_scoped_rid_${hotelId}`, newRequestId);
+        }
 
         await router.replace(
             { pathname: router.pathname, query: newQuery },
             undefined,
             { shallow: true },
         );
-    }, [router, setLocalRequestId]);
+    }, [router, setLocalRequestId, hotelId]);
 
     const handleStaleRequestId = useStaleHotelSearchRefresh({
         hotelId,
@@ -124,8 +133,18 @@ export default function HotelDetails() {
         return { ...hotel, ...meta };
     }, [hotel, router.query.reviews_count, router.query.rating, searchHotelItem, hotelRating, reviews.length]);
 
-    // Run initial search if needed (when coming from hot deals without request_id)
-    useInitialHotelSearch(hotelId, requestId, localRequestId, router.isReady, setLocalRequestId);
+    // Run hotel-scoped search when there is no request_id (deep link, from search list).
+    const { searching: initialSearchSearching, settled: initialSearchSettled } =
+        useInitialHotelSearch(hotelId, requestId, localRequestId, router.isReady, setLocalRequestId);
+
+    const roomsSearchAttempted = Boolean(requestId) || initialSearchSettled;
+    const awaitingInitialSearch =
+        router.isReady && Boolean(hotelId) && !requestId && !initialSearchSettled;
+    const roomsSectionLoading =
+        hotelSearchSearching ||
+        roomsLoading ||
+        awaitingInitialSearch ||
+        (initialSearchSearching && !requestId);
 
     useEffect(() => {
         if (initialSearchParams?.start_date) {
@@ -137,34 +156,43 @@ export default function HotelDetails() {
         }
     }, [initialSearchParams?.start_date, queryStartDate]);
 
-    useEffect(() => {
-        if (!router.isReady) return;
-        const flexRaw = Array.isArray(router.query.flex_dates)
-            ? router.query.flex_dates[0]
-            : router.query.flex_dates;
-        if (flexRaw != null && flexRaw !== '') return;
-
-        router.replace(
-            {
-                pathname: router.pathname,
-                query: {
-                    ...router.query,
-                    flex_dates: String(HOTEL_DETAILS_DEFAULT_FLEX_DATES),
-                },
-            },
-            undefined,
-            { shallow: true },
-        );
-    }, [router.isReady, router.query.flex_dates, router.pathname, router.query, router]);
+    // ±flex_dates: auto-inject flex_dates=2 disabled — fixed date only
+    // useEffect(() => {
+    //     if (!router.isReady) return;
+    //     const flexRaw = Array.isArray(router.query.flex_dates)
+    //         ? router.query.flex_dates[0]
+    //         : router.query.flex_dates;
+    //     if (flexRaw != null && flexRaw !== '') return;
+    //
+    //     router.replace(
+    //         {
+    //             pathname: router.pathname,
+    //             query: {
+    //                 ...router.query,
+    //                 flex_dates: String(HOTEL_DETAILS_DEFAULT_FLEX_DATES),
+    //             },
+    //         },
+    //         undefined,
+    //         { shallow: true },
+    //     );
+    // }, [router.isReady, router.query.flex_dates, router.pathname, router.query, router]);
 
     const urlRequestId = Array.isArray(router.query.request_id)
         ? router.query.request_id[0]
         : router.query.request_id;
     const prevUrlRequestIdRef = useRef<string | undefined>(undefined);
+    const urlRequestIdInitializedRef = useRef(false);
 
-    // Reload rooms when URL request_id changes (browser back/forward).
+    // Reload rooms when URL request_id changes (browser back/forward) — not on first hydration.
     useEffect(() => {
         if (!router.isReady || !urlRequestId) return;
+
+        if (!urlRequestIdInitializedRef.current) {
+            urlRequestIdInitializedRef.current = true;
+            prevUrlRequestIdRef.current = urlRequestId;
+            return;
+        }
+
         if (prevUrlRequestIdRef.current === urlRequestId) return;
         prevUrlRequestIdRef.current = urlRequestId;
         setLastSearchSnapshot(null);
@@ -291,7 +319,8 @@ export default function HotelDetails() {
                 hotel={hotel}
                 hotelId={hotelId}
                 rooms={rooms}
-                panding={roomsLoading}
+                panding={roomsSectionLoading}
+                searchAttempted={roomsSearchAttempted}
                 images={hotel?.images || apiHotelData?.images || []}
                 selectedRoomDate={selectedRoomDate}
             />
@@ -300,13 +329,15 @@ export default function HotelDetails() {
                 hotelId={hotelId}
                 apiHotelData={apiHotelData}
                 onSearchComplete={handleSearchComplete}
+                onSearchingChange={setHotelSearchSearching}
                 initialSearchParams={initialSearchParams}
                 searchSessionKey={requestId ?? urlRequestId ?? null}
             />
             <HotelDetailsRooms
                 rooms={rooms}
                 roomFilters={roomFilters}
-                loading={roomsLoading}
+                loading={roomsSectionLoading}
+                searchAttempted={roomsSearchAttempted}
                 selectedDate={selectedRoomDate}
                 onSelectedDateChange={setSelectedRoomDate}
                 departureDate={roomDepartureDate}

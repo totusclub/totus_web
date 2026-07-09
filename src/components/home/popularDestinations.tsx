@@ -78,8 +78,8 @@ export default function PopularDestinations({ popularDestinations }: { popularDe
                 return;
             }
 
-            const nightsValue = "7..9";
-            const nightCount = parseInt(nightsValue.split('..')[0] || "7", 10);
+            const nightsValue = "7";
+            const nightCount = parseInt(nightsValue, 10);
             const dateRange = calculateStayDates(date, nightCount);
 
             const params = {
@@ -92,7 +92,6 @@ export default function PopularDestinations({ popularDestinations }: { popularDe
                 start_date_from: dateRange.start_date_from,
                 end_date_till: dateRange.end_date_till,
                 nights: nightsValue,
-                flex_dates: "2",
                 search_type: "package",
                 page_number: 1,
                 page_limit: 20,
@@ -110,7 +109,6 @@ export default function PopularDestinations({ popularDestinations }: { popularDe
                 end_date_till: params.end_date_till,
                 nights: params.nights,
                 search_type: params.search_type,
-                flex_dates: Number(params.flex_dates),
                 page_number: params.page_number,
                 page_limit: params.page_limit,
                 sort_by: params.sort_by,

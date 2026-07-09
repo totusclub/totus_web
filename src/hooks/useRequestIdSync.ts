@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store';
+import { isHotelScopedRequestId } from '@/utils/hotelSearchRefresh';
 
 /**
  * Keeps `request_id` aligned with the URL (back/forward) while allowing a brief
@@ -56,11 +57,16 @@ export const useRequestIdSync = (): {
     if (pendingRequestIdRef.current) {
       return pendingRequestIdRef.current;
     }
-    if (existingRequestId) return existingRequestId;
+    if (existingRequestId) {
+      if (hotelIdInUrl && !isHotelScopedRequestId(hotelIdInUrl, existingRequestId)) {
+        return undefined;
+      }
+      return existingRequestId;
+    }
     if (localRequestId) return localRequestId;
     if (hotelOnlyDeepLink) return undefined;
     return initialRequestId ?? undefined;
-  }, [existingRequestId, localRequestId, hotelOnlyDeepLink, initialRequestId]);
+  }, [existingRequestId, localRequestId, hotelOnlyDeepLink, initialRequestId, hotelIdInUrl]);
 
   return {
     requestId,

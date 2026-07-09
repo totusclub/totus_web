@@ -8,6 +8,8 @@ import { parseNightsValue, buildHotelSearchParamsFromForm, normalizeQueryDate, g
 import { endYmdAfterNights } from '@/utils/calendarDateRange';
 import styles from './hotelSearchSection.module.css';
 
+// ±2 flex dates/nights UI + API range disabled — fixed date only (see hotelDetailsUtils.ts).
+
 // ============================================================================
 // Types
 // ============================================================================
@@ -50,6 +52,7 @@ interface HotelSearchSectionProps {
   hotelId: string | null;
   apiHotelData?: ApiHotelData | null;
   onSearchComplete?: (requestId: string, snapshot: SearchParamsSnapshot) => void;
+  onSearchingChange?: (searching: boolean) => void;
   initialSearchParams?: InitialSearchParams | null;
   /** Current search session — resets the form when URL request_id changes (e.g. browser back). */
   searchSessionKey?: string | null;
@@ -104,6 +107,7 @@ const HotelSearchSection: React.FC<HotelSearchSectionProps> = ({
   hotelId,
   apiHotelData,
   onSearchComplete,
+  onSearchingChange,
   initialSearchParams,
   searchSessionKey,
   runStart = false,
@@ -113,6 +117,11 @@ const HotelSearchSection: React.FC<HotelSearchSectionProps> = ({
   // ==========================================================================
   
   const [isSearching, setIsSearching] = useState(false);
+
+  const setSearching = useCallback((value: boolean) => {
+    setIsSearching(value);
+    onSearchingChange?.(value);
+  }, [onSearchingChange]);
   const [hasUserChangedParams, setHasUserChangedParams] = useState(false);
   const paramsRef = useRef<SearchParamsState | null>(null);
   const prevHotelIdRef = useRef<string | null>(null);
@@ -327,17 +336,17 @@ const HotelSearchSection: React.FC<HotelSearchSectionProps> = ({
 
     try {
       searchInFlightRef.current = true;
-      setIsSearching(true);
+      setSearching(true);
       const response = await startSearch(searchParams);
 
       if (response?.request_id && onSearchComplete) {
-        onSearchComplete(response.request_id, snapshot);
+        await onSearchComplete(response.request_id, snapshot);
       }
     } catch (error) {
       console.error('[HotelSearchSection] Error starting search:', error);
     } finally {
       searchInFlightRef.current = false;
-      setIsSearching(false);
+      setSearching(false);
     }
   }, [params, buildSearchParams, onSearchComplete]);
 
@@ -359,7 +368,8 @@ const HotelSearchSection: React.FC<HotelSearchSectionProps> = ({
                 handleChange={handleDateFieldChange}
                 value={defaultDate}
                 endValue={calendarRangeEnd}
-                flexDates={params.flexDates}
+                // flexDates={params.flexDates} // ±2 dates disabled
+                flexDates={0}
                 departureOnlyLabel
                 className={styles.radioFrom}
               />
@@ -367,7 +377,8 @@ const HotelSearchSection: React.FC<HotelSearchSectionProps> = ({
                 handleChange={handleDateFieldChange}
                 name="nights"
                 value={params.nights.toString()}
-                flexDates={String(params.flexDates)}
+                // flexDates={String(params.flexDates)} // ±2 nights disabled
+                flexDates="0"
               />
               <People
                 handleChange={handleTouristsChange}
