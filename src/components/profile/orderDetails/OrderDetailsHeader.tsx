@@ -5,6 +5,8 @@ import Icon from '@/components/icons/Icon';
 import OrderSbpPayButton from '@/components/profile/OrderSbpPayButton';
 import { isOrderAwaitingPayment } from '@/utils/orderPayment';
 import { getStatusColor, getStatusLabel } from '@/utils/orderDisplay';
+import useAuth from '@/hooks/useAuth';
+import { decodeToken } from '@/utils/auth';
 
 interface OrderDetailsHeaderProps {
   order: any;
@@ -13,6 +15,29 @@ interface OrderDetailsHeaderProps {
   destination?: string;
 }
 
+const resolveDocumentsEmail = (
+  order: any,
+  pkg: any,
+  user: { email?: string } | null | undefined,
+  token: string | null | undefined,
+): string => {
+  const fromUser = user?.email?.trim();
+  if (fromUser) return fromUser;
+
+  if (token) {
+    const decoded = decodeToken(token) as { email?: string } | null;
+    const fromToken = decoded?.email?.trim();
+    if (fromToken) return fromToken;
+  }
+
+  const fromOrder =
+    order?.package?.client?.email ??
+    order?.client?.email ??
+    pkg?.client?.email;
+
+  return typeof fromOrder === 'string' && fromOrder.trim() ? fromOrder.trim() : '—';
+};
+
 const OrderDetailsHeader: React.FC<OrderDetailsHeaderProps> = ({
   order,
   pkg,
@@ -20,6 +45,7 @@ const OrderDetailsHeader: React.FC<OrderDetailsHeaderProps> = ({
   destination = '',
 }) => {
   const router = useRouter();
+  const { user, token } = useAuth();
   const orderId = order?.order_id ?? order?.id ?? '—';
 
   const statusColor = useMemo(
@@ -37,11 +63,10 @@ const OrderDetailsHeader: React.FC<OrderDetailsHeaderProps> = ({
     return Number(amount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '\u202F');
   }, [pkg, order]);
 
-  const clientEmail =
-    order?.package?.client?.email ??
-    order?.client?.email ??
-    pkg?.client?.email ??
-    '—';
+  const clientEmail = useMemo(
+    () => resolveDocumentsEmail(order, pkg, user, token),
+    [order, pkg, user, token],
+  );
 
   return (
     <div className={styles.orderDetailsCard}>
