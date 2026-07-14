@@ -9,7 +9,7 @@ const ResultTicketList = ({ flights, packages, loading }: any) => {
         <div className={styles.resultList}>
             <Progress title={'Ищем подходящие туры'} loading={loading} />
 
-            <SelectedTour packages={packages} />
+            <SelectedTour packages={packages} flights={flights} />
             <div className={styles.resultListSelectedFilter}>
                 {/*<div className={styles.selectedFiltersList}>*/}
                 {/*    {filters.map((item) => (*/}

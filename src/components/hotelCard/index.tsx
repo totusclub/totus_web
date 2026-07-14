@@ -254,7 +254,7 @@ const HotelCard = ({ item, request_id, lazy }: HotelCardState) => {
                         ))}
                     </div>
                     <div className={styles.hotelCardPriceM}>
-                        <p>{analytics_min_price?.toString()?.replace(/\B(?=(\d{3})+(?!\d))/g, '\u202F')}₽</p>
+                        <p>от {analytics_min_price?.toString()?.replace(/\B(?=(\d{3})+(?!\d))/g, '\u202F')}₽</p>
                         <p>от {formattedDate}, на {min_price_nights} ночей</p>
                     </div>
 
@@ -267,7 +267,7 @@ const HotelCard = ({ item, request_id, lazy }: HotelCardState) => {
                         )}
                     </div>
                     <div className={styles.hotelCardCheckout}>
-                        <p>{analytics_min_price?.toString()?.replace(/\B(?=(\d{3})+(?!\d))/g, '\u202F')}₽</p>
+                        <p>от {analytics_min_price?.toString()?.replace(/\B(?=(\d{3})+(?!\d))/g, '\u202F')}₽</p>
                         <Button onClick={() => handleClick()} full={true} title={'Выбрать'} />
                         <div className={styles.hotelCardDate}>
                             <p>c {formattedDate}, на {min_price_nights} ночей</p>

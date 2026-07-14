@@ -1,10 +1,13 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
+import { API_BASE_URL } from '@/config/api';
 
 export const fetchDepartures = createAsyncThunk(
     'departures/fetchDepartures',
     async (params = {}) => {
-        const res = await axios.get('https://api.totus.club/references/departures?prioritized_count=10', { prioritized_count:10 });
+        const res = await axios.get(`${API_BASE_URL}/references/departures?prioritized_count=10`, {
+            params: { prioritized_count: 10 },
+        });
         return res.data;
     }
 );

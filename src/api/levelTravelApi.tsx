@@ -333,6 +333,33 @@ export async function PackagesActualizeFlight(id: never, f_id: never) {
     return response.data;
 };
 
+export async function prebuildOrder(params: Record<string, unknown>) {
+    if (!params?.package_id) {
+        throw new Error('Missing package_id');
+    }
+    const response = await axios.post(`${BASE_URL}/orders/prebuild`, params);
+    return response.data;
+}
+
+export async function prebookPackage(params: Record<string, unknown>) {
+    if (!params?.package_id) {
+        throw new Error('Missing package_id');
+    }
+    try {
+        const response = await axios.post(`${BASE_URL}/packages/prebook`, params);
+        return response.data;
+    } catch (err: any) {
+        return {
+            success: false,
+            error: err?.response?.data?.error ?? err?.response?.data ?? err?.message,
+            errors: err?.response?.data?.errors ?? [],
+            skippable: Boolean(err?.response?.data?.skippable),
+            status: err?.response?.status,
+            isAxiosError: true,
+        };
+    }
+}
+
 export async function validateTourist(params: never) {
     try {
         if (!params) {

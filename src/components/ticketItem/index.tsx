@@ -7,6 +7,7 @@ import { useState, FC } from "react";
 import useAuth from "@/hooks/useAuth";
 import AuthModal from "@/components/auth";
 import { formatRussianDateTime, formatRussianDate, secondsToRussianTime } from "@/utils/dateTimeUtils";
+import { formatMoneyRub, getFlightOfferTotal, toMoney } from "@/utils/packagePrice";
 
 interface TicketItemProps {
     green?: boolean;
@@ -21,9 +22,20 @@ const TicketItem: FC<TicketItemProps> = ({ green, item, price, lazy }) => {
     const [authModal, setAuthModal] = useState(false)
     const { user, token } = useAuth()
 
+    const basePrice = toMoney(price);
+    const fuelCharge = toMoney(item?.fuel_charge);
+    const totalPrice = getFlightOfferTotal(basePrice, item);
+
     const handleClick = (id) => {
         if (token) {
-            router.push(`/booking?package=${router.query.package}&flight_pair_id=${id}`);
+            // Price comes from Level Travel actualize on booking — not from URL
+            router.push({
+                pathname: '/booking',
+                query: {
+                    package: router.query.package,
+                    flight_pair_id: id,
+                },
+            });
         } else {
             setAuthModal(true)
         }
@@ -109,8 +121,8 @@ const TicketItem: FC<TicketItemProps> = ({ green, item, price, lazy }) => {
 
                         <div className={styles.ticketItemPriceInfo}>
                             <div className={styles.ticketItemPrice}>
-                                <p>{(price + item?.fuel_charge).toString()?.replace(/\B(?=(\d{3})+(?!\d))/g, '\u202F')}₽</p>
-                                <p>Доплаты и сборы: +{item?.fuel_charge}₽</p>
+                                <p>{formatMoneyRub(totalPrice).replace(' ₽', '₽')}</p>
+                                <p>Доплаты и сборы: +{formatMoneyRub(fuelCharge).replace(' ₽', '₽')}</p>
                                 <p>За тур с перелётом</p>
                             </div>
                             <Button

@@ -41,7 +41,7 @@ export function useSbpPay() {
 
       setLoading(true);
       try {
-        const expireDate = new Date(Date.now() + 20 * 60 * 1000);
+        const expireDate = new Date(Date.now() + 30 * 60 * 1000);
         const returnUrl = `${PAY_RETURN_ORIGIN}/pay?orderId=${orderIdStr}`;
         const payInfo = await createPay({
           orderId: `ORDER${orderIdStr}`,

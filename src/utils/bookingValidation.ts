@@ -320,32 +320,96 @@ export const validateBookingForm = (formData: BookingFormData): BookingValidatio
  * Checks if booking form is valid (returns boolean)
  */
 export const isBookingFormValid = (formData: BookingFormData): boolean => {
-  // Check email
-  if (validateEmail(formData.email)) {
-    return false;
+  const errors = validateBookingForm(formData);
+  return Object.keys(errors).length === 0;
+};
+
+/**
+ * Flattens validation errors into a list of messages for UI summary
+ */
+export const flattenBookingErrors = (errors: BookingValidationErrors): string[] => {
+  const messages: string[] = [];
+
+  if (errors.general) messages.push(errors.general);
+  if (errors.email) messages.push(errors.email);
+  if (errors.phone) messages.push(errors.phone);
+
+  if (errors.tourists) {
+    Object.entries(errors.tourists).forEach(([index, touristErrors]) => {
+      const touristLabel = `Турист ${Number(index) + 1}`;
+      Object.values(touristErrors).forEach((message) => {
+        if (message) messages.push(`${touristLabel}: ${message}`);
+      });
+    });
   }
 
-  // Check phone
-  if (validatePhone(formData.phone)) {
-    return false;
-  }
+  return messages;
+};
 
-  // Check tourists
-  if (!formData.tourists || formData.tourists.length === 0) {
-    return false;
-  }
+/**
+ * Maps Level Travel tourists/validate error payload into booking form errors.
+ * Supports both API body and axios error.response.data shapes.
+ */
+export function mapLevelTravelTouristValidateErrors(payload: any): BookingValidationErrors {
+  const body = payload?.response?.data ?? payload?.data ?? payload;
+  const errRoot = body?.error ?? body;
+  const errBlock = errRoot?.errors ?? errRoot;
 
-  // Use validateTouristFields for comprehensive validation
-  for (let i = 0; i < formData.tourists.length; i++) {
-    const tourist = formData.tourists[i];
-    const errors = validateTouristFields(tourist);
+  const result: BookingValidationErrors = {};
+  const commonMessages: string[] = [];
 
-    // If there are any errors, form is not valid
-    if (Object.keys(errors).length > 0) {
-      return false;
+  const common = errBlock?.common;
+  if (Array.isArray(common)) {
+    for (const item of common) {
+      const text = item?.description || item?.message || (typeof item === 'string' ? item : null);
+      if (text) commonMessages.push(String(text));
     }
   }
 
-  return true;
-};
+  if (commonMessages.length > 0) {
+    result.general = commonMessages.join('. ');
+  }
+
+  const touristsErrors = errBlock?.tourists;
+  if (Array.isArray(touristsErrors)) {
+    const tourists: BookingValidationErrors['tourists'] = {};
+
+    touristsErrors.forEach((touristErr, index) => {
+      if (!touristErr || typeof touristErr !== 'object') return;
+
+      const fieldErrors: TouristErrors = {};
+      Object.entries(touristErr).forEach(([field, messages]) => {
+        if (!Array.isArray(messages) || messages.length === 0) return;
+
+        const texts = messages
+          .map((m: any) => m?.description || m?.message || (typeof m === 'string' ? m : null))
+          .filter(Boolean)
+          .map(String);
+
+        if (texts.length > 0) {
+          fieldErrors[field as keyof TouristErrors] = texts.join('. ');
+        }
+      });
+
+      if (Object.keys(fieldErrors).length > 0) {
+        tourists[index] = fieldErrors;
+      }
+    });
+
+    if (Object.keys(tourists).length > 0) {
+      result.tourists = tourists;
+    }
+  }
+
+  if (!result.general && !result.tourists) {
+    const fallback =
+      body?.message ||
+      errRoot?.message ||
+      (typeof body?.error === 'string' ? body.error : null) ||
+      'Пожалуйста, введите корректные данные туриста';
+    result.general = String(fallback);
+  }
+
+  return result;
+}
 

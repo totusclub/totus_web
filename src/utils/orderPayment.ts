@@ -1,3 +1,5 @@
+import { getBookingPriceBreakdown, toMoney } from '@/utils/packagePrice';
+
 /** Level Travel package nested inside DB order row */
 export function getLtOrderPackage(order: any) {
   if (!order) return null;
@@ -27,17 +29,45 @@ export function getOrderIdForPay(order: any): string | number | null {
   return order.order_id ?? order.id ?? order.package?.id ?? null;
 }
 
+/**
+ * Amount for SBP QR / checkout Итого.
+ * Uses Level Travel fields: remaining_amount, full_price, then price + fuel_charge.
+ */
 export function getOrderPayAmount(order: any): number {
+  if (!order) return 0;
+
   const lt = getLtOrderPackage(order);
-  const value =
+  const nested = lt?.package && (lt.package.price != null || lt.package.hotel)
+    ? lt.package
+    : lt;
+
+  const remaining = toMoney(lt?.remaining_amount ?? order?.remaining_amount);
+  if (remaining > 0) return remaining;
+
+  const full = toMoney(
     lt?.full_price ??
-    lt?.remaining_amount ??
-    lt?.price ??
-    order?.package?.full_price ??
-    order?.package?.price ??
-    0;
-  const num = typeof value === 'number' ? value : Number(value);
-  return Number.isFinite(num) ? num : 0;
+      order?.full_price ??
+      order?.package?.full_price,
+  );
+
+  const breakdown = getBookingPriceBreakdown({
+    price: toMoney(nested?.price) || toMoney(lt?.price) || toMoney(order?.price),
+    net_price: nested?.net_price ?? lt?.net_price,
+    fuel_charge:
+      toMoney(nested?.fuel_charge) ||
+      toMoney(lt?.fuel_charge) ||
+      toMoney(order?.fuel_charge),
+    predicted_surcharge: nested?.predicted_surcharge ?? lt?.predicted_surcharge,
+  });
+
+  const withFees = breakdown.totalPrice;
+
+  // If LT full_price omitted fuel, charge the full breakdown (same as booking Итого)
+  if (full > 0 && withFees > 0) return Math.max(full, withFees);
+  if (withFees > 0) return withFees;
+  if (full > 0) return full;
+
+  return toMoney(lt?.price ?? order?.package?.price ?? order?.price);
 }
 
 export function canPayWithSbp(order: any): boolean {

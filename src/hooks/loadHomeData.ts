@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { getHomeData } from '../api/levelTravelApi';
 
 export type HomeDataPayload = {
+  recommendedTitle?: string;
+  destinationsTitle?: string;
   popularDestinations?: any[];
   recomendHotels?: any[];
 };

@@ -1,12 +1,50 @@
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 import styles from './footer.module.css';
-import Icon from "@/components/icons/Icon";
-import Select from "@/components/UI/select";
-import {useState} from "react";
+import Icon from '@/components/icons/Icon';
+import { getFooterSocialLinks, type FooterSocialLink } from '@/api/footerSocialApi';
+
+const FALLBACK_SOCIAL: FooterSocialLink[] = [
+    { id: 1, title: 'VK', icon: 'vk', url: '', sort_order: 1, is_active: true },
+    { id: 2, title: 'Rutube', icon: 'rutube', url: '', sort_order: 2, is_active: true },
+    { id: 3, title: 'AI Star', icon: 'aiStar', url: '', sort_order: 3, is_active: true },
+    { id: 4, title: 'VC', icon: 'vc', url: '', sort_order: 4, is_active: true },
+];
+
+function SocialLinks({ items }: { items: FooterSocialLink[] }) {
+    if (!items.length) return null;
+
+    return (
+        <div className={styles.social}>
+            <p className={styles.socialTitle}></p>
+            <ul>
+                {items.map((item) => {
+                    const content = <Icon name={item.icon} size={24} color="var(--textPrimary)" />;
+                    if (item.url) {
+                        return (
+                            <li key={item.id}>
+                                <a href={item.url} target="_blank" rel="noopener noreferrer" aria-label={item.title || item.icon}>
+                                    {content}
+                                </a>
+                            </li>
+                        );
+                    }
+                    return <li key={item.id}>{content}</li>;
+                })}
+            </ul>
+        </div>
+    );
+}
 
 const Footer = () => {
-    const [selected, setSelected] = useState(null);
-    const options = [{value:'RUB',name:'Российский рубль (₽)'},{value:'USD',name:'Доллар США ($)'}];
+    const [socialLinks, setSocialLinks] = useState<FooterSocialLink[]>(FALLBACK_SOCIAL);
+
+    useEffect(() => {
+        getFooterSocialLinks().then((data) => {
+            if (data.length > 0) setSocialLinks(data);
+        });
+    }, []);
+
     return (
         <footer className={styles.footer}>
             <div className={'content'}>
@@ -16,15 +54,7 @@ const Footer = () => {
                         <div className={styles.appStore}>
                             <Icon name={"appStore"} size={'100%'}/>
                         </div>
-                        <div className={styles.social}>
-                            <p className={styles.socialTitle}></p>
-                            <ul>
-                                <li><Icon name={"vk"} size={24} color="var(--textPrimary)"/></li>
-                                <li><Icon name={"rutube"} size={24} color="var(--textPrimary)"/></li>
-                                <li><Icon name={"aiStar"} size={24} color="var(--textPrimary)"/></li>
-                                <li><Icon name={"vc"} size={24} color="var(--textPrimary)"/></li>
-                            </ul>
-                        </div>
+                        <SocialLinks items={socialLinks} />
                         <p className={styles.footerColumnTitle}></p>
                         <div className={styles.footerPayList}>
                             <div><Icon name={'mir'} size={41}/></div>
@@ -43,18 +73,6 @@ const Footer = () => {
                                 <Icon name={"googlePlay"} size={'100%'}/>
                                 <Icon name={"ruStore"} size={'48px'}/>
                             </div>
-                            {/*<li>*/}
-                            {/*    <Link href="/career" className={styles.footerLink}>Карьера</Link>*/}
-                            {/*</li>*/}
-                            {/*<li>*/}
-                            {/*    <Link href="/apps" className={styles.footerLink}>Приложения</Link>*/}
-                            {/*</li>*/}
-                            {/*<li>*/}
-                            {/*    <Link href="/blog" className={styles.footerLink}>Блог</Link>*/}
-                            {/*</li>*/}
-                            {/*<li>*/}
-                            {/*    <Link href="/how-we-work" className={styles.footerLink}>Как мы работаем</Link>*/}
-                            {/*</li>*/}
                         </ul>
                     </div>
                     <div className={styles.footerColumn}>
@@ -70,15 +88,6 @@ const Footer = () => {
                                     Помощь/Часто задаваемые вопросы
                                 </Link>
                             </li>
-                            {/*<li>*/}
-                            {/*    <Link href="/press" className={styles.footerLink}>Пресса</Link>*/}
-                            {/*</li>*/}
-                            {/*<li>*/}
-                            {/*    <Link href="/branches" className={styles.footerLink}>Филиалы</Link>*/}
-                            {/*</li>*/}
-                            {/*<li>*/}
-                            {/*    <Link href="/hotel-owners" className={styles.footerLink}>Владельцы отелей</Link>*/}
-                            {/*</li>*/}
                             <li>
                                 <Link href="/partners" className={styles.footerLink}>Партнеры</Link>
                             </li>
@@ -91,9 +100,6 @@ const Footer = () => {
                     <div className={styles.footerColumn}>
                         <p className={styles.footerColumnTitle}></p>
                         <ul>
-                            {/*<li>*/}
-                            {/*    <Link href="/airline-fees" className={styles.footerLink}>Авиакомпанийные сборы</Link>*/}
-                            {/*</li>*/}
                             <li>
                                 <Link href="/airlines" className={styles.footerLink}>Авиакомпании</Link>
                             </li>
@@ -113,22 +119,8 @@ const Footer = () => {
                         <div className={styles.footerPayList}>
                             <div><Icon name={'mir'} size={41}/></div>
                             <div><Icon name={'visa'} size={38}/></div>
-                            {/*<div><Icon name={'master'} size={29}/></div>*/}
                         </div>
-
-                        {/*<p className={styles.footerColumnTitle}>Скачать приложение</p>*/}
-
-                        <div className={styles.social}>
-                            {/*<p className={styles.socialTitle}>Мы в соц. сетях</p>*/}
-                            <ul>
-                                <li><Icon name={"vk"} size={24} color="var(--textPrimary)"/></li>
-                                <li><Icon name={"rutube"} size={24} color="var(--textPrimary)"/></li>
-                                <li><Icon name={"aiStar"} size={24} color="var(--textPrimary)"/></li>
-                                <li><Icon name={"vc"} size={24} color="var(--textPrimary)"/></li>
-                            </ul>
-                        </div>
-
-
+                        <SocialLinks items={socialLinks} />
                     </div>
                 </div>
                 <div className={styles.footerBottom}>
@@ -149,11 +141,6 @@ const Footer = () => {
                                 Условия и положения
                             </Link>
                         </li>
-                        {/*<li>*/}
-                        {/*    <Link href="/ad-choices" className={styles.footerBottomLink}>*/}
-                        {/*        Выбор рекламы*/}
-                        {/*    </Link>*/}
-                        {/*</li>*/}
                     </ul>
                 </div>
 

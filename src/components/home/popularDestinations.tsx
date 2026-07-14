@@ -60,7 +60,13 @@ interface DestinationItem {
     [key: string]: string | number | boolean | undefined;
 }
 
-export default function PopularDestinations({ popularDestinations }: { popularDestinations?: DestinationItem[] | null }) {
+export default function PopularDestinations({
+    title = 'Популярные направления',
+    popularDestinations,
+}: {
+    title?: string;
+    popularDestinations?: DestinationItem[] | null;
+}) {
     const router = useRouter();
     const dispatch = useDispatch<AppDispatch>();
     const date = useMemo(() => {
@@ -179,7 +185,7 @@ export default function PopularDestinations({ popularDestinations }: { popularDe
 
     return (
         <div className={styles.popularDestinationsWrapper}>
-            <p className={styles.hotProductTitle}>Популярные направления</p>
+            <p className={styles.hotProductTitle}>{title}</p>
 
             <div className={styles.recomendDeslist}>
                 {popularDestinations?.map((item, index) => {

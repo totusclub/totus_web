@@ -14,7 +14,7 @@ export default function Support() {
         setLoading(true);
 
         try {
-            const res = await fetch(`http://localhost:3001/api/support/call`, {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api.totus.club"}/api/support/call`, {
                 method: "POST",
             });
 

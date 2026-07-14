@@ -715,6 +715,34 @@
 .formRequestCallText {
   margin-top: 14px;
 }
+.formRequestCallInput {
+  margin-bottom: 14px;
+}
+.formRequestCallInput input {
+  width: 100%;
+  height: 56px;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid var(--borderTertiary);
+  background: var(--bgPrimary);
+  color: var(--textPrimary);
+  font-family: "Golos Text";
+  font-size: 16px;
+  outline: none;
+  box-sizing: border-box;
+}
+.formRequestCallInput input:focus {
+  border-color: var(--core_Orange);
+  box-shadow: 0 2px 8px rgba(254, 115, 46, 0.2);
+}
+.formRequestCallSuccess {
+  margin: 0 0 14px;
+  color: #86efac;
+  text-align: center;
+  font-family: "Golos Text";
+  font-size: 14px;
+  line-height: 20px;
+}
 .formRequestCallText > p {
   color: #fff;
   text-align: center;

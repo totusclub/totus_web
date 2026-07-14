@@ -7,7 +7,7 @@ import HomeBanners from "@/components/home/banners";
 import Partner from "@/components/home/partner";
 import PopularDestinations from "@/components/home/popularDestinations";
 import CallRequest from "@/components/home/callRequest";
-// import Faq from "@/components/home/faq";
+import Faq from "@/components/home/faq";
 import { useLoadHomeData } from "@/hooks/loadHomeData";
 
 
@@ -20,13 +20,19 @@ export default function Home() {
         <main>
             <Search />
             <HomeBanners />
-            <HotDealsSlide title={'Начните планирование путешествия здесь'} slidesToShow={3} recomendHotels={homeData?.recomendHotels
-            } />
+            <HotDealsSlide
+                title={homeData?.recommendedTitle || 'Начните планирование путешествия здесь'}
+                slidesToShow={3}
+                recomendHotels={homeData?.recomendHotels}
+            />
             {/*<Services />*/}
-            <PopularDestinations popularDestinations={homeData?.popularDestinations} />
+            <PopularDestinations
+                title={homeData?.destinationsTitle || 'Популярные направления'}
+                popularDestinations={homeData?.popularDestinations}
+            />
             <Partner />
             <CallRequest />
-            {/*<Faq />*/}
+            <Faq />
 
         </main>
     );

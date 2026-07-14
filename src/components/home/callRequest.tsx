@@ -1,10 +1,32 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import styles from "./home.module.css";
-import PhoneInput from "@/components/UI/phoneInput";
+import PhoneInputField from "@/components/UI/phoneInputField";
+import { submitCallbackRequest } from "@/api/callbackRequestApi";
 
 
 export default function CallRequest(): JSX.Element {
-    const [error, setError] = useState(true);
+    const [phone, setPhone] = useState('');
+    const [submitting, setSubmitting] = useState(false);
+    const [submitted, setSubmitted] = useState(false);
+
+    const isValid = /^7\d{10}$/.test(phone);
+
+    const handleSubmit = async () => {
+        if (!isValid || submitting) return;
+
+        try {
+            setSubmitting(true);
+            await submitCallbackRequest(phone);
+            setSubmitted(true);
+            setPhone('');
+        } catch (error) {
+            const message = error instanceof Error ? error.message : 'Не удалось отправить запрос';
+            alert(message);
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
     return (
         <div className={'content'}>
             <div className={styles.callRequest}>
@@ -17,9 +39,31 @@ export default function CallRequest(): JSX.Element {
                             <p>и наши специалисты свяжутся с вами в</p>
                             <p>ближайшее время</p>
                         </div>
-                        <PhoneInput setError={setError}/>
-                        <div className={ error ? styles.formRequestCallBtnDisable:styles.formRequestCallBtn} onClick={()=>error ? alert('Запрос отправлен') : alert('Введите корректный российский номер (+7XXXXXXXXXX)')}>
-                            <p>Перезвоните мне</p>
+                        <div className={styles.formRequestCallInput}>
+                            <PhoneInputField
+                                value={phone}
+                                onChange={setPhone}
+                                placeholder="+7 (___) ___-__-__"
+                            />
+                        </div>
+                        {submitted && (
+                            <p className={styles.formRequestCallSuccess}>
+                                Спасибо! Мы свяжемся с вами в ближайшее время.
+                            </p>
+                        )}
+                        <div
+                            className={isValid && !submitting ? styles.formRequestCallBtn : styles.formRequestCallBtnDisable}
+                            onClick={handleSubmit}
+                            role="button"
+                            tabIndex={0}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' || e.key === ' ') {
+                                    e.preventDefault();
+                                    handleSubmit();
+                                }
+                            }}
+                        >
+                            <p>{submitting ? 'Отправка...' : 'Перезвоните мне'}</p>
                         </div>
                         <div className={styles.formRequestCallText}>
                             <p>Нажимая кнопку, я соглашаюсь на обработку своих персональных данных согласно</p>
