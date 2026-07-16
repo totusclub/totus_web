@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { startSearch } from '@/api/levelTravelApi';
+import { startSearch, getHotelInfo } from '@/api/levelTravelApi';
 import { buildInitialSearchParams } from '@/utils/hotelDetailsUtils';
 
 export function isStaleSearchRequestError(error: unknown): boolean {
@@ -74,6 +74,28 @@ export async function createHotelSearchRequest(
     hotelId: string,
 ): Promise<string | null> {
     const searchParams = buildInitialSearchParams(query, hotelId);
+
+    // LevelTravel enqueue requires a destination. Deep links (home cards,
+    // favorites) may not carry to_country — resolve it from the hotel itself.
+    if (!searchParams.to_country) {
+        try {
+            const hotelInfo = await getHotelInfo({ hotel_id: hotelId });
+            const iso2 = hotelInfo?.country?.iso2;
+            if (iso2) {
+                searchParams.to_country = String(iso2);
+            }
+            const cityName = hotelInfo?.city?.name_en || hotelInfo?.city?.name_ru;
+            if (!searchParams.to_city && cityName) {
+                searchParams.to_city = String(cityName);
+            }
+        } catch (err) {
+            console.warn('[createHotelSearchRequest] Failed to resolve hotel country:', err);
+        }
+        if (!searchParams.to_country) {
+            searchParams.to_country = 'RU';
+        }
+    }
+
     const response = await startSearch(searchParams);
     const requestId = response?.request_id ? String(response.request_id) : null;
     if (requestId && typeof window !== 'undefined') {

@@ -1,4 +1,4 @@
-import React, { CSSProperties, useMemo } from "react";
+import React, { CSSProperties } from "react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -6,6 +6,7 @@ import styles from './home.module.css'
 import HotelBoxCard from "@/components/hotelBox/hotelBoxCard";
 import Icon from "@/components/icons/Icon";
 import { useRouter } from "next/router";
+import { buildHotelDetailsDeepLinkQuery } from "@/utils/hotelDetailsUtils";
 
 interface HotelItem {
     id: number | string;
@@ -39,22 +40,8 @@ const PrevArrow = ({ onClick }: ArrowProps) => {
     );
 };
 
-// Helper function to get default start date (7 days from today)
-const getDefaultStartDate = (): string => {
-    const today = new Date();
-    const plus7 = new Date();
-    plus7.setDate(today.getDate() + 7);
-    const year = plus7.getFullYear();
-    const month = String(plus7.getMonth() + 1).padStart(2, '0');
-    const day = String(plus7.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-};
-
 export default function HotDealsSlide({ slidesToShow, title, recomendHotels }: { slidesToShow: number, title: string, recomendHotels?: HotelItem[] | null }) {
     const router = useRouter();
-    const date = useMemo(() => {
-        return getDefaultStartDate();
-    }, []);
 
     const handlePressHotel = React.useCallback(
         (hotelId: number | string) => {
@@ -62,27 +49,12 @@ export default function HotDealsSlide({ slidesToShow, title, recomendHotels }: {
                 return;
             }
 
-            // Build search params similar to React Native app
-            const queryParams = {
-                hotel_id: String(hotelId),
-                from_city: "Moscow",
-                from_country: "RU",
-                to_country: "RU",
-                to_city: "",
-                adults: "2",
-                start_date: date,
-                nights: "7",
-                search_type: "package",
-            };
-
-            // Navigate to hotel-details with search params using object format
-            // Use shallow: false to ensure fresh navigation and prevent conflicts
             router.push({
                 pathname: '/hotel-details',
-                query: queryParams,
+                query: buildHotelDetailsDeepLinkQuery(hotelId),
             }, undefined, { shallow: false });
         },
-        [router, date]
+        [router]
     );
 
     const settings = {

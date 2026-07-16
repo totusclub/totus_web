@@ -284,14 +284,18 @@ export function resolveActiveSearchMealCodes(options: {
   );
   if (fromSelectedOptions.length) return fromSelectedOptions;
 
-  // Only for fresh package search with no meal filter state at all
+  // Only for fresh package search when an explicit default is provided (never invent AI).
   if (
     options.searchType !== 'hotel' &&
+    options.defaultPackageMeals != null &&
+    String(options.defaultPackageMeals).trim() !== '' &&
     (options.filterMeals == null || String(options.filterMeals).trim() === '') &&
     !(options.listingMealOptions ?? []).some((option) => option.selected)
   ) {
-    const fallback = options.defaultPackageMeals ?? 'AI';
-    return normalizeSearchMealsToRoomCodes(fallback, options.listingMealOptions);
+    return normalizeSearchMealsToRoomCodes(
+      options.defaultPackageMeals,
+      options.listingMealOptions,
+    );
   }
 
   return [];

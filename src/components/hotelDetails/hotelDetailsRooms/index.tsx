@@ -32,7 +32,6 @@ import {
     resolveListSelectedRoom,
     sortRoomsWithListPickFirst,
 } from "@/utils/listRoomPick";
-import { readSearchListState } from "@/utils/searchListState";
 
 const HotelLocationMap = dynamic(() => import("./HotelLocationMap"), {
     ssr: false,
@@ -129,14 +128,13 @@ const HotelDetailsRooms = ({
             return trimmed || undefined;
         };
 
-        const rawFilterMeals =
-            joinQueryValue(router.query.filter_meals) ||
-            (typeof window !== 'undefined'
-                ? sessionStorage.getItem('hotelDetailsFilterMeals') || undefined
-                : undefined) ||
-            readSearchListState()?.filters?.filter_meals ||
-            undefined;
+        // Only URL meal params count — do not revive stale AI from session/search list state.
+        const rawFilterMeals = joinQueryValue(router.query.filter_meals);
         const rawMealId = joinQueryValue(router.query.meal_id);
+
+        if (typeof window !== 'undefined' && !rawFilterMeals) {
+            sessionStorage.removeItem('hotelDetailsFilterMeals');
+        }
 
         const mealCodes = Array.from(
             new Set([
@@ -527,6 +525,9 @@ const HotelDetailsRooms = ({
                 <div className={styles.HotelDetailsRooms}>
                     <div id="choose-room" className={styles.HotelDetailsRoomsHead}>
                         <p>Выберите номер</p>
+                        {filtersLoading ? (
+                            <p className={styles.HotelDetailsRoomFiltersLoading}>Обновляем варианты...</p>
+                        ) : null}
                     </div>
                     {/* Date/price tabs removed
                     <DatesPrice
@@ -538,7 +539,6 @@ const HotelDetailsRooms = ({
                     <RoomFilters
                         filters={displayRoomFilters}
                         hasActiveFilters={hasActiveFilters}
-                        loading={filtersLoading}
                         onChange={handleFilterChange}
                         onClear={() => {
                             if (!activeRoomFilters) return;

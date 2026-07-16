@@ -585,7 +585,9 @@ export const buildInitialSearchParams = (
   return {
     from_city: (query.from_city as string) || 'Moscow',
     from_country: (query.from_country as string) || 'RU',
-    to_country: (query.to_country as string) || 'RU',
+    to_country: query.to_country && String(query.to_country).trim()
+      ? (query.to_country as string)
+      : undefined,
     to_city: query.to_city === 'null' || query.to_city === '' ? undefined : (query.to_city as string),
     adults: (query.adults as string) || '2',
     kids: query.kids as string,
@@ -624,7 +626,6 @@ export function buildHotelDetailsDeepLinkQuery(hotelId: string | number): Record
     hotel_id: String(hotelId),
     from_city: String(built.from_city),
     from_country: String(built.from_country),
-    to_country: String(built.to_country ?? ""),
     adults: String(built.adults),
     start_date: String(built.start_date),
     start_date_from: String(built.start_date_from),
@@ -635,6 +636,9 @@ export function buildHotelDetailsDeepLinkQuery(hotelId: string | number): Record
   };
   if (built.to_city != null && String(built.to_city)) {
     out.to_city = String(built.to_city);
+  }
+  if (built.to_country != null && String(built.to_country)) {
+    out.to_country = String(built.to_country);
   }
   if (built.kids != null) {
     out.kids = String(built.kids);

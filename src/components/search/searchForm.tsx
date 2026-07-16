@@ -423,7 +423,6 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
         };
         if (data.search_type !== 'hotel') {
             filterParams.filter_stars = '3,4,5';
-            filterParams.filter_meals = 'AI';
         }
         if (savedFilters && Object.keys(savedFilters).length) {
             Object.assign(filterParams, savedFilters);
@@ -596,7 +595,7 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
             replaceSearchListFilters({
                 filter_instant_confirm: false,
                 ...(searchParams.search_type !== 'hotel'
-                    ? { filter_stars: '3,4,5', filter_meals: 'AI' }
+                    ? { filter_stars: '3,4,5' }
                     : {}),
                 sort_by: 'relevance',
             });

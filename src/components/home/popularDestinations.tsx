@@ -126,7 +126,6 @@ export default function PopularDestinations({
                 page_limit: 20,
                 sort_by: "relevance",
                 filter_stars: "3,4,5",
-                filter_meals: "AI",
             };
 
             const destinationName = item?.name || item?.name_ru || item?.name_en || '';

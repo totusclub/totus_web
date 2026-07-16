@@ -15,7 +15,6 @@ import { formatPriceRub } from '@/utils/formatPrice';
 type RoomFiltersProps = {
     filters: HotelRoomFilters | null;
     hasActiveFilters?: boolean;
-    loading?: boolean;
     onChange: (
         filters: HotelRoomFilters | ((current: HotelRoomFilters) => HotelRoomFilters),
     ) => void;
@@ -36,7 +35,6 @@ function getSummary(
     const selected = options.filter((option) => option.selected && !option.disabled);
     if (!selected.length) return allLabel;
     if (selected.length === 1) return getLabel(selected[0]);
-    // Show all selected labels so multi meal/operator filters stay readable.
     if (selected.length <= 3) {
         return selected.map(getLabel).join(', ');
     }
@@ -161,7 +159,7 @@ function RoomFilterDropdown({
     );
 }
 
-const RoomFilters = ({ filters, hasActiveFilters = false, loading = false, onChange, onClear }: RoomFiltersProps) => {
+const RoomFilters = ({ filters, hasActiveFilters = false, onChange, onClear }: RoomFiltersProps) => {
     const [openFilter, setOpenFilter] = useState<FilterKey | null>(null);
 
     if (!filters) return null;
@@ -186,7 +184,6 @@ const RoomFilters = ({ filters, hasActiveFilters = false, loading = false, onCha
 
     return (
         <div className={styles.HotelDetailsRoomFilters}>
-            {loading ? <p className={styles.HotelDetailsRoomFiltersLoading}>Обновляем варианты...</p> : null}
             <div className={styles.HotelDetailsRoomFiltersRow}>
                 {hasMeals ? (
                     <RoomFilterDropdown

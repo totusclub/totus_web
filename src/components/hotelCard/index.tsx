@@ -146,6 +146,8 @@ const HotelCard = ({ item, lazy }: HotelCardState) => {
             if (typeof window !== 'undefined') {
                 sessionStorage.setItem('hotelDetailsFilterMeals', activeFilterMeals);
             }
+        } else if (typeof window !== 'undefined') {
+            sessionStorage.removeItem('hotelDetailsFilterMeals');
         }
         if (itemMeal.mealId) {
             // Keep full search meals in filter_meals; item meal is only for offer matching.

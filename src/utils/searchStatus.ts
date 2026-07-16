@@ -51,6 +51,7 @@ export function isAllOperatorsTerminal(
  * - every operator reached a terminal status (not performing/pending).
  *
  * Matches mobile app: `performing` alone does NOT stop polling.
+ * Used by search listing (progressive results).
  */
 export function shouldStopSearchPolling(
     statusMap: Record<string, SearchOperatorStatus>,
@@ -60,6 +61,18 @@ export function shouldStopSearchPolling(
     if (getReadySearchOperators(statusMap).length > 0) return true;
     if (isAllOperatorsTerminal(statusMap)) return true;
     return false;
+}
+
+/**
+ * True only when the search will not receive more operator results.
+ * Use for hotel-details rooms so pending operators are not skipped.
+ */
+export function isSearchFullyComplete(
+    statusMap: Record<string, SearchOperatorStatus>,
+    completeness?: number,
+): boolean {
+    if (Number(completeness) >= 100) return true;
+    return isAllOperatorsTerminal(statusMap);
 }
 
 /** @deprecated Use isAllOperatorsTerminal — performing is not settled. */
