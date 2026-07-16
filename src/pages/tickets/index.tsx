@@ -1,6 +1,6 @@
 import Steps from "@/components/searchPage/steps";
 import SearchResult from "@/components/searchPage/searchResult";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { PackagesActualize, Packagesflights } from "@/api/levelTravelApi";
 import { useRouter } from "next/router";
 
@@ -12,46 +12,56 @@ export default function Tickets() {
     const [packageId, setPackageId] = useState(null);
     const [loading, setLoading] = useState(false);
 
+    const packageQuery = Array.isArray(router.query.package)
+        ? router.query.package[0]
+        : router.query.package;
 
-    useEffect(() => {
-        if (router?.query?.package) {
-            setLoading(true);
-            PackagesActualize(router?.query?.package).then(e => {
-                setPackages(e.package)
-                const params = { package_id: e.package.id }
-                setPackageId(e.package.id)
-                requestFlights(params)
-            }).catch(err => {
-                console.error('Package loading failed:', err);
-                setLoading(false);
-            })
-        }
-    }, [router]);
-
-
-    const requestFlights = async (paramsFlight) => {
+    const requestFlights = useCallback(async (paramsFlight: Record<string, unknown>) => {
         try {
             const f = await Packagesflights(paramsFlight);
-            setAllFlights(f.flights);
-            setFlightsFilter(f.filters);
+            setAllFlights(f.flights || []);
+            setFlightsFilter(f.filters || null);
         } catch (err) {
             console.error('Flights loading failed:', err);
+            setAllFlights([]);
+            setFlightsFilter(null);
         } finally {
             setLoading(false);
         }
-    }
+    }, []);
 
-    const setFiltersRequest = (data) => {
+    useEffect(() => {
+        if (!router.isReady || !packageQuery) return;
+
+        let cancelled = false;
         setLoading(true);
-        const filterParams = { ...data, package_id: packageId }
-        Packagesflights(filterParams).then((f) => {
-            setAllFlights(f.flights);
-            setFlightsFilter(f.filters);
-            setLoading(false);
-        }).catch(err => {
-            console.error('Filter request failed:', err);
-            setLoading(false);
-        })
+
+        PackagesActualize(packageQuery as never)
+            .then((e) => {
+                if (cancelled) return;
+                const id = e?.package?.id;
+                if (!id) {
+                    throw new Error('Package actualize returned no package.id');
+                }
+                setPackages(e.package);
+                setPackageId(id);
+                return requestFlights({ package_id: id });
+            })
+            .catch((err) => {
+                console.error('Package loading failed:', err);
+                if (!cancelled) setLoading(false);
+            });
+
+        return () => {
+            cancelled = true;
+        };
+    }, [router.isReady, packageQuery, requestFlights]);
+
+    const setFiltersRequest = (data: Record<string, unknown>) => {
+        if (!packageId) return;
+        setLoading(true);
+        const filterParams = { ...data, package_id: packageId };
+        requestFlights(filterParams);
     }
 
     return (

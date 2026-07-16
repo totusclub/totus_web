@@ -39,6 +39,16 @@ const TicketItem: FC<TicketItemProps> = ({ green, item, price, lazy }) => {
         return '';
     };
 
+    const getAirportName = (place: any) =>
+        place?.code || '';
+
+    const formatAirports = (flight: any) => {
+        const from = getAirportName(flight?.origin);
+        const to = getAirportName(flight?.destination);
+        if (from && to) return `${from} — ${to}`;
+        return from || to || '';
+    };
+
     const handleClick = (id) => {
         if (token) {
             // Price comes from Level Travel actualize on booking — not from URL
@@ -91,6 +101,7 @@ const TicketItem: FC<TicketItemProps> = ({ green, item, price, lazy }) => {
                                         <div className={styles.ticketItemDate}>
                                             <p>{secondsToRussianTime(item?.to?.time)}</p>
                                             <p className={styles.ticketItemRoute}>{formatRoute(item?.to)}</p>
+                                            <p className={styles.ticketItemAirport}>{formatAirports(item?.to)}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -119,6 +130,7 @@ const TicketItem: FC<TicketItemProps> = ({ green, item, price, lazy }) => {
                                         <div className={styles.ticketItemDate}>
                                             <p>{secondsToRussianTime(item?.back?.time)}</p>
                                             <p className={styles.ticketItemRoute}>{formatRoute(item?.back)}</p>
+                                            <p className={styles.ticketItemAirport}>{formatAirports(item?.back)}</p>
                                         </div>
                                     </div>
                                 </div>

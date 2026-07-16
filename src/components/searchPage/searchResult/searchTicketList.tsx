@@ -2,9 +2,12 @@ import styles from '../searchPage.module.css';
 import TicketItem from "@/components/ticketItem";
 import SelectedTour from "@/components/selectedTour";
 import Progress from '@/components/UI/progress';
+import { pluralizeRu } from '@/utils/formatRussianPlural';
 
 
 const ResultTicketList = ({ flights, packages, loading }: any) => {
+    const flightsCount = flights?.length ?? 0;
+
     return (
         <div className={styles.resultList}>
             <Progress title={'Ищем подходящие туры'} loading={loading} />
@@ -28,9 +31,12 @@ const ResultTicketList = ({ flights, packages, loading }: any) => {
                 {/*        icon={'trash'}*/}
                 {/*    />*/}
                 {/*</div>*/}
-                {flights && flights.length > 0 ? (
+                {flightsCount > 0 ? (
                     <div className={styles.resultListSorting}>
-                        <p>Найдено {flights?.length}</p>
+                        <p>
+                            Найдено {flightsCount}{' '}
+                            {pluralizeRu(flightsCount, ['вариант', 'варианта', 'вариантов'])}
+                        </p>
                     </div>
                 ) : (
                     <div className={styles.resultListSorting}>

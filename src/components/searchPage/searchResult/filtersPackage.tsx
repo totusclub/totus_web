@@ -36,25 +36,26 @@ const FiltersPackage = ({ allFilters, setFiltersRequest, netPrice }: any) => {
     const [isMobile, setIsMobile] = useState(false);
     const [instantConfirm, setInstantConfirm] = useState(false);
     const [filters, setFilters] = useState({
-        arrival_airports: [],
-        departure_airports: [],
-        forward_airlines: [],
-        backward_airlines: [],
-        flight_classes: [],
-        flight_types: [],
-        transitions_count: [],
-        transitions_time: [],
-        operators: [],
-        insurance: [],
-        transfer: [],
-        luggage_types: [],
-        forward_arrival_dates: [],
+        arrival_airports: [] as Array<string | number>,
+        departure_airports: [] as Array<string | number>,
+        forward_airlines: [] as Array<string | number>,
+        backward_airlines: [] as Array<string | number>,
+        flight_classes: [] as Array<string | number>,
+        flight_types: [] as Array<string | number>,
+        transitions_count: [] as Array<string | number>,
+        transitions_time: [] as Array<string | number>,
+        operators: [] as Array<string | number>,
+        insurance: [] as Array<string | number>,
+        transfer: [] as Array<string | number>,
+        luggage_types: [] as Array<string | number>,
+        forward_arrival_dates: [] as Array<string | number>,
+        forward_departure_intervals: [] as Array<string | number>,
+        backward_departure_intervals: [] as Array<string | number>,
         forward_departure_time: { from: '', to: '' },
         backward_departure_time: { from: '', to: '' },
-        payment_benefits: [],
+        payment_benefits: [] as Array<string | number>,
         confirmability: [] as Array<string | number>,
-        package_id: 377680913,
-        tour_ids: [],
+        tour_ids: [] as Array<string | number>,
     });
 
     useEffect(() => {
@@ -101,12 +102,17 @@ const FiltersPackage = ({ allFilters, setFiltersRequest, netPrice }: any) => {
             return;
         }
 
-        const intArray = String(value)
-            .split(',')
-            .map((v) => v.trim())
-            .filter((v) => v && v !== '...')
-            .map((v) => (/^\d+$/.test(v) ? Number(v) : v));
-        const updatedFilters = { ...filters, [key]: intArray[0] === 0 ? [] : intArray };
+        const raw = value == null ? '' : String(value);
+        const intArray =
+            raw.trim() === ''
+                ? []
+                : raw
+                      .split(',')
+                      .map((v) => v.trim())
+                      .filter((v) => v !== '' && v !== '...')
+                      .map((v) => (/^-?\d+$/.test(v) ? Number(v) : v));
+
+        const updatedFilters = { ...filters, [key]: intArray };
         setFilters(updatedFilters);
         setFiltersRequest(updatedFilters);
     };
@@ -135,6 +141,7 @@ const FiltersPackage = ({ allFilters, setFiltersRequest, netPrice }: any) => {
                                 <CheckboxGroup
                                     name={'forward_airlines'}
                                     options={[...allFilters?.forward_airlines] || []}
+                                    selected={filters.forward_airlines}
                                     onChange={onChangeFilters}
                                     pk={true}
                                     netPrice={netPrice}
@@ -146,6 +153,7 @@ const FiltersPackage = ({ allFilters, setFiltersRequest, netPrice }: any) => {
                                 <CheckboxGroup
                                     name={'backward_airlines'}
                                     options={[...allFilters?.backward_airlines] || []}
+                                    selected={filters.backward_airlines}
                                     onChange={onChangeFilters}
                                     pk={true}
                                     netPrice={netPrice}
@@ -157,6 +165,7 @@ const FiltersPackage = ({ allFilters, setFiltersRequest, netPrice }: any) => {
                                 <CheckboxGroup
                                     name={'departure_airports'}
                                     options={[...allFilters?.departure_airports?.airports] || []}
+                                    selected={filters.departure_airports}
                                     onChange={onChangeFilters}
                                     pk={true}
                                     netPrice={netPrice}
@@ -168,6 +177,7 @@ const FiltersPackage = ({ allFilters, setFiltersRequest, netPrice }: any) => {
                                 <CheckboxGroup
                                     name={'arrival_airports'}
                                     options={[...allFilters?.arrival_airports?.airports] || []}
+                                    selected={filters.arrival_airports}
                                     onChange={onChangeFilters}
                                     pk={true}
                                     netPrice={netPrice}
@@ -179,6 +189,7 @@ const FiltersPackage = ({ allFilters, setFiltersRequest, netPrice }: any) => {
                                 <CheckboxGroup
                                     name={'forward_departure_intervals'}
                                     options={[...allFilters?.forward_departure_intervals] || []}
+                                    selected={filters.forward_departure_intervals}
                                     onChange={onChangeFilters}
                                     pk={true}
                                     netPrice={netPrice}
@@ -190,6 +201,7 @@ const FiltersPackage = ({ allFilters, setFiltersRequest, netPrice }: any) => {
                                 <CheckboxGroup
                                     name={'backward_departure_intervals'}
                                     options={[...allFilters?.backward_departure_intervals] || []}
+                                    selected={filters.backward_departure_intervals}
                                     onChange={onChangeFilters}
                                     pk={true}
                                     netPrice={netPrice}
@@ -201,6 +213,7 @@ const FiltersPackage = ({ allFilters, setFiltersRequest, netPrice }: any) => {
                                 <CheckboxGroup
                                     name={'operators'}
                                     options={[...allFilters?.operators] || []}
+                                    selected={filters.operators}
                                     onChange={onChangeFilters}
                                     pk={true}
                                     netPrice={netPrice}
@@ -212,6 +225,7 @@ const FiltersPackage = ({ allFilters, setFiltersRequest, netPrice }: any) => {
                                 <CheckboxGroup
                                     name={'luggage_types'}
                                     options={[...allFilters?.luggage_types] || []}
+                                    selected={filters.luggage_types}
                                     onChange={onChangeFilters}
                                     pk={true}
                                     netPrice={netPrice}
@@ -223,6 +237,7 @@ const FiltersPackage = ({ allFilters, setFiltersRequest, netPrice }: any) => {
                                 <CheckboxGroup
                                     name={'flight_classes'}
                                     options={[...allFilters?.flight_classes] || []}
+                                    selected={filters.flight_classes}
                                     onChange={onChangeFilters}
                                     pk={true}
                                     netPrice={netPrice}
@@ -234,6 +249,7 @@ const FiltersPackage = ({ allFilters, setFiltersRequest, netPrice }: any) => {
                                 <CheckboxGroup
                                     name={'flight_types'}
                                     options={[...allFilters?.flight_types] || []}
+                                    selected={filters.flight_types}
                                     onChange={onChangeFilters}
                                     pk={true}
                                     netPrice={netPrice}
@@ -245,6 +261,7 @@ const FiltersPackage = ({ allFilters, setFiltersRequest, netPrice }: any) => {
                                 <CheckboxGroup
                                     name={'transitions_count'}
                                     options={[...allFilters?.transitions_count] || []}
+                                    selected={filters.transitions_count}
                                     onChange={onChangeFilters}
                                     pk={true}
                                     netPrice={netPrice}

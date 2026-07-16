@@ -39,7 +39,7 @@ async function resolvePackageWithFlightFees(pkg: any, flightPairId?: string | st
 
     // Look up surcharge from LT packages/flights for the selected pair
     try {
-        const flightsRes = await Packagesflights({ package_id: pkg.id || pkg.package_id } as never);
+        const flightsRes = await Packagesflights({ package_id: pkg.id || pkg.package_id });
         const flights = flightsRes?.flights || [];
         const selected = flights.find(
             (f: any) => String(f?.flight_pair_id) === String(pairId),

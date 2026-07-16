@@ -1,45 +1,19 @@
-
-import React, {useEffect, useMemo, useState} from 'react';
-import styles from './checkboxGroup.module.css';
+import React from 'react';
 import Icon from "@/components/icons/Icon";
 
-
-interface CheckboxGroupProps {
+interface CheckboxProps {
     option: any;
-    handleToggle:any
-
+    checked: boolean;
+    handleToggle: (value: number | string) => void;
+    value: number | string;
 }
 
-export default function Checkbox({ option, handleToggle }: CheckboxGroupProps) {
-    const [checked, setChecked] = useState<boolean>(false);
-
-
-    useEffect(() => {
-        if(option.selected){
-            setChecked(option.selected)
-        }
-    }, [option]);
-
-
-    const handleChange = (e) => {
-        setChecked(!checked)
-        handleToggle(e)
-    }
-
+export default function Checkbox({ checked, handleToggle, value }: CheckboxProps) {
     return (
         <Icon
             name={checked ? 'checkBoxActive' : 'checkBox'}
             size={24}
-            onClick={() =>
-                handleChange(
-                    option.id ??
-                    option.luggage_type ??
-                    option.flight_class ??
-                    option.number ??
-                    option.flight_type ??
-                    option.interval
-                )
-            }
+            onClick={() => handleToggle(value)}
         />
     );
 }

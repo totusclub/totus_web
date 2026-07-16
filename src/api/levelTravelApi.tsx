@@ -308,11 +308,41 @@ export async function PackagesActualize(
     return response.data;
 };
 
-export async function Packagesflights(params: never) {
-    if (!params) {
+function sanitizePackageFlightsParams(
+    params: Record<string, unknown>,
+): Record<string, unknown> {
+    const cleaned: Record<string, unknown> = {};
+
+    for (const [key, value] of Object.entries(params || {})) {
+        if (value == null) continue;
+        if (Array.isArray(value) && value.length === 0) continue;
+        if (
+            typeof value === 'object' &&
+            !Array.isArray(value) &&
+            Object.values(value as Record<string, unknown>).every(
+                (v) => v == null || v === '',
+            )
+        ) {
+            continue;
+        }
+        cleaned[key] = value;
+    }
+
+    return cleaned;
+}
+
+export async function Packagesflights(params: Record<string, unknown>) {
+    const packageId = params?.package_id ?? params?.packageId;
+    if (packageId == null || packageId === '') {
         throw new Error('Missing package_id');
     }
-    const response = await axios.post(`${BASE_URL}/packages/flights`, params);
+
+    const body = sanitizePackageFlightsParams({
+        ...params,
+        package_id: Number(packageId) || packageId,
+    });
+
+    const response = await axios.post(`${BASE_URL}/packages/flights`, body);
     return response.data;
 }
 
