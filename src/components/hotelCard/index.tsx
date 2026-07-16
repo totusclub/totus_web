@@ -105,10 +105,13 @@ const HotelCard = ({ item, lazy }: HotelCardState) => {
 
         const dateFromCard =
             dates && typeof dates === "object" ? Object.keys(dates)[0] : undefined;
-        const nightsFromCard =
-            min_price_nights != null && Number.isFinite(Number(min_price_nights))
+        // Prefer search nights from URL — card min_price_nights can be a different
+        // duration and hide most rooms on hotel details.
+        const nightsFromSearch =
+            (router.query.nights as string) ||
+            (min_price_nights != null && Number.isFinite(Number(min_price_nights))
                 ? String(min_price_nights)
-                : undefined;
+                : '7');
         const listPrice =
             analytics_min_price != null && Number.isFinite(Number(analytics_min_price))
                 ? String(Math.round(Number(analytics_min_price)))
@@ -123,10 +126,10 @@ const HotelCard = ({ item, lazy }: HotelCardState) => {
             to_city: (router.query.to_city as string) || '',
             adults: (router.query.adults as string) || '2',
             start_date:
-                dateFromCard ||
                 (router.query.start_date as string) ||
+                dateFromCard ||
                 '',
-            nights: nightsFromCard || (router.query.nights as string) || '7',
+            nights: nightsFromSearch,
             search_type: searchType,
             // flex_dates: (router.query.flex_dates as string) ?? '2', // ±2 dates disabled
             flex_dates: (router.query.flex_dates as string) ?? '0',
@@ -161,9 +164,8 @@ const HotelCard = ({ item, lazy }: HotelCardState) => {
             queryParams.meal_id = activeFilterMeals;
             delete queryParams.meal_type;
         }
-        if (hotelsState?.request_id) {
-            queryParams.request_id = String(hotelsState.request_id);
-        }
+        // Do not reuse the listing request_id — it only has partial hotel inventory
+        // (often one room). Hotel details must start a hotel-scoped search.
         if (activeFilterOperators) {
             queryParams.filter_operators = activeFilterOperators;
             queryParams.operator_id = activeFilterOperators;

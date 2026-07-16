@@ -40,8 +40,14 @@ export const useRequestIdSync = (): {
       return;
     }
 
-    // Remember shared / refreshed hotel request ids for this browser.
-    if (hotelIdInUrl && typeof window !== 'undefined') {
+    // Remember only hotel-scoped ids we just created — never mark a listing
+    // request_id as hotel-scoped (that blocked a fresh hotel search).
+    if (
+      hotelIdInUrl &&
+      typeof window !== 'undefined' &&
+      pendingRequestIdRef.current &&
+      pendingRequestIdRef.current === existingRequestId
+    ) {
       sessionStorage.setItem(`hotel_scoped_rid_${hotelIdInUrl}`, String(existingRequestId));
     }
 

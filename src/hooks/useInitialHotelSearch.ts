@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
 import {
     buildHotelSearchQueryUpdate,
     createHotelSearchRequest,
+    isHotelScopedRequestId,
 } from '@/utils/hotelSearchRefresh';
 
 export type InitialHotelSearchState = {
@@ -11,8 +12,9 @@ export type InitialHotelSearchState = {
 };
 
 /**
- * Runs hotel-scoped startSearch when there is a hotel_id but no request_id yet.
- * Deep links, favorites, and navigation from search results (without listing request_id).
+ * Runs hotel-scoped startSearch when needed:
+ * - no request_id (deep link / favorites / search list without id)
+ * - URL has a listing request_id that is not hotel-scoped (partial rooms)
  */
 export const useInitialHotelSearch = (
   hotelId: string | undefined,
@@ -24,14 +26,27 @@ export const useInitialHotelSearch = (
   const router = useRouter();
   const [searching, setSearching] = useState(false);
   const [settled, setSettled] = useState(false);
+  const upgradeAttemptedRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (!isReady || !hotelId) return;
 
-    // URL / pending hotel request_id already available — use it.
-    // Do not treat a stale local-only id as settled when requestId is missing
-    // (that caused infinite loading on shared links).
-    if (requestId) {
+    const hasHotelScopedId =
+      Boolean(requestId) && isHotelScopedRequestId(hotelId, requestId);
+
+    // Already have a hotel-scoped search — use it.
+    if (hasHotelScopedId) {
+      setSettled(true);
+      return;
+    }
+
+    // Listing request_id in URL: upgrade once to a hotel-scoped search.
+    const listingRequestId = requestId ? String(requestId) : null;
+    const upgradeKey = listingRequestId
+      ? `${hotelId}:${listingRequestId}`
+      : `${hotelId}:new`;
+
+    if (upgradeAttemptedRef.current === upgradeKey) {
       setSettled(true);
       return;
     }
@@ -39,6 +54,7 @@ export const useInitialHotelSearch = (
     let isMounted = true;
 
     const runInitialSearch = async () => {
+      upgradeAttemptedRef.current = upgradeKey;
       setSearching(true);
       setSettled(false);
       try {
