@@ -192,14 +192,24 @@ const BookingOrderForm: React.FC<BookingOrderFormProps> = ({ params, handleChang
                                         error={errors.tourists?.[index]?.patronymic}
                                         disabled={params.tourist[index].noPatronymic}
                                     />
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '-8px', marginBottom: '8px' }}>
-                                        <span style={{ fontSize: '16px', fontWeight: 400 }}>Нет отчества</span>
+                                    <div
+                                        className={styles.noPatronymicField}
+                                        onClick={() => {
+                                            const next = !params.tourist[index].noPatronymic;
+                                            handleChangeTourist(next, 'noPatronymic', index);
+                                            if (next) {
+                                                handleChangeTourist('', 'patronymic', index);
+                                            }
+                                        }}
+                                        role="switch"
+                                        aria-checked={params.tourist[index].noPatronymic || false}
+                                    >
+                                        <span className={styles.noPatronymicLabel}>Нет отчества</span>
                                         <SwitchToggle
                                             isOn={params.tourist[index].noPatronymic || false}
                                             setIsOn={(value: boolean) => {
                                                 handleChangeTourist(value, 'noPatronymic', index);
                                                 if (value) {
-                                                    // Clear patronymic when toggle is enabled
                                                     handleChangeTourist('', 'patronymic', index);
                                                 }
                                             }}
@@ -232,15 +242,11 @@ const BookingOrderForm: React.FC<BookingOrderFormProps> = ({ params, handleChang
                                                     }
                                                 },
                                                 label: 'Пол',
-                                                placeholder: "Выберите пол"
+                                                placeholder: "Выберите пол",
+                                                error: errors.tourists?.[index]?.gender,
                                             };
                                             return <Select {...(SelectProps as unknown as React.ComponentProps<typeof Select>)} />;
                                         })()}
-                                        {errors.tourists?.[index]?.gender && (
-                                            <span className={styles.selectError}>
-                                                {errors.tourists[index].gender}
-                                            </span>
-                                        )}
                                     </div>
 
                                 </div>
@@ -262,15 +268,11 @@ const BookingOrderForm: React.FC<BookingOrderFormProps> = ({ params, handleChang
                                                     }
                                                 },
                                                 label: "Гражданство",
-                                                placeholder: "Россия"
+                                                placeholder: "Россия",
+                                                error: errors.tourists?.[index]?.nationality_id,
                                             };
                                             return <Select {...(SelectProps as unknown as React.ComponentProps<typeof Select>)} />;
                                         })()}
-                                        {errors.tourists?.[index]?.nationality_id && (
-                                            <span className={styles.selectError}>
-                                                {errors.tourists[index].nationality_id}
-                                            </span>
-                                        )}
                                     </div>
                                     <div className={styles.selectWrapper}>
                                         {(() => {
@@ -288,15 +290,11 @@ const BookingOrderForm: React.FC<BookingOrderFormProps> = ({ params, handleChang
                                                     }
                                                 },
                                                 label: 'Документ',
-                                                placeholder: "Заграничный паспорт РФ"
+                                                placeholder: "Заграничный паспорт РФ",
+                                                error: errors.tourists?.[index]?.doc_type,
                                             };
                                             return <Select {...(SelectProps as unknown as React.ComponentProps<typeof Select>)} />;
                                         })()}
-                                        {errors.tourists?.[index]?.doc_type && (
-                                            <span className={styles.selectError}>
-                                                {errors.tourists[index].doc_type}
-                                            </span>
-                                        )}
                                     </div>
                                 </div>
 

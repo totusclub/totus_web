@@ -286,12 +286,44 @@
 }
 .bookingFormInputs{
     display: flex;
-    align-items: flex-end;
+    align-items: flex-start;
     align-content: flex-start;
     gap: 8px 8px;
     align-self: stretch;
     flex-wrap: wrap;
-    padding-bottom: 18px;
+    padding-bottom: 0;
+}
+
+.noPatronymicField {
+    display: flex;
+    flex: 0 0 auto;
+    width: auto;
+    max-width: 220px;
+    min-width: 0;
+    height: 56px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 0 16px;
+    border-radius: 16px;
+    border: 1px solid var(--borderSecondary);
+    background: var(--bgPrimary);
+    box-sizing: border-box;
+    cursor: pointer;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.noPatronymicField:hover {
+    border-color: var(--core_Orange);
+}
+
+.noPatronymicLabel {
+    color: var(--textPrimary);
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 20px;
+    letter-spacing: -0.32px;
 }
 
 .selectWrapper {
@@ -301,20 +333,18 @@
     flex-direction: column;
     width: 100%;
     position: relative;
+    gap: 4px;
 }
 
 .selectError {
-    position: absolute;
-    left: 4px;
-    top: calc(100% + 2px);
-    z-index: 2;
+    position: static;
+    display: block;
     color: #ef4444;
     font-size: 12px;
+    line-height: 16px;
     margin: 0;
-    padding: 0;
-    display: block;
-    pointer-events: none;
-    max-width: calc(100% - 8px);
+    padding: 0 4px;
+    word-break: break-word;
 }
 .bookingLineForm{
     display: flex;

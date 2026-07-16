@@ -361,7 +361,13 @@ export function mapLevelTravelTouristValidateErrors(payload: any): BookingValida
   const common = errBlock?.common;
   if (Array.isArray(common)) {
     for (const item of common) {
-      const text = item?.description || item?.message || (typeof item === 'string' ? item : null);
+      let text: string | null = null;
+      if (typeof item === 'string') text = item;
+      else if (typeof item?.description === 'string') text = item.description;
+      else if (typeof item?.message === 'string') text = item.message;
+      else if (item?.description && typeof item.description === 'object') {
+        text = item.description.ru || item.description.en || null;
+      }
       if (text) commonMessages.push(String(text));
     }
   }
@@ -382,7 +388,15 @@ export function mapLevelTravelTouristValidateErrors(payload: any): BookingValida
         if (!Array.isArray(messages) || messages.length === 0) return;
 
         const texts = messages
-          .map((m: any) => m?.description || m?.message || (typeof m === 'string' ? m : null))
+          .map((m: any) => {
+            if (typeof m === 'string') return m;
+            if (m?.description && typeof m.description === 'string') return m.description;
+            if (m?.message && typeof m.message === 'string') return m.message;
+            if (m?.description && typeof m.description === 'object') {
+              return m.description.ru || m.description.en || JSON.stringify(m.description);
+            }
+            return null;
+          })
           .filter(Boolean)
           .map(String);
 

@@ -16,6 +16,7 @@ interface SelectProps {
     label?: string;
     isFull?: boolean;
     type?: string;
+    error?: string;
 }
 
 const Select: React.FC<SelectProps> = ({
@@ -24,7 +25,8 @@ const Select: React.FC<SelectProps> = ({
     onChange,
     placeholder = 'Select an option',
     label,
-    isFull = false
+    isFull = false,
+    error,
 }) => {
     const [open, setOpen] = useState(false);
     const [openUp, setOpenUp] = useState(false);
@@ -64,11 +66,12 @@ const Select: React.FC<SelectProps> = ({
             style={{ flex: isFull ? 1 : 'none' }}
         >
             <div
-                className={styles.selectButton}
+                className={`${styles.selectButton} ${error ? styles.selectButtonError : ''}`}
                 onClick={() => setOpen((prev) => !prev)}
                 role="combobox"
                 aria-expanded={open}
                 aria-haspopup="listbox"
+                aria-invalid={error ? 'true' : 'false'}
             >
                 <div className={styles.selectButtonInfo}>
                     {label && <p className={styles.selectLabel}>{label}</p>}
@@ -108,6 +111,7 @@ const Select: React.FC<SelectProps> = ({
                     ))}
                 </ul>
             )}
+            {error ? <span className={styles.selectError}>{error}</span> : null}
         </div>
     );
 };

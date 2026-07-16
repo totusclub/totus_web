@@ -36,17 +36,14 @@
 }
 
 .errorMessage {
-  position: absolute;
-  left: 4px;
-  top: calc(100% + 2px);
-  z-index: 2;
+  display: block;
+  position: static;
   color: #ef4444;
   font-size: 12px;
   font-weight: 400;
   line-height: 16px;
-  margin: 0;
-  padding: 0;
-  pointer-events: none;
+  margin: 4px 0 0;
+  padding: 0 4px;
   white-space: normal;
-  max-width: calc(100% - 8px);
+  word-break: break-word;
 }

@@ -242,33 +242,36 @@ const DateInput: React.FC<DateInputProps> = ({
 
     return (
         <div className={styles.dateInputWrapper} ref={wrapperRef}>
-            {label && <label className={styles.label}>{label}</label>}
             <div className={`${styles.dateInput} ${error ? styles.dateInputError : ''}`}>
                 <div onClick={handleToggle} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
                     <Icon name={'calendar'} size={20} color="var(--textPrimary)" />
                 </div>
-                <input
-                    type="text"
-                    value={inputValue}
-                    onChange={handleInputChange}
-                    onBlur={handleInputBlur}
-                    onFocus={(e) => {
-                        e.stopPropagation();
-                        e.currentTarget.focus();
-                    }}
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        e.currentTarget.focus();
-                    }}
-                    onKeyDown={(e) => {
-                        e.stopPropagation();
-                    }}
-                    placeholder={placeholder}
-                    required={required}
-                    maxLength={10}
-                    className={styles.input}
-                    autoComplete="off"
-                />
+                <div className={styles.dateInputBody}>
+                    {label ? <span className={styles.floatingLabel}>{label}</span> : null}
+                    <input
+                        type="text"
+                        value={inputValue}
+                        onChange={handleInputChange}
+                        onBlur={handleInputBlur}
+                        onFocus={(e) => {
+                            e.stopPropagation();
+                            e.currentTarget.focus();
+                        }}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            e.currentTarget.focus();
+                        }}
+                        onKeyDown={(e) => {
+                            e.stopPropagation();
+                        }}
+                        placeholder={placeholder}
+                        required={required}
+                        maxLength={10}
+                        className={styles.input}
+                        autoComplete="off"
+                        aria-invalid={error ? 'true' : 'false'}
+                    />
+                </div>
                 <div onClick={handleToggle} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
                     <Icon name={'downArrow'} size={20} color="var(--textPrimary)" />
                 </div>

@@ -4,6 +4,7 @@
   position: relative;
   width: 100%;
   min-width: 0; /* Allows flex item to shrink below content size */
+  gap: 4px;
   /*font-family: Arial, sans-serif;*/
 }
 
@@ -21,6 +22,19 @@
   padding-right: 16px;
   box-sizing: border-box;
   transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+.selectButtonError {
+  border-color: #ef4444;
+}
+.selectError {
+  display: block;
+  color: #ef4444;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 16px;
+  margin: 0;
+  padding: 0 4px;
+  word-break: break-word;
 }
 .selectButtonInfo {
   width: 100%;
@@ -125,7 +139,7 @@
   }
   .selectLabel {
     font-size: 11px;
-    display: none;
+    display: block;
   }
   .selectValue {
     font-size: 16px;

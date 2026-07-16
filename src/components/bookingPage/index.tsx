@@ -309,10 +309,49 @@ const BookingCard = () => {
             );
         }
 
-        return Array.from(new Set(messages));
+        return Array.from(new Set(messages.filter(Boolean)));
     }, [errors.general, errors.tourists, liveValidationErrors, showErrors]);
 
-    // Sync live field errors with Level Travel comments (do not wipe LT messages)
+    /** Field errors shown under inputs — live validation + kept API messages. */
+    const displayedFieldErrors = useMemo((): ValidationErrors => {
+        if (!showErrors) return {};
+
+        const next: ValidationErrors = { ...liveValidationErrors };
+        if (errors.general) next.general = errors.general;
+        if (errors.email && !next.email) next.email = errors.email;
+        if (errors.phone && !next.phone) next.phone = errors.phone;
+
+        if (errors.tourists) {
+            const merged: NonNullable<ValidationErrors['tourists']> = {
+                ...(next.tourists || {}),
+            };
+
+            Object.entries(errors.tourists).forEach(([indexKey, fields]) => {
+                const index = Number(indexKey);
+                const liveFields = merged[index] || {};
+                const kept: TouristErrors = { ...liveFields };
+
+                Object.entries(fields).forEach(([field, message]) => {
+                    const key = field as keyof TouristErrors;
+                    if (!liveFields[key] && message) {
+                        kept[key] = message;
+                    }
+                });
+
+                if (Object.keys(kept).length > 0) {
+                    merged[index] = kept;
+                }
+            });
+
+            if (Object.keys(merged).length > 0) {
+                next.tourists = merged;
+            }
+        }
+
+        return next;
+    }, [showErrors, liveValidationErrors, errors]);
+
+    // Keep errors state aligned with live validation for submit / API merge paths
     useEffect(() => {
         if (!showErrors) return;
         setErrors((prev) => {
@@ -730,7 +769,7 @@ const BookingCard = () => {
                         handleChangeTourist={handleChangeTourist}
                         params={params}
                         dataLoading={dataLoading}
-                        errors={showErrors ? errors : {}}
+                        errors={displayedFieldErrors}
                     />
                     <BookingOrderCard
                         loading={loading}
