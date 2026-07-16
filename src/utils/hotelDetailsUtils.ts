@@ -425,14 +425,21 @@ export const findCheapestOfferForStartDate = (
   startDate: string,
   nightsCount?: number | null,
   nightsRange?: { min: number; max: number } | null,
+  /** When set, only consider these meal codes (e.g. RO, AI) — keeps header in sync with search filters. */
+  mealIds?: string[] | null,
 ): any | null => {
   if (!rooms?.length || !startDate) return null;
   let best: any = null;
   let bestPrice = Infinity;
+  const mealSet =
+    mealIds?.length
+      ? new Set(mealIds.map((id) => String(id).toUpperCase()))
+      : null;
 
   rooms.forEach((room) => {
     const offers = room?.offers || {};
-    Object.values(offers).forEach((offerList: any) => {
+    Object.entries(offers).forEach(([mealType, offerList]: [string, any]) => {
+      if (mealSet && !mealSet.has(String(mealType).toUpperCase())) return;
       if (!Array.isArray(offerList)) return;
       offerList.forEach((offer: any) => {
         if (offer?.start_date !== startDate) return;

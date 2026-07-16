@@ -26,6 +26,19 @@ const TicketItem: FC<TicketItemProps> = ({ green, item, price, lazy }) => {
     const fuelCharge = toMoney(item?.fuel_charge);
     const totalPrice = getFlightOfferTotal(basePrice, item);
 
+    const getPlaceName = (place: any) =>
+        place?.city?.name || place?.name?.split(',')[0] || place?.name || place?.code || '';
+
+    const formatRoute = (flight: any) => {
+        const from = getPlaceName(flight?.origin);
+        const to = getPlaceName(flight?.destination);
+        if (from && to) return `${from} — ${to}`;
+        const fromCode = flight?.origin?.code;
+        const toCode = flight?.destination?.code;
+        if (fromCode && toCode) return `${fromCode}-${toCode}`;
+        return '';
+    };
+
     const handleClick = (id) => {
         if (token) {
             // Price comes from Level Travel actualize on booking — not from URL
@@ -55,49 +68,58 @@ const TicketItem: FC<TicketItemProps> = ({ green, item, price, lazy }) => {
                     >
                         <div className={styles.ticketItemInfo}>
                             <div className={styles.ticketItemLine}>
-                                <div className={styles.ticketItemLineItem}>
-                                    <div className={styles.ticketItemLogo}>
-                                        <img src={item?.to?.airline?.logo?.src} alt={item?.to?.airline?.name} />
+                                <span className={styles.ticketItemDirection} aria-hidden="true">
+                                    Туда
+                                </span>
+                                <div className={styles.ticketItemLineBody}>
+                                    <div className={styles.ticketItemLineItem}>
+                                        <div className={styles.ticketItemLogo}>
+                                            <img src={item?.to?.airline?.logo?.src} alt={item?.to?.airline?.name} />
+                                        </div>
+                                        <div className={styles.ticketItemDate}>
+                                            <p>{formatRussianDateTime(item?.to?.departure)} - {formatRussianDateTime(item?.to?.arrival)}</p>
+                                            <p>{formatRussianDate(item?.to?.departure)}</p>
+                                        </div>
                                     </div>
-                                    <div className={styles.ticketItemDate}>
-                                        <p>{formatRussianDateTime(item?.to?.departure)} - {formatRussianDateTime(item?.to?.arrival)}</p>
-                                        <p>{formatRussianDate(item?.to?.departure)}</p>
+                                    <div className={styles.ticketItemLineItem}>
+                                        <div className={styles.ticketItemDate}>
+                                            <p>{item?.to?.direct ? 'Прямой' : item?.direction}</p>
+                                            <p>{item?.to?.airline?.name}</p>
+                                        </div>
                                     </div>
-                                </div>
-                                <div className={styles.ticketItemLineItem}>
-                                    <div className={styles.ticketItemDate}>
-                                        <p>{item.back.direct ? 'Прямой' : item?.direction}</p>
-                                        <p>{item?.to?.airline?.name}</p>
-                                    </div>
-                                </div>
-                                <div className={styles.ticketItemLineItem}>
-                                    <div className={styles.ticketItemDate}>
-                                        <p>{secondsToRussianTime(item?.to?.time)}</p>
-                                        <p>{item.to.origin.code}-{item.to.destination.code}</p>
+                                    <div className={styles.ticketItemLineItem}>
+                                        <div className={styles.ticketItemDate}>
+                                            <p>{secondsToRussianTime(item?.to?.time)}</p>
+                                            <p className={styles.ticketItemRoute}>{formatRoute(item?.to)}</p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                             <div className={styles.ticketItemLine}>
-                                <div className={styles.ticketItemLineItem}>
-                                    <div className={styles.ticketItemLogo}>
-                                        <img src={item?.back?.airline?.logo?.src} alt={item?.to?.airline?.name} />
+                                <span className={styles.ticketItemDirection} aria-hidden="true">
+                                    Обратно
+                                </span>
+                                <div className={styles.ticketItemLineBody}>
+                                    <div className={styles.ticketItemLineItem}>
+                                        <div className={styles.ticketItemLogo}>
+                                            <img src={item?.back?.airline?.logo?.src} alt={item?.back?.airline?.name} />
+                                        </div>
+                                        <div className={styles.ticketItemDate}>
+                                            <p>{formatRussianDateTime(item?.back?.departure)} - {formatRussianDateTime(item?.back?.arrival)}</p>
+                                            <p>{formatRussianDate(item?.back?.departure)}</p>
+                                        </div>
                                     </div>
-                                    <div className={styles.ticketItemDate}>
-                                        <p>{formatRussianDateTime(item?.back?.departure)} - {formatRussianDateTime(item?.back?.arrival)}</p>
-                                        <p>{formatRussianDate(item?.back?.departure)}</p>
-
+                                    <div className={styles.ticketItemLineItem}>
+                                        <div className={styles.ticketItemDate}>
+                                            <p>{item?.back?.direct ? 'Прямой' : item?.direction}</p>
+                                            <p>{item?.back?.airline?.name}</p>
+                                        </div>
                                     </div>
-                                </div>
-                                <div className={styles.ticketItemLineItem}>
-                                    <div className={styles.ticketItemDate}>
-                                        <p>{item.back.direct ? 'Прямой' : item?.direction}</p>
-                                        <p>{item?.back?.airline?.name}</p>
-                                    </div>
-                                </div>
-                                <div className={styles.ticketItemLineItem}>
-                                    <div className={styles.ticketItemDate}>
-                                        <p>{secondsToRussianTime(item?.back?.time)}</p>
-                                        <p>{item.back.origin.code}-{item.back.destination.code}</p>
+                                    <div className={styles.ticketItemLineItem}>
+                                        <div className={styles.ticketItemDate}>
+                                            <p>{secondsToRussianTime(item?.back?.time)}</p>
+                                            <p className={styles.ticketItemRoute}>{formatRoute(item?.back)}</p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -162,56 +184,56 @@ const TicketItem: FC<TicketItemProps> = ({ green, item, price, lazy }) => {
 
                     {/* Outbound Flight Line */}
                     <div className={styles.ticketItemLine}>
-                        {/* Logo + Time */}
-                        <div className={styles.ticketItemLineItem}>
-                            <div className={styles.ticketItemLogo}>
-                                <div className={styles.animationImagelazy} style={{ width: '50px', height: '50px' }}></div>
+                        <span className={styles.ticketItemDirection}>Туда</span>
+                        <div className={styles.ticketItemLineBody}>
+                            <div className={styles.ticketItemLineItem}>
+                                <div className={styles.ticketItemLogo}>
+                                    <div className={styles.animationImagelazy} style={{ width: '50px', height: '50px' }}></div>
+                                </div>
+                                <div className={styles.ticketItemDate}>
+                                    <div className={styles.animationTextlazy} style={{ width: '130px', height: '16px' }}></div>
+                                    <div className={styles.animationTextlazy} style={{ width: '70px', height: '14px', marginTop: '4px' }}></div>
+                                </div>
                             </div>
-                            <div className={styles.ticketItemDate}>
-                                <div className={styles.animationTextlazy} style={{ width: '130px', height: '16px' }}></div>
-                                <div className={styles.animationTextlazy} style={{ width: '70px', height: '14px', marginTop: '4px' }}></div>
+                            <div className={styles.ticketItemLineItem}>
+                                <div className={styles.ticketItemDate}>
+                                    <div className={styles.animationTextlazy} style={{ width: '60px', height: '16px' }}></div>
+                                    <div className={styles.animationTextlazy} style={{ width: '100px', height: '14px', marginTop: '4px' }}></div>
+                                </div>
                             </div>
-                        </div>
-                        {/* Flight Type */}
-                        <div className={styles.ticketItemLineItem}>
-                            <div className={styles.ticketItemDate}>
-                                <div className={styles.animationTextlazy} style={{ width: '60px', height: '16px' }}></div>
-                                <div className={styles.animationTextlazy} style={{ width: '100px', height: '14px', marginTop: '4px' }}></div>
-                            </div>
-                        </div>
-                        {/* Duration + Route */}
-                        <div className={styles.ticketItemLineItem}>
-                            <div className={styles.ticketItemDate}>
-                                <div className={styles.animationTextlazy} style={{ width: '50px', height: '16px' }}></div>
-                                <div className={styles.animationTextlazy} style={{ width: '60px', height: '14px', marginTop: '4px' }}></div>
+                            <div className={styles.ticketItemLineItem}>
+                                <div className={styles.ticketItemDate}>
+                                    <div className={styles.animationTextlazy} style={{ width: '50px', height: '16px' }}></div>
+                                    <div className={styles.animationTextlazy} style={{ width: '60px', height: '14px', marginTop: '4px' }}></div>
+                                </div>
                             </div>
                         </div>
                     </div>
 
                     {/* Return Flight Line */}
                     <div className={styles.ticketItemLine}>
-                        {/* Logo + Time */}
-                        <div className={styles.ticketItemLineItem}>
-                            <div className={styles.ticketItemLogo}>
-                                <div className={styles.animationImagelazy} style={{ width: '50px', height: '50px' }}></div>
+                        <span className={styles.ticketItemDirection}>Обратно</span>
+                        <div className={styles.ticketItemLineBody}>
+                            <div className={styles.ticketItemLineItem}>
+                                <div className={styles.ticketItemLogo}>
+                                    <div className={styles.animationImagelazy} style={{ width: '50px', height: '50px' }}></div>
+                                </div>
+                                <div className={styles.ticketItemDate}>
+                                    <div className={styles.animationTextlazy} style={{ width: '130px', height: '16px' }}></div>
+                                    <div className={styles.animationTextlazy} style={{ width: '70px', height: '14px', marginTop: '4px' }}></div>
+                                </div>
                             </div>
-                            <div className={styles.ticketItemDate}>
-                                <div className={styles.animationTextlazy} style={{ width: '130px', height: '16px' }}></div>
-                                <div className={styles.animationTextlazy} style={{ width: '70px', height: '14px', marginTop: '4px' }}></div>
+                            <div className={styles.ticketItemLineItem}>
+                                <div className={styles.ticketItemDate}>
+                                    <div className={styles.animationTextlazy} style={{ width: '60px', height: '16px' }}></div>
+                                    <div className={styles.animationTextlazy} style={{ width: '100px', height: '14px', marginTop: '4px' }}></div>
+                                </div>
                             </div>
-                        </div>
-                        {/* Flight Type */}
-                        <div className={styles.ticketItemLineItem}>
-                            <div className={styles.ticketItemDate}>
-                                <div className={styles.animationTextlazy} style={{ width: '60px', height: '16px' }}></div>
-                                <div className={styles.animationTextlazy} style={{ width: '100px', height: '14px', marginTop: '4px' }}></div>
-                            </div>
-                        </div>
-                        {/* Duration + Route */}
-                        <div className={styles.ticketItemLineItem}>
-                            <div className={styles.ticketItemDate}>
-                                <div className={styles.animationTextlazy} style={{ width: '50px', height: '16px' }}></div>
-                                <div className={styles.animationTextlazy} style={{ width: '60px', height: '14px', marginTop: '4px' }}></div>
+                            <div className={styles.ticketItemLineItem}>
+                                <div className={styles.ticketItemDate}>
+                                    <div className={styles.animationTextlazy} style={{ width: '50px', height: '16px' }}></div>
+                                    <div className={styles.animationTextlazy} style={{ width: '60px', height: '14px', marginTop: '4px' }}></div>
+                                </div>
                             </div>
                         </div>
                     </div>

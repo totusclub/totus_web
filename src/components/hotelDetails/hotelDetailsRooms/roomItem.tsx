@@ -10,12 +10,21 @@ import {
     offerMatchesNightsConstraint,
     HOTEL_DETAILS_DEFAULT_FLEX_DATES,
 } from "@/utils/hotelDetailsUtils";
+import { resolveExactMealIdsFromPick, type ListRoomPick } from "@/utils/listRoomPick";
 
 type RoomImage = {
     x900?: string;
 };
 
-const HotelDetailsRoomItem = ({ item, selectedDate }: any) => {
+const HotelDetailsRoomItem = ({
+    item,
+    selectedDate,
+    listRoomPick = null,
+}: {
+    item: any;
+    selectedDate?: string;
+    listRoomPick?: ListRoomPick | null;
+}) => {
     const router = useRouter();
     const nightsConstraint = useMemo(
         () => getNightsConstraintFromQuery(router.query, {
@@ -34,6 +43,11 @@ const HotelDetailsRoomItem = ({ item, selectedDate }: any) => {
         [item?.room?.images],
     );
 
+    const preferredMealIds = useMemo(
+        () => resolveExactMealIdsFromPick(listRoomPick),
+        [listRoomPick],
+    );
+
     const offersForDate = useMemo(() => {
         if (!selectedDate || !item?.offers) return [];
 
@@ -48,10 +62,17 @@ const HotelDetailsRoomItem = ({ item, selectedDate }: any) => {
         );
     }, [selectedDate, item?.offers, nightsConstraint]);
 
-    const visibleOfferTypes = useMemo(
-        () => Array.from(new Set(offersForDate.map((offer) => offer.type))),
-        [offersForDate],
-    );
+    // Meals are already filtered by active room filters — do not re-lock to search URL meals
+    // (that hid UAI when the user switched from «Всё включено» to «Ультра всё включено»).
+    const visibleOfferTypes = useMemo(() => {
+        const types = Array.from(new Set(offersForDate.map((offer) => offer.type)));
+        if (!preferredMealIds.length) return types;
+        return [...types].sort((a, b) => {
+            const aPreferred = preferredMealIds.includes(String(a).toUpperCase()) ? 0 : 1;
+            const bPreferred = preferredMealIds.includes(String(b).toUpperCase()) ? 0 : 1;
+            return aPreferred - bPreferred;
+        });
+    }, [offersForDate, preferredMealIds]);
 
     useEffect(() => {
         setImageError(false);

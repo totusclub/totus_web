@@ -11,6 +11,77 @@ import Icon from "@/components/icons/Icon";
 import Button from "@/components/UI/button";
 import { useRouter } from 'next/router';
 import { parseUiPageNumber } from '@/utils/searchResults';
+import type { RootState } from '@/store';
+import {
+    pickAppliedFiltersFromHotels,
+    peekSearchListRestoreFlag,
+    readSearchListState,
+    replaceSearchListFilters,
+    shouldRestoreSearchFilters,
+    writeSearchListState,
+} from '@/utils/searchListState';
+
+const DEFAULT_FILTERS = {
+    filter_instant_confirm: false,
+    filter_stars: '3,4,5',
+    sort_by: 'relevance' as string,
+};
+
+function buildFiltersFromHotels(hotels: any) {
+    const saved = readSearchListState();
+    const fromHotels = pickAppliedFiltersFromHotels(hotels);
+    const fromSession = saved?.filters ?? {};
+    const restoring = shouldRestoreSearchFilters({
+        restoreFlag: peekSearchListRestoreFlag(),
+        hotelsRequestId: hotels?.request_id ? String(hotels.request_id) : null,
+        autoSearchKey: saved?.autoSearchKey,
+    });
+
+    // Returning from hotel details: session snapshot is the source of truth.
+    // Do not re-apply package defaults (AI / 3-5★) over the user's selection.
+    if (restoring) {
+        return {
+            filter_instant_confirm: false,
+            sort_by: 'relevance',
+            ...fromHotels,
+            ...fromSession,
+            filter_meals: fromSession.filter_meals ?? fromHotels.filter_meals,
+            filter_stars: fromSession.filter_stars ?? fromHotels.filter_stars,
+            filter_operators: fromSession.filter_operators ?? fromHotels.filter_operators,
+            filter_hotel_type: fromSession.filter_hotel_type ?? fromHotels.filter_hotel_type,
+            filter_regions: fromSession.filter_regions ?? fromHotels.filter_regions,
+            filter_line: fromSession.filter_line ?? fromHotels.filter_line,
+            filter_instant_confirm:
+                fromSession.filter_instant_confirm ??
+                fromHotels.filter_instant_confirm ??
+                false,
+            sort_by: fromSession.sort_by ?? fromHotels.sort_by ?? 'relevance',
+            filter_price_min: fromSession.filter_price_min ?? fromHotels.filter_price_min,
+            filter_price_max: fromSession.filter_price_max ?? fromHotels.filter_price_max,
+        };
+    }
+
+    return {
+        ...DEFAULT_FILTERS,
+        ...fromSession,
+        ...fromHotels,
+        filter_meals:
+            fromHotels.filter_meals ??
+            fromSession.filter_meals ??
+            (DEFAULT_FILTERS as { filter_meals?: string }).filter_meals,
+        filter_stars:
+            fromHotels.filter_stars ?? fromSession.filter_stars ?? DEFAULT_FILTERS.filter_stars,
+        filter_operators: fromHotels.filter_operators ?? fromSession.filter_operators,
+        filter_hotel_type: fromHotels.filter_hotel_type ?? fromSession.filter_hotel_type,
+        filter_regions: fromHotels.filter_regions ?? fromSession.filter_regions,
+        filter_line: fromHotels.filter_line ?? fromSession.filter_line,
+        filter_instant_confirm:
+            fromHotels.filter_instant_confirm ??
+            fromSession.filter_instant_confirm ??
+            DEFAULT_FILTERS.filter_instant_confirm,
+        sort_by: fromHotels.sort_by ?? fromSession.sort_by ?? DEFAULT_FILTERS.sort_by,
+    };
+}
 
 const Filters = ({ selectedFilters, allFilters, statistics }: any) => {
     const { hotels, loading, startSearchValid } = useSelector((state: RootState) => state.search);
@@ -22,16 +93,8 @@ const Filters = ({ selectedFilters, allFilters, statistics }: any) => {
     const [priceReady, setPriceReady] = useState(false);
     const [km, setKm] = useState([20, 60]);
     const [meter, setMeter] = useState([20, 60]);
-    const [filters, setFilters] = useState({
-        filter_instant_confirm: false,
-        filter_stars: '3,4,5',
-        sort_by: 'relevance'
-    })
-    const [pendingFilters, setPendingFilters] = useState({
-        filter_instant_confirm: false,
-        filter_stars: '3,4,5',
-        sort_by: 'relevance'
-    })
+    const [filters, setFilters] = useState(() => buildFiltersFromHotels(hotels));
+    const [pendingFilters, setPendingFilters] = useState(() => buildFiltersFromHotels(hotels));
     const priceInitializedRef = useRef(false);
     const lastRequestIdRef = useRef<string | null>(null);
     const lastFilterRequestKeyRef = useRef<string | null>(null);
@@ -106,12 +169,17 @@ const Filters = ({ selectedFilters, allFilters, statistics }: any) => {
         const {
             request_id: _requestId,
             readyOperators: _readyOperators,
-            page_limit: _pageLimit,
             page_number: _pageNumber,
+            page_limit: _pageLimit,
             ...filterFields
         } = params;
 
         setFilters((prev) => ({ ...prev, ...filterFields }));
+        // Replace (not merge) so cleared checkboxes don't keep old defaults in session.
+        replaceSearchListFilters(
+            pickAppliedFiltersFromHotels({ ...hotels, ...filterFields }),
+            String(params.request_id),
+        );
         dispatch(setAllMyHotels([]));
         dispatch(searchFilters(params));
     };
@@ -122,19 +190,37 @@ const Filters = ({ selectedFilters, allFilters, statistics }: any) => {
         lastFilterRequestKeyRef.current = null;
         filtersSyncedRef.current = false;
 
-        setFilters((prev) => ({
-            ...prev,
-            filter_instant_confirm: hotels.filter_instant_confirm ?? prev.filter_instant_confirm,
-            filter_stars: hotels.filter_stars ?? prev.filter_stars,
-            filter_meals: hotels.filter_meals ?? prev.filter_meals,
-            filter_hotel_type: hotels.filter_hotel_type ?? prev.filter_hotel_type,
-            filter_regions: hotels.filter_regions ?? prev.filter_regions,
-            filter_line: hotels.filter_line ?? prev.filter_line,
-            filter_operators: hotels.filter_operators ?? prev.filter_operators,
-            sort_by: hotels.sort_by ?? prev.sort_by,
-        }));
+        const restored = buildFiltersFromHotels(hotels);
+        setFilters((prev) => ({ ...prev, ...restored }));
+        setPendingFilters((prev) => ({ ...prev, ...restored }));
+
+        const restoring = shouldRestoreSearchFilters({
+            restoreFlag: peekSearchListRestoreFlag(),
+            hotelsRequestId: String(hotels.request_id),
+        });
+        // While restoring from hotel details, keep the session snapshot —
+        // don't overwrite it with a partial hotels payload.
+        if (!restoring) {
+            writeSearchListState({
+                requestId: hotels.request_id,
+                filters: {
+                    ...readSearchListState()?.filters,
+                    ...pickAppliedFiltersFromHotels(hotels),
+                },
+            });
+        }
         filtersSyncedRef.current = true;
-    }, [hotels?.request_id]);
+    }, [
+        hotels?.request_id,
+        hotels?.filter_meals,
+        hotels?.filter_stars,
+        hotels?.filter_operators,
+        hotels?.filter_hotel_type,
+        hotels?.filter_regions,
+        hotels?.filter_line,
+        hotels?.filter_instant_confirm,
+        hotels?.sort_by,
+    ]);
 
     // Detect mobile screen
     useEffect(() => {

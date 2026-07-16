@@ -149,10 +149,12 @@ export default function HotelDetails() {
     useEffect(() => {
         if (initialSearchParams?.start_date) {
             setActiveStartDate(initialSearchParams.start_date);
+            setSelectedRoomDate((prev) => prev || initialSearchParams.start_date || '');
             return;
         }
         if (queryStartDate) {
             setActiveStartDate(queryStartDate);
+            setSelectedRoomDate((prev) => prev || queryStartDate);
         }
     }, [initialSearchParams?.start_date, queryStartDate]);
 
@@ -243,7 +245,8 @@ export default function HotelDetails() {
             }
             if (prev && dates.includes(prev)) return prev;
             if (preferredDate && dates.includes(preferredDate)) return preferredDate;
-            return dates[Math.floor(dates.length / 2)] ?? dates[0];
+            // Prefer search date over a mid-range tab so list/details prices stay aligned.
+            return dates[0];
         });
     }, [rooms, activeStartDate, router.query, roomDepartureDate, roomFlexDates]);
 

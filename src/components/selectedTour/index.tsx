@@ -8,6 +8,7 @@ import {
     getPackageBasePrice,
     toMoney,
 } from '@/utils/packagePrice';
+import { formatAdultsCountWithDates } from '@/utils/formatRussianPlural';
 
 const formatTourPrice = (amount: number) => formatMoneyRub(amount).replace(' ₽', '₽');
 
@@ -115,7 +116,7 @@ const SelectedTour = ({ packages, flights }: any) => {
 
                             <div className={styles.selectedTourList}>
                                 <Icon name={'user'} size={16} />
-                                <p>{packages?.adults_count} взрослых</p>
+                                <p>{formatAdultsCountWithDates(packages)}</p>
                             </div>
 
                             <div className={styles.selectedTourList}>
@@ -141,13 +142,13 @@ const SelectedTour = ({ packages, flights }: any) => {
                                 {formatTourPrice(totalPrice)}
                             </p>
 
-                            {showPriceComparison && oldTotal != null && (
+                            {/* {showPriceComparison && oldTotal != null && (
                                 <div className={styles.actualePackageParices}>
                                     <del>{formatTourPrice(oldTotal)}</del>
                                     <Icon name={'prev'} size={16} />
                                     <p>{formatTourPrice(totalPrice)}</p>
                                 </div>
-                            )}
+                            )} */}
 
                             <p className={styles.feesText}>
                                 Доплаты и сборы +{formatTourPrice(fees)}

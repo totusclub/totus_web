@@ -15,6 +15,7 @@
   height: 152px;
   flex-direction: column;
   align-items: flex-start;
+  justify-content: flex-start;
   gap: 8px;
   flex-shrink: 0;
   border-radius: 8px;
@@ -23,6 +24,7 @@
   background-position: center;
   background-repeat: no-repeat;
   padding: 8px;
+  position: relative;
 }
 .hotelCardImageInfo {
   width: 100%;
@@ -225,6 +227,15 @@
   line-height: 24px; /* 120% */
   letter-spacing: -0.4px;
 }
+.hotelCardRoomType {
+  margin: 0;
+  color: var(--textSecondary);
+  text-align: center;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 16px;
+  letter-spacing: -0.02em;
+}
 .hotelCardPriceM {
   display: none;
 }
@@ -338,8 +349,9 @@
   }
   .hotelCardPriceM {
     display: flex;
-    gap: 8px;
-    align-items: center;
+    flex-direction: column;
+    gap: 4px;
+    align-items: flex-start;
   }
   .hotelCardPriceM > p:nth-child(1) {
     color: var(--textPrimary);
@@ -350,7 +362,13 @@
     line-height: 24px; /* 120% */
     letter-spacing: -0.4px;
   }
-  .hotelCardPriceM > p:nth-child(2) {
+  .hotelCardPriceM .hotelCardRoomType {
+    text-align: left;
+    color: var(--textSecondary);
+    font-size: 13px;
+    line-height: 16px;
+  }
+  .hotelCardPriceM > p:last-child {
     color: var(--textTertiary);
     font-family: "Golos Text";
     font-size: 14px;

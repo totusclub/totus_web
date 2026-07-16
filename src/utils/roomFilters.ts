@@ -120,11 +120,23 @@ function preserveOptionSelections(
 ): RoomFilterOption[] | undefined {
     if (!nextOptions) return undefined;
 
-    return nextOptions.map((option) => {
+    const merged = nextOptions.map((option) => {
         const previous = previousOptions?.find((item) => optionIdEquals(item.id, option.id));
         if (!previous) return option;
         return { ...option, selected: previous.selected };
     });
+
+    // Keep previously selected options that the API response dropped (e.g. multi meal filter).
+    const nextIds = new Set(merged.map((option) => String(option.id).toUpperCase()));
+    (previousOptions ?? []).forEach((option) => {
+        if (!option.selected) return;
+        const id = String(option.id).toUpperCase();
+        if (nextIds.has(id)) return;
+        merged.push({ ...option, selected: true, disabled: false });
+        nextIds.add(id);
+    });
+
+    return merged;
 }
 
 export function normalizeInitialRoomFilters(filters: HotelRoomFilters): HotelRoomFilters {
@@ -526,20 +538,91 @@ export function clearRoomFilters(filters: HotelRoomFilters): HotelRoomFilters {
     };
 }
 
+export function buildMealsFilterFromRooms(
+    rooms: unknown[] | null | undefined,
+    previousMeals?: RoomFilterOption[] | null,
+): RoomFilterOption[] {
+    const selectedIds = new Set(
+        (previousMeals ?? [])
+            .filter((meal) => meal.selected)
+            .map((meal) => String(meal.id).toUpperCase()),
+    );
+
+    const meals = new Map<string, RoomFilterOption>();
+
+    (previousMeals ?? []).forEach((meal) => {
+        const id = String(meal.id);
+        meals.set(id.toUpperCase(), {
+            ...meal,
+            id: meal.id,
+            selected: selectedIds.has(id.toUpperCase()),
+        });
+    });
+
+    rooms?.forEach((room) => {
+        const offers = (room as { offers?: Record<string, unknown[]> })?.offers ?? {};
+        Object.keys(offers).forEach((mealType) => {
+            const key = String(mealType).toUpperCase();
+            if (!key || meals.has(key)) return;
+            meals.set(key, {
+                id: key,
+                name: key,
+                selected: selectedIds.has(key),
+            });
+        });
+    });
+
+    return Array.from(meals.values());
+}
+
 export function mergeRoomFiltersWithOperators(
     filters: HotelRoomFilters | null | undefined,
     rooms: unknown[] | null | undefined,
     previous?: HotelRoomFilters | null,
     operatorListRooms?: unknown[] | null | undefined,
 ): HotelRoomFilters | null {
-    if (!filters) return null;
+    // Prefer API filters; if missing, keep previous or synthesize from rooms so URL meal picks can apply.
+    const base: HotelRoomFilters | null = filters
+        ? preserveFilterSelections(cloneRoomFilters(filters)!, previous)
+        : previous
+          ? cloneRoomFilters(previous)
+          : rooms?.length
+            ? { meals: [], operators: [], free_cancel: [], confirmability: [] }
+            : null;
 
-    const merged = preserveFilterSelections(cloneRoomFilters(filters)!, previous);
+    if (!base) return null;
+
     const operatorSource = operatorListRooms ?? rooms;
-    const previousOperators = previous?.operators ?? merged.operators;
+    const previousOperators = previous?.operators ?? base.operators;
+    const previousMeals = previous?.meals ?? base.meals;
+
+    const mealsFromRooms = buildMealsFilterFromRooms(rooms, previousMeals);
+    const meals =
+        (base.meals?.length ? preserveOptionSelections(base.meals, previousMeals) : null) ??
+        mealsFromRooms;
+
+    // Ensure every meal code present in rooms exists as a filter option (for URL pick).
+    const mealIds = new Set(meals.map((meal) => String(meal.id).toUpperCase()));
+    mealsFromRooms.forEach((meal) => {
+        const id = String(meal.id).toUpperCase();
+        if (!mealIds.has(id)) {
+            meals.push(meal);
+            mealIds.add(id);
+        }
+    });
+
+    // Keep previously selected meals even if filtered API omitted them.
+    (previousMeals ?? []).forEach((meal) => {
+        if (!meal.selected) return;
+        const id = String(meal.id).toUpperCase();
+        if (mealIds.has(id)) return;
+        meals.push({ ...meal, selected: true, disabled: false });
+        mealIds.add(id);
+    });
 
     return {
-        ...merged,
+        ...base,
+        meals,
         operators: buildOperatorsFilterFromRooms(operatorSource, previousOperators),
     };
 }

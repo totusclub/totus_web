@@ -46,6 +46,26 @@ export function buildHotelSearchQueryUpdate(
         newQuery.flex_dates = String(searchParams.flex_dates);
     }
 
+    // Keep list→details handoff params across hotel-scoped request_id replace.
+    const preserveKeys = [
+        'filter_meals',
+        'meal_id',
+        'meal_type',
+        'list_price',
+        'filter_operators',
+        'operator_id',
+        'operator_name',
+        'room_type',
+        'room_id',
+        'offer_id',
+    ] as const;
+    preserveKeys.forEach((key) => {
+        const value = query[key];
+        if (value != null && value !== '') {
+            newQuery[key] = value;
+        }
+    });
+
     return newQuery;
 }
 

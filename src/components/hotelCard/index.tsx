@@ -4,34 +4,115 @@ import Button from "@/components/UI/button";
 import { useRouter } from "next/router";
 import { useMemo } from "react";
 import { useTheme } from "@/hooks/useTheme";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/store";
+import {
+    buildListRoomPickFromHotelItem,
+    extractMealFromHotelItem,
+    listRoomPickToQueryParams,
+    resolveActiveSearchMealCodes,
+} from "@/utils/listRoomPick";
+import { markSearchListForRestore, pickAppliedFiltersFromHotels, readSearchListState, replaceSearchListFilters } from "@/utils/searchListState";
 
-interface HotelCardItemProps {
-    id: number,
-    name: string,
-    rate: number,
-    city: string,
-    price: number,
-    tags: string[],
-    date: string,
-    night: string,
-    image: string
-}
 interface HotelCardState {
-    item: HotelCardItemProps
-    request_id: string,
+    item: any
+    request_id?: string,
     lazy?: boolean
 }
 
 
-const HotelCard = ({ item, request_id, lazy }: HotelCardState) => {
+const HotelCard = ({ item, lazy }: HotelCardState) => {
     const router = useRouter();
     const { theme, mounted } = useTheme();
+    const hotelsState = useSelector((state: RootState) => state.search.hotels);
 
     // Use safe default during SSR to prevent hydration mismatch
     const iconColor = mounted ? (theme === 'dark' ? '#fff' : '#000') : '#000';
 
+    const { hotel, analytics_min_price, min_price_nights, dates } = item ?? {};
+
+    const searchType = (router.query.search_type as string) || 'package';
+    const activeFilterMeals = useMemo(() => {
+        const fromHotels = hotelsState?.filter_meals;
+        const fromQuery = router.query.filter_meals;
+        const raw = fromHotels ?? (Array.isArray(fromQuery) ? fromQuery[0] : fromQuery);
+        const rawStr = raw != null && String(raw).trim() !== '' ? String(raw) : null;
+
+        // Resolve listing ids/names → room codes (RO, BB, AI…). Never invent AI here —
+        // that overwrote the user's meal filter on hotel details.
+        const codes = resolveActiveSearchMealCodes({
+            filterMeals: rawStr,
+            listingMealOptions: hotelsState?.filters?.meals ?? null,
+            searchType,
+            defaultPackageMeals: null,
+        });
+        if (codes.length) return codes.join(',');
+        return rawStr || undefined;
+    }, [hotelsState?.filter_meals, hotelsState?.filters?.meals, router.query.filter_meals, searchType]);
+
+    const activeFilterOperators = useMemo(() => {
+        const fromHotels =
+            hotelsState?.filter_operators ??
+            hotelsState?.operators ??
+            hotelsState?.filters?.operators
+                ?.filter((op: { selected?: boolean }) => op?.selected)
+                ?.map((op: { id?: string | number }) => op.id)
+                ?.filter((id: unknown) => id != null)
+                ?.join(',');
+        const fromQuery =
+            router.query.filter_operators ??
+            router.query.operators;
+        const raw = fromHotels ?? (Array.isArray(fromQuery) ? fromQuery[0] : fromQuery);
+        if (raw == null || raw === '') return undefined;
+        return String(raw)
+            .split(',')
+            .map((part) => part.trim())
+            .filter(Boolean)
+            .join(',');
+    }, [
+        hotelsState?.filter_operators,
+        hotelsState?.operators,
+        hotelsState?.filters?.operators,
+        router.query.filter_operators,
+        router.query.operators,
+    ]);
+
+    const listRoomPick = useMemo(
+        () =>
+            buildListRoomPickFromHotelItem(item as unknown as Record<string, unknown>, {
+                filterMeals: activeFilterMeals,
+                filterOperators: activeFilterOperators,
+                startDate: (router.query.start_date as string) || undefined,
+            }),
+        [item, activeFilterMeals, activeFilterOperators, router.query.start_date],
+    );
+
     const handleClick = () => {
         sessionStorage.setItem("searchScroll", window.scrollY.toString());
+        markSearchListForRestore();
+
+        // Snapshot every currently applied listing filter before leaving the results page.
+        const snapshot = {
+            ...readSearchListState()?.filters,
+            ...pickAppliedFiltersFromHotels(hotelsState),
+            ...(activeFilterMeals ? { filter_meals: activeFilterMeals } : {}),
+            ...(activeFilterOperators ? { filter_operators: activeFilterOperators } : {}),
+        };
+        replaceSearchListFilters(
+            snapshot,
+            hotelsState?.request_id ? String(hotelsState.request_id) : undefined,
+        );
+
+        const dateFromCard =
+            dates && typeof dates === "object" ? Object.keys(dates)[0] : undefined;
+        const nightsFromCard =
+            min_price_nights != null && Number.isFinite(Number(min_price_nights))
+                ? String(min_price_nights)
+                : undefined;
+        const listPrice =
+            analytics_min_price != null && Number.isFinite(Number(analytics_min_price))
+                ? String(Math.round(Number(analytics_min_price)))
+                : undefined;
 
         // Get all search params from current URL query
         const queryParams: Record<string, string | string[]> = {
@@ -41,12 +122,50 @@ const HotelCard = ({ item, request_id, lazy }: HotelCardState) => {
             to_country: (router.query.to_country as string) || '',
             to_city: (router.query.to_city as string) || '',
             adults: (router.query.adults as string) || '2',
-            start_date: (router.query.start_date as string) || '',
-            nights: (router.query.nights as string) || '7',
-            search_type: (router.query.search_type as string) || 'package',
+            start_date:
+                dateFromCard ||
+                (router.query.start_date as string) ||
+                '',
+            nights: nightsFromCard || (router.query.nights as string) || '7',
+            search_type: searchType,
             // flex_dates: (router.query.flex_dates as string) ?? '2', // ±2 dates disabled
             flex_dates: (router.query.flex_dates as string) ?? '0',
+            ...listRoomPickToQueryParams(listRoomPick),
         };
+
+        // Always pin the card price so hotel details can match it.
+        if (listPrice) {
+            queryParams.list_price = listPrice;
+        }
+
+        // filter_meals = full search selection (can be AI,UAI).
+        // meal_id = concrete item meal when known; otherwise same as search filter.
+        const itemMeal = extractMealFromHotelItem(item as unknown as Record<string, unknown>);
+        if (activeFilterMeals) {
+            queryParams.filter_meals = activeFilterMeals;
+            if (typeof window !== 'undefined') {
+                sessionStorage.setItem('hotelDetailsFilterMeals', activeFilterMeals);
+            }
+        }
+        if (itemMeal.mealId) {
+            // Keep full search meals in filter_meals; item meal is only for offer matching.
+            queryParams.meal_id = String(itemMeal.mealId);
+            if (itemMeal.mealType && !String(activeFilterMeals || '').includes(',')) {
+                queryParams.meal_type = itemMeal.mealType;
+            } else {
+                delete queryParams.meal_type;
+            }
+        } else if (activeFilterMeals) {
+            queryParams.meal_id = activeFilterMeals;
+            delete queryParams.meal_type;
+        }
+        if (hotelsState?.request_id) {
+            queryParams.request_id = String(hotelsState.request_id);
+        }
+        if (activeFilterOperators) {
+            queryParams.filter_operators = activeFilterOperators;
+            queryParams.operator_id = activeFilterOperators;
+        }
 
         if (router.query.start_date_from) {
             queryParams.start_date_from = router.query.start_date_from as string;
@@ -76,10 +195,6 @@ const HotelCard = ({ item, request_id, lazy }: HotelCardState) => {
             query: queryParams,
         }, undefined, { shallow: false });
     };
-    // console.log(item);
-
-
-    const { hotel, analytics_min_price, min_price_nights, dates } = item ?? {};
 
 
     const formattedDate = useMemo(() => {
@@ -166,36 +281,28 @@ const HotelCard = ({ item, request_id, lazy }: HotelCardState) => {
                     return `${value}-я линия`;
                 }
                 if (key === 'beach_surface') {
+                    const raw = String(value).trim().toUpperCase().replace(/\s+/g, '');
                     const beachSurfaceMap: Record<string, string> = {
-                        SAND: 'Песчаный пляж',
+                        SAND: 'Песок',
                         PEBBLE: 'Галька',
-                        GRAVEL: 'Мелкая галька',
                         'SAND+PEBBLE': 'Песок с галькой',
-                        'SAND+GRAVEL': 'Песок с галькой',
-                        ROCK: 'Скалистый пляж',
-                        ROCKY: 'Скалистый пляж',
-                        CORAL: 'Коралловый риф',
-                        CORAL_REEF: 'Коралловый риф',
-                        SHELL: 'Ракушечник',
-                        CONCRETE: 'Бетонная платформа',
-                        CONCRETE_PLATFORM: 'Бетонная платформа',
+                        SAND_PEBBLE: 'Песок с галькой',
                         PLATFORM: 'Платформа',
+                        CONCRETE: 'Бетон',
+                        CORAL: 'Коралл',
+                        ROCKS: 'Скалы',
                     };
-                    const normalized = String(value).toUpperCase();
-                    return beachSurfaceMap[normalized] || label;
+                    return beachSurfaceMap[raw] || String(value);
                 }
 
-                const unit = units[key] || '';
-                return `${label}: ${value}${unit}`;
+                return `${value}${units[key] || ''} ${label}`;
             });
     };
 
 
-
     const TAGS = useMemo(() => {
         if (hotel?.features) {
-            const result = formatHotelInfoToRussian(hotel.features);
-            return result
+            return formatHotelInfoToRussian(hotel.features);
         } else {
             return [];
         }
@@ -205,9 +312,6 @@ const HotelCard = ({ item, request_id, lazy }: HotelCardState) => {
     const showImage = useMemo(() => {
         if (hotel?.images?.length > 0) {
             let path = hotel.images[0]?.webp_x620 || hotel.images[0].x500 || "";
-            // Remove the prefix
-            // console.log('path.replace("https://img.cdn.level.travel/", "")',path.replace("https://img.cdn.level.travel/", ""));
-            // return path.replace("https://img.cdn.level.travel/", "");
             return path
         }
         return "";
@@ -323,33 +427,33 @@ const HotelCard = ({ item, request_id, lazy }: HotelCardState) => {
 
                     {/* Mobile Price Section */}
                     <div className={styles.hotelCardPriceM}>
-                        <div className={styles.animationTextlazy} style={{ width: '110px', height: '20px' }}></div>
-                        <div className={styles.animationTextlazy} style={{ width: '160px', height: '14px' }}></div>
+                        <div className={styles.animationTextlazy} style={{ width: '100px', height: '20px' }}></div>
+                        <div className={styles.animationTextlazy} style={{ width: '140px', height: '14px' }}></div>
                     </div>
                 </div>
 
-                {/* Price Section - 160px width */}
+                {/* Desktop Price Section */}
                 <div className={styles.hotelCardPrice}>
                     {/* Desktop Reviews Info */}
                     <div className={styles.hotelCardImageInfo}>
-                        <div className={styles.animationTextlazy} style={{ width: '120px', height: '12px' }}></div>
-                        <div className={styles.animationTextlazy} style={{ width: '35px', height: '12px' }}></div>
+                        <div className={styles.animationTextlazy} style={{ width: '100px', height: '12px' }}></div>
+                        <div className={styles.animationTextlazy} style={{ width: '35px', height: '18px' }}></div>
                     </div>
 
                     {/* Checkout Section */}
                     <div className={styles.hotelCardCheckout}>
                         {/* Price */}
-                        <div className={styles.animationTextlazy} style={{ width: '110px', height: '20px' }}></div>
+                        <div className={styles.animationTextlazy} style={{ width: '120px', height: '24px' }}></div>
                         {/* Button */}
-                        <div className={styles.leazyButton}></div>
-                        {/* Date Info */}
+                        <div className={styles.animationButtonLazy}></div>
+                        {/* Date */}
                         <div className={styles.hotelCardDate}>
-                            <div className={styles.animationTextlazy} style={{ width: '160px', height: '14px' }}></div>
+                            <div className={styles.animationTextlazy} style={{ width: '150px', height: '14px' }}></div>
                         </div>
                     </div>
                 </div>
             </div>
-        )
+        );
     }
 };
 

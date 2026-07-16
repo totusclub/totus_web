@@ -10,7 +10,8 @@ export default function Pay() {
     const [status, setStatus] = useState(null);
 
     useEffect(()=>{
-        const orderId = router?.query?.orderId;
+        const orderIdRaw = router?.query?.orderId;
+        const orderId = Array.isArray(orderIdRaw) ? orderIdRaw[0] : orderIdRaw;
         if (!orderId) return;
 
         const qrcId =

@@ -1,6 +1,7 @@
 import React from 'react';
 import styles from './tourModal.module.css'
 import AppModal from "@/components/UI/modal";
+import { formatAdultsCount } from '@/utils/formatRussianPlural';
 import { format } from "date-fns";
 import {ru} from "date-fns/locale";
 
@@ -42,7 +43,7 @@ const TourModel: React.FC = ({open,setOpen,packages}) => {
                     <p>Даты перелёта</p>
                 </div>
                 <div className={styles.tourModalItem}>
-                    <p>{packages?.adults_count} взрослый</p>
+                    <p>{formatAdultsCount(packages?.adults_count)}</p>
                     <p>Туристы</p>
                 </div>
                 <div className={styles.tourModalItem}>

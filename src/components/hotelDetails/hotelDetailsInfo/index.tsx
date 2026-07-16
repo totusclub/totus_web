@@ -4,13 +4,24 @@ import VerticalSlider from "@/components/UI/verticalSlide";
 import Button from "@/components/UI/button";
 import Icon from "@/components/icons/Icon";
 import { useRouter } from "next/router";
-import { findCheapestOfferForStartDate, getNightsConstraintFromQuery, HOTEL_DETAILS_DEFAULT_FLEX_DATES } from "@/utils/hotelDetailsUtils";
+import {
+    findCheapestOfferForStartDate,
+    getAvailableStartDatesFromRooms,
+    getNightsConstraintFromQuery,
+    HOTEL_DETAILS_DEFAULT_FLEX_DATES,
+} from "@/utils/hotelDetailsUtils";
 import {
     getOfferPriceTitle,
     getSearchTypeFromQuery,
 } from "@/utils/bookingFlowUtils";
 import HotelFavoriteButton from "@/components/hotelDetails/HotelFavoriteButton";
 import AuthModal from "@/components/auth";
+import {
+    buildListRoomPickFromQuery,
+    findListMatchedOfferAcrossRooms,
+    formatListRoomOfferLabel,
+    resolveExactMealIdsFromPick,
+} from "@/utils/listRoomPick";
 
 const CHOOSE_ROOM_SECTION_ID = "choose-room";
 
@@ -66,37 +77,131 @@ const HotelDetailsInfo = ({
         [router.query],
     );
 
-    const highlightOffer = useMemo(
-        () =>
-            findCheapestOfferForStartDate(
-                rooms as any[],
-                selectedRoomDate,
-                nightsConstraint.searchNights,
-                nightsConstraint.nightsRange,
-            ),
-        [rooms, selectedRoomDate, nightsConstraint],
+    const listRoomPick = useMemo(
+        () => buildListRoomPickFromQuery(router.query as Record<string, string | string[] | undefined>),
+        [router.query],
     );
+
+    // Prefer URL/search start_date so first navigation matches the list card date.
+    const effectiveRoomDate = useMemo(() => {
+        const availableDates = getAvailableStartDatesFromRooms(rooms as any[]);
+        const preferred =
+            listRoomPick?.startDate ||
+            selectedRoomDate ||
+            "";
+
+        if (preferred && availableDates.includes(preferred)) {
+            return preferred;
+        }
+        if (preferred) return preferred;
+        if (selectedRoomDate && availableDates.includes(selectedRoomDate)) {
+            return selectedRoomDate;
+        }
+        return availableDates[0] || selectedRoomDate || "";
+    }, [rooms, selectedRoomDate, listRoomPick?.startDate]);
+
+    const listMatched = useMemo(
+        () =>
+            findListMatchedOfferAcrossRooms(
+                rooms as any[],
+                listRoomPick,
+                effectiveRoomDate || listRoomPick?.startDate || null,
+            ),
+        [rooms, listRoomPick, effectiveRoomDate],
+    );
+
+    const searchMealIds = useMemo(
+        () => resolveExactMealIdsFromPick(listRoomPick),
+        [listRoomPick],
+    );
+
+    const cheapestOffer = useMemo(() => {
+        if (!effectiveRoomDate) return null;
+        return findCheapestOfferForStartDate(
+            rooms as any[],
+            effectiveRoomDate,
+            nightsConstraint.searchNights,
+            nightsConstraint.nightsRange,
+            // Keep header inside search meals — never fall back to other meal "other prices".
+            searchMealIds.length ? searchMealIds : null,
+        );
+    }, [rooms, effectiveRoomDate, nightsConstraint, searchMealIds]);
+
+    // Prefer list-matched offer so header price matches search results.
+    const highlightOffer = listMatched?.offer ?? cheapestOffer;
+
+    const hasRooms = Array.isArray(rooms) && rooms.length > 0;
+    const listPrice = listRoomPick?.roomPrice;
+
+    const matchedOfferPrice = useMemo(() => {
+        if (!highlightOffer) return null;
+        const value = Number(
+            (highlightOffer as any)?.analytics_price ?? (highlightOffer as any)?.price,
+        );
+        return Number.isFinite(value) ? value : null;
+    }, [highlightOffer]);
+
+    // Stick to search-list price until rooms produce a matching offer (first navigation race).
+    const offerPrice = useMemo(() => {
+        if (listPrice != null && Number.isFinite(listPrice)) {
+            if (
+                matchedOfferPrice != null &&
+                Math.round(matchedOfferPrice) === Math.round(listPrice)
+            ) {
+                return matchedOfferPrice;
+            }
+            // Loading / no rooms yet — always show the list card price.
+            if (panding || !hasRooms || !searchAttempted) return listPrice;
+            // Search meals set but no list match — don't flash a cheaper other offer.
+            if (searchMealIds.length > 0 && !listMatched) return listPrice;
+        }
+        return matchedOfferPrice ?? listPrice ?? undefined;
+    }, [
+        listPrice,
+        matchedOfferPrice,
+        listMatched,
+        searchAttempted,
+        panding,
+        hasRooms,
+        searchMealIds.length,
+    ]);
+
+    const priceFormatted =
+        offerPrice != null
+            ? String(Math.round(Number(offerPrice))).replace(/\B(?=(\d{3})+(?!\d))/g, "\u202F")
+            : "—";
+
+    const roomOfferLabel = useMemo(() => {
+        if (!listRoomPick) return '';
+        return formatListRoomOfferLabel({
+            ...listRoomPick,
+            roomType: listMatched?.room?.room?.name_ru || listRoomPick.roomType,
+            mealId: listRoomPick.mealId || listMatched?.mealId,
+        });
+    }, [listRoomPick, listMatched]);
 
     const handleChooseRoomClick = () => {
         scrollToChooseRoomSection();
     };
 
     const formatDate = useMemo(() => {
-        if (!highlightOffer?.start_date) return "";
-        const date = new Date(highlightOffer.start_date);
+        const startDate =
+            (listMatched?.offer as any)?.start_date ||
+            listRoomPick?.startDate ||
+            effectiveRoomDate ||
+            (highlightOffer as any)?.start_date;
+        if (!startDate) return "";
+        const date = new Date(String(startDate));
         const formatter = new Intl.DateTimeFormat("ru-RU", {
             day: "numeric",
             month: "long",
         });
         return `с ${formatter.format(date)}`;
-    }, [highlightOffer?.start_date]);
+    }, [listMatched, listRoomPick?.startDate, effectiveRoomDate, highlightOffer]);
 
-    const priceFormatted =
-        highlightOffer?.price != null
-            ? String(highlightOffer.price).replace(/\B(?=(\d{3})+(?!\d))/g, "\u202F")
-            : "—";
-
-    const showNoRoomsPrice = searchAttempted && !panding && !highlightOffer;
+    // Only when search finished and there are truly no rooms — not when offer match lags behind.
+    const showNoRoomsPrice =
+        searchAttempted && !panding && !hasRooms && listPrice == null && !highlightOffer;
 
     return (
         <>
@@ -127,11 +232,16 @@ const HotelDetailsInfo = ({
                                                 <p className={styles.HotelDetailsInfoPriceText}>от {priceFormatted}₽</p>
                                                 <div className={styles.HotelDetailsInfoDate}>
                                                     <p className={styles.HotelDetailsInfoDateTitle}>{getOfferPriceTitle(searchType)}</p>
+                                                    {roomOfferLabel ? (
+                                                        <p className={styles.HotelDetailsInfoDateText}>{roomOfferLabel}</p>
+                                                    ) : null}
                                                     <p className={styles.HotelDetailsInfoDateText}>
                                                         {formatDate}
-                                                        {highlightOffer?.nights_count != null
-                                                            ? `, ${highlightOffer.nights_count} ночей`
-                                                            : ""}
+                                                        {(highlightOffer as any)?.nights_count != null
+                                                            ? `, ${(highlightOffer as any).nights_count} ночей`
+                                                            : nightsConstraint.searchNights != null
+                                                              ? `, ${nightsConstraint.searchNights} ночей`
+                                                              : ""}
                                                     </p>
                                                 </div>
                                             </>

@@ -36,6 +36,10 @@ function getSummary(
     const selected = options.filter((option) => option.selected && !option.disabled);
     if (!selected.length) return allLabel;
     if (selected.length === 1) return getLabel(selected[0]);
+    // Show all selected labels so multi meal/operator filters stay readable.
+    if (selected.length <= 3) {
+        return selected.map(getLabel).join(', ');
+    }
     return `${selected.length} выбрано`;
 }
 

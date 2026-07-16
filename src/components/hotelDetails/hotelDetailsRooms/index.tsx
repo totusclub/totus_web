@@ -22,6 +22,17 @@ import {
     resolveDisplayRooms,
     type HotelRoomFilters,
 } from "@/utils/roomFilters";
+import {
+    applyListPickToRoomFilters,
+    buildListRoomPickFromQuery,
+    enrichListRoomPickFromRooms,
+    filterRoomsByMealCodes,
+    normalizeSearchMealsToRoomCodes,
+    resolveExactMealIdsFromPick,
+    resolveListSelectedRoom,
+    sortRoomsWithListPickFirst,
+} from "@/utils/listRoomPick";
+import { readSearchListState } from "@/utils/searchListState";
 
 const HotelLocationMap = dynamic(() => import("./HotelLocationMap"), {
     ssr: false,
@@ -96,6 +107,80 @@ const HotelDetailsRooms = ({
     const prevBaseRoomsKeyRef = useRef<string | null>(null);
     const lastFilterRequestKeyRef = useRef<string | null>(null);
     const filterRequestSeqRef = useRef(0);
+    const listPickAppliedRef = useRef(false);
+    const userChangedFiltersRef = useRef(false);
+    const prevListPickMealKeyRef = useRef<string | null>(null);
+
+    const listRoomPick = useMemo(
+        () => buildListRoomPickFromQuery(router.query as Record<string, string | string[] | undefined>),
+        [router.query],
+    );
+
+    // Search meal/operator from URL — works even before listRoomPick is fully built.
+    // Prefer filter_meals (full search multi-select) and union with meal_id when both exist.
+    const filterListRoomPick = useMemo(() => {
+        const joinQueryValue = (value: string | string[] | undefined): string | undefined => {
+            if (value == null) return undefined;
+            if (Array.isArray(value)) {
+                const joined = value.map((part) => String(part).trim()).filter(Boolean).join(',');
+                return joined || undefined;
+            }
+            const trimmed = String(value).trim();
+            return trimmed || undefined;
+        };
+
+        const rawFilterMeals =
+            joinQueryValue(router.query.filter_meals) ||
+            (typeof window !== 'undefined'
+                ? sessionStorage.getItem('hotelDetailsFilterMeals') || undefined
+                : undefined) ||
+            readSearchListState()?.filters?.filter_meals ||
+            undefined;
+        const rawMealId = joinQueryValue(router.query.meal_id);
+
+        const mealCodes = Array.from(
+            new Set([
+                ...normalizeSearchMealsToRoomCodes(rawFilterMeals),
+                ...normalizeSearchMealsToRoomCodes(rawMealId),
+                ...normalizeSearchMealsToRoomCodes(listRoomPick?.mealId),
+            ]),
+        );
+        const mealId = mealCodes.length
+            ? mealCodes.join(',')
+            : rawFilterMeals || rawMealId || listRoomPick?.mealId || undefined;
+
+        const operatorId =
+            joinQueryValue(router.query.filter_operators) ||
+            joinQueryValue(router.query.operator_id) ||
+            (listRoomPick?.operatorId != null ? String(listRoomPick.operatorId) : undefined);
+
+        if (!listRoomPick && !mealId && !operatorId) return null;
+
+        return {
+            ...(listRoomPick ?? {}),
+            // Multi-meal search: don't keep a single mealType that hides other selected meals.
+            mealType:
+                mealCodes.length > 1
+                    ? undefined
+                    : listRoomPick?.mealType,
+            mealId: mealId ? String(mealId) : undefined,
+            operatorId: operatorId ? String(operatorId) : listRoomPick?.operatorId,
+            operatorName: listRoomPick?.operatorName,
+            roomPrice: listRoomPick?.roomPrice,
+            startDate: listRoomPick?.startDate,
+        };
+    }, [
+        listRoomPick,
+        router.query.filter_meals,
+        router.query.meal_id,
+        router.query.filter_operators,
+        router.query.operator_id,
+    ]);
+
+    const enrichedListRoomPick = useMemo(
+        () => enrichListRoomPickFromRooms(filterListRoomPick, canonicalRooms, selectedDate || null),
+        [filterListRoomPick, canonicalRooms, selectedDate],
+    );
 
     const requestId = Array.isArray(router.query.request_id)
         ? router.query.request_id[0]
@@ -117,19 +202,49 @@ const HotelDetailsRooms = ({
         setFilterApiRooms(null);
         lastFilterRequestKeyRef.current = null;
 
-        setActiveRoomFilters((previous) =>
-            mergeRoomFiltersWithOperators(
+        if (isNewRoomSet) {
+            listPickAppliedRef.current = false;
+            // Do not clear userChangedFilters on every room poll — only on real new search set.
+        }
+
+        setActiveRoomFilters((previous) => {
+            const merged = mergeRoomFiltersWithOperators(
                 roomFiltersFromApi,
                 canonicalRooms,
                 isNewRoomSet ? null : previous,
                 canonicalRooms,
-            ),
-        );
-    }, [roomFiltersFromApi, baseRoomsKey, canonicalRooms]);
+            );
+
+            const pickKey = JSON.stringify({
+                mealId: filterListRoomPick?.mealId ?? null,
+                operatorId: filterListRoomPick?.operatorId ?? null,
+            });
+            if (prevListPickMealKeyRef.current !== pickKey) {
+                listPickAppliedRef.current = false;
+                userChangedFiltersRef.current = false;
+                prevListPickMealKeyRef.current = pickKey;
+            }
+
+            if (!merged) return previous;
+
+            if (filterListRoomPick && !userChangedFiltersRef.current) {
+                const withPick = applyListPickToRoomFilters(merged, filterListRoomPick);
+                const hasMealsSelected = withPick?.meals?.some((meal) => meal.selected);
+                const hasOperatorSelected = withPick?.operators?.some((operator) => operator.selected);
+                if (hasMealsSelected || hasOperatorSelected) {
+                    listPickAppliedRef.current = true;
+                    return withPick;
+                }
+            }
+
+            return merged;
+        });
+    }, [roomFiltersFromApi, baseRoomsKey, canonicalRooms, filterListRoomPick]);
 
     const handleFilterChange = (
         next: HotelRoomFilters | ((current: HotelRoomFilters) => HotelRoomFilters),
     ) => {
+        userChangedFiltersRef.current = true;
         setActiveRoomFilters((current) => {
             if (!current) return current;
             return typeof next === "function" ? next(current) : next;
@@ -180,14 +295,24 @@ const HotelDetailsRooms = ({
                 const exactNightApiRooms = toNightFilteredRooms(apiRooms);
                 setFilterApiRooms(exactNightApiRooms);
 
-                setActiveRoomFilters((previous) =>
-                    mergeRoomFiltersWithOperators(
+                setActiveRoomFilters((previous) => {
+                    const merged = mergeRoomFiltersWithOperators(
                         response?.filters,
                         exactNightApiRooms.length > 0 ? exactNightApiRooms : canonicalRooms,
                         previous,
                         canonicalRooms,
-                    ),
-                );
+                    );
+                    // Filtered API often returns a subset of meal options — re-apply
+                    // search multi-select until the user changes filters manually.
+                    if (
+                        merged &&
+                        filterListRoomPick &&
+                        !userChangedFiltersRef.current
+                    ) {
+                        return applyListPickToRoomFilters(merged, filterListRoomPick) ?? merged;
+                    }
+                    return merged;
+                });
             } catch (error) {
                 if (requestSeq !== filterRequestSeqRef.current) return;
                 console.error("[HotelDetailsRooms] Failed to fetch filtered rooms:", error);
@@ -213,18 +338,67 @@ const HotelDetailsRooms = ({
         rooms,
         canonicalRooms,
         toNightFilteredRooms,
+        filterListRoomPick,
     ]);
 
     const displayBaseRooms = useMemo(() => {
         if (!hasActiveFilters) return canonicalRooms;
+        // While filtered API loads, keep canonical rooms — meal codes are applied client-side below.
         if (filtersLoading) return canonicalRooms;
         return filterApiRooms ?? canonicalRooms;
     }, [canonicalRooms, hasActiveFilters, filtersLoading, filterApiRooms]);
 
+    const searchMealIds = useMemo(
+        () => resolveExactMealIdsFromPick(filterListRoomPick),
+        [filterListRoomPick],
+    );
+
     const roomsMatchingFilters = useMemo(() => {
-        if (!hasActiveFilters) return canonicalRooms;
-        return applyRoomFilters(displayBaseRooms, activeRoomFilters) as any[];
-    }, [canonicalRooms, displayBaseRooms, activeRoomFilters, hasActiveFilters]);
+        let result: any[] = hasActiveFilters
+            ? (applyRoomFilters(displayBaseRooms, activeRoomFilters) as any[])
+            : canonicalRooms;
+
+        // Always enforce search-list meal on first open (before checkboxes / API catch up).
+        // Refresh worked because URL meals were already applied; first nav often painted too early.
+        if (searchMealIds.length > 0 && !userChangedFiltersRef.current) {
+            result = filterRoomsByMealCodes(result, searchMealIds) as any[];
+        }
+
+        const selectedMealIds = (activeRoomFilters?.meals ?? [])
+            .filter((meal) => meal.selected)
+            .map((meal) => String(meal.id).toUpperCase());
+        const pickMealIds = resolveExactMealIdsFromPick(enrichedListRoomPick);
+        const pickMealStillActive =
+            !selectedMealIds.length ||
+            pickMealIds.some((id) => selectedMealIds.includes(id));
+
+        if (enrichedListRoomPick && pickMealStillActive && !userChangedFiltersRef.current) {
+            const matchedRoom = resolveListSelectedRoom(
+                canonicalRooms,
+                enrichedListRoomPick,
+                selectedDate || enrichedListRoomPick.startDate || null,
+            );
+            if (matchedRoom && !result.some((room) => String(room.ID) === String(matchedRoom.ID))) {
+                const mealFiltered = filterRoomsByMealCodes(
+                    [matchedRoom],
+                    searchMealIds.length ? searchMealIds : null,
+                );
+                if (mealFiltered[0]) {
+                    result = [mealFiltered[0], ...result];
+                }
+            }
+        }
+
+        return result;
+    }, [
+        canonicalRooms,
+        displayBaseRooms,
+        activeRoomFilters,
+        hasActiveFilters,
+        enrichedListRoomPick,
+        selectedDate,
+        searchMealIds,
+    ]);
 
     const roomFlexDates = useMemo(
         () =>
@@ -263,17 +437,21 @@ const HotelDetailsRooms = ({
         onSelectedDateChange(effectiveSelectedDate);
     }, [effectiveSelectedDate, selectedDate, onSelectedDateChange]);
 
-    const filteredRooms = useMemo(
-        () =>
-            resolveDisplayRooms(
-                roomsMatchingFilters,
-                null,
-                effectiveSelectedDate,
-                nightsConstraint.searchNights,
-                (offer) => offerMatchesNightsConstraint(offer, nightsConstraint),
-            ) as any[],
-        [roomsMatchingFilters, effectiveSelectedDate, nightsConstraint],
-    );
+    const filteredRooms = useMemo(() => {
+        const roomsForDate = resolveDisplayRooms(
+            roomsMatchingFilters,
+            null,
+            effectiveSelectedDate,
+            nightsConstraint.searchNights,
+            (offer) => offerMatchesNightsConstraint(offer, nightsConstraint),
+        ) as any[];
+
+        return sortRoomsWithListPickFirst(
+            roomsForDate,
+            enrichedListRoomPick,
+            effectiveSelectedDate ?? null,
+        ) as any[];
+    }, [roomsMatchingFilters, effectiveSelectedDate, nightsConstraint, enrichedListRoomPick]);
 
     const displayRoomFilters = useMemo(
         () => enrichRoomFilterOptions(canonicalRooms, activeRoomFilters),
@@ -364,6 +542,7 @@ const HotelDetailsRooms = ({
                         onChange={handleFilterChange}
                         onClear={() => {
                             if (!activeRoomFilters) return;
+                            userChangedFiltersRef.current = true;
                             lastFilterRequestKeyRef.current = null;
                             setFilterApiRooms(null);
                             setActiveRoomFilters(clearRoomFilters(activeRoomFilters));
@@ -380,6 +559,7 @@ const HotelDetailsRooms = ({
                                 className={styles.HotelDetailsRoomFiltersClear}
                                 onClick={() => {
                                     if (!activeRoomFilters) return;
+                                    userChangedFiltersRef.current = true;
                                     lastFilterRequestKeyRef.current = null;
                                     setFilterApiRooms(null);
                                     setActiveRoomFilters(clearRoomFilters(activeRoomFilters));
@@ -395,7 +575,14 @@ const HotelDetailsRooms = ({
                         />
                     ) : (
                         filteredRooms.map((r, i) => (
-                            <HotelDetailsRoomItem key={i} item={r} selectedDate={effectiveSelectedDate} />
+                            <HotelDetailsRoomItem
+                                key={i}
+                                item={r}
+                                selectedDate={effectiveSelectedDate}
+                                listRoomPick={
+                                    userChangedFiltersRef.current ? null : filterListRoomPick
+                                }
+                            />
                         ))
                     )}
 

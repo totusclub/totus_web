@@ -339,11 +339,31 @@ export const searchFilters = createAsyncThunk(
         }
 
         try {
-            return await getGroupedHotels({
+            const hotels = await getGroupedHotels({
                 ...params,
                 page_number: parseUiPageNumber(params?.page_number),
                 page_limit: Math.max(1, Number(params?.page_limit) || 20),
             });
+
+            // Persist applied filter params on the hotels object (API response does not echo them).
+            // Without this, hotel cards fall back to default package meals (AI).
+            const {
+                request_id,
+                readyOperators,
+                page_number,
+                page_limit,
+                hotels: _hotelsIgnored,
+                filters: _filtersIgnored,
+                ...appliedFilters
+            } = params || {};
+
+            return {
+                ...hotels,
+                request_id: hotels?.request_id ?? request_id,
+                readyOperators: hotels?.readyOperators ?? readyOperators,
+                ...appliedFilters,
+                ui_page_number: parseUiPageNumber(page_number),
+            };
         } catch (err: any) {
             return rejectWithValue(err.message || 'Failed to fetch grouped hotels');
         }

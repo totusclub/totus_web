@@ -386,32 +386,58 @@ export async function createOrder(params: never) {
 export async function createPay(params: {
     orderId: string;
     orderName: string;
-    expire: Date;
+    expire: Date | string;
     amount: { value: any; code: string };
     returnUrl: string;
     paymentPurpose?: string;
 }) {
     try {
-        if (!params) {
-            throw new Error('Missing package_id');
+        if (!params?.orderId || params?.amount?.value == null) {
+            throw new Error('Missing payment params');
         }
-        const response = await axios.post(`${BASE_URL}/vtb/create-order`, params);
+        const response = await axios.post(`${BASE_URL}/vtb/create-order`, {
+            ...params,
+            expire:
+                params.expire instanceof Date
+                    ? params.expire.toISOString()
+                    : params.expire,
+        });
         return response.data;
-    } catch (err) {
-        return err
+    } catch (err: any) {
+        return {
+            status: 'error',
+            error:
+                err?.response?.data?.error ||
+                err?.response?.data?.details ||
+                err?.response?.data?.message ||
+                err?.message ||
+                'Failed to create payment',
+            details: err?.response?.data?.details,
+            isAxiosError: true,
+        };
     }
-};
-export async function checkPay(params: never) {
+}
+export async function checkPay(params: {
+    orderId?: string | number | string[];
+    qrcId?: string | null;
+}) {
     try {
-        if (!params) {
-            throw new Error('Missing package_id');
+        if (!params?.orderId && !params?.qrcId) {
+            throw new Error('Missing orderId or qrcId');
         }
-        const response = await axios.post(`${BASE_URL}/check_pay`, params);
+        const orderId = Array.isArray(params.orderId)
+            ? params.orderId[0]
+            : params.orderId;
+        const payload = {
+            ...(orderId != null ? { orderId: String(orderId) } : {}),
+            ...(params.qrcId ? { qrcId: String(params.qrcId) } : {}),
+        };
+        const response = await axios.post(`${BASE_URL}/check_pay`, payload);
         return response.data;
-    } catch (err) {
-        return err
+    } catch (err: any) {
+        return err?.response?.data || { status: 'error', message: err?.message };
     }
-};
+}
 
 export async function getOrder(id: never) {
     if (!id) {

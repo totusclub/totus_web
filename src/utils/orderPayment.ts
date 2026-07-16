@@ -47,7 +47,8 @@ export function getOrderPayAmount(order: any): number {
   const full = toMoney(
     lt?.full_price ??
       order?.full_price ??
-      order?.package?.full_price,
+      order?.package?.full_price ??
+      nested?.full_price,
   );
 
   const breakdown = getBookingPriceBreakdown({
@@ -67,7 +68,15 @@ export function getOrderPayAmount(order: any): number {
   if (withFees > 0) return withFees;
   if (full > 0) return full;
 
-  return toMoney(lt?.price ?? order?.package?.price ?? order?.price);
+  // Same fallback as formatOrderPrice — list cards often only have `price`
+  return toMoney(
+    lt?.price ??
+      nested?.price ??
+      order?.package?.price ??
+      order?.price ??
+      lt?._pay_amount ??
+      order?.package?._pay_amount,
+  );
 }
 
 export function canPayWithSbp(order: any): boolean {

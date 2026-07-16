@@ -244,6 +244,19 @@ const ResultList = ({ tickets, loading, data, setFiltersRequest }: ResultListPro
         autoLoadPageRef.current = 1;
     }, [hotels?.request_id, hotels?.filter_price_min, hotels?.filter_price_max, hotels?.sort_by]);
 
+    // Restore scroll after returning from hotel details.
+    useEffect(() => {
+        if (showSkeleton || isLoading) return;
+        const raw = sessionStorage.getItem('searchScroll');
+        if (!raw) return;
+        const y = Number(raw);
+        sessionStorage.removeItem('searchScroll');
+        if (!Number.isFinite(y) || y <= 0) return;
+        requestAnimationFrame(() => {
+            window.scrollTo(0, y);
+        });
+    }, [showSkeleton, isLoading, hotels?.request_id]);
+
     useEffect(() => {
         if (!hasMore || showSkeleton || isLoadingMore) return;
 

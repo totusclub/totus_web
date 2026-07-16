@@ -8,6 +8,7 @@ import AuthModal from "@/components/auth";
 import useAuth from "@/hooks/useAuth";
 import { useRouter } from "next/router";
 import { clearSearch } from '@/store/slices/searchSlice';
+import { clearSearchListState } from '@/utils/searchListState';
 import { useDispatch } from 'react-redux';
 import LogoDesktopIcon from "@/components/icons/logoDesktop";
 import { FOOTER_STATIC_MOBILE_TITLES } from "@/config/footerStaticPages";
@@ -64,7 +65,8 @@ const Header = () => {
         const pageName = segments[segments.length - 1] || 'home';
         if (pageName === 'search') {
             router.push('/');
-            dispatch(clearSearch())
+            dispatch(clearSearch());
+            clearSearchListState();
         } else {
             router.back();
         }

@@ -10,6 +10,15 @@ import { useRouter } from "next/router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from 'react-redux';
 import { runFullSearchFlow, setStartSearch } from '@/store/slices/searchSlice';
+import {
+    pickAppliedFiltersFromHotels,
+    readSearchListState,
+    replaceSearchListFilters,
+    writeSearchListState,
+    peekSearchListRestoreFlag,
+    consumeSearchListRestoreFlag,
+    shouldRestoreSearchFilters,
+} from '@/utils/searchListState';
 import { RootState } from '@/store';
 import { stayRangeFromDeparture } from '@/utils/calendarDateRange';
 import { parseUiPageNumber } from '@/utils/searchResults';
@@ -244,7 +253,20 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
         if (!router.isReady || (pageName !== 'search' && pageName !== 'home')) return;
 
         const parsed = parseSearchParams(router.query);
-        const autoSearchKey = getAutoSearchKey(router.query);
+        const autoSearchKey = getAutoSearchKey(router.query as Record<string, string | string[]>);
+        const saved = readSearchListState();
+        const restoreFlag = pageName === 'search' && peekSearchListRestoreFlag();
+        const sameResultsInMemory =
+            Boolean(hotels?.request_id) &&
+            Boolean(saved?.requestId) &&
+            String(saved?.requestId) === String(hotels.request_id);
+        const shouldRestore =
+            pageName === 'search' &&
+            shouldRestoreSearchFilters({
+                restoreFlag,
+                hotelsRequestId: hotels?.request_id ? String(hotels.request_id) : null,
+                autoSearchKey,
+            });
 
         setParams((prev) => {
             let next: SearchParams = { ...prev };
@@ -273,44 +295,144 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
                 autoSearchKey !== lastAutoSearchKeyRef.current
             ) {
                 lastAutoSearchKeyRef.current = autoSearchKey;
+
+                // Back from hotel details OR remount with same results — keep filters.
+                // Session snapshot wins over Redux so cleared defaults stay cleared.
+                if ((shouldRestore || sameResultsInMemory) && hotels?.request_id) {
+                    consumeSearchListRestoreFlag();
+                    writeSearchListState({
+                        autoSearchKey,
+                        requestId: String(hotels.request_id),
+                        filters: {
+                            ...pickAppliedFiltersFromHotels(hotels),
+                            ...(saved?.filters ?? {}),
+                        },
+                    });
+                    return next;
+                }
+
+                // Restore flag / same search key but Redux empty — re-fetch with saved filters.
+                if (shouldRestore) {
+                    consumeSearchListRestoreFlag();
+                    queueMicrotask(() => {
+                        dispatchSearch(
+                            next,
+                            saved?.filters && Object.keys(saved.filters).length
+                                ? saved.filters
+                                : null,
+                        );
+                        dispatch(setStartSearch(false));
+                    });
+                    return next;
+                }
+
                 queueMicrotask(() => {
-                    dispatchSearch(next);
+                    // On results page keep sidebar filters; home / fresh search uses defaults.
+                    const savedOnList =
+                        pageName === 'search' ? readSearchListState()?.filters : undefined;
+                    dispatchSearch(
+                        next,
+                        savedOnList && Object.keys(savedOnList).length ? savedOnList : null,
+                    );
                     dispatch(setStartSearch(false));
+                });
+            } else if ((shouldRestore || sameResultsInMemory) && hotels?.request_id) {
+                consumeSearchListRestoreFlag();
+                writeSearchListState({
+                    autoSearchKey,
+                    requestId: String(hotels.request_id),
+                    filters: {
+                        ...pickAppliedFiltersFromHotels(hotels),
+                        ...(readSearchListState()?.filters ?? {}),
+                    },
                 });
             }
 
             return next;
         });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [router.isReady, router.query, pageName]);
 
+    // Keep session snapshot in sync while results/filters live in Redux.
+    useEffect(() => {
+        if (pageName !== 'search' || !hotels?.request_id || !router.isReady) return;
+        writeSearchListState({
+            autoSearchKey: getAutoSearchKey(router.query as Record<string, string | string[]>),
+            requestId: String(hotels.request_id),
+            filters: {
+                ...(readSearchListState()?.filters ?? {}),
+                ...pickAppliedFiltersFromHotels(hotels),
+            },
+        });
+    }, [
+        pageName,
+        router.isReady,
+        router.query,
+        hotels?.request_id,
+        hotels?.filter_meals,
+        hotels?.filter_stars,
+        hotels?.filter_operators,
+        hotels?.filter_hotel_type,
+        hotels?.filter_regions,
+        hotels?.filter_line,
+        hotels?.filter_instant_confirm,
+        hotels?.sort_by,
+        hotels?.filter_price_min,
+        hotels?.filter_price_max,
+    ]);
+
     // Core search dispatch — always runs (used by explicit user clicks).
-    const dispatchSearch = (data: SearchParams) => {
+    // Pass `null` for preservedFilters to force package defaults (fresh search from home).
+    // Pass an object / omit to reuse current listing filters (results page re-search).
+    const dispatchSearch = (
+        data: SearchParams,
+        preservedFilters?: ReturnType<typeof pickAppliedFiltersFromHotels> | null,
+    ) => {
+        const savedFilters =
+            preservedFilters === null
+                ? undefined
+                : preservedFilters ?? readSearchListState()?.filters;
+
+        const autoSearchKey = JSON.stringify(
+            (({ page_number: _p, page_limit: _l, sort_by: _s, ...core }) => core)(
+                data as Record<string, unknown>,
+            ),
+        );
+
         if (data?.hotel_ids?.length > 0) {
-            dispatch(runFullSearchFlow({
-                searchParams: data,
-                filterParams: {
-                    filter_instant_confirm: false,
-                    page_number: parseUiPageNumber(data.page_number),
-                    page_limit: Math.max(1, Number(data.page_limit) || 20),
-                    sort_by: data?.sort_by || 'relevance'
-                }
-            }));
-        } else {
             const filterParams: Record<string, unknown> = {
-                filter_instant_confirm: false,
+                filter_instant_confirm: savedFilters?.filter_instant_confirm ?? false,
                 page_number: parseUiPageNumber(data.page_number),
                 page_limit: Math.max(1, Number(data.page_limit) || 20),
-                sort_by: data?.sort_by || 'relevance',
+                sort_by: savedFilters?.sort_by || data?.sort_by || 'relevance',
+                ...(savedFilters ?? {}),
             };
-            if (data.search_type !== 'hotel') {
-                filterParams.filter_stars = '3,4,5';
-                filterParams.filter_meals = 'AI';
-            }
+            writeSearchListState({ autoSearchKey, filters: filterParams as any });
             dispatch(runFullSearchFlow({
                 searchParams: data,
                 filterParams,
             }));
+            return;
         }
+
+        const filterParams: Record<string, unknown> = {
+            filter_instant_confirm: false,
+            page_number: parseUiPageNumber(data.page_number),
+            page_limit: Math.max(1, Number(data.page_limit) || 20),
+            sort_by: data?.sort_by || 'relevance',
+        };
+        if (data.search_type !== 'hotel') {
+            filterParams.filter_stars = '3,4,5';
+            filterParams.filter_meals = 'AI';
+        }
+        if (savedFilters && Object.keys(savedFilters).length) {
+            Object.assign(filterParams, savedFilters);
+        }
+        writeSearchListState({ autoSearchKey, filters: filterParams as any });
+        dispatch(runFullSearchFlow({
+            searchParams: data,
+            filterParams,
+        }));
     };
 
     // Guarded auto-search — kept for explicit flows that still call it.
@@ -448,8 +570,41 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
         const searchParams = { ...params, page_number: 1 };
         const { page_number, page_limit, sort_by, ...coreSearchParams } = searchParams;
         lastAutoSearchKeyRef.current = JSON.stringify(coreSearchParams);
+
+        // On results page: keep sidebar filters when country/date/etc. change.
+        // On home (new search): use package defaults.
+        // Drop price bounds — they belong to the previous destination's histogram.
+        const keepCurrentFilters = pageName === 'search';
+        const preservedFilters = keepCurrentFilters
+            ? (() => {
+                  const {
+                      filter_price_min: _min,
+                      filter_price_max: _max,
+                      ...rest
+                  } = {
+                      ...pickAppliedFiltersFromHotels(hotels),
+                      ...(readSearchListState()?.filters ?? {}),
+                  };
+                  return rest;
+              })()
+            : null;
+
+        if (keepCurrentFilters && preservedFilters && Object.keys(preservedFilters).length) {
+            replaceSearchListFilters(preservedFilters);
+            writeSearchListState({ autoSearchKey: lastAutoSearchKeyRef.current });
+        } else {
+            replaceSearchListFilters({
+                filter_instant_confirm: false,
+                ...(searchParams.search_type !== 'hotel'
+                    ? { filter_stars: '3,4,5', filter_meals: 'AI' }
+                    : {}),
+                sort_by: 'relevance',
+            });
+            writeSearchListState({ autoSearchKey: lastAutoSearchKeyRef.current });
+        }
+
         const url = createSearchUrl(searchParams);
-        dispatchSearch(searchParams);
+        dispatchSearch(searchParams, preservedFilters);
         // Keep the guard disabled so the /search query-param effect doesn't run it again.
         dispatch(setStartSearch(false));
         router.push(`/search?${url}`);

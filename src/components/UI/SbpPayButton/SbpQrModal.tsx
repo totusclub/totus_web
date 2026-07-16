@@ -30,7 +30,8 @@ const SbpQrModal = ({
 
   useEffect(() => {
     if (typeof document !== 'undefined') {
-      Modal.setAppElement('#root');
+      const appEl = document.getElementById('root') || document.body;
+      Modal.setAppElement(appEl);
     }
   }, []);
 
@@ -45,7 +46,7 @@ const SbpQrModal = ({
         const result = await checkPay({
           orderId,
           ...(qrcId ? { qrcId } : {}),
-        } as never);
+        });
 
         if (!cancelled && isSbpPaymentPaid(result)) {
           window.location.href = returnUrl;

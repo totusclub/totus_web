@@ -28,8 +28,10 @@ export const useInitialHotelSearch = (
   useEffect(() => {
     if (!isReady || !hotelId) return;
 
-    // URL already has request_id (e.g. page refresh) — use it; stale IDs refresh via useHotelRooms.
-    if (requestId || localRequestId) {
+    // URL / pending hotel request_id already available — use it.
+    // Do not treat a stale local-only id as settled when requestId is missing
+    // (that caused infinite loading on shared links).
+    if (requestId) {
       setSettled(true);
       return;
     }
@@ -38,6 +40,7 @@ export const useInitialHotelSearch = (
 
     const runInitialSearch = async () => {
       setSearching(true);
+      setSettled(false);
       try {
         const newRequestId = await createHotelSearchRequest(router.query, hotelId);
 
@@ -68,7 +71,7 @@ export const useInitialHotelSearch = (
       isMounted = false;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isReady, hotelId, requestId, localRequestId, setLocalRequestId]);
+  }, [isReady, hotelId, requestId, setLocalRequestId]);
 
   return { searching, settled };
 };

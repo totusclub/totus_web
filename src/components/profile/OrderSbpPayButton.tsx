@@ -1,5 +1,6 @@
 import { SbpPayButton } from '@/components/UI/SbpPayButton';
 import SbpQrModal from '@/components/UI/SbpPayButton/SbpQrModal';
+import type { MouseEvent } from 'react';
 import {
   canPayWithSbp,
   getOrderIdForPay,
@@ -16,7 +17,7 @@ type Props = {
 };
 
 const OrderSbpPayButton = ({ order, fullWidth = true }: Props) => {
-  const { loading, pay, qrModal, closeQrModal } = useSbpPay();
+  const { loading, error, pay, qrModal, closeQrModal, clearError } = useSbpPay();
 
   if (!order || !isOrderAwaitingPayment(order) || !canPayWithSbp(order)) {
     return null;
@@ -24,13 +25,18 @@ const OrderSbpPayButton = ({ order, fullWidth = true }: Props) => {
 
   const orderId = getOrderIdForPay(order);
   const amount = getOrderPayAmount(order);
+  const canPay = Boolean(orderId) && amount > 0;
 
-  const handlePay = () => {
-    if (!orderId) return;
+  const handlePay = (e?: MouseEvent) => {
+    e?.preventDefault();
+    e?.stopPropagation();
+    clearError();
+    if (!orderId || amount <= 0) return;
     pay({
       orderId,
       amount,
       paymentPurpose: getOrderPaymentPurpose(order),
+      orderName: `Заказ №${orderId}`,
     });
   };
 
@@ -39,13 +45,18 @@ const OrderSbpPayButton = ({ order, fullWidth = true }: Props) => {
       <div
         className={styles.orderItemPayWrap}
         onClick={(e) => e.stopPropagation()}
+        onMouseDown={(e) => e.stopPropagation()}
       >
         <SbpPayButton
           fullWidth={fullWidth}
           onClick={handlePay}
           loading={loading}
-          disabled={loading}
+          disabled={loading || !canPay}
         />
+        {error ? <p className={styles.orderPayError}>{error}</p> : null}
+        {!canPay ? (
+          <p className={styles.orderPayError}>Не удалось определить сумму оплаты</p>
+        ) : null}
       </div>
       {qrModal ? (
         <SbpQrModal

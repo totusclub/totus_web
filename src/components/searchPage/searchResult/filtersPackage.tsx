@@ -1,23 +1,41 @@
 import styles from '../searchPage.module.css';
 import ItemSwitch from "@/components/UI/itemSwitch";
-import {useEffect, useMemo, useState} from "react";
+import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import Collapse from "@/components/UI/collapse";
 import CheckboxGroup from "@/components/UI/checkboxGroup";
-import RangeInput from "@/components/UI/rangeInput";
-import {searchFilters} from "@/store/slices/searchSlice";
-import {useDispatch} from "react-redux";
 import Icon from "@/components/icons/Icon";
 import Button from "@/components/UI/button";
 
-const FiltersPackage = ({allFilters,setFiltersRequest,netPrice}:any) => {
-    const dispatch = useDispatch();
-    const [price, setPrice] = useState([20,100]);
-    const [km, setKm] = useState([20,60]);
-    const [meter, setMeter] = useState([20,60]);
-    const [mobileModal,setMobileModal]=useState(false);
+/** Prefer API option labeled as fast confirm; fall back to confirmability id `2`. */
+function getFastConfirmIds(allFilters: any): Array<string | number> {
+    const fromConfirmability = allFilters?.confirmability;
+    if (Array.isArray(fromConfirmability) && fromConfirmability.length > 0) {
+        const match = fromConfirmability.find((item: any) => {
+            const id = Number(item?.id);
+            const name = String(item?.name ?? '').toLowerCase();
+            return id === 2 || name.includes('быстр');
+        });
+        if (match?.id !== undefined && match?.id !== null) return [match.id];
+    }
+
+    const fromInstant = allFilters?.instant_confirm;
+    if (Array.isArray(fromInstant) && fromInstant.length > 0) {
+        const selectedOrFirst =
+            fromInstant.find((item: any) => item?.selected) ?? fromInstant[0];
+        if (selectedOrFirst?.id !== undefined && selectedOrFirst?.id !== null) {
+            return [selectedOrFirst.id];
+        }
+    }
+
+    return [2];
+}
+
+const FiltersPackage = ({ allFilters, setFiltersRequest, netPrice }: any) => {
+    const [mobileModal, setMobileModal] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
-    const [filters,setFilters] = useState(    {
+    const [instantConfirm, setInstantConfirm] = useState(false);
+    const [filters, setFilters] = useState({
         arrival_airports: [],
         departure_airports: [],
         forward_airlines: [],
@@ -31,14 +49,13 @@ const FiltersPackage = ({allFilters,setFiltersRequest,netPrice}:any) => {
         transfer: [],
         luggage_types: [],
         forward_arrival_dates: [],
-        forward_departure_time: {from: '', to: ''},
-        backward_departure_time: {from: "", to: ""},
+        forward_departure_time: { from: '', to: '' },
+        backward_departure_time: { from: '', to: '' },
         payment_benefits: [],
-        confirmability: [],
+        confirmability: [] as Array<string | number>,
         package_id: 377680913,
         tour_ids: [],
-        // "sign": "280f5d8d9217324c5ff1fb6736f177e7"
-    })
+    });
 
     useEffect(() => {
         const checkMobile = () => {
@@ -75,38 +92,44 @@ const FiltersPackage = ({allFilters,setFiltersRequest,netPrice}:any) => {
     }, [mobileModal, isMobile]);
 
     const onChangeFilters = (key: string, value: string | boolean | number) => {
-        const intArray = value
+        if (typeof value === 'boolean') {
+            const confirmability = value ? getFastConfirmIds(allFilters) : [];
+            const updatedFilters = { ...filters, confirmability };
+            setInstantConfirm(value);
+            setFilters(updatedFilters);
+            setFiltersRequest(updatedFilters);
+            return;
+        }
+
+        const intArray = String(value)
             .split(',')
             .map((v) => v.trim())
-            .filter((v) => v && v !== '...') // Remove empty strings and junk
-            .map((v) => /^\d+$/.test(v) ? Number(v) : v);
-        const updatedFilters = { ...filters, [key]: intArray[0] === 0 ?[]:intArray };
+            .filter((v) => v && v !== '...')
+            .map((v) => (/^\d+$/.test(v) ? Number(v) : v));
+        const updatedFilters = { ...filters, [key]: intArray[0] === 0 ? [] : intArray };
         setFilters(updatedFilters);
-        setFiltersRequest(updatedFilters)
+        setFiltersRequest(updatedFilters);
     };
-
-
-    // const instantConfirm = useMemo(()=>{
-    //     if(allFilters?.instant_confirm){
-    //         return allFilters?.instant_confirm.find(item=>item.selected).id
-    //     }
-    // },[allFilters])
-
-
 
     return (
         <>
             <div className={styles.buttonFilterMob} onClick={() => setMobileModal(true)}>
-                <Icon name={'filter'}/>
+                <Icon name={'filter'} />
             </div>
             {(() => {
                 const filtersPanel = (
                     <div className={`${styles.filters} ${mobileModal && isMobile ? styles.activeModal : ''}`}>
                         <div className={styles.mobileFilterHeader}>
                             <p>Фильтры</p>
-                            <p onClick={()=>setMobileModal(false)} >Отменить</p>
+                            <p onClick={() => setMobileModal(false)}>Отменить</p>
                         </div>
                         <div className={styles.mobileFilterBody}>
+                        <ItemSwitch
+                            name={'confirmability'}
+                            title={'Быстрое подтверждение'}
+                            setIsOn={onChangeFilters}
+                            isOn={instantConfirm}
+                        />
                         {allFilters?.forward_airlines?.length > 0 && (
                             <Collapse title={'Авиакомпания туда'} open={true}>
                                 <CheckboxGroup
@@ -230,7 +253,7 @@ const FiltersPackage = ({allFilters,setFiltersRequest,netPrice}:any) => {
                         )}
                         </div>
                         <div className={styles.mobileFilterFooter}>
-                            <Button title={'Применять'} full={true} onClick={() => setMobileModal(false)}/>
+                            <Button title={'Применять'} full={true} onClick={() => setMobileModal(false)} />
                         </div>
                     </div>
                 );
@@ -244,7 +267,6 @@ const FiltersPackage = ({allFilters,setFiltersRequest,netPrice}:any) => {
                 return filtersPanel;
             })()}
         </>
-
     );
 };
 
