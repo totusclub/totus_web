@@ -17,7 +17,7 @@ export function getFlowSteps(searchType: SearchTypeValue): FlowStepConfig[] {
       { id: 'search', label: 'Выбор отелей' },
       { id: 'hotel', label: 'Выбор отеля и размещения' },
       { id: 'booking', label: 'Бронирование' },
-      { id: 'checkout', label: 'Подтверждение и оплата' },
+      { id: 'checkout', label: 'Создание и оплата' },
     ];
   }
   return [
@@ -25,7 +25,7 @@ export function getFlowSteps(searchType: SearchTypeValue): FlowStepConfig[] {
     { id: 'hotel', label: 'Выбор отеля и размещения' },
     { id: 'flights', label: 'Выбор перелёта' },
     { id: 'booking', label: 'Бронирование' },
-    { id: 'checkout', label: 'Подтверждение и оплата' },
+    { id: 'checkout', label: 'Создание и оплата' },
   ];
 }
 

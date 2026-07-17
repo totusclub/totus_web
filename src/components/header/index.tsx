@@ -12,11 +12,12 @@ import { clearSearchListState } from '@/utils/searchListState';
 import { useDispatch } from 'react-redux';
 import LogoDesktopIcon from "@/components/icons/logoDesktop";
 import { FOOTER_STATIC_MOBILE_TITLES } from "@/config/footerStaticPages";
+import HeaderProfileMenu from "@/components/header/HeaderProfileMenu";
 
 const Header = () => {
     const dispatch = useDispatch();
     const [authModalOpen, setAuthModalOpen] = useState(false);
-    const { user, token } = useAuth();
+    const { token } = useAuth();
     const router = useRouter();
     const pathname = router.pathname || '';
 
@@ -107,9 +108,7 @@ const Header = () => {
 
                 <div className={`${styles.headerRow} ${styles.headerRowPc}`}>
                     {token ? (
-                        <div onClick={() => router.push('/profile')} className={styles.profileButton}>
-                            <p>{user?.name} {user?.l_name}</p>
-                        </div>
+                        <HeaderProfileMenu />
                     ) : (
                         <Button onClick={() => setAuthModalOpen(true)} title={'Войти'} />
                     )}

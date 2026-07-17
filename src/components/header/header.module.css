@@ -52,6 +52,179 @@
   line-height: 20px; /* 125% */
   letter-spacing: -0.32px;
 }
+
+.profileMenuRoot {
+  position: relative;
+  z-index: 40;
+}
+
+.profileTrigger {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 6px 12px 6px 6px;
+  border-radius: 999px;
+  border: 1px solid var(--borderTertiary);
+  background: var(--bgPrimary);
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.profileTrigger:hover,
+.profileTriggerOpen {
+  border-color: rgba(255, 122, 0, 0.45);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+}
+
+.profileAvatar,
+.profileAvatarLarge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ff8a3d 0%, #ff6a00 100%);
+  color: #fff;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  flex-shrink: 0;
+}
+
+.profileAvatar {
+  width: 36px;
+  height: 36px;
+  font-size: 13px;
+  line-height: 1;
+}
+
+.profileAvatarLarge {
+  width: 42px;
+  height: 42px;
+  font-size: 14px;
+}
+
+.profileTriggerText {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+  max-width: 160px;
+}
+
+.profileTriggerName {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--textPrimary);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 18px;
+  letter-spacing: -0.28px;
+}
+
+.profileTriggerHint {
+  color: var(--textTertiary);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 14px;
+}
+
+.profileDropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 280px;
+  padding: 10px;
+  border-radius: 16px;
+  border: 1px solid var(--borderTertiary);
+  background: var(--bgPrimary);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12);
+  animation: profileMenuIn 0.18s ease-out;
+}
+
+.profileDropdownHead {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 8px 12px;
+  border-bottom: 1px solid var(--borderTertiary);
+  margin-bottom: 8px;
+}
+
+.profileDropdownHeadText {
+  min-width: 0;
+}
+
+.profileDropdownName {
+  margin: 0;
+  color: var(--textPrimary);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 20px;
+  letter-spacing: -0.3px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profileDropdownEmail {
+  margin: 2px 0 0;
+  color: var(--textTertiary);
+  font-size: 12px;
+  line-height: 16px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profileDropdownList {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.profileDropdownItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--textPrimary);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 18px;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.profileDropdownItem:hover {
+  background: rgba(255, 122, 0, 0.08);
+}
+
+.profileDropdownItemDanger {
+  color: var(--core_Orange);
+  margin-top: 4px;
+}
+
+.profileDropdownItemDanger:hover {
+  background: rgba(255, 122, 0, 0.12);
+}
+
+@keyframes profileMenuIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 .headBanner {
   width: 100%;
   height: 80px;
@@ -114,6 +287,9 @@
     /*flex: 1 0 0;*/
   }
   .profileButton {
+    display: none;
+  }
+  .profileMenuRoot {
     display: none;
   }
   .shareBtn {

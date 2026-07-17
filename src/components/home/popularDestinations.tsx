@@ -9,6 +9,7 @@ import { useDispatch } from "react-redux";
 import { runFullSearchFlow, setHeaderName, setStartSearch } from "@/store/slices/searchSlice";
 import { AppDispatch } from "@/store";
 import { stayRangeFromDeparture } from "@/utils/calendarDateRange";
+import { replaceSearchListFilters, writeSearchListState } from "@/utils/searchListState";
 
 // Helper function to get default start date (7 days from today)
 const getDefaultStartDate = (): string => {
@@ -127,6 +128,21 @@ export default function PopularDestinations({
                 sort_by: "relevance",
                 filter_stars: "3,4,5",
             };
+
+            // Fresh destination search — do not carry previous meal filters (e.g. AI).
+            replaceSearchListFilters({
+                filter_instant_confirm: false,
+                filter_stars: "3,4,5",
+                sort_by: "relevance",
+            });
+            writeSearchListState({
+                autoSearchKey: JSON.stringify(searchParams),
+                requestId: null,
+            });
+
+            if (typeof window !== 'undefined') {
+                sessionStorage.removeItem('hotelDetailsFilterMeals');
+            }
 
             const destinationName = item?.name || item?.name_ru || item?.name_en || '';
             dispatch(setHeaderName(destinationName));

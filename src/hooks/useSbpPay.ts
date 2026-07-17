@@ -11,21 +11,25 @@ export type SbpPayRequest = {
   amount: number;
   paymentPurpose?: string;
   orderName?: string;
+  /** QR lifetime in minutes (default 2). */
+  expireMinutes?: number;
 };
 
-export type SbpQrModalState = {
-  isOpen: boolean;
+export type SbpQrState = {
   qrSrc: string;
   orderId: string;
   qrcId: string | null;
   returnUrl: string;
   amount?: number;
+  expiresAt: number;
 };
 
 const PAY_RETURN_ORIGIN =
   typeof window !== 'undefined' && window.location?.origin
     ? window.location.origin
     : 'https://totus.club';
+
+const DEFAULT_EXPIRE_MINUTES = 2;
 
 function isCreatePayError(payInfo: any): boolean {
   if (!payInfo || typeof payInfo !== 'object') return true;
@@ -38,32 +42,40 @@ function isCreatePayError(payInfo: any): boolean {
 export function useSbpPay() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [qrModal, setQrModal] = useState<SbpQrModalState | null>(null);
+  const [qr, setQr] = useState<SbpQrState | null>(null);
 
-  const closeQrModal = useCallback(() => {
-    setQrModal(null);
+  const clearQr = useCallback(() => {
+    setQr(null);
   }, []);
 
   const pay = useCallback(
-    async ({ orderId, amount, paymentPurpose, orderName }: SbpPayRequest) => {
+    async ({
+      orderId,
+      amount,
+      paymentPurpose,
+      orderName,
+      expireMinutes = DEFAULT_EXPIRE_MINUTES,
+    }: SbpPayRequest) => {
       const orderIdStr = String(orderId ?? '').replace(/^ORDER/i, '').trim();
       const payAmount = Number(amount);
+      const lifetimeMs = Math.max(1, expireMinutes) * 60 * 1000;
 
       if (!orderIdStr) {
         setError('Не найден номер заказа');
-        return;
+        return null;
       }
       if (!Number.isFinite(payAmount) || payAmount <= 0) {
         setError('Некорректная сумма оплаты');
-        return;
+        return null;
       }
-      if (loading) return;
+      if (loading) return null;
 
       setLoading(true);
       setError(null);
 
       try {
-        const expireDate = new Date(Date.now() + 30 * 60 * 1000);
+        const expiresAt = Date.now() + lifetimeMs;
+        const expireDate = new Date(expiresAt);
         const returnUrl = `${PAY_RETURN_ORIGIN}/pay?orderId=${orderIdStr}`;
         const payInfo = await createPay({
           orderId: `ORDER${orderIdStr}`,
@@ -85,7 +97,7 @@ export function useSbpPay() {
             payInfo?.response?.data?.error ||
             'Не удалось создать QR-код оплаты';
           setError(String(message));
-          return;
+          return null;
         }
 
         const { payload, qrcId, image } = parseSbpPayResponse(payInfo);
@@ -93,26 +105,28 @@ export function useSbpPay() {
 
         const qrSrc = getSbpQrImageSrc(payload, image);
         if (qrSrc) {
-          // Always show QR when we can generate it (desktop + tablet + mobile web).
-          setQrModal({
-            isOpen: true,
+          const next: SbpQrState = {
             qrSrc,
             orderId: orderIdStr,
             qrcId,
             returnUrl,
             amount: payAmount,
-          });
-          return;
+            expiresAt,
+          };
+          setQr(next);
+          return next;
         }
 
         if (payload) {
           window.location.href = payload;
-          return;
+          return null;
         }
 
         setError('QR-код не получен от банка. Попробуйте ещё раз');
+        return null;
       } catch (err: any) {
         setError(err?.message || 'Ошибка при создании оплаты');
+        return null;
       } finally {
         setLoading(false);
       }
@@ -124,8 +138,20 @@ export function useSbpPay() {
     loading,
     error,
     pay,
-    qrModal,
-    closeQrModal,
+    qr,
+    clearQr,
     clearError: () => setError(null),
+    /** @deprecated use `qr` — kept for older modal callers */
+    qrModal: qr
+      ? {
+          isOpen: true,
+          qrSrc: qr.qrSrc,
+          orderId: qr.orderId,
+          qrcId: qr.qrcId,
+          returnUrl: qr.returnUrl,
+          amount: qr.amount,
+        }
+      : null,
+    closeQrModal: clearQr,
   };
 }

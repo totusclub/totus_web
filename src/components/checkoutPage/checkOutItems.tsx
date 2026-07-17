@@ -169,11 +169,6 @@ const CheckoutItems = ({ order, dataLoading, buyerFromBooking }: any) => {
 
     return (
         <div className={styles.checkoutItemsWrap}>
-            <div className={styles.checkoutMessage}>
-                <Icon name={'info'} size={24} color={'var(--core_Orange)'} />
-                <p>Оплатите заказ в течение 30 минут</p>
-            </div>
-
             {dataLoading && !order ? (
                 <div className={styles.checkoutItems}>
                     <div className={styles.checkoutItemsHead}>
