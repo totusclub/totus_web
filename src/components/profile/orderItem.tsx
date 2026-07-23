@@ -42,15 +42,20 @@ const OrderItem = ({ item }: any) => {
         >
             <div className={styles.orderItemHead}>
                 <div className={styles.orderItemHeadLeft}>
-                    <p>
-                        Тур <span className={styles.orderItemId}>№ {item?.order_id}</span>{' '}
-                        <span
-                            style={{ backgroundColor: statusColor }}
-                            className={styles.orderItemStatus}
-                        >
-                            {statusLabel}
-                        </span>
-                    </p>
+                    <div className={styles.orderItemTitleRow}>
+                        <p className={styles.orderItemTitle}>
+                            Тур{' '}
+                            <span className={styles.orderItemId}>№ {item?.order_id}</span>
+                        </p>
+                        {statusLabel ? (
+                            <span
+                                style={{ backgroundColor: statusColor }}
+                                className={styles.orderItemStatus}
+                            >
+                                {statusLabel}
+                            </span>
+                        ) : null}
+                    </div>
                     {orderDateLabel ? (
                         <p className={styles.orderItemDate}>{orderDateLabel}</p>
                     ) : null}

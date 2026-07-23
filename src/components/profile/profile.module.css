@@ -253,9 +253,21 @@
 .orderItemHead {
   display: flex;
   justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
   width: 100%;
 }
-.orderItemHeadLeft > p:nth-child(1) {
+.orderItemHeadLeft {
+  min-width: 0;
+  flex: 1;
+}
+.orderItemTitleRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.orderItemTitle {
   color: var(--textPrimary);
   font-family: "Golos Text";
   font-size: 20px;
@@ -263,9 +275,7 @@
   font-weight: 500;
   line-height: 24px; /* 120% */
   letter-spacing: -0.4px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  margin: 0;
 }
 .orderItemId {
   color: var(--textTertiary);
@@ -277,16 +287,16 @@
   letter-spacing: -0.4px;
 }
 .orderItemStatus {
-  display: flex;
-  height: 20px;
-  padding: 0px 12px;
+  display: inline-flex;
+  flex-shrink: 0;
+  min-height: 20px;
+  padding: 2px 12px;
   justify-content: center;
   align-items: center;
   border-radius: 15px;
   background: var(--primary_blue);
   color: var(--primary_b, #fff);
-  leading-trim: both;
-  text-edge: cap;
+  white-space: nowrap;
   font-family: "Golos Text";
   font-size: 12px;
   font-style: normal;
@@ -308,6 +318,7 @@
   flex-direction: column;
   align-items: flex-end;
   justify-content: space-between;
+  flex-shrink: 0;
 }
 .orderItemPrices > p:nth-child(1) {
   color: var(--textPrimary, #1f1f1f);

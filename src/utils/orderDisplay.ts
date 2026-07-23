@@ -1,5 +1,9 @@
 import { API_BASE_URL } from '@/config/api';
-import { getLtOrderPackage } from '@/utils/orderPayment';
+import {
+  getLtOrderPackage,
+  isOrderAwaitingPayment,
+  isOrderCancelled,
+} from '@/utils/orderPayment';
 
 export type OrderDocument = { name: string; url: string };
 
@@ -124,18 +128,61 @@ export function collectOrderDocuments(
   return docs;
 }
 
-export function resolveStatusKey(pkg: any, order: any): 'pending' | 'approved' | 'cancel' {
+function getClientStatusText(order: any, pkg?: any): string {
+  const lastEventStatus = order?.last_lt_event?.status;
+  if (typeof lastEventStatus === 'string' && lastEventStatus.trim()) {
+    return lastEventStatus.trim();
+  }
+
   const lt = getLtOrderPackage(order) ?? pkg;
+  const candidates = [
+    lt?.status_for_client,
+    order?.package?.status_for_client,
+    order?.status_for_client,
+    pkg?.status_for_client,
+  ];
+
+  for (const value of candidates) {
+    if (typeof value === 'string' && value.trim()) return value.trim();
+  }
+
+  return '';
+}
+
+export function resolveStatusKey(pkg: any, order: any): 'pending' | 'approved' | 'cancel' {
+  if (isOrderCancelled(order)) return 'cancel';
+  if (isOrderAwaitingPayment(order)) return 'pending';
+
+  const lastEvent = order?.last_lt_event;
+  const clientStatus = getClientStatusText(order, pkg).toLowerCase();
+  if (clientStatus.includes('отмен') || clientStatus.includes('аннул')) {
+    return 'cancel';
+  }
+  if (clientStatus.includes('ожидает оплат')) return 'pending';
+
   const state = String(
-    lt?.state ?? order?.order_state ?? order?.state ?? '',
+    lastEvent?.state ??
+      lastEvent?.event ??
+      order?.order_state ??
+      getLtOrderPackage(order)?.state ??
+      pkg?.state ??
+      order?.state ??
+      '',
   ).toLowerCase();
 
-  if (state.includes('cancel')) return 'cancel';
+  if (
+    state.includes('cancel') ||
+    state.includes('annul') ||
+    state === 'cancelation'
+  ) {
+    return 'cancel';
+  }
   if (
     state.includes('approve') ||
     state.includes('confirm') ||
     state === 'documents_sent' ||
-    state === 'completed'
+    state === 'completed' ||
+    state === 'paid'
   ) {
     return 'approved';
   }
@@ -157,16 +204,13 @@ export function getStatusColor(pkg: any, order: any): string {
 }
 
 export function getStatusLabel(order: any, pkg?: any): string {
-  const lt = getLtOrderPackage(order) ?? pkg;
-  return (
-    lt?.status_for_client ??
-    order?.package?.status_for_client ??
-    (resolveStatusKey(lt, order) === 'cancel'
-      ? 'Отменено'
-      : resolveStatusKey(lt, order) === 'approved'
-        ? 'Подтверждено'
-        : 'В обработке')
-  );
+  const clientStatus = getClientStatusText(order, pkg);
+  if (clientStatus) return clientStatus;
+
+  const key = resolveStatusKey(pkg, order);
+  if (key === 'cancel') return 'Отменено';
+  if (key === 'approved') return 'Подтверждено';
+  return 'В обработке';
 }
 
 export function getOrderCreatedAt(order: any): Date | null {
