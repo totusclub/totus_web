@@ -3,6 +3,9 @@ import styles from './auth.module.css'
 import Input from "@/components/UI/input";
 import Button from "@/components/UI/button";
 import { SignUpRequest } from "@/api/AuthApi";
+import YandexSmartCaptcha, {
+    YANDEX_SMARTCAPTCHA_SITEKEY,
+} from '@/components/auth/YandexSmartCaptcha';
 
 
 const SignUpForm: React.FC = ({ setScreen, setEmail, email }: any) => {
@@ -12,21 +15,56 @@ const SignUpForm: React.FC = ({ setScreen, setEmail, email }: any) => {
         l_name: '',
         phone: ''
     });
+    const [captchaToken, setCaptchaToken] = useState('');
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
+
+    const captchaRequired = Boolean(YANDEX_SMARTCAPTCHA_SITEKEY);
+    const formReady =
+        Boolean(params.name?.trim()) &&
+        Boolean(params.l_name?.trim()) &&
+        Boolean(params.email?.trim()) &&
+        Boolean(params.phone?.trim());
+    const disabled =
+        !formReady || loading || (captchaRequired && !captchaToken);
 
     const handelSignup = async () => {
-        //setScreen('SIGNUP')//VERIFICATION
-        const res = await SignUpRequest(params)
-        // console.log('res',res.screen)
-        setEmail(params.email)
-        setScreen(res.screen)
-
+        if (disabled) return;
+        setError('');
+        setLoading(true);
+        try {
+            const res = await SignUpRequest({
+                ...params,
+                'smart-token': captchaToken,
+                smartToken: captchaToken,
+            });
+            if (res?.error || (res?.message && !res?.screen)) {
+                // signup success always has screen VERIFICATION
+            }
+            if (!res?.screen) {
+                setError(res?.message || 'Ошибка регистрации');
+                setCaptchaToken('');
+                return;
+            }
+            setEmail(params.email)
+            setScreen(res.screen)
+        } catch (err: any) {
+            setError(
+                err?.response?.data?.message ||
+                    err?.message ||
+                    'Не удалось зарегистрироваться',
+            );
+            setCaptchaToken('');
+        } finally {
+            setLoading(false);
+        }
     }
 
     useEffect(() => {
-        setParams({ ...params, email: email })
+        setParams((prev) => ({ ...prev, email: email }))
     }, [email])
 
-    const handleChange = (key, value) => {
+    const handleChange = (key: string, value: string) => {
         setParams({ ...params, [key]: value })
     }
 
@@ -42,7 +80,9 @@ const SignUpForm: React.FC = ({ setScreen, setEmail, email }: any) => {
             <div className={styles.authCardText}>
                 <p>Мы позвоним или отправим сообщение, чтобы подтвердить ваш номер. Применяются стандартные тарифы на сообщения и данные.</p>
             </div>
-            <Button onClick={() => handelSignup()} title={'Зарегистрироваться'} />
+            <YandexSmartCaptcha onTokenChange={setCaptchaToken} />
+            {error ? <p className={styles.captchaError}>{error}</p> : null}
+            <Button disabled={disabled} onClick={() => handelSignup()} title={'Зарегистрироваться'} />
         </div>
     );
 };

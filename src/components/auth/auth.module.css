@@ -44,6 +44,22 @@
     width: 52px;
     height: 52px;
 }
+.captchaWrap{
+    margin: 8px 0;
+    min-height: 100px;
+}
+.captchaHint{
+    margin: 8px 0;
+    color: var(--textTertiary);
+    font-size: 12px;
+    line-height: 16px;
+}
+.captchaError{
+    margin: 0;
+    color: #d64545;
+    font-size: 12px;
+    line-height: 16px;
+}
 .containerVerify{
     margin-top:16px;
 }

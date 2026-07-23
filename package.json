@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.8.1",
+    "@yandex/smart-captcha": "^2.9.1",
     "axios": "^1.9.0",
     "date-fns": "^4.1.0",
     "framer-motion": "^12.19.1",
