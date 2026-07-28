@@ -18,7 +18,6 @@ import {
     readSearchListState,
     replaceSearchListFilters,
     shouldRestoreSearchFilters,
-    writeSearchListState,
 } from '@/utils/searchListState';
 
 const DEFAULT_FILTERS = {
@@ -26,6 +25,70 @@ const DEFAULT_FILTERS = {
     filter_stars: '3,4,5',
     sort_by: 'relevance' as string,
 };
+
+/** Extra list filters from grouped-hotels (CSV of ids). */
+const EXTRA_LIST_FILTER_KEYS = [
+    'filter_rating',
+    'filter_wifi',
+    'filter_beach_surface',
+    'filter_beach_type',
+    'filter_category',
+    'filter_confirmability',
+] as const;
+
+/** Extra bool amenity filters (true when switch is on). */
+const EXTRA_BOOL_FILTER_KEYS = [
+    'filter_adults_only',
+    'filter_direct_flight',
+    'filter_aquapark',
+    'filter_pool',
+    'filter_kids_pool',
+    'filter_heated_pool',
+    'filter_kids_club',
+    'filter_kids_menu',
+    'filter_nanny',
+    'filter_aircon',
+    'filter_parking',
+    'filter_bar',
+    'filter_massage',
+    'filter_thermal_fun',
+    'filter_no_single_men',
+] as const;
+
+const BOOL_AMENITY_UI: Array<{
+    key: (typeof EXTRA_BOOL_FILTER_KEYS)[number];
+    apiKey: string;
+    title: string;
+}> = [
+    { key: 'filter_adults_only', apiKey: 'adults_only', title: 'Только для взрослых' },
+    { key: 'filter_direct_flight', apiKey: 'direct_flight', title: 'Прямой перелёт' },
+    { key: 'filter_aquapark', apiKey: 'aquapark', title: 'Аквапарк' },
+    { key: 'filter_pool', apiKey: 'pool', title: 'Бассейн' },
+    { key: 'filter_kids_pool', apiKey: 'kids_pool', title: 'Детский бассейн' },
+    { key: 'filter_heated_pool', apiKey: 'heated_pool', title: 'Подогреваемый бассейн' },
+    { key: 'filter_kids_club', apiKey: 'kids_club', title: 'Детский клуб' },
+    { key: 'filter_kids_menu', apiKey: 'kids_menu', title: 'Детское меню' },
+    { key: 'filter_nanny', apiKey: 'nanny', title: 'Няня' },
+    { key: 'filter_aircon', apiKey: 'aircon', title: 'Кондиционер' },
+    { key: 'filter_parking', apiKey: 'parking', title: 'Парковка' },
+    { key: 'filter_bar', apiKey: 'bar', title: 'Бар' },
+    { key: 'filter_massage', apiKey: 'massage', title: 'Массаж' },
+    { key: 'filter_thermal_fun', apiKey: 'thermal_fun', title: 'Термальные процедуры' },
+    { key: 'filter_no_single_men', apiKey: 'no_single_men', title: 'Без одиноких мужчин' },
+];
+
+const LIST_FILTER_UI: Array<{
+    key: (typeof EXTRA_LIST_FILTER_KEYS)[number];
+    apiKey: string;
+    title: string;
+}> = [
+    { key: 'filter_rating', apiKey: 'rating', title: 'Рейтинг' },
+    { key: 'filter_wifi', apiKey: 'wifi', title: 'Wi-Fi' },
+    { key: 'filter_beach_surface', apiKey: 'beach_surface', title: 'Покрытие пляжа' },
+    { key: 'filter_beach_type', apiKey: 'beach_type', title: 'Тип пляжа' },
+    { key: 'filter_category', apiKey: 'category', title: 'Категория' },
+    { key: 'filter_confirmability', apiKey: 'confirmability', title: 'Подтверждение' },
+];
 
 function buildFiltersFromHotels(hotels: any) {
     const saved = readSearchListState();
@@ -58,6 +121,18 @@ function buildFiltersFromHotels(hotels: any) {
             sort_by: fromSession.sort_by ?? fromHotels.sort_by ?? 'relevance',
             filter_price_min: fromSession.filter_price_min ?? fromHotels.filter_price_min,
             filter_price_max: fromSession.filter_price_max ?? fromHotels.filter_price_max,
+            ...Object.fromEntries(
+                EXTRA_LIST_FILTER_KEYS.map((key) => [
+                    key,
+                    fromSession[key] ?? fromHotels[key],
+                ]),
+            ),
+            ...Object.fromEntries(
+                EXTRA_BOOL_FILTER_KEYS.map((key) => [
+                    key,
+                    fromSession[key] ?? fromHotels[key],
+                ]),
+            ),
         };
     }
 
@@ -80,6 +155,18 @@ function buildFiltersFromHotels(hotels: any) {
             fromSession.filter_instant_confirm ??
             DEFAULT_FILTERS.filter_instant_confirm,
         sort_by: fromHotels.sort_by ?? fromSession.sort_by ?? DEFAULT_FILTERS.sort_by,
+        ...Object.fromEntries(
+            EXTRA_LIST_FILTER_KEYS.map((key) => [
+                key,
+                fromHotels[key] ?? fromSession[key],
+            ]),
+        ),
+        ...Object.fromEntries(
+            EXTRA_BOOL_FILTER_KEYS.map((key) => [
+                key,
+                fromHotels[key] ?? fromSession[key],
+            ]),
+        ),
     };
 }
 
@@ -91,8 +178,6 @@ const Filters = ({ selectedFilters, allFilters, statistics }: any) => {
     const [isMobile, setIsMobile] = useState(false);
     const [price, setPrice] = useState<number[]>([0, 0]);
     const [priceReady, setPriceReady] = useState(false);
-    const [km, setKm] = useState([20, 60]);
-    const [meter, setMeter] = useState([20, 60]);
     const [filters, setFilters] = useState(() => buildFiltersFromHotels(hotels));
     const [pendingFilters, setPendingFilters] = useState(() => buildFiltersFromHotels(hotels));
     const priceInitializedRef = useRef(false);
@@ -134,27 +219,59 @@ const Filters = ({ selectedFilters, allFilters, statistics }: any) => {
         const searchBase = getSearchBaseParams();
         if (!searchBase) return null;
 
-        const merged = {
-            filter_instant_confirm: filters.filter_instant_confirm ?? hotels?.filter_instant_confirm ?? false,
-            filter_stars: filters.filter_stars ?? hotels?.filter_stars,
-            filter_meals: filters.filter_meals ?? hotels?.filter_meals,
-            filter_hotel_type: filters.filter_hotel_type ?? hotels?.filter_hotel_type,
-            filter_regions: filters.filter_regions ?? hotels?.filter_regions,
-            filter_line: filters.filter_line ?? hotels?.filter_line,
-            filter_operators: filters.filter_operators ?? hotels?.filter_operators,
-            filter_price_min: filters.filter_price_min ?? hotels?.filter_price_min ?? priceBounds.min,
-            filter_price_max: filters.filter_price_max ?? hotels?.filter_price_max ?? priceBounds.max,
-            sort_by: filters.sort_by ?? hotels?.sort_by ?? router.query.sort_by ?? 'relevance',
-            page_limit: 20,
+        // Local UI state wins over persisted hotels payload; overrides (pending) win last.
+        const source = { ...hotels, ...filters, ...overrides } as Record<string, unknown>;
+
+        const extraList = Object.fromEntries(
+            EXTRA_LIST_FILTER_KEYS.map((key) => {
+                const value = source[key];
+                if (value == null) return [key, undefined];
+                // Keep '' so unchecked list filters stay cleared in params/state.
+                return [key, value];
+            }).filter(([, value]) => value !== undefined),
+        );
+        const extraBool = Object.fromEntries(
+            EXTRA_BOOL_FILTER_KEYS.map((key) => {
+                const value = source[key];
+                // Only send amenity filters when enabled (true).
+                if (value === true || value === 'true') return [key, true];
+                return [key, undefined];
+            }).filter(([, value]) => value !== undefined),
+        );
+
+        const merged: Record<string, unknown> = {
+            filter_instant_confirm:
+                source.filter_instant_confirm ?? false,
+            filter_stars: source.filter_stars,
+            filter_meals: source.filter_meals,
+            filter_hotel_type: source.filter_hotel_type,
+            filter_regions: source.filter_regions,
+            filter_line: source.filter_line,
+            filter_operators: source.filter_operators,
+            filter_price_min: source.filter_price_min ?? priceBounds.min,
+            filter_price_max: source.filter_price_max ?? priceBounds.max,
+            ...extraList,
+            ...extraBool,
+            sort_by: source.sort_by ?? router.query.sort_by ?? 'relevance',
+            page_limit: 50,
             page_number: 1,
             ...searchBase,
             ...overrides,
         };
 
+        // Keep '' / amenity false in params so Redux/session can clear selection.
+        // getGroupedHotels strips them before the HTTP call.
+        Object.keys(merged).forEach((key) => {
+            const value = merged[key];
+            if (value === undefined || value === null) {
+                delete merged[key];
+            }
+        });
+
         return {
             ...merged,
             page_number: parseUiPageNumber(merged.page_number),
-            page_limit: Math.max(1, Number(merged.page_limit) || 20),
+            page_limit: Math.max(1, Number(merged.page_limit) || 50),
         };
     };
 
@@ -174,12 +291,42 @@ const Filters = ({ selectedFilters, allFilters, statistics }: any) => {
             ...filterFields
         } = params;
 
-        setFilters((prev) => ({ ...prev, ...filterFields }));
-        // Replace (not merge) so cleared checkboxes don't keep old defaults in session.
-        replaceSearchListFilters(
-            pickAppliedFiltersFromHotels({ ...hotels, ...filterFields }),
-            String(params.request_id),
-        );
+        setFilters((prev) => {
+            const next = { ...prev };
+            Object.entries(filterFields).forEach(([key, value]) => {
+                if (value === undefined || value === null) {
+                    delete (next as Record<string, unknown>)[key];
+                } else if (
+                    value === false &&
+                    key !== 'filter_instant_confirm' &&
+                    key.startsWith('filter_')
+                ) {
+                    // Amenity switched off — remove so UI stays unchecked.
+                    delete (next as Record<string, unknown>)[key];
+                } else {
+                    // Keep '' for list filters so defaults are not re-applied.
+                    (next as Record<string, unknown>)[key] = value;
+                }
+            });
+            return next;
+        });
+        // Replace (not merge) so cleared checkboxes don't keep old values in session.
+        const sessionFilters = pickAppliedFiltersFromHotels({
+            ...hotels,
+            ...filterFields,
+        });
+        Object.entries(filterFields).forEach(([key, value]) => {
+            if (typeof value === 'string' && value.trim() === '' && key.startsWith('filter_')) {
+                (sessionFilters as Record<string, unknown>)[key] = '';
+            } else if (
+                value === false &&
+                key !== 'filter_instant_confirm' &&
+                key.startsWith('filter_')
+            ) {
+                delete (sessionFilters as Record<string, unknown>)[key];
+            }
+        });
+        replaceSearchListFilters(sessionFilters, String(params.request_id));
         dispatch(setAllMyHotels([]));
         dispatch(searchFilters(params));
     };
@@ -201,13 +348,11 @@ const Filters = ({ selectedFilters, allFilters, statistics }: any) => {
         // While restoring from hotel details, keep the session snapshot —
         // don't overwrite it with a partial hotels payload.
         if (!restoring) {
-            writeSearchListState({
-                requestId: hotels.request_id,
-                filters: {
-                    ...readSearchListState()?.filters,
-                    ...pickAppliedFiltersFromHotels(hotels),
-                },
-            });
+            // Replace (not merge) so unchecked filters stay cleared.
+            replaceSearchListFilters(
+                pickAppliedFiltersFromHotels(hotels),
+                String(hotels.request_id),
+            );
         }
         filtersSyncedRef.current = true;
     }, [
@@ -219,6 +364,16 @@ const Filters = ({ selectedFilters, allFilters, statistics }: any) => {
         hotels?.filter_regions,
         hotels?.filter_line,
         hotels?.filter_instant_confirm,
+        hotels?.filter_rating,
+        hotels?.filter_wifi,
+        hotels?.filter_beach_surface,
+        hotels?.filter_beach_type,
+        hotels?.filter_category,
+        hotels?.filter_confirmability,
+        hotels?.filter_adults_only,
+        hotels?.filter_direct_flight,
+        hotels?.filter_aquapark,
+        hotels?.filter_pool,
         hotels?.sort_by,
     ]);
 
@@ -292,7 +447,9 @@ const Filters = ({ selectedFilters, allFilters, statistics }: any) => {
 
     // Apply filters function - used on mobile when Apply button is clicked
     const applyFilters = () => {
+        // Must merge pendingFilters — checkbox/switch changes on mobile only update pending state.
         const filtersToApply = getMergedFilterParams({
+            ...pendingFilters,
             filter_price_min: price[0],
             filter_price_max: price[1],
         });
@@ -312,14 +469,14 @@ const Filters = ({ selectedFilters, allFilters, statistics }: any) => {
                     ...prev,
                     filter_price_min: value[0],
                     filter_price_max: value[1],
-                    page_limit: 20,
+                    page_limit: 50,
                     page_number: 1
                 }))
             } else {
                 setPendingFilters(prev => ({
                     ...prev,
                     [key]: value,
-                    page_limit: 20,
+                    page_limit: 50,
                     page_number: 1
                 }))
             }
@@ -381,6 +538,16 @@ const Filters = ({ selectedFilters, allFilters, statistics }: any) => {
         });
     }
 
+    const resolveBoolFilter = (key: (typeof EXTRA_BOOL_FILTER_KEYS)[number] | 'filter_instant_confirm') => {
+        if (isMobile && mobileModal && pendingFilters?.[key] !== undefined) {
+            return Boolean(pendingFilters[key]);
+        }
+        if (filters?.[key] !== undefined) {
+            return Boolean(filters[key]);
+        }
+        return false;
+    };
+
     const instantConfirm = useMemo(() => {
         // On mobile with modal open, use pendingFilters
         if (isMobile && mobileModal && pendingFilters?.filter_instant_confirm !== undefined) {
@@ -391,12 +558,16 @@ const Filters = ({ selectedFilters, allFilters, statistics }: any) => {
             return filters.filter_instant_confirm
         }
         if (allFilters?.instant_confirm) {
-            return allFilters?.instant_confirm.find(item => item.selected).id
+            return allFilters?.instant_confirm.find((item: { selected?: boolean }) => item.selected)?.id
         }
     }, [allFilters, filters, pendingFilters, isMobile, mobileModal])
 
     const usePendingState = isMobile && mobileModal;
     const activeFilterValues = usePendingState ? pendingFilters : filters;
+
+    const hasAmenityFilters = BOOL_AMENITY_UI.some(
+        ({ apiKey }) => Array.isArray(allFilters?.[apiKey]) && allFilters[apiKey].length > 0,
+    );
 
     const filtersPanel = (
         <div className={`${styles.filters} ${usePendingState ? styles.activeModal : ''}`}>
@@ -457,7 +628,7 @@ const Filters = ({ selectedFilters, allFilters, statistics }: any) => {
                         <CheckboxGroup
                             name={'filter_stars'}
                             options={getOptionsWithSelected(
-                                (allFilters?.stars || []).filter((star) => String(star?.id) !== '0'),
+                                (allFilters?.stars || []).filter((star: { id?: unknown }) => String(star?.id) !== '0'),
                                 activeFilterValues?.filter_stars
                             )}
                             selected={activeFilterValues?.filter_stars}
@@ -502,6 +673,45 @@ const Filters = ({ selectedFilters, allFilters, statistics }: any) => {
                             selected={activeFilterValues?.filter_operators}
                             onChange={onChangeFilters}
                         />
+                    </Collapse>
+                )}
+                {LIST_FILTER_UI.map(({ key, apiKey, title }) => {
+                    const options = allFilters?.[apiKey];
+                    if (!Array.isArray(options) || options.length === 0) return null;
+                    // Amenity-style bool lists (true/false) are handled as switches below
+                    const onlyBoolIds = options.every(
+                        (opt: { id?: unknown }) => typeof opt?.id === 'boolean',
+                    );
+                    if (onlyBoolIds) return null;
+                    return (
+                        <Collapse key={key} title={title} open={true}>
+                            <CheckboxGroup
+                                name={key}
+                                options={getOptionsWithSelected(
+                                    options,
+                                    activeFilterValues?.[key],
+                                )}
+                                selected={activeFilterValues?.[key]}
+                                onChange={onChangeFilters}
+                            />
+                        </Collapse>
+                    );
+                })}
+                {hasAmenityFilters && (
+                    <Collapse title={'Удобства'} open={true}>
+                        {BOOL_AMENITY_UI.map(({ key, apiKey, title }) => {
+                            const options = allFilters?.[apiKey];
+                            if (!Array.isArray(options) || options.length === 0) return null;
+                            return (
+                                <ItemSwitch
+                                    key={key}
+                                    name={key}
+                                    title={title}
+                                    setIsOn={onChangeFilters}
+                                    isOn={resolveBoolFilter(key)}
+                                />
+                            );
+                        })}
                     </Collapse>
                 )}
             </div>

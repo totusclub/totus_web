@@ -22,7 +22,7 @@ export function toApiPageNumber(value: unknown): number {
 }
 
 export function getNextPageNumber(shownCount: number, pageLimit: number): number {
-    const limit = Number.isFinite(pageLimit) && pageLimit > 0 ? pageLimit : 20;
+    const limit = Number.isFinite(pageLimit) && pageLimit > 0 ? pageLimit : 50;
     const shown = Number.isFinite(shownCount) && shownCount > 0 ? shownCount : 0;
     return Math.max(1, Math.floor(shown / limit) + 1);
 }
@@ -49,7 +49,7 @@ export function hasMoreHotelResults({
     shownCount,
     totalCount,
     lastPageSize,
-    pageLimit = 20,
+    pageLimit = 50,
 }: {
     shownCount: number;
     totalCount: number;

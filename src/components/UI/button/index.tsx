@@ -1,9 +1,10 @@
 import styles from './button.module.css';
 import Icon from "@/components/icons/Icon";
+import type { MouseEvent } from "react";
 
 interface ButtonProps {
     title: string;
-    onClick?: () => void;
+    onClick?: (e?: MouseEvent) => void;
     icon?: string;
     br?: number;
     full?: boolean;

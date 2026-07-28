@@ -182,7 +182,7 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
             kids_ages: [],
             hotel_ids: [],
             search_type: 'package',
-            page_limit: 20,
+            page_limit: 50,
             page_number: 1,
             sort_by: 'relevance',
         };
@@ -217,7 +217,7 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
             } else if (key === 'page_number') {
                 parsed.page_number = parseUiPageNumber(Array.isArray(value) ? value[0] : value);
             } else if (key === 'page_limit') {
-                parsed.page_limit = Math.max(1, Number(Array.isArray(value) ? value[0] : value) || 20);
+                parsed.page_limit = Math.max(1, Number(Array.isArray(value) ? value[0] : value) || 50);
             } else {
                 parsed[key as keyof SearchParams] = Array.isArray(value) ? value[0] : value;
             }
@@ -403,7 +403,7 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
             const filterParams: Record<string, unknown> = {
                 filter_instant_confirm: savedFilters?.filter_instant_confirm ?? false,
                 page_number: parseUiPageNumber(data.page_number),
-                page_limit: Math.max(1, Number(data.page_limit) || 20),
+                page_limit: Math.max(1, Number(data.page_limit) || 50),
                 sort_by: savedFilters?.sort_by || data?.sort_by || 'relevance',
                 ...(savedFilters ?? {}),
             };
@@ -418,7 +418,7 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
         const filterParams: Record<string, unknown> = {
             filter_instant_confirm: false,
             page_number: parseUiPageNumber(data.page_number),
-            page_limit: Math.max(1, Number(data.page_limit) || 20),
+            page_limit: Math.max(1, Number(data.page_limit) || 50),
             sort_by: data?.sort_by || 'relevance',
         };
         if (data.search_type !== 'hotel') {

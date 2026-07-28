@@ -13,7 +13,7 @@ interface Option {
 
 interface CheckboxGroupProps {
     options: Option[];
-    selected?: (number | string)[];
+    selected?: (number | string)[] | string;
     onChange: (key?: string, selected?: string) => void;
     name?: string;
     pk?: boolean;
@@ -48,6 +48,12 @@ export default function CheckboxGroup({
 
     const selectedValues = useMemo(() => {
         if (Array.isArray(selected)) return selected;
+        if (typeof selected === 'string') {
+            return selected
+                .split(',')
+                .map((part) => part.trim())
+                .filter(Boolean);
+        }
         return (options || [])
             .filter((item) => item?.selected)
             .map((item) => getOptionValue(item));
@@ -72,6 +78,62 @@ export default function CheckboxGroup({
             if (item.id === 5) return `${item.id} звёзд`;
             if (item.id === 1) return `${item.id} звезда`;
             return `${item.id} звезды`;
+        }
+
+        if (name === 'filter_rating') {
+            return `от ${item.id}`;
+        }
+
+        if (name === 'filter_wifi') {
+            const wifiMap: Record<string, string> = {
+                FREE: 'Бесплатный Wi-Fi',
+                PAID: 'Платный Wi-Fi',
+                LOBBY_FREE: 'Бесплатный Wi-Fi в лобби',
+                LOBBY_PAID: 'Платный Wi-Fi в лобби',
+                LOBBY_UNKNOWN: 'Wi-Fi в лобби',
+                NONE: 'Без Wi-Fi',
+            };
+            return wifiMap[String(item.id)] || item.name || String(item.id);
+        }
+
+        if (name === 'filter_beach_surface') {
+            const beachSurfaceMap: Record<string, string> = {
+                SAND: 'Песок',
+                PEBBLE: 'Галька',
+                'SAND+PEBBLE': 'Песок с галькой',
+                SAND_PEBBLE: 'Песок с галькой',
+                PLATFORM: 'Платформа',
+                CONCRETE: 'Бетон',
+                CORAL: 'Коралл',
+                ROCKS: 'Скалы',
+            };
+            return beachSurfaceMap[String(item.id)] || item.name || String(item.id);
+        }
+
+        if (name === 'filter_beach_type') {
+            const beachTypeMap: Record<string, string> = {
+                DESIGNATED: 'Собственный пляж',
+                PUBLIC: 'Общественный пляж',
+            };
+            return beachTypeMap[String(item.id)] || item.name || String(item.id);
+        }
+
+        if (name === 'filter_category') {
+            const categoryMap: Record<string, string> = {
+                FAMILY: 'Для семьи',
+                COUPLES: 'Для пар',
+                ACTIVE: 'Активный отдых',
+            };
+            return categoryMap[String(item.id)] || item.name || String(item.id);
+        }
+
+        if (name === 'filter_confirmability') {
+            const confirmabilityMap: Record<string, string> = {
+                '1': 'Мгновенное подтверждение',
+                '2': 'Быстрое подтверждение',
+                '3': 'Любое подтверждение',
+            };
+            return confirmabilityMap[String(item.id)] || item.name || String(item.id);
         }
 
         if (

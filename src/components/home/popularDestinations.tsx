@@ -101,7 +101,7 @@ export default function PopularDestinations({
                 nights: nightsValue,
                 search_type: "package",
                 page_number: 1,
-                page_limit: 20,
+                page_limit: 50,
                 sort_by: "relevance",
             };
 
@@ -124,7 +124,7 @@ export default function PopularDestinations({
             const filterParams = {
                 filter_instant_confirm: false,
                 page_number: 1,
-                page_limit: 20,
+                page_limit: 50,
                 sort_by: "relevance",
                 filter_stars: "3,4,5",
             };

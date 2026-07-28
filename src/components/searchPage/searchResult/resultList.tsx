@@ -10,6 +10,7 @@ import { RootState } from '@/store';
 import Select from '@/components/UI/select';
 import Icon from "@/components/icons/Icon";
 import Button from "@/components/UI/button";
+import { pickAppliedFiltersFromHotels } from '@/utils/searchListState';
 
 interface ResultListProps {
     tickets?: boolean;
@@ -18,7 +19,7 @@ interface ResultListProps {
     setFiltersRequest?: any;
 }
 
-const PAGE_LIMIT = 20;
+const PAGE_LIMIT = 50;
 
 const ResultList = ({ tickets, loading, data, setFiltersRequest }: ResultListProps) => {
     const dispatch = useDispatch();
@@ -83,19 +84,18 @@ const ResultList = ({ tickets, loading, data, setFiltersRequest }: ResultListPro
     // Get current filter params from hotels object (includes all applied filters)
     // IMPORTANT: Do NOT include sort_by here - we set it explicitly in handleSelect
     const currentFilters = useMemo(() => {
-        if (hotels) {
-            const filters: any = {
-                filter_instant_confirm: hotels?.filter_instant_confirm,
-                filter_stars: hotels?.filter_stars,
-                filter_meals: hotels?.filter_meals,
-                filter_price_min: hotels?.filter_price_min,
-                filter_price_max: hotels?.filter_price_max,
-            };
-            // Explicitly exclude sort_by to prevent it from being overridden
-            // We'll set sort_by explicitly in handleSelect
-            return filters;
-        }
-        return {};
+        if (!hotels) return {};
+        const applied = pickAppliedFiltersFromHotels(hotels as Record<string, unknown>);
+        const { sort_by: _sortBy, ...rest } = applied;
+        // Omit amenity filters that are off — only keep true / non-empty values.
+        const cleaned: Record<string, unknown> = {};
+        Object.entries(rest).forEach(([key, value]) => {
+            if (value === undefined || value === null) return;
+            if (typeof value === 'string' && value.trim() === '') return;
+            if (value === false && key !== 'filter_instant_confirm') return;
+            cleaned[key] = value;
+        });
+        return cleaned;
     }, [hotels]);
 
 
@@ -130,7 +130,7 @@ const ResultList = ({ tickets, loading, data, setFiltersRequest }: ResultListPro
         const paramsFilter: any = {
             ...currentFilters, // Include all current filter params (excludes sort_by)
             ...selectedFilters, // Include request_id and readyOperators
-            page_limit: 20,
+            page_limit: 50,
             page_number: 1,
         };
 
@@ -159,9 +159,9 @@ const ResultList = ({ tickets, loading, data, setFiltersRequest }: ResultListPro
             .map((star: any) => star?.id)
             .filter((id: any) => id !== null && id !== undefined && String(id) !== '0');
 
-        const resetParams: any = {
+        const resetParams: Record<string, unknown> = {
             ...selectedFilters,
-            page_limit: 20,
+            page_limit: 50,
             page_number: 1,
             sort_by: 'relevance',
             filter_instant_confirm: false,

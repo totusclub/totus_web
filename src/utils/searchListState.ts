@@ -11,8 +11,64 @@ export type SearchListAppliedFilters = {
   filter_operators?: string;
   filter_price_min?: number;
   filter_price_max?: number;
+  filter_rating?: string;
+  filter_wifi?: string;
+  filter_beach_surface?: string;
+  filter_beach_type?: string;
+  filter_category?: string;
+  filter_confirmability?: string;
+  filter_adults_only?: boolean;
+  filter_direct_flight?: boolean;
+  filter_aquapark?: boolean;
+  filter_pool?: boolean;
+  filter_kids_pool?: boolean;
+  filter_heated_pool?: boolean;
+  filter_kids_club?: boolean;
+  filter_kids_menu?: boolean;
+  filter_nanny?: boolean;
+  filter_aircon?: boolean;
+  filter_parking?: boolean;
+  filter_bar?: boolean;
+  filter_massage?: boolean;
+  filter_thermal_fun?: boolean;
+  filter_no_single_men?: boolean;
   sort_by?: string;
 };
+
+/** Keys persisted/restored for listing filter state. */
+export const SEARCH_LIST_FILTER_KEYS: (keyof SearchListAppliedFilters)[] = [
+  'filter_instant_confirm',
+  'filter_stars',
+  'filter_meals',
+  'filter_hotel_type',
+  'filter_regions',
+  'filter_line',
+  'filter_operators',
+  'filter_price_min',
+  'filter_price_max',
+  'filter_rating',
+  'filter_wifi',
+  'filter_beach_surface',
+  'filter_beach_type',
+  'filter_category',
+  'filter_confirmability',
+  'filter_adults_only',
+  'filter_direct_flight',
+  'filter_aquapark',
+  'filter_pool',
+  'filter_kids_pool',
+  'filter_heated_pool',
+  'filter_kids_club',
+  'filter_kids_menu',
+  'filter_nanny',
+  'filter_aircon',
+  'filter_parking',
+  'filter_bar',
+  'filter_massage',
+  'filter_thermal_fun',
+  'filter_no_single_men',
+  'sort_by',
+];
 
 export type SearchListState = {
   autoSearchKey: string;
@@ -118,24 +174,37 @@ export function pickAppliedFiltersFromHotels(
 ): SearchListAppliedFilters {
   if (!hotels) return {};
   const out: SearchListAppliedFilters = {};
-  const keys: (keyof SearchListAppliedFilters)[] = [
-    'filter_instant_confirm',
-    'filter_stars',
-    'filter_meals',
-    'filter_hotel_type',
-    'filter_regions',
-    'filter_line',
-    'filter_operators',
-    'filter_price_min',
-    'filter_price_max',
-    'sort_by',
-  ];
-  keys.forEach((key) => {
+  SEARCH_LIST_FILTER_KEYS.forEach((key) => {
     const value = hotels[key];
     // Keep empty strings so "cleared" filters survive restore (vs falling back to defaults).
-    if (value !== undefined && value !== null) {
-      (out as Record<string, unknown>)[key] = value;
+    if (value === undefined || value === null) return;
+    // Amenity toggles are omit-when-off.
+    if (value === false && key !== 'filter_instant_confirm') return;
+    (out as Record<string, unknown>)[key] = value;
+  });
+  return out;
+}
+
+/** Strip values that must not be sent / persisted as active filters.
+ * Empty strings on filter_* keys are kept so "unchecked" survives restore
+ * (and blocks package defaults like stars 3,4,5).
+ */
+export function sanitizeListingFilterParams(
+  params: Record<string, unknown> | null | undefined,
+): Record<string, unknown> {
+  if (!params) return {};
+  const out: Record<string, unknown> = {};
+  Object.entries(params).forEach(([key, value]) => {
+    if (value === undefined || value === null) return;
+    if (typeof value === 'string' && value.trim() === '') {
+      if (key.startsWith('filter_')) {
+        out[key] = '';
+      }
+      return;
     }
+    if (value === false && key !== 'filter_instant_confirm' && key.startsWith('filter_')) return;
+    if (Array.isArray(value) && value.length === 0) return;
+    out[key] = value;
   });
   return out;
 }

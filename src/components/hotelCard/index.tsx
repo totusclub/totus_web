@@ -216,6 +216,7 @@ const HotelCard = ({ item, lazy }: HotelCardState) => {
             renovation_year: 'Год реновации',
             airport_distance: 'до аэропорта',
             beach_distance: 'до пляжа',
+            distance_to_city_center: 'до центра города',
             beach_size: 'Размер пляжа',
             beach_type: 'Тип пляжа',
             beach_surface: 'Покрытие пляжа',
@@ -260,6 +261,17 @@ const HotelCard = ({ item, lazy }: HotelCardState) => {
                     }
                 }
 
+                // Already in km (e.g. 7.8) or meters (>= 1000)
+                if (key === 'distance_to_city_center') {
+                    const num = Number(value);
+                    if (!Number.isFinite(num) || num <= 0) return null;
+                    if (num >= 1000) {
+                        return `${Math.round(num / 1000)} км ${label}`;
+                    }
+                    const km = Number.isInteger(num) ? num : Math.round(num * 10) / 10;
+                    return `${km} км ${label}`;
+                }
+
                 if (typeof value === 'string' && value === 'FREE') {
                     return `бесплатно ${label}`;
                 }
@@ -267,10 +279,13 @@ const HotelCard = ({ item, lazy }: HotelCardState) => {
                     return `платный ${label}`;
                 }
                 if (typeof value === 'string' && value === 'LOBBY_FREE') {
-                    return `Бесплатный ${label} в фойе`;
+                    return `Бесплатный ${label} в лобби`;
                 }
                 if (typeof value === 'string' && value === 'LOBBY_PAID') {
-                    return `платный ${label} в фойе`;
+                    return `платный ${label} в лобби`;
+                }
+                if (typeof value === 'string' && value === 'LOBBY_UNKNOWN') {
+                    return `${label} в лобби`;
                 }
 
                 if (typeof value === 'boolean') {
@@ -300,7 +315,8 @@ const HotelCard = ({ item, lazy }: HotelCardState) => {
                 }
 
                 return `${value}${units[key] || ''} ${label}`;
-            });
+            })
+            .filter((tag): tag is string => Boolean(tag));
     };
 
 
@@ -323,9 +339,21 @@ const HotelCard = ({ item, lazy }: HotelCardState) => {
 
     if (!lazy) {
         return (
-            <div onClick={() => handleClick()} className={styles.hotelCard}>
+            <div className={styles.hotelCard}>
                 {/*<div className={styles.hotelCardImage} style={{backgroundImage: `url(https://image.totus.club/imagePath?directory=${showImage})`}}/>*/}
-                <div className={styles.hotelCardImage} style={{ backgroundImage: `url(${showImage})` }} />
+                <div
+                    className={styles.hotelCardImage}
+                    style={{ backgroundImage: `url(${showImage})` }}
+                    onClick={handleClick}
+                    role="link"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            handleClick();
+                        }
+                    }}
+                />
 
                 <div className={styles.hotelCardInfo}>
                     <div className={styles.hotelCardHead}>
@@ -364,6 +392,7 @@ const HotelCard = ({ item, lazy }: HotelCardState) => {
                     <div className={styles.hotelCardPriceM}>
                         <p>от {analytics_min_price?.toString()?.replace(/\B(?=(\d{3})+(?!\d))/g, '\u202F')}₽</p>
                         <p>от {formattedDate}, на {min_price_nights} ночей</p>
+                        <Button onClick={handleClick} full={true} title={'Выбрать'} />
                     </div>
 
                 </div>
@@ -376,7 +405,7 @@ const HotelCard = ({ item, lazy }: HotelCardState) => {
                     </div>
                     <div className={styles.hotelCardCheckout}>
                         <p>от {analytics_min_price?.toString()?.replace(/\B(?=(\d{3})+(?!\d))/g, '\u202F')}₽</p>
-                        <Button onClick={() => handleClick()} full={true} title={'Выбрать'} />
+                        <Button onClick={handleClick} full={true} title={'Выбрать'} />
                         <div className={styles.hotelCardDate}>
                             <p>c {formattedDate}, на {min_price_nights} ночей</p>
                         </div>

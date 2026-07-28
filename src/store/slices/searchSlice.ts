@@ -173,6 +173,7 @@ import {
     getReadySearchOperators,
     shouldStopSearchPolling,
 } from '@/utils/searchStatus';
+import { sanitizeListingFilterParams } from '@/utils/searchListState';
 
 let activeSearchPoll: ReturnType<typeof setTimeout> | null = null;
 let activeSearchPollAttempts = 0;
@@ -304,7 +305,7 @@ export const runFullSearchFlow = createAsyncThunk(
                         const hotels = await getGroupedHotels({
                             ...filters,
                             page_number: parseUiPageNumber(filters.page_number),
-                            page_limit: Math.max(1, Number(filters.page_limit) || 20),
+                            page_limit: Math.max(1, Number(filters.page_limit) || 50),
                         });
                         resolve({
                             ...hotels,
@@ -342,11 +343,12 @@ export const searchFilters = createAsyncThunk(
             const hotels = await getGroupedHotels({
                 ...params,
                 page_number: parseUiPageNumber(params?.page_number),
-                page_limit: Math.max(1, Number(params?.page_limit) || 20),
+                page_limit: Math.max(1, Number(params?.page_limit) || 50),
             });
 
             // Persist applied filter params on the hotels object (API response does not echo them).
             // Without this, hotel cards fall back to default package meals (AI).
+            // Sanitize so amenity=false / empty strings are not re-applied over the cleaned response.
             const {
                 request_id,
                 readyOperators,
@@ -361,7 +363,7 @@ export const searchFilters = createAsyncThunk(
                 ...hotels,
                 request_id: hotels?.request_id ?? request_id,
                 readyOperators: hotels?.readyOperators ?? readyOperators,
-                ...appliedFilters,
+                ...sanitizeListingFilterParams(appliedFilters),
                 ui_page_number: parseUiPageNumber(page_number),
             };
         } catch (err: any) {

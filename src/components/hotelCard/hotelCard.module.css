@@ -25,6 +25,7 @@
   background-repeat: no-repeat;
   padding: 8px;
   position: relative;
+  cursor: pointer;
 }
 .hotelCardImageInfo {
   width: 100%;
@@ -350,8 +351,9 @@
   .hotelCardPriceM {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 8px;
     align-items: flex-start;
+    width: 100%;
   }
   .hotelCardPriceM > p:nth-child(1) {
     color: var(--textPrimary);
@@ -368,7 +370,7 @@
     font-size: 13px;
     line-height: 16px;
   }
-  .hotelCardPriceM > p:last-child {
+  .hotelCardPriceM > p:last-of-type {
     color: var(--textTertiary);
     font-family: "Golos Text";
     font-size: 14px;

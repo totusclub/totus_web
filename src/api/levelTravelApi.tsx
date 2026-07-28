@@ -30,7 +30,7 @@ function prepareStartSearchParams(raw: Record<string, unknown>): Record<string, 
             continue;
         }
         if (key === 'page_limit') {
-            out[key] = Math.max(1, Number(value) || 20);
+            out[key] = Math.max(1, Number(value) || 50);
             continue;
         }
         out[key] = value as string | number | boolean;
@@ -96,13 +96,15 @@ export async function getGroupedHotels(params: { request_id?: string; readyOpera
                 if (value === null || value === undefined) return false;
                 if (typeof value === 'string') return value.trim() !== '';
                 if (Array.isArray(value)) return value.length > 0;
+                // Amenity toggles are omit-when-off; only instant_confirm sends explicit false.
+                if (value === false) return key === 'filter_instant_confirm';
                 return true;
             }).map(([key, value]) => {
                 if (key === 'page_number') {
                     return [key, toApiPageNumber(value)];
                 }
                 if (key === 'page_limit') {
-                    return [key, Math.max(1, Number(value) || 20)];
+                    return [key, Math.max(1, Number(value) || 50)];
                 }
                 return [key, value];
             })
