@@ -12,27 +12,28 @@ function prepareStartSearchParams(raw: Record<string, unknown>): Record<string, 
     const out: Record<string, string | number | boolean> = {};
     if (!raw || typeof raw !== 'object') return out;
 
+    // Listing-only keys — must not be sent to /start-search (enqueue).
+    const skipKeys = new Set([
+        'page_number',
+        'page_limit',
+        'sort_by',
+        'request_id',
+        'readyOperators',
+        'operator_ids',
+        'ui_page_number',
+    ]);
+
     for (const [key, value] of Object.entries(raw)) {
+        if (skipKeys.has(key)) continue;
+        if (key.startsWith('filter_')) continue;
         if (value === undefined || value === null) continue;
         if (typeof value === 'string' && value.trim() === '') continue;
         if (Array.isArray(value)) {
             if (value.length === 0) continue;
-            if (key === 'kids_ages' || key === 'hotel_ids') {
-                out[key] = value.map((v) => String(v)).join(',');
-            } else {
-                out[key] = value.map((v) => String(v)).join(',');
-            }
+            out[key] = value.map((v) => String(v)).join(',');
             continue;
         }
         if (typeof value === 'object') continue;
-        if (key === 'page_number') {
-            out[key] = toApiPageNumber(value);
-            continue;
-        }
-        if (key === 'page_limit') {
-            out[key] = Math.max(1, Number(value) || 50);
-            continue;
-        }
         out[key] = value as string | number | boolean;
     }
     return out;
@@ -118,7 +119,19 @@ export async function getGroupedHotels(params: { request_id?: string; readyOpera
                 indexes: null,
             },
         });
-        return { ...res.data, ...sanitizedParams, ui_page_number: uiPageNumber };
+        // Attach applied filter metadata without overwriting API list fields
+        // (hotels, hotels_count, filters, status, …).
+        const {
+            hotels: _h,
+            hotels_count: _hc,
+            filters: _f,
+            status: _s,
+            filtered_hotels: _fh,
+            filtered_results: _fr,
+            statistics: _st,
+            ...appliedMeta
+        } = sanitizedParams as Record<string, unknown>;
+        return { ...res.data, ...appliedMeta, ui_page_number: uiPageNumber };
     } catch (error) {
         console.error('Error getting grouped hotels:', error);
         throw error;

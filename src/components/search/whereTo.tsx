@@ -97,12 +97,12 @@ const WhereFrom = ({ handleChange, value, name, searchType = 'package', fromCity
         }
     }, [isOpen]);
 
-    // Initialize searchValue from value prop
+    // Keep input in sync when destination is set from parent (URL / header / select)
     useEffect(() => {
-        if (value && !searchValue) {
+        if (value) {
             setSearchValue(value);
         }
-    }, [value, searchValue]);
+    }, [value]);
 
     // Fetch destinations on mount when modal opens
     useEffect(() => {
@@ -119,7 +119,9 @@ const WhereFrom = ({ handleChange, value, name, searchType = 'package', fromCity
 
     const ignorName = ['Крым', 'Донецк', 'Луганск', 'Ялта', 'Yalta']
 
-    // Get popular destinations from API data - only countries with images
+    const isTypingSearch = searchValue.trim().length > 0;
+
+    // Popular list: require images when browsing; when typing, show all country matches
     const getPopularDestinations = (): DestinationItem[] => {
         if (!data || !Array.isArray(data)) return [];
 
@@ -128,13 +130,13 @@ const WhereFrom = ({ handleChange, value, name, searchType = 'package', fromCity
         ) as DataGroup | undefined;
         const apiCountries: DestinationItem[] = countriesData?.results || [];
 
-        // Return only countries that have images
-        return apiCountries.filter((c: DestinationItem) => c.image && c.image.trim() !== '');
+        if (isTypingSearch) return apiCountries;
+        return apiCountries.filter((c: DestinationItem) => c.image && String(c.image).trim() !== '');
     };
 
-    // Get other countries - only those with images (since we only show destinations with images)
+    // Other countries (browse mode only — while typing, all matches are in popular)
     const getOtherCountries = (): DestinationItem[] => {
-        if (!data || !Array.isArray(data)) return [];
+        if (isTypingSearch || !data || !Array.isArray(data)) return [];
 
         const countriesData = data.find((item: unknown) =>
             isDataGroup(item) && item.group_name === "countries"
@@ -142,10 +144,9 @@ const WhereFrom = ({ handleChange, value, name, searchType = 'package', fromCity
         const apiCountries: DestinationItem[] = countriesData?.results || [];
         const popularIso2s = getPopularDestinations().map(d => d.iso2 || '');
 
-        // Return countries with images that are not in popular destinations
         return apiCountries.filter((c: DestinationItem) =>
             c.image &&
-            c.image.trim() !== '' &&
+            String(c.image).trim() !== '' &&
             !popularIso2s.includes(c.iso2 || '')
         );
     };

@@ -300,14 +300,21 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
                 // Session snapshot wins over Redux so cleared defaults stay cleared.
                 if ((shouldRestore || sameResultsInMemory) && hotels?.request_id) {
                     consumeSearchListRestoreFlag();
-                    writeSearchListState({
-                        autoSearchKey,
-                        requestId: String(hotels.request_id),
-                        filters: {
-                            ...pickAppliedFiltersFromHotels(hotels),
-                            ...(saved?.filters ?? {}),
-                        },
-                    });
+                    replaceSearchListFilters({
+                        ...pickAppliedFiltersFromHotels(hotels),
+                        ...(saved?.filters ?? {}),
+                    }, String(hotels.request_id));
+                    writeSearchListState({ autoSearchKey });
+                    return next;
+                }
+
+                // Home popular / form already started this exact search — don't restart
+                // (restart would cancel the in-flight poll and could show empty results).
+                if (
+                    pageName === 'search' &&
+                    saved?.autoSearchKey === autoSearchKey &&
+                    (loading || Boolean(hotels?.request_id))
+                ) {
                     return next;
                 }
 
@@ -327,9 +334,13 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
                 }
 
                 queueMicrotask(() => {
-                    // On results page keep sidebar filters; home / fresh search uses defaults.
-                    const savedOnList =
-                        pageName === 'search' ? readSearchListState()?.filters : undefined;
+                    // Keep sidebar filters only when session already belongs to this
+                    // same search key (results-page refine). Home → /search uses defaults.
+                    const useSaved =
+                        pageName === 'search' &&
+                        Boolean(saved?.requestId) &&
+                        saved?.autoSearchKey === autoSearchKey;
+                    const savedOnList = useSaved ? saved?.filters : undefined;
                     dispatchSearch(
                         next,
                         savedOnList && Object.keys(savedOnList).length ? savedOnList : null,
@@ -338,14 +349,11 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
                 });
             } else if ((shouldRestore || sameResultsInMemory) && hotels?.request_id) {
                 consumeSearchListRestoreFlag();
-                writeSearchListState({
-                    autoSearchKey,
-                    requestId: String(hotels.request_id),
-                    filters: {
-                        ...pickAppliedFiltersFromHotels(hotels),
-                        ...(readSearchListState()?.filters ?? {}),
-                    },
-                });
+                replaceSearchListFilters({
+                    ...pickAppliedFiltersFromHotels(hotels),
+                    ...(readSearchListState()?.filters ?? {}),
+                }, String(hotels.request_id));
+                writeSearchListState({ autoSearchKey });
             }
 
             return next;
@@ -359,10 +367,8 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
         writeSearchListState({
             autoSearchKey: getAutoSearchKey(router.query as Record<string, string | string[]>),
             requestId: String(hotels.request_id),
-            filters: {
-                ...(readSearchListState()?.filters ?? {}),
-                ...pickAppliedFiltersFromHotels(hotels),
-            },
+            // Hotels payload is source of truth — do not re-merge stale session amenities.
+            filters: pickAppliedFiltersFromHotels(hotels),
         });
     }, [
         pageName,
@@ -407,7 +413,8 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
                 sort_by: savedFilters?.sort_by || data?.sort_by || 'relevance',
                 ...(savedFilters ?? {}),
             };
-            writeSearchListState({ autoSearchKey, filters: filterParams as any });
+            replaceSearchListFilters(filterParams as any);
+            writeSearchListState({ autoSearchKey });
             dispatch(runFullSearchFlow({
                 searchParams: data,
                 filterParams,
@@ -427,7 +434,9 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
         if (savedFilters && Object.keys(savedFilters).length) {
             Object.assign(filterParams, savedFilters);
         }
-        writeSearchListState({ autoSearchKey, filters: filterParams as any });
+        // Always replace — never merge with a previous country's amenity filters.
+        replaceSearchListFilters(filterParams as any);
+        writeSearchListState({ autoSearchKey });
         dispatch(runFullSearchFlow({
             searchParams: data,
             filterParams,
@@ -466,26 +475,29 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
             }));
         } else if (key === 'to_city') {
             if (type === 'countries') {
-                delete params.hotel_ids
+                // Country-only search: clear city/hotel so a previous destination
+                // (e.g. Hurghada) is not sent with the new country (API 500).
                 setParams((prev) => ({
                     ...prev,
-                    to_country: value?.iso2
+                    to_country: value?.iso2 || '',
+                    to_city: '',
+                    hotel_ids: [],
                 }));
             }
             if (type === 'regions' || type === 'metaregions') {
-                delete params.hotel_ids
                 setParams((prev) => ({
                     ...prev,
-                    to_city: value?.name_en,
-                    to_country: value?.iso2
+                    to_city: value?.name_en || '',
+                    to_country: value?.iso2 || '',
+                    hotel_ids: [],
                 }));
             }
             if (type === 'hotels') {
                 setParams((prev) => ({
                     ...prev,
-                    to_city: value?.name_en,
-                    to_country: value?.iso2,
-                    hotel_ids: [value.id]
+                    to_city: value?.name_en || '',
+                    to_country: value?.iso2 || '',
+                    hotel_ids: value?.id != null ? [value.id] : [],
                 }));
             }
         } else if (key === 'form_date') {
@@ -570,10 +582,18 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
         const { page_number, page_limit, sort_by, ...coreSearchParams } = searchParams;
         lastAutoSearchKeyRef.current = JSON.stringify(coreSearchParams);
 
-        // On results page: keep sidebar filters when country/date/etc. change.
-        // On home (new search): use package defaults.
-        // Drop price bounds — they belong to the previous destination's histogram.
-        const keepCurrentFilters = pageName === 'search';
+        // Keep sidebar filters only on /search when destination did NOT change.
+        // Changing country (e.g. Egypt → Turkey) with leftover wifi/amenities
+        // often returns 0 hotels.
+        const prevCountry = String(router.query.to_country || '');
+        const prevCity = String(router.query.to_city || '');
+        const nextCountry = String(searchParams.to_country || '');
+        const nextCity = String(searchParams.to_city || '');
+        const destinationChanged =
+            pageName === 'search' &&
+            (prevCountry !== nextCountry || prevCity !== nextCity);
+
+        const keepCurrentFilters = pageName === 'search' && !destinationChanged;
         const preservedFilters = keepCurrentFilters
             ? (() => {
                   const {
@@ -662,7 +682,7 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
                             <WhereTo
                                 handleChange={handleChange}
                                 name={'to_city'}
-                                value={params.to_city}
+                                value={params.to_city || headerName || ''}
                                 searchType={params.search_type as SearchTypeValue}
                                 fromCity={params.from_city}
                             />

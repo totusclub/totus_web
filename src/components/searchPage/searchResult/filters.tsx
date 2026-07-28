@@ -94,10 +94,11 @@ function buildFiltersFromHotels(hotels: any) {
     const saved = readSearchListState();
     const fromHotels = pickAppliedFiltersFromHotels(hotels);
     const fromSession = saved?.filters ?? {};
+    // Do NOT pass saved.autoSearchKey here — that compared the key to itself
+    // and always "restored" stale session filters (wifi etc. → 0 Turkey hotels).
     const restoring = shouldRestoreSearchFilters({
         restoreFlag: peekSearchListRestoreFlag(),
         hotelsRequestId: hotels?.request_id ? String(hotels.request_id) : null,
-        autoSearchKey: saved?.autoSearchKey,
     });
 
     // Returning from hotel details: session snapshot is the source of truth.

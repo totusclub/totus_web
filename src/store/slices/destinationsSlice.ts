@@ -2,14 +2,37 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { API_BASE_URL } from '@/config/api';
 
+/** Autocomplete misses some English spellings (e.g. "turkish") — map to a known query. */
+const DESTINATION_QUERY_ALIASES: Record<string, string> = {
+    turkish: 'Турция',
+    turkye: 'Турция',
+    turkiye: 'Турция',
+    türkiye: 'Турция',
+    туркиш: 'Турция',
+    турецкая: 'Турция',
+    турецкий: 'Турция',
+};
+
+function normalizeDestinationQuery(query: unknown): string {
+    const raw = String(query ?? '').trim();
+    if (!raw) return '';
+    const alias = DESTINATION_QUERY_ALIASES[raw.toLowerCase()];
+    return alias || raw;
+}
+
 export const fetchDestinations = createAsyncThunk(
     'destinations/fetchDestinations',
-    async (params = {}) => {
-        // query:'""',from_city:from_city,search_type:'package'
+    async (params: { query?: string; from_city?: string; search_type?: string } = {}) => {
         const searchType = params?.search_type === 'hotel' ? 'hotel' : 'package';
-        const res = await axios.get(
-            `${API_BASE_URL}/references/autocomplete_v2?query="${params.query}"&from_city=${params?.from_city}&search_type=${searchType}`
-        );
+        const query = normalizeDestinationQuery(params.query);
+        const res = await axios.get(`${API_BASE_URL}/references/autocomplete_v2`, {
+            params: {
+                // Empty query: space keeps popular countries (incl. Turkey) in the list.
+                query: query || ' ',
+                from_city: params?.from_city || 'Moscow',
+                search_type: searchType,
+            },
+        });
         return res.data;
     }
 );

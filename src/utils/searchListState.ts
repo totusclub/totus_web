@@ -95,10 +95,9 @@ export function writeSearchListState(patch: Partial<SearchListState> & { autoSea
       ...prev,
       ...patch,
       autoSearchKey: patch.autoSearchKey ?? prev.autoSearchKey,
-      filters:
-        patch.filters !== undefined
-          ? { ...prev.filters, ...patch.filters }
-          : prev.filters,
+      // Replace filters entirely when provided — merging kept stale amenities
+      // (e.g. filter_wifi) from a previous country and zeroed Turkey results.
+      filters: patch.filters !== undefined ? { ...patch.filters } : prev.filters,
     };
     sessionStorage.setItem(SEARCH_LIST_STATE_KEY, JSON.stringify(next));
   } catch {
@@ -218,6 +217,7 @@ export function shouldRestoreSearchFilters(options: {
   const saved = readSearchListState();
   if (options.restoreFlag) return true;
 
+  // Same in-memory / session search result — keep sidebar selection.
   if (
     options.hotelsRequestId &&
     saved?.requestId &&
@@ -226,12 +226,15 @@ export function shouldRestoreSearchFilters(options: {
     return true;
   }
 
+  // Only when caller passes the *current URL* autoSearchKey (not saved.autoSearchKey).
+  // Comparing saved key to itself always returned true and re-applied stale filters.
   if (
     options.autoSearchKey &&
     saved?.autoSearchKey &&
     options.autoSearchKey === saved.autoSearchKey &&
     saved.filters &&
-    Object.keys(saved.filters).length > 0
+    Object.keys(saved.filters).length > 0 &&
+    saved.requestId
   ) {
     return true;
   }

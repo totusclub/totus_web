@@ -116,9 +116,6 @@ export default function PopularDestinations({
                 end_date_till: params.end_date_till,
                 nights: params.nights,
                 search_type: params.search_type,
-                page_number: params.page_number,
-                page_limit: params.page_limit,
-                sort_by: params.sort_by,
             };
 
             const filterParams = {
@@ -135,6 +132,8 @@ export default function PopularDestinations({
                 filter_stars: "3,4,5",
                 sort_by: "relevance",
             });
+            // Same key shape as searchForm getAutoSearchKey (no page_limit/sort_by)
+            // so /search does not cancel this in-flight request.
             writeSearchListState({
                 autoSearchKey: JSON.stringify(searchParams),
                 requestId: null,
@@ -149,12 +148,22 @@ export default function PopularDestinations({
             dispatch(setStartSearch(false));
             dispatch(
                 runFullSearchFlow({
-                    searchParams,
+                    searchParams: {
+                        ...searchParams,
+                        page_number: 1,
+                        page_limit: 50,
+                        sort_by: "relevance",
+                    },
                     filterParams,
                 })
             );
 
-            const url = createSearchUrl(params);
+            const url = createSearchUrl({
+                ...params,
+                page_number: 1,
+                page_limit: 50,
+                sort_by: "relevance",
+            });
             router.push(`/search?${url}`);
         },
         [router, date, dispatch]

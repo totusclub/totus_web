@@ -296,10 +296,20 @@ export const runFullSearchFlow = createAsyncThunk(
 
                         let filters: Record<string, unknown> = { request_id };
                         if (readyOperators.length > 0) {
-                            filters.readyOperators = readyOperators;
+                            // CSV string — array serialization can break operator_ids upstream.
+                            filters.readyOperators = readyOperators.join(',');
                         }
                         if (filterParams && typeof filterParams === 'object') {
-                            filters = { ...filters, ...filterParams };
+                            const {
+                                hotels: _h,
+                                hotels_count: _hc,
+                                filters: _f,
+                                status: _s,
+                                request_id: _r,
+                                readyOperators: _ro,
+                                ...safeFilterParams
+                            } = filterParams as Record<string, unknown>;
+                            filters = { ...filters, ...safeFilterParams };
                         }
 
                         const hotels = await getGroupedHotels({
@@ -307,11 +317,22 @@ export const runFullSearchFlow = createAsyncThunk(
                             page_number: parseUiPageNumber(filters.page_number),
                             page_limit: Math.max(1, Number(filters.page_limit) || 50),
                         });
+                        const {
+                            hotels: _fh,
+                            hotels_count: _fhc,
+                            filters: _ff,
+                            status: _fs,
+                            request_id: _fr,
+                            readyOperators: _fro,
+                            ...appliedFilterMeta
+                        } = (filterParams && typeof filterParams === 'object'
+                            ? filterParams
+                            : {}) as Record<string, unknown>;
                         resolve({
                             ...hotels,
                             request_id,
                             readyOperators,
-                            ...filterParams,
+                            ...appliedFilterMeta,
                         });
                     } catch (err) {
                         pollingStopped = true;
