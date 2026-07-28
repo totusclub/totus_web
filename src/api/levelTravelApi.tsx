@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { API_BASE_URL } from '@/config/api';
-import { parseUiPageNumber, toApiPageNumber } from '@/utils/searchResults';
+import { parseUiPageNumber, toApiPageNumber, toOperatorIdsCsv } from '@/utils/searchResults';
 import {
     getReadySearchOperators,
     shouldStopSearchPolling,
@@ -107,7 +107,13 @@ export async function getGroupedHotels(params: { request_id?: string; readyOpera
                 if (key === 'page_limit') {
                     return [key, Math.max(1, Number(value) || 50)];
                 }
+                if (key === 'readyOperators' || key === 'operator_ids') {
+                    return [key, toOperatorIdsCsv(value)];
+                }
                 return [key, value];
+            }).filter(([, value]) => {
+                if (typeof value === 'string') return value.trim() !== '';
+                return true;
             })
         );
 
@@ -120,7 +126,8 @@ export async function getGroupedHotels(params: { request_id?: string; readyOpera
             },
         });
         // Attach applied filter metadata without overwriting API list fields
-        // (hotels, hotels_count, filters, status, …).
+        // (hotels, hotels_count, filters, status, …) or leaking 0-based page_number
+        // into Redux (parseUiPageNumber(0) === 1 breaks load-more append logic).
         const {
             hotels: _h,
             hotels_count: _hc,
@@ -129,6 +136,7 @@ export async function getGroupedHotels(params: { request_id?: string; readyOpera
             filtered_hotels: _fh,
             filtered_results: _fr,
             statistics: _st,
+            page_number: _pn,
             ...appliedMeta
         } = sanitizedParams as Record<string, unknown>;
         return { ...res.data, ...appliedMeta, ui_page_number: uiPageNumber };

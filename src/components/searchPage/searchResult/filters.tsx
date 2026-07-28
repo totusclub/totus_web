@@ -10,7 +10,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import Icon from "@/components/icons/Icon";
 import Button from "@/components/UI/button";
 import { useRouter } from 'next/router';
-import { parseUiPageNumber } from '@/utils/searchResults';
+import { parseUiPageNumber, toOperatorIdsCsv } from '@/utils/searchResults';
 import type { RootState } from '@/store';
 import {
     pickAppliedFiltersFromHotels,
@@ -211,9 +211,14 @@ const Filters = ({ selectedFilters, allFilters, statistics }: any) => {
 
     const getSearchBaseParams = () => {
         const requestId = hotels?.request_id ?? selectedFilters?.request_id;
-        const readyOperators = hotels?.readyOperators ?? selectedFilters?.readyOperators;
+        const readyOperators = toOperatorIdsCsv(
+            hotels?.readyOperators ?? selectedFilters?.readyOperators,
+        );
         if (!requestId) return null;
-        return { request_id: requestId, readyOperators };
+        return {
+            request_id: requestId,
+            ...(readyOperators ? { readyOperators } : {}),
+        };
     };
 
     const getMergedFilterParams = (overrides: Record<string, unknown> = {}) => {

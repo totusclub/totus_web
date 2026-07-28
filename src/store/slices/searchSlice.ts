@@ -168,7 +168,7 @@
 // // store/slices/searchSlice.ts
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import {checkSearchStatus, getGroupedHotels, startSearch} from "@/api/levelTravelApi";
-import { mergeHotelPages, parseUiPageNumber } from '@/utils/searchResults';
+import { mergeHotelPages, parseUiPageNumber, toOperatorIdsCsv } from '@/utils/searchResults';
 import {
     getReadySearchOperators,
     shouldStopSearchPolling,
@@ -293,11 +293,11 @@ export const runFullSearchFlow = createAsyncThunk(
                         clearActiveSearchPoll();
 
                         const readyOperators = getReadySearchOperators(statusMap);
+                        const readyOperatorsCsv = toOperatorIdsCsv(readyOperators);
 
                         let filters: Record<string, unknown> = { request_id };
-                        if (readyOperators.length > 0) {
-                            // CSV string — array serialization can break operator_ids upstream.
-                            filters.readyOperators = readyOperators.join(',');
+                        if (readyOperatorsCsv) {
+                            filters.readyOperators = readyOperatorsCsv;
                         }
                         if (filterParams && typeof filterParams === 'object') {
                             const {
@@ -331,7 +331,8 @@ export const runFullSearchFlow = createAsyncThunk(
                         resolve({
                             ...hotels,
                             request_id,
-                            readyOperators,
+                            // Always CSV — array becomes readyOperators=6&readyOperators=7 in axios.
+                            readyOperators: readyOperatorsCsv || toOperatorIdsCsv(hotels?.readyOperators),
                             ...appliedFilterMeta,
                         });
                     } catch (err) {
@@ -383,7 +384,9 @@ export const searchFilters = createAsyncThunk(
             return {
                 ...hotels,
                 request_id: hotels?.request_id ?? request_id,
-                readyOperators: hotels?.readyOperators ?? readyOperators,
+                readyOperators: toOperatorIdsCsv(
+                    hotels?.readyOperators ?? readyOperators,
+                ),
                 ...sanitizeListingFilterParams(appliedFilters),
                 ui_page_number: parseUiPageNumber(page_number),
             };
@@ -474,23 +477,22 @@ const searchSlice = createSlice({
                 state.error = null;
                 state.progress = {};
                 const pageNumber = parseUiPageNumber(action.meta?.arg?.page_number);
-                if (pageNumber === 1 && !state.loadMore) {
+                // Append path: load-more sets loadMore before dispatch. Never clear the list then.
+                if (pageNumber <= 1 && !state.loadMore) {
                     state.allMyHotels = [];
                 }
             })
             .addCase(searchFilters.fulfilled, (state, action) => {
+                const requestedPage = parseUiPageNumber(action.meta?.arg?.page_number);
                 state.hotels = action.payload;
                 state.loading = false;
                 state.loadMore = false;
-                const pageNumber = parseUiPageNumber(
-                    action.meta?.arg?.page_number ?? action.payload.ui_page_number,
-                );
                 const hotels = action.payload.hotels || [];
 
-                if (pageNumber === 1) {
-                    state.allMyHotels = hotels;
-                } else {
+                if (requestedPage > 1) {
                     state.allMyHotels = mergeHotelPages(state.allMyHotels || [], hotels);
+                } else {
+                    state.allMyHotels = hotels;
                 }
             })
             .addCase(searchFilters.rejected, (state, action) => {

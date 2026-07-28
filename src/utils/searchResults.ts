@@ -21,10 +21,31 @@ export function toApiPageNumber(value: unknown): number {
     return Math.max(0, parseUiPageNumber(value) - 1);
 }
 
+/** Normalize operator ids to a single CSV string (avoids readyOperators=6&readyOperators=7). */
+export function toOperatorIdsCsv(value: unknown): string {
+    if (value == null) return '';
+    if (Array.isArray(value)) {
+        return value
+            .map((v) => String(v).trim())
+            .filter(Boolean)
+            .join(',');
+    }
+    const raw = String(value).trim();
+    if (!raw) return '';
+    // Already CSV or single id
+    return raw
+        .split(',')
+        .map((v) => v.trim())
+        .filter(Boolean)
+        .join(',');
+}
+
 export function getNextPageNumber(shownCount: number, pageLimit: number): number {
     const limit = Number.isFinite(pageLimit) && pageLimit > 0 ? pageLimit : 50;
     const shown = Number.isFinite(shownCount) && shownCount > 0 ? shownCount : 0;
-    return Math.max(1, Math.floor(shown / limit) + 1);
+    // Pages already loaded (partial first page still counts as 1 page).
+    const pagesLoaded = shown <= 0 ? 0 : Math.ceil(shown / limit);
+    return pagesLoaded + 1;
 }
 
 export function mergeHotelPages(

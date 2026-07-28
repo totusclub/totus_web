@@ -6,6 +6,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { useMemo } from "react";
 import FiltersPackage from "@/components/searchPage/searchResult/filtersPackage";
+import { toOperatorIdsCsv } from "@/utils/searchResults";
 
 interface SearchResultProps {
     tickets?: any
@@ -21,9 +22,10 @@ const SearchResult = ({ tickets, flights, packages, flightsFilter, setFiltersReq
 
     const selectedFilters = useMemo(() => {
         if (hotels?.request_id) {
+            const operators = toOperatorIdsCsv(hotels?.readyOperators);
             return {
                 request_id: hotels.request_id,
-                readyOperators: hotels?.readyOperators,
+                ...(operators ? { readyOperators: operators } : {}),
             };
         }
         return null;

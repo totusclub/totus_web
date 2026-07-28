@@ -5,7 +5,7 @@ import { useEffect, useState, useMemo, useRef, useCallback } from "react";
 import { useRouter } from 'next/router';
 import { useDispatch, useSelector } from 'react-redux';
 import { setLoadMore, searchFilters, setAllMyHotels } from '@/store/slices/searchSlice';
-import { getHotelListItemKey, getNextPageNumber, hasMoreHotelResults, parseUiPageNumber } from '@/utils/searchResults';
+import { getHotelListItemKey, getNextPageNumber, hasMoreHotelResults, parseUiPageNumber, toOperatorIdsCsv } from '@/utils/searchResults';
 import { RootState } from '@/store';
 import Select from '@/components/UI/select';
 import Icon from "@/components/icons/Icon";
@@ -47,7 +47,8 @@ const ResultList = ({ tickets, loading, data, setFiltersRequest }: ResultListPro
     // Show skeletons only for a fresh search/filter/sort, not while appending more results.
     const showSkeleton = isSearching && !loadMore;
     const loadMoreRef = useRef(false);
-    const autoLoadPageRef = useRef(1);
+    /** Last successfully requested UI page (1-based). Load-more always does +1. */
+    const lastUiPageRef = useRef(1);
     const sentinelRef = useRef<HTMLDivElement | null>(null);
 
     const totalHotelsCount = Number(data?.hotels_count ?? hotels?.hotels_count ?? 0);
@@ -73,13 +74,14 @@ const ResultList = ({ tickets, loading, data, setFiltersRequest }: ResultListPro
     // Get selectedFilters from hotels (request_id and readyOperators) - same pattern as filters.tsx
     const selectedFilters = useMemo(() => {
         if (hotels?.request_id) {
+            const operators = toOperatorIdsCsv(hotels?.readyOperators);
             return {
                 request_id: hotels.request_id,
-                readyOperators: hotels?.readyOperators,
+                ...(operators ? { readyOperators: operators } : {}),
             };
         }
         return null;
-    }, [hotels]);
+    }, [hotels?.request_id, hotels?.readyOperators]);
 
     // Get current filter params from hotels object (includes all applied filters)
     // IMPORTANT: Do NOT include sort_by here - we set it explicitly in handleSelect
@@ -216,11 +218,13 @@ const ResultList = ({ tickets, loading, data, setFiltersRequest }: ResultListPro
             return;
         }
 
-        const nextPage = getNextPageNumber(shownHotelsCount, PAGE_LIMIT);
-        if (autoLoadPageRef.current >= nextPage) return;
+        // Explicit cursor: always request the next UI page after the last one loaded.
+        // (Deriving only from shownCount/50 got stuck when append failed or page was partial.)
+        const fromCount = getNextPageNumber(shownHotelsCount, PAGE_LIMIT);
+        const nextPage = Math.max(lastUiPageRef.current + 1, fromCount);
 
         loadMoreRef.current = true;
-        autoLoadPageRef.current = nextPage;
+        lastUiPageRef.current = nextPage;
 
         dispatch(setLoadMore(true));
         dispatch(searchFilters(buildFilterParams(nextPage)) as any);
@@ -240,9 +244,21 @@ const ResultList = ({ tickets, loading, data, setFiltersRequest }: ResultListPro
         }
     }, [storeLoading]);
 
+    // New search / filter page-1 replace → reset pagination cursor.
     useEffect(() => {
-        autoLoadPageRef.current = 1;
-    }, [hotels?.request_id, hotels?.filter_price_min, hotels?.filter_price_max, hotels?.sort_by]);
+        lastUiPageRef.current = 1;
+        loadMoreRef.current = false;
+    }, [hotels?.request_id]);
+
+    useEffect(() => {
+        if (storeLoading || loadMore) return;
+        const uiPage = parseUiPageNumber(hotels?.ui_page_number);
+        if (uiPage <= 1) {
+            lastUiPageRef.current = 1;
+        } else {
+            lastUiPageRef.current = Math.max(lastUiPageRef.current, uiPage);
+        }
+    }, [storeLoading, loadMore, hotels?.ui_page_number, hotels?.request_id]);
 
     // Restore scroll after returning from hotel details.
     useEffect(() => {
