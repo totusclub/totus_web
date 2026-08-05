@@ -98,7 +98,10 @@ const FiltersPackage = ({ allFilters, setFiltersRequest, netPrice }: any) => {
             const updatedFilters = { ...filters, confirmability };
             setInstantConfirm(value);
             setFilters(updatedFilters);
-            setFiltersRequest(updatedFilters);
+            // Only send non-empty filter fields (empty arrays/times → LT 400/422).
+            setFiltersRequest({
+                ...(confirmability.length ? { confirmability } : {}),
+            });
             return;
         }
 
@@ -114,7 +117,12 @@ const FiltersPackage = ({ allFilters, setFiltersRequest, netPrice }: any) => {
 
         const updatedFilters = { ...filters, [key]: intArray };
         setFilters(updatedFilters);
-        setFiltersRequest(updatedFilters);
+
+        const active: Record<string, unknown> = {};
+        Object.entries(updatedFilters).forEach(([k, v]) => {
+            if (Array.isArray(v) && v.length > 0) active[k] = v;
+        });
+        setFiltersRequest(active);
     };
 
     return (

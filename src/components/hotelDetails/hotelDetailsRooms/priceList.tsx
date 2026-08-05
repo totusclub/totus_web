@@ -41,8 +41,17 @@ const HotelDetailsPriceList: React.FC<HotelDetailsPriceListProps> = ({ item, typ
     const [showAll, setShowAll] = useState(false);
 
     const handleBook = async (id) => {
-      const res =  await createPackage({request_id:router.query.request_id,tour_id:id})
-        navigateAfterPackageCreate(router, res.package.id, searchType);
+      const requestId = Array.isArray(router.query.request_id)
+        ? router.query.request_id[0]
+        : router.query.request_id;
+      if (!requestId || !id) return;
+      const res = await createPackage({ request_id: requestId as never, tour_id: id as never });
+      const packageId = res?.package?.id;
+      if (!packageId) {
+        console.error('createPackage returned no package.id', res);
+        return;
+      }
+      navigateAfterPackageCreate(router, packageId, searchType);
     };
 
     const formatDate = (dateStr) => {

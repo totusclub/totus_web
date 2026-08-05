@@ -4,8 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9b054eca-f19d-4e8b-ba86-c2382a8c8a86" name="Changes" comment="integration sbp">
+    <list default="true" id="9b054eca-f19d-4e8b-ba86-c2382a8c8a86" name="Changes" comment="pagination fix">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/api/levelTravelApi.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/api/levelTravelApi.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/bookingPage/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/bookingPage/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/hotelDetails/hotelDetailsRooms/priceList.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/hotelDetails/hotelDetailsRooms/priceList.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/searchPage/searchResult/filtersPackage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/searchPage/searchResult/filtersPackage.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/tickets/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/tickets/index.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -58,7 +64,7 @@
     &quot;git-widget-placeholder&quot;: &quot;main&quot;,
     &quot;js.debugger.nextJs.config.created.client&quot;: &quot;true&quot;,
     &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/Users/haykmaruqyan/Desktop/TOSMEDIA/TOTUS/kedam_WEB&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/haykmaruqyan/Desktop/TOSMEDIA/TOTUS/kedam-WEB&quot;,
     &quot;list.type.of.created.stylesheet&quot;: &quot;CSS&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
@@ -68,7 +74,7 @@
     &quot;npm.build.executor&quot;: &quot;Run&quot;,
     &quot;npm.dev.executor&quot;: &quot;Run&quot;,
     &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
-    &quot;ts.external.directory.path&quot;: &quot;/Users/haykmaruqyan/Desktop/TOSMEDIA/TOTUS/kedam_WEB/node_modules/typescript/lib&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;/Users/haykmaruqyan/Desktop/TOSMEDIA/TOTUS/kedam-WEB/node_modules/typescript/lib&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
@@ -227,6 +233,8 @@
       <workItem from="1780144695401" duration="1594000" />
       <workItem from="1780311699230" duration="1266000" />
       <workItem from="1780490731677" duration="8991000" />
+      <workItem from="1784806283165" duration="7754000" />
+      <workItem from="1785243117658" duration="6640000" />
     </task>
     <task id="LOCAL-00001" summary="added font">
       <option name="closed" value="true" />
@@ -428,7 +436,47 @@
       <option name="project" value="LOCAL" />
       <updated>1780508046118</updated>
     </task>
-    <option name="localTasksCounter" value="26" />
+    <task id="LOCAL-00026" summary="status">
+      <option name="closed" value="true" />
+      <created>1784810245966</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1784810245966</updated>
+    </task>
+    <task id="LOCAL-00027" summary="status">
+      <option name="closed" value="true" />
+      <created>1784818401623</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1784818401623</updated>
+    </task>
+    <task id="LOCAL-00028" summary="status">
+      <option name="closed" value="true" />
+      <created>1785245833292</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1785245833292</updated>
+    </task>
+    <task id="LOCAL-00029" summary="status">
+      <option name="closed" value="true" />
+      <created>1785249368111</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1785249368111</updated>
+    </task>
+    <task id="LOCAL-00030" summary="pagination fix">
+      <option name="closed" value="true" />
+      <created>1785250272754</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1785250272754</updated>
+    </task>
+    <option name="localTasksCounter" value="31" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -456,7 +504,9 @@
     <MESSAGE value="yandex metrika" />
     <MESSAGE value="small chnages" />
     <MESSAGE value="integration sbp" />
-    <option name="LAST_COMMIT_MESSAGE" value="integration sbp" />
+    <MESSAGE value="status" />
+    <MESSAGE value="pagination fix" />
+    <option name="LAST_COMMIT_MESSAGE" value="pagination fix" />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>

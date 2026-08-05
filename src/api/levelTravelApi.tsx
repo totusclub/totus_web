@@ -331,6 +331,28 @@ export async function PackagesActualize(
     return response.data;
 };
 
+function isBlankTimeRange(value: unknown): boolean {
+    if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+    const entries = Object.values(value as Record<string, unknown>);
+    if (entries.length === 0) return true;
+    return entries.every((v) => v == null || v === '');
+}
+
+function isValidIsoTime(value: unknown): boolean {
+    if (typeof value !== 'string') return false;
+    // LT expects ISO 8601 time extended, e.g. 12:33 or 12:33:55
+    return /^\d{2}:\d{2}(:\d{2})?$/.test(value.trim());
+}
+
+function sanitizeTimeRange(value: unknown): Record<string, string> | undefined {
+    if (!value || typeof value !== 'object' || Array.isArray(value)) return undefined;
+    const from = (value as Record<string, unknown>).from;
+    const to = (value as Record<string, unknown>).to;
+    if (!isValidIsoTime(from) || !isValidIsoTime(to)) return undefined;
+    return { from: String(from).trim(), to: String(to).trim() };
+}
+
+/** Keep only params Level.Travel accepts for POST /packages/flights. */
 function sanitizePackageFlightsParams(
     params: Record<string, unknown>,
 ): Record<string, unknown> {
@@ -338,7 +360,17 @@ function sanitizePackageFlightsParams(
 
     for (const [key, value] of Object.entries(params || {})) {
         if (value == null) continue;
+        if (key === 'packageId') continue; // normalized to package_id
         if (Array.isArray(value) && value.length === 0) continue;
+
+        if (key.endsWith('_time') || key.includes('departure_time') || key.includes('arrival_time')) {
+            if (isBlankTimeRange(value)) continue;
+            const range = sanitizeTimeRange(value);
+            if (!range) continue; // drop invalid / partial ranges (LT 400/422)
+            cleaned[key] = range;
+            continue;
+        }
+
         if (
             typeof value === 'object' &&
             !Array.isArray(value) &&
@@ -348,21 +380,32 @@ function sanitizePackageFlightsParams(
         ) {
             continue;
         }
+
         cleaned[key] = value;
     }
 
     return cleaned;
 }
 
+function toPackageIdNumber(value: unknown): number | null {
+    if (typeof value === 'number' && Number.isFinite(value) && value > 0) {
+        return Math.trunc(value);
+    }
+    const raw = String(value ?? '').trim();
+    if (!/^\d+$/.test(raw)) return null;
+    const n = Number(raw);
+    return Number.isFinite(n) && n > 0 ? n : null;
+}
+
 export async function Packagesflights(params: Record<string, unknown>) {
-    const packageId = params?.package_id ?? params?.packageId;
-    if (packageId == null || packageId === '') {
-        throw new Error('Missing package_id');
+    const packageId = toPackageIdNumber(params?.package_id ?? params?.packageId);
+    if (packageId == null) {
+        throw new Error('Missing or invalid package_id');
     }
 
     const body = sanitizePackageFlightsParams({
         ...params,
-        package_id: Number(packageId) || packageId,
+        package_id: packageId,
     });
 
     const response = await axios.post(`${BASE_URL}/packages/flights`, body);
