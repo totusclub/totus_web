@@ -79,7 +79,7 @@ function MyApp({ Component, pageProps }: AppProps) {
                 <Component {...pageProps} />
                 {!isAiRoute && <Footer />}
                 {!isAiRoute && <MobileBottomBar />}
-                <CookieConsent />
+                {!isAiRoute && <CookieConsent />}
             </div>
         </>
     );
