@@ -1,6 +1,7 @@
 import Head from 'next/head'
 import {
   AiAssistantProvider,
+  AiHomePage,
   ChatWidget,
 } from '@tosmedia/ai-assistant'
 import '@tosmedia/ai-assistant/styles.css'
@@ -29,7 +30,8 @@ export default function AiPage() {
         homePath="/ai"
         tourBasePath="/ai/tours"
       >
-        <ChatWidget layout="fullscreen" siteHref="/" siteLabel="← На сайт" />
+        <AiHomePage />
+        <ChatWidget />
       </AiAssistantProvider>
     </>
   )
