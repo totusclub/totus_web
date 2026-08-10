@@ -56,7 +56,7 @@ export default function AiTourPage() {
         ) : (
           <div style={{ padding: 24 }}>Загрузка…</div>
         )}
-        <ChatWidget />
+        <ChatWidget fullscreenOnOpen />
       </AiAssistantProvider>
     </>
   )

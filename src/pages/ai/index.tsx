@@ -30,8 +30,8 @@ export default function AiPage() {
         homePath="/ai"
         tourBasePath="/ai/tours"
       >
-        <AiHomePage />
-        <ChatWidget />
+        <AiHomePage autoOpenChat={false} />
+        <ChatWidget fullscreenOnOpen />
       </AiAssistantProvider>
     </>
   )
