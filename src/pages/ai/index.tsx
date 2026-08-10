@@ -1,10 +1,5 @@
 import Head from 'next/head'
-import {
-  AiAssistantProvider,
-  AiHomePage,
-  ChatWidget,
-} from '@tosmedia/ai-assistant'
-import '@tosmedia/ai-assistant/styles.css'
+import { AiAssistantProvider, AiHomePage } from '@tosmedia/ai-assistant'
 import { getAiApiBase, getAiWsUrl } from '@/lib/aiConfig'
 
 export default function AiPage() {
@@ -25,13 +20,13 @@ export default function AiPage() {
       </Head>
 
       <AiAssistantProvider
+        shell="page"
         apiBase={getAiApiBase()}
         wsUrl={getAiWsUrl()}
         homePath="/ai"
         tourBasePath="/ai/tours"
       >
         <AiHomePage autoOpenChat={false} />
-        <ChatWidget />
       </AiAssistantProvider>
     </>
   )

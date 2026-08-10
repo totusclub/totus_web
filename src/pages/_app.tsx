@@ -13,6 +13,7 @@ import { useDispatch } from "react-redux";
 import MobileBottomBar from "@/components/mobileBottomBar";
 import SiteSeo from "@/components/seo/SiteSeo";
 import CookieConsent from "@/components/cookieConsent";
+import GlobalAiChat from '@/components/GlobalAiChat';
 import { useStopSearchPollOnLeave } from '@/hooks/useStopSearchPollOnLeave';
 // import ScrollRestoration from '@/components/ScrollRestoration';
 
@@ -80,6 +81,7 @@ function MyApp({ Component, pageProps }: AppProps) {
                 {!isAiRoute && <Footer />}
                 {!isAiRoute && <MobileBottomBar />}
                 {!isAiRoute && <CookieConsent />}
+                <GlobalAiChat />
             </div>
         </>
     );
