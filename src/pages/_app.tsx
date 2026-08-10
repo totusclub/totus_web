@@ -1,6 +1,7 @@
 import type { AppProps } from 'next/app';
 import { useEffect } from 'react';
 import Script from 'next/script'; // ✅ ADD
+import { useRouter } from 'next/router';
 import { wrapper } from '../store';
 import '../styles/globals.css';
 import '@/utils/themeInit';
@@ -17,6 +18,8 @@ import { useStopSearchPollOnLeave } from '@/hooks/useStopSearchPollOnLeave';
 
 function MyApp({ Component, pageProps }: AppProps) {
     const dispatch = useDispatch();
+    const router = useRouter();
+    const isAiRoute = router.pathname.startsWith('/ai');
     useStopSearchPollOnLeave();
 
     useEffect(() => {
@@ -72,10 +75,10 @@ function MyApp({ Component, pageProps }: AppProps) {
 
             <div id="root">
                 {/* <ScrollRestoration /> */}
-                <Header />
+                {!isAiRoute && <Header />}
                 <Component {...pageProps} />
-                <Footer />
-                <MobileBottomBar />
+                {!isAiRoute && <Footer />}
+                {!isAiRoute && <MobileBottomBar />}
                 <CookieConsent />
             </div>
         </>
