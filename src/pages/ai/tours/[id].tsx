@@ -1,7 +1,12 @@
 import Head from 'next/head'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { AiAssistantProvider, AiTourDetailPage } from '@tosmedia/ai-assistant'
+import {
+  AiAssistantProvider,
+  AiTourDetailPage,
+  ChatWidget,
+} from '@tosmedia/ai-assistant'
+import '@tosmedia/ai-assistant/styles.css'
 import { getAiApiBase, getAiWsUrl } from '@/lib/aiConfig'
 
 export default function AiTourPage() {
@@ -23,7 +28,6 @@ export default function AiTourPage() {
       </Head>
 
       <AiAssistantProvider
-        shell="page"
         apiBase={getAiApiBase()}
         wsUrl={getAiWsUrl()}
         homePath="/ai"
@@ -52,6 +56,7 @@ export default function AiTourPage() {
         ) : (
           <div style={{ padding: 24 }}>Загрузка…</div>
         )}
+        <ChatWidget />
       </AiAssistantProvider>
     </>
   )
