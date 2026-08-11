@@ -1,6 +1,6 @@
 import styles from './search.module.css';
 import Icon from "@/components/icons/Icon";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import { fetchDestinations } from "@/store/slices/destinationsSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "@/store";
@@ -36,6 +36,8 @@ const WhereFrom = ({ handleChange, value, name, searchType = 'package', fromCity
     const wrapperRef = useRef<HTMLDivElement>(null);
     const [isOpen, setIsOpen] = useState(false);
     const [searchValue, setSearchValue] = useState("");
+    // Until user types after open, show default popular list (not filter by selected text).
+    const [hasTyped, setHasTyped] = useState(false);
     const { data } = useSelector((state: RootState) => state.destinations);
 
     // Type guard for data structure
@@ -48,25 +50,36 @@ const WhereFrom = ({ handleChange, value, name, searchType = 'package', fromCity
         return typeof item === 'object' && item !== null && 'group_name' in item;
     };
 
+    const openDropdown = () => {
+        setHasTyped(false);
+        setIsOpen(true);
+        setTimeout(() => {
+            inputRef.current?.focus();
+            inputRef.current?.select();
+        }, 0);
+    };
 
+    // Live search only after the user types in the open field.
     useEffect(() => {
+        if (!isOpen || !hasTyped) return;
         const timeoutId = setTimeout(() => {
             dispatch(
                 fetchDestinations({
-                    query: searchValue,
+                    query: searchValue.trim() || ' ',
                     from_city: fromCity,
                     search_type: searchType,
-                } as unknown as undefined)
+                })
             );
-        }, 500); // debounce 500ms
+        }, 350);
 
         return () => clearTimeout(timeoutId);
-    }, [searchValue, dispatch, fromCity, searchType]);
+    }, [searchValue, dispatch, fromCity, searchType, isOpen, hasTyped]);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
                 setIsOpen(false);
+                setHasTyped(false);
             }
         };
         document.addEventListener("mousedown", handleClickOutside);
@@ -77,49 +90,53 @@ const WhereFrom = ({ handleChange, value, name, searchType = 'package', fromCity
 
 
     const handleToggle = () => {
-        setIsOpen(prev => !prev);
-        setTimeout(() => inputRef.current?.focus(), 0);
+        if (isOpen) {
+            setIsOpen(false);
+            setHasTyped(false);
+            return;
+        }
+        openDropdown();
     };
 
     const handleSelect = (type: string, item: DestinationItem) => {
         const displayName = item.name || item.name_ru || item.name_en || '';
         setSearchValue(displayName);
+        setHasTyped(false);
         dispatch(setHeaderName(displayName));
         handleChange(item, name, type);
         setIsOpen(false);
     };
 
-
-    useEffect(() => {
-        if (isOpen && inputRef.current) {
-            inputRef.current.focus();
-            inputRef.current.select();
-        }
-    }, [isOpen]);
+    const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+        setHasTyped(true);
+        setSearchValue(e.target.value);
+        setIsOpen(true);
+    };
 
     // Keep input in sync when destination is set from parent (URL / header / select)
     useEffect(() => {
         if (value) {
             setSearchValue(value);
+            setHasTyped(false);
         }
     }, [value]);
 
-    // Fetch destinations on mount when modal opens
+    // On click/open: always load first popular list from API (ignore written value until typing).
     useEffect(() => {
-        if (isOpen && !searchValue) {
+        if (isOpen && !hasTyped) {
             dispatch(
                 fetchDestinations({
-                    query: " ",
+                    query: ' ',
                     from_city: fromCity,
                     search_type: searchType,
-                } as unknown as undefined)
+                })
             );
         }
-    }, [isOpen, dispatch, searchValue, fromCity, searchType]);
+    }, [isOpen, hasTyped, dispatch, fromCity, searchType]);
 
     const ignorName = ['Крым', 'Донецк', 'Луганск', 'Ялта', 'Yalta']
 
-    const isTypingSearch = searchValue.trim().length > 0;
+    const isTypingSearch = hasTyped && searchValue.trim().length > 0;
 
     // Popular list: require images when browsing; when typing, show all country matches
     const getPopularDestinations = (): DestinationItem[] => {
@@ -161,10 +178,10 @@ const WhereFrom = ({ handleChange, value, name, searchType = 'package', fromCity
                     type="text"
                     ref={inputRef}
                     value={searchValue}
-                    onChange={(e) => setSearchValue(e.target.value)}
+                    onChange={handleInputChange}
                     onClick={(e) => {
                         e.stopPropagation();
-                        setIsOpen(true);
+                        openDropdown();
                     }}
                     placeholder="Египет"
                 />
@@ -174,7 +191,10 @@ const WhereFrom = ({ handleChange, value, name, searchType = 'package', fromCity
                 <div className={styles.whereFromModal} onClick={(e) => e.stopPropagation()}>
                     <div className={styles.whereFromModalHead}>
                         <p>Страна, город, регион или отель</p>
-                        <div onClick={() => setIsOpen(false)}>
+                        <div onClick={() => {
+                            setIsOpen(false);
+                            setHasTyped(false);
+                        }}>
                             <Icon name={'closeLine'} size={24} color="var(--textPrimary)" />
                         </div>
                     </div>
@@ -182,12 +202,11 @@ const WhereFrom = ({ handleChange, value, name, searchType = 'package', fromCity
                         <input
                             className={styles.searchFieldsValue}
                             type="text"
-                            ref={inputRef}
                             value={searchValue}
-                            onChange={(e) => setSearchValue(e.target.value)}
+                            onChange={handleInputChange}
                             onClick={(e) => {
                                 e.stopPropagation();
-                                setIsOpen(true);
+                                openDropdown();
                             }}
                             placeholder="Москва"
                         />

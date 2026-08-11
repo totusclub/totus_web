@@ -88,39 +88,26 @@ const WhereFrom = ({handleChange,value,name}) => {
                         />
                     </div>
 
-                    {searchValue.trim() === "" ? (
-                        // <p  className={styles.noResults}>Введите город или аэропорт</p>
-                        results.map((item) => {
-                            if (item.prioritized) {
-                                return (
-                                    <div
-                                        key={item.id}
-                                        onClick={() => handleSelect(item)}
-                                        className={styles.locationItem}
-                                    >
-                                        <Icon name={item.icon} size={24} color="var(--textPrimary)" />
-                                        <div>
-                                            <p className={styles.locationItemName}>{item.name}</p>
-                                            <p className={styles.locationItemType}>{item.type}</p>
-                                        </div>
-                                    </div>
-                                );
-                            }
-                        })
-                    ) : results.length > 0 ? (
+                    {results.length > 0 ? (
                         results.map((item) => (
                             <div
                                 key={item.id}
                                 onClick={() => handleSelect(item)}
                                 className={styles.locationItem}
                             >
-                                <Icon name={item.icon} size={24} color="var(--textPrimary)"/>
+                                <Icon name={item.icon} size={24} color="var(--textPrimary)" />
                                 <div>
                                     <p className={styles.locationItemName}>{item.name}</p>
                                     <p className={styles.locationItemType}>{item.type}</p>
                                 </div>
                             </div>
                         ))
+                    ) : searchValue.trim() === "" ? (
+                        status === "loading" ? (
+                            <p className={styles.noResults}>Загрузка...</p>
+                        ) : (
+                            <p className={styles.noResults}>Список городов пуст</p>
+                        )
                     ) : (
                         <p className={styles.noResults}>Ничего не найдено</p>
                     )}

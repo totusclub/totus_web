@@ -52,7 +52,15 @@ export const useDepartureSearch = (searchValue: string) => {
                 );
             });
 
-            setResults(filtered);
+            // Popular (prioritized) cities first, then the rest of the full list.
+            const sorted = [...filtered].sort((a, b) => {
+                const ap = a.prioritized ? 0 : 1;
+                const bp = b.prioritized ? 0 : 1;
+                if (ap !== bp) return ap - bp;
+                return String(a.name || '').localeCompare(String(b.name || ''), 'ru');
+            });
+
+            setResults(sorted);
         } else {
             setResults([]);
         }

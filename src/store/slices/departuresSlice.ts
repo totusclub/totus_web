@@ -4,10 +4,9 @@ import { API_BASE_URL } from '@/config/api';
 
 export const fetchDepartures = createAsyncThunk(
     'departures/fetchDepartures',
-    async (params = {}) => {
-        const res = await axios.get(`${API_BASE_URL}/references/departures?prioritized_count=10`, {
-            params: { prioritized_count: 10 },
-        });
+    async () => {
+        // Full departures list (do not limit with prioritized_count).
+        const res = await axios.get(`${API_BASE_URL}/references/departures`);
         return res.data;
     }
 );

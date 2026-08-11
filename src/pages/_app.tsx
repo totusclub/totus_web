@@ -75,11 +75,12 @@ function MyApp({ Component, pageProps }: AppProps) {
 
             <div id="root">
                 {/* <ScrollRestoration /> */}
-                {!isAiRoute && <Header />}
+
+                <Header />
                 <Component {...pageProps} />
-                {!isAiRoute && <Footer />}
-                {!isAiRoute && <MobileBottomBar />}
-                {!isAiRoute && <CookieConsent />}
+                <Footer />
+                <MobileBottomBar />
+                 <CookieConsent />
             </div>
         </>
     );
