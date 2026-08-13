@@ -13,6 +13,7 @@ import { useDispatch } from "react-redux";
 import MobileBottomBar from "@/components/mobileBottomBar";
 import SiteSeo from "@/components/seo/SiteSeo";
 import CookieConsent from "@/components/cookieConsent";
+import GlobalAiChat from '@/components/GlobalAiChat';
 import { useStopSearchPollOnLeave } from '@/hooks/useStopSearchPollOnLeave';
 // import ScrollRestoration from '@/components/ScrollRestoration';
 
@@ -76,11 +77,13 @@ function MyApp({ Component, pageProps }: AppProps) {
             <div id="root">
                 {/* <ScrollRestoration /> */}
 
-                <Header />
+                {!isAiRoute && <Header />}
                 <Component {...pageProps} />
-                <Footer />
-                <MobileBottomBar />
-                 <CookieConsent />
+                {!isAiRoute && <Footer />}
+                {!isAiRoute && <MobileBottomBar />}
+                {!isAiRoute && <CookieConsent />}
+                {/* Мила FAB on all site pages; /ai home redirects to / */}
+                {!isAiRoute && <GlobalAiChat />}
             </div>
         </>
     );

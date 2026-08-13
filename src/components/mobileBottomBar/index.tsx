@@ -61,7 +61,7 @@ const MobileBottomBar = () => {
                 {/*</div>*/}
             </div>
             <AuthModal open={authModalOpen} setOpen={setAuthModalOpen}/>
-            {/*<ModalPin open={pinModalOpen} setOpen={setPinModalOpen}/>*/}
+            <ModalPin open={pinModalOpen} setOpen={setPinModalOpen}/>
         </>
 
     );

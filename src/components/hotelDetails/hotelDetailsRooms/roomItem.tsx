@@ -64,13 +64,32 @@ const HotelDetailsRoomItem = ({
 
     // Meals are already filtered by active room filters — do not re-lock to search URL meals
     // (that hid UAI when the user switched from «Всё включено» to «Ультра всё включено»).
+    // Order meal sections by cheapest offer first (min price on top).
     const visibleOfferTypes = useMemo(() => {
         const types = Array.from(new Set(offersForDate.map((offer) => offer.type)));
-        if (!preferredMealIds.length) return types;
+
+        const minPriceByType = new Map<string, number>();
+        for (const offer of offersForDate) {
+            const price = Number(offer?.analytics_price ?? offer?.price);
+            if (!Number.isFinite(price)) continue;
+            const prev = minPriceByType.get(offer.type);
+            if (prev == null || price < prev) {
+                minPriceByType.set(offer.type, price);
+            }
+        }
+
         return [...types].sort((a, b) => {
-            const aPreferred = preferredMealIds.includes(String(a).toUpperCase()) ? 0 : 1;
-            const bPreferred = preferredMealIds.includes(String(b).toUpperCase()) ? 0 : 1;
-            return aPreferred - bPreferred;
+            const priceA = minPriceByType.get(a) ?? Number.POSITIVE_INFINITY;
+            const priceB = minPriceByType.get(b) ?? Number.POSITIVE_INFINITY;
+            if (priceA !== priceB) return priceA - priceB;
+
+            // Same min price: keep preferred search meal slightly ahead as tie-break.
+            if (preferredMealIds.length) {
+                const aPreferred = preferredMealIds.includes(String(a).toUpperCase()) ? 0 : 1;
+                const bPreferred = preferredMealIds.includes(String(b).toUpperCase()) ? 0 : 1;
+                if (aPreferred !== bPreferred) return aPreferred - bPreferred;
+            }
+            return String(a).localeCompare(String(b));
         });
     }, [offersForDate, preferredMealIds]);
 

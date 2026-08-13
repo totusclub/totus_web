@@ -141,29 +141,22 @@ const HotelDetailsInfo = ({
         return Number.isFinite(value) ? value : null;
     }, [highlightOffer]);
 
-    // Stick to search-list price until rooms produce a matching offer (first navigation race).
+    // Live cheapest/matched offer from rooms for these search params.
+    // Do not stick to URL list_price — AI deep links omit it on purpose.
     const offerPrice = useMemo(() => {
-        if (listPrice != null && Number.isFinite(listPrice)) {
-            if (
-                matchedOfferPrice != null &&
-                Math.round(matchedOfferPrice) === Math.round(listPrice)
-            ) {
-                return matchedOfferPrice;
-            }
-            // Loading / no rooms yet — always show the list card price.
-            if (panding || !hasRooms || !searchAttempted) return listPrice;
-            // Search meals set but no list match — don't flash a cheaper other offer.
-            if (searchMealIds.length > 0 && !listMatched) return listPrice;
+        if (matchedOfferPrice != null) return matchedOfferPrice;
+        // While rooms are still loading, optional list_price is only a soft placeholder
+        // (search-list navigation). AI chat links do not send it.
+        if (panding || !hasRooms || !searchAttempted) {
+            return listPrice ?? undefined;
         }
-        return matchedOfferPrice ?? listPrice ?? undefined;
+        return listPrice ?? undefined;
     }, [
-        listPrice,
         matchedOfferPrice,
-        listMatched,
-        searchAttempted,
+        listPrice,
         panding,
         hasRooms,
-        searchMealIds.length,
+        searchAttempted,
     ]);
 
     const priceFormatted =
