@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { AiAssistantProvider, ChatWidget } from '@tosmedia/ai-assistant'
 import '@tosmedia/ai-assistant/styles.css'
 import { getAiApiBase, getAiWsUrl } from '@/lib/aiConfig'
@@ -13,6 +13,9 @@ export default function GlobalAiChat() {
     setMounted(true)
   }, [])
 
+  // Same JWT as site login → AI API stores chats in MySQL for this user.
+  const getAccessToken = useCallback(() => token || null, [token])
+
   // Same on server + first client paint → no hydration mismatch.
   if (!mounted || !user || !token) return null
 
@@ -23,6 +26,8 @@ export default function GlobalAiChat() {
       wsUrl={getAiWsUrl()}
       homePath="/"
       tourBasePath="/ai/tours"
+      getAccessToken={getAccessToken}
+      historyMode="auto"
     >
       <ChatWidget />
     </AiAssistantProvider>
