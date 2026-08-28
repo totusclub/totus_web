@@ -1,0 +1,209 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  margin-top: 20px;
+}
+
+.changeOrderButton {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 16px;
+  border: 1px solid var(--core_Orange);
+  background: var(--bgSecondary);
+  color: var(--textPrimary);
+  font-family: "Golos Text";
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 20px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.changeOrderButton:hover {
+  background: var(--hoverPrimary);
+}
+
+.requestsList {
+  display: flex;
+  flex-direction: column;
+  background: var(--bgSecondary);
+  border-radius: 16px;
+  padding: 4px 16px;
+}
+
+.requestRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 0;
+}
+
+.requestRow + .requestRow {
+  border-top: 1px solid var(--bgTertiary);
+}
+
+.requestRowInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.requestType {
+  color: var(--textPrimary);
+  font-family: "Golos Text";
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 18px;
+  margin: 0;
+}
+
+.requestDate {
+  color: var(--textSecondary);
+  font-family: "Golos Text";
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 16px;
+  margin: 0;
+}
+
+.statusBadge {
+  display: inline-flex;
+  flex-shrink: 0;
+  min-height: 24px;
+  padding: 2px 12px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 15px;
+  color: #fff;
+  white-space: nowrap;
+  font-family: "Golos Text";
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 16px;
+}
+
+.status_new {
+  background: var(--core_Orange, #ff7733);
+}
+
+.status_in_progress {
+  background: #4a90d9;
+}
+
+.status_done {
+  background: #34a853;
+}
+
+.status_rejected {
+  background: #e53935;
+}
+
+.modalContent {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 8px 0;
+}
+
+.requestBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.blockTitle {
+  color: var(--textPrimary);
+  font-family: "Golos Text";
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 20px;
+  margin: 0;
+}
+
+.blockHint {
+  color: var(--textSecondary);
+  font-family: "Golos Text";
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 18px;
+  margin: 0;
+}
+
+.blockDivider {
+  height: 1px;
+  background: var(--bgTertiary);
+  width: 100%;
+}
+
+.textarea {
+  width: 100%;
+  min-height: 88px;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid var(--borderTertiary);
+  background: var(--bgSecondary);
+  color: var(--textPrimary);
+  font-family: "Golos Text";
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 18px;
+  resize: vertical;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.textarea::placeholder {
+  color: var(--textTertiary);
+}
+
+.textarea:focus {
+  border-color: var(--core_Orange);
+}
+
+.submitButton {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 16px;
+  border: none;
+  background: var(--core_Orange, #ff7733);
+  color: #fff;
+  font-family: "Golos Text";
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 20px;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.submitButton:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.errorText {
+  color: #e53935;
+  font-family: "Golos Text";
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 18px;
+  margin: 0;
+}
+
+.successBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 8px 0;
+}
+
+.successText {
+  color: var(--textPrimary);
+  font-family: "Golos Text";
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 20px;
+  margin: 0;
+}

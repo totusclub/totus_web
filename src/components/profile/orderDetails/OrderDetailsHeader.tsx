@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import styles from './orderDetails.module.css';
 import Icon from '@/components/icons/Icon';
 import OrderSbpPayButton from '@/components/profile/OrderSbpPayButton';
+import OrderChangeRequest from '@/components/profile/OrderChangeRequest/OrderChangeRequest';
 import { isOrderAwaitingPayment } from '@/utils/orderPayment';
 import { getStatusColor, getStatusLabel } from '@/utils/orderDisplay';
 import useAuth from '@/hooks/useAuth';
@@ -122,6 +123,8 @@ const OrderDetailsHeader: React.FC<OrderDetailsHeaderProps> = ({
           <OrderSbpPayButton order={order} />
         </div>
       )}
+
+      <OrderChangeRequest orderId={order?.order_id ?? order?.id} />
     </div>
   );
 };
