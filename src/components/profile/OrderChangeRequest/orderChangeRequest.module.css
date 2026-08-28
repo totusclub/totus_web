@@ -132,6 +132,16 @@
   margin: 0;
 }
 
+.confirmHint {
+  color: var(--textSecondary);
+  font-family: "Golos Text";
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 16px;
+  margin: 0;
+  text-align: center;
+}
+
 .blockDivider {
   height: 1px;
   background: var(--bgTertiary);
@@ -175,12 +185,16 @@
   font-weight: 500;
   line-height: 20px;
   cursor: pointer;
-  transition: opacity 0.2s ease;
+  transition: opacity 0.2s ease, background-color 0.2s ease;
 }
 
 .submitButton:disabled {
   opacity: 0.5;
   cursor: default;
+}
+
+.dangerButton {
+  background: #e53935;
 }
 
 .errorText {

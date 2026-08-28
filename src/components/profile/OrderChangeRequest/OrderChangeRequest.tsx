@@ -41,11 +41,11 @@ const OrderChangeRequest: React.FC<OrderChangeRequestProps> = ({ orderId }) => {
     const [hasToken, setHasToken] = useState(false);
     const [requests, setRequests] = useState<OrderRequest[]>([]);
     const [modalOpen, setModalOpen] = useState(false);
-    const [cancelReason, setCancelReason] = useState('');
+    const [confirmCancel, setConfirmCancel] = useState(false);
     const [messageText, setMessageText] = useState('');
     const [submitting, setSubmitting] = useState<OrderRequestType | null>(null);
     const [error, setError] = useState<string | null>(null);
-    const [success, setSuccess] = useState(false);
+    const [successText, setSuccessText] = useState<string | null>(null);
 
     useEffect(() => {
         setHasToken(Boolean(loadToken()));
@@ -81,29 +81,23 @@ const OrderChangeRequest: React.FC<OrderChangeRequestProps> = ({ orderId }) => {
     const closeModal = () => {
         setModalOpen(false);
         setError(null);
-        setSuccess(false);
-        setCancelReason('');
+        setSuccessText(null);
+        setConfirmCancel(false);
         setMessageText('');
     };
 
-    const handleSubmit = async (type: OrderRequestType) => {
+    const submitRequest = async (type: OrderRequestType, message?: string) => {
         if (submitting) return;
-        const message =
-            type === 'cancel' ? cancelReason.trim() : messageText.trim();
-        if (type === 'message' && !message) {
-            setError('Введите текст сообщения');
-            return;
-        }
         setSubmitting(type);
         setError(null);
         try {
-            await createOrderRequest({
-                orderId,
-                type,
-                message: message || undefined,
-            });
-            setSuccess(true);
-            setCancelReason('');
+            await createOrderRequest({ orderId, type, message });
+            setSuccessText(
+                type === 'cancel'
+                    ? 'Запрос на отмену отправлен. Мы свяжемся с вами.'
+                    : 'Обращение отправлено. Мы свяжемся с вами.',
+            );
+            setConfirmCancel(false);
             setMessageText('');
             loadRequests();
         } catch (err) {
@@ -112,9 +106,28 @@ const OrderChangeRequest: React.FC<OrderChangeRequestProps> = ({ orderId }) => {
                     ? err.message
                     : 'Не удалось отправить запрос. Попробуйте позже',
             );
+            setConfirmCancel(false);
         } finally {
             setSubmitting(null);
         }
+    };
+
+    const handleCancelClick = () => {
+        if (submitting) return;
+        if (!confirmCancel) {
+            setConfirmCancel(true);
+            return;
+        }
+        submitRequest('cancel');
+    };
+
+    const handleMessageSubmit = () => {
+        const message = messageText.trim();
+        if (!message) {
+            setError('Введите текст сообщения');
+            return;
+        }
+        submitRequest('message', message);
     };
 
     return (
@@ -158,11 +171,9 @@ const OrderChangeRequest: React.FC<OrderChangeRequestProps> = ({ orderId }) => {
                 title="Изменить заказ"
                 width="480px"
             >
-                {success ? (
+                {successText ? (
                     <div className={styles.successBlock}>
-                        <p className={styles.successText}>
-                            Обращение отправлено. Мы свяжемся с вами.
-                        </p>
+                        <p className={styles.successText}>{successText}</p>
                         <button
                             type="button"
                             className={styles.submitButton}
@@ -175,7 +186,7 @@ const OrderChangeRequest: React.FC<OrderChangeRequestProps> = ({ orderId }) => {
                     <div className={styles.modalContent}>
                         <div className={styles.requestBlock}>
                             <p className={styles.blockTitle}>
-                                Запросить отмену заказа
+                                Запросить отмену бронирования
                             </p>
                             {hasActiveCancelRequest ? (
                                 <p className={styles.blockHint}>
@@ -184,25 +195,26 @@ const OrderChangeRequest: React.FC<OrderChangeRequestProps> = ({ orderId }) => {
                                 </p>
                             ) : (
                                 <>
-                                    <textarea
-                                        className={styles.textarea}
-                                        placeholder="Причина (необязательно)"
-                                        value={cancelReason}
-                                        onChange={(e) =>
-                                            setCancelReason(e.target.value)
-                                        }
-                                        rows={3}
-                                    />
                                     <button
                                         type="button"
-                                        className={styles.submitButton}
-                                        onClick={() => handleSubmit('cancel')}
+                                        className={`${styles.submitButton} ${
+                                            confirmCancel ? styles.dangerButton : ''
+                                        }`}
+                                        onClick={handleCancelClick}
                                         disabled={submitting !== null}
                                     >
                                         {submitting === 'cancel'
                                             ? 'Отправка…'
-                                            : 'Запросить отмену'}
+                                            : confirmCancel
+                                              ? 'Подтвердить отмену?'
+                                              : 'Запросить отмену бронирования'}
                                     </button>
+                                    {confirmCancel && submitting === null && (
+                                        <p className={styles.confirmHint}>
+                                            Нажмите ещё раз, чтобы подтвердить
+                                            отмену
+                                        </p>
+                                    )}
                                 </>
                             )}
                         </div>
@@ -213,7 +225,7 @@ const OrderChangeRequest: React.FC<OrderChangeRequestProps> = ({ orderId }) => {
                             <p className={styles.blockTitle}>Отправить сообщение</p>
                             <textarea
                                 className={styles.textarea}
-                                placeholder="Опишите, что нужно изменить в заказе"
+                                placeholder="Ваше сообщение"
                                 value={messageText}
                                 onChange={(e) => setMessageText(e.target.value)}
                                 rows={3}
@@ -221,14 +233,14 @@ const OrderChangeRequest: React.FC<OrderChangeRequestProps> = ({ orderId }) => {
                             <button
                                 type="button"
                                 className={styles.submitButton}
-                                onClick={() => handleSubmit('message')}
+                                onClick={handleMessageSubmit}
                                 disabled={
                                     submitting !== null || !messageText.trim()
                                 }
                             >
                                 {submitting === 'message'
                                     ? 'Отправка…'
-                                    : 'Отправить сообщение'}
+                                    : 'Отправить'}
                             </button>
                         </div>
 
