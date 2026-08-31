@@ -32,3 +32,27 @@ export async function verifyCodeRequest(params: any) {
     }
 
 }
+
+export interface MeProfile {
+    id: number;
+    name?: string | null;
+    f_name?: string | null;
+    l_name?: string | null;
+    email?: string | null;
+    phone?: string | null;
+    loyalty_id?: string | null;
+    date?: string | null;
+    role?: 'user' | 'agent';
+}
+
+// Профиль по токену (Bearer подставляет interceptor из '@/api/http').
+// Возвращает null, если не авторизован или API недоступен — вызывающий код
+// продолжает работать с профилем из payload токена.
+export async function getMe(): Promise<MeProfile | null> {
+    try {
+        const response = await axios.get<{ user: MeProfile }>(`${BASE_URL}/api/auth/me`);
+        return response.data?.user ?? null;
+    } catch {
+        return null;
+    }
+}

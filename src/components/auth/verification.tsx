@@ -1,8 +1,8 @@
 import {useEffect, useState} from 'react';
 import VerificationCodeInput from "@/components/UI/verificationCodeInput";
 import styles from './auth.module.css'
-import {verifyCodeRequest} from "@/api/AuthApi";
-import {decodeToken, saveToken} from "@/utils/auth";
+import {verifyCodeRequest, getMe} from "@/api/AuthApi";
+import {decodeToken, saveToken, saveRefreshToken} from "@/utils/auth";
 import {useDispatch} from "react-redux";
 import {setAuth} from "@/store/slices/authSlice";
 
@@ -14,16 +14,24 @@ export default function Verification({email,setOpen}:any) {
     const handleComplete = async (fullCode) => {
       const data =  await verifyCodeRequest({code:fullCode,email:email})
       if(data.auth){
-          const user = decodeToken(data.authToken);
-          saveToken(data.authToken)
+          const token = data.accessToken || data.authToken;
+          const user = decodeToken(token);
+          saveToken(token)
+          saveRefreshToken(data.refreshToken)
           dispatch(setAuth({
-              token: data.authToken,
+              token,
               user,
           }));
           if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
               window.ReactNativeWebView.postMessage(JSON.stringify({ screen: 'auth', user }));
           }
           setOpen(false)
+          // Актуальный профиль — с сервера, а не из payload токена (не блокируем UI)
+          getMe().then((profile) => {
+              if (profile) {
+                  dispatch(setAuth({ token, user: { ...user, ...profile } }));
+              }
+          });
       }else{
           // console.log('data',data)
           setValid(true)

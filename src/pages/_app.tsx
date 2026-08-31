@@ -5,10 +5,13 @@ import { useRouter } from 'next/router';
 import { wrapper } from '../store';
 import '../styles/globals.css';
 import '@/utils/themeInit';
+import '@/api/http'; // Bearer + refresh для всех запросов к totus_API
 import Header from '@/components/header';
 import Footer from '@/components/footer';
-import { decodeToken, loadToken } from "@/utils/auth";
-import { setAuth } from "@/store/slices/authSlice";
+import { decodeToken, loadToken, isTokenAlive } from "@/utils/auth";
+import { setAuth, logout } from "@/store/slices/authSlice";
+import { getMe } from '@/api/AuthApi';
+import { AUTH_LOGOUT_EVENT } from '@/api/http';
 import { useDispatch } from "react-redux";
 import MobileBottomBar from "@/components/mobileBottomBar";
 import SiteSeo from "@/components/seo/SiteSeo";
@@ -25,12 +28,28 @@ function MyApp({ Component, pageProps }: AppProps) {
 
     useEffect(() => {
         const token = loadToken();
-        if (token) {
+        if (token && isTokenAlive(token)) {
+            // 1) мгновенно — профиль из payload токена (как раньше)
             const user = decodeToken(token);
-            if (user && user?.exp * 1000 > Date.now()) {
-                dispatch(setAuth({ token, user }));
-            }
+            dispatch(setAuth({ token, user }));
+            // 2) затем — актуальный профиль с сервера (/api/auth/me)
+            let cancelled = false;
+            getMe().then((profile) => {
+                if (!cancelled && profile) {
+                    dispatch(setAuth({ token, user: { ...user, ...profile } }));
+                }
+            });
+            return () => {
+                cancelled = true;
+            };
         }
+    }, [dispatch]);
+
+    // Interceptor не смог обновить токен → разлогиниваем Redux
+    useEffect(() => {
+        const onLogout = () => dispatch(logout());
+        window.addEventListener(AUTH_LOGOUT_EVENT, onLogout);
+        return () => window.removeEventListener(AUTH_LOGOUT_EVENT, onLogout);
     }, [dispatch]);
 
     return (
