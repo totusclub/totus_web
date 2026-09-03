@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import styles from './checkboxGroup.module.css';
 import Checkbox from '@/components/UI/checkboxGroup/checkBox';
 import { pluralizeRu } from '@/utils/formatRussianPlural';
-import { formatFilterOptionName } from '@/utils/filterChips';
+import { NARROW_NBSP, formatFilterOptionName } from '@/utils/filterChips';
 
 interface Option {
     id?: number | string;
@@ -164,7 +164,7 @@ export default function CheckboxGroup({
                                     {option?.hotel_count} отелей от{' '}
                                     {option?.min_price
                                         ?.toString()
-                                        ?.replace(/\B(?=(\d{3})+(?!\d))/g, ' ')}
+                                        ?.replace(/\B(?=(\d{3})+(?!\d))/g, NARROW_NBSP)}
                                     ₽
                                 </span>
                             )}
@@ -180,7 +180,7 @@ export default function CheckboxGroup({
                                     от{' '}
                                     {(netPrice + option?.min_fuel_charge)
                                         ?.toString()
-                                        ?.replace(/\B(?=(\d{3})+(?!\d))/g, ' ')}
+                                        ?.replace(/\B(?=(\d{3})+(?!\d))/g, NARROW_NBSP)}
                                     ₽
                                 </span>
                             )}
