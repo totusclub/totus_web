@@ -19,6 +19,7 @@ import {
     replaceSearchListFilters,
     shouldRestoreSearchFilters,
 } from '@/utils/searchListState';
+import { countActiveFilters } from '@/utils/filterChips';
 
 const DEFAULT_FILTERS = {
     filter_instant_confirm: false,
@@ -337,6 +338,10 @@ const Filters = ({ selectedFilters, allFilters, statistics }: any) => {
         dispatch(searchFilters(params));
     };
 
+    // Все применённые фильтры одной строкой — чтобы эффект ниже ловил любое изменение,
+    // включая удобства (раньше 11 ключей отсутствовали в deps и сайдбар не синхронизировался).
+    const appliedFiltersKey = JSON.stringify(pickAppliedFiltersFromHotels(hotels));
+
     useEffect(() => {
         if (!hotels?.request_id) return;
 
@@ -344,8 +349,22 @@ const Filters = ({ selectedFilters, allFilters, statistics }: any) => {
         filtersSyncedRef.current = false;
 
         const restored = buildFiltersFromHotels(hotels);
-        setFilters((prev) => ({ ...prev, ...restored }));
-        setPendingFilters((prev) => ({ ...prev, ...restored }));
+        // Удобства, которых больше нет ни в hotels, ни в сессии (снятый тег над списком) — убираем,
+        // иначе merge оставит старое true и переключатель в сайдбаре не погаснет.
+        const mergeRestored = (prev: Record<string, unknown>) => {
+            const next: Record<string, unknown> = { ...prev, ...restored };
+            EXTRA_BOOL_FILTER_KEYS.forEach((key) => {
+                if ((restored as Record<string, unknown>)[key] === undefined) delete next[key];
+            });
+            return next;
+        };
+        setFilters((prev) => mergeRestored(prev) as typeof prev);
+        setPendingFilters((prev) => mergeRestored(prev) as typeof prev);
+        // Ползунок цены живёт отдельным state — подтягиваем его к применённому диапазону
+        // (например, после снятия тега цены над списком).
+        if (restored.filter_price_min != null && restored.filter_price_max != null) {
+            setPriceRange([Number(restored.filter_price_min), Number(restored.filter_price_max)]);
+        }
 
         const restoring = shouldRestoreSearchFilters({
             restoreFlag: peekSearchListRestoreFlag(),
@@ -361,27 +380,8 @@ const Filters = ({ selectedFilters, allFilters, statistics }: any) => {
             );
         }
         filtersSyncedRef.current = true;
-    }, [
-        hotels?.request_id,
-        hotels?.filter_meals,
-        hotels?.filter_stars,
-        hotels?.filter_operators,
-        hotels?.filter_hotel_type,
-        hotels?.filter_regions,
-        hotels?.filter_line,
-        hotels?.filter_instant_confirm,
-        hotels?.filter_rating,
-        hotels?.filter_wifi,
-        hotels?.filter_beach_surface,
-        hotels?.filter_beach_type,
-        hotels?.filter_category,
-        hotels?.filter_confirmability,
-        hotels?.filter_adults_only,
-        hotels?.filter_direct_flight,
-        hotels?.filter_aquapark,
-        hotels?.filter_pool,
-        hotels?.sort_by,
-    ]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [hotels?.request_id, appliedFiltersKey]);
 
     // Detect mobile screen
     useEffect(() => {
@@ -568,6 +568,7 @@ const Filters = ({ selectedFilters, allFilters, statistics }: any) => {
         }
     }, [allFilters, filters, pendingFilters, isMobile, mobileModal])
 
+    const activeFiltersCount = useMemo(() => countActiveFilters(hotels), [hotels]);
     const usePendingState = isMobile && mobileModal;
     const activeFilterValues = usePendingState ? pendingFilters : filters;
 
@@ -731,6 +732,9 @@ const Filters = ({ selectedFilters, allFilters, statistics }: any) => {
         <>
             <div className={styles.buttonFilterMob} onClick={() => setMobileModal(true)}>
                 <Icon name={'filter'} />
+                {activeFiltersCount > 0 && (
+                    <span className={styles.filterBadge}>{activeFiltersCount}</span>
+                )}
             </div>
             {isMobile
                 ? (mobileModal && typeof document !== 'undefined'
