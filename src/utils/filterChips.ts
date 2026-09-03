@@ -124,8 +124,11 @@ function parseCsv(value: unknown): string[] {
         .filter(Boolean);
 }
 
+/** Узкий неразрывный пробел (U+202F) — разделитель тысяч в ценах. */
+export const NARROW_NBSP = String.fromCharCode(0x202f);
+
 function formatPrice(value: number): string {
-    return String(Math.round(value)).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+    return String(Math.round(value)).replace(/\B(?=(\d{3})+(?!\d))/g, NARROW_NBSP);
 }
 
 export function getPriceBounds(hotels: AnyRecord | null | undefined): { min: number; max: number } | null {
