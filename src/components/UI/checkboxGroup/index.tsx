@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import styles from './checkboxGroup.module.css';
 import Checkbox from '@/components/UI/checkboxGroup/checkBox';
 import { pluralizeRu } from '@/utils/formatRussianPlural';
+import { formatFilterOptionName } from '@/utils/filterChips';
 
 interface Option {
     id?: number | string;
@@ -74,66 +75,18 @@ export default function CheckboxGroup({
     };
 
     const renderName = (item: any) => {
-        if (name === 'filter_stars') {
-            if (item.id === 5) return `${item.id} звёзд`;
-            if (item.id === 1) return `${item.id} звезда`;
-            return `${item.id} звезды`;
-        }
-
-        if (name === 'filter_rating') {
-            return `от ${item.id}`;
-        }
-
-        if (name === 'filter_wifi') {
-            const wifiMap: Record<string, string> = {
-                FREE: 'Бесплатный Wi-Fi',
-                PAID: 'Платный Wi-Fi',
-                LOBBY_FREE: 'Бесплатный Wi-Fi в лобби',
-                LOBBY_PAID: 'Платный Wi-Fi в лобби',
-                LOBBY_UNKNOWN: 'Wi-Fi в лобби',
-                NONE: 'Без Wi-Fi',
-            };
-            return wifiMap[String(item.id)] || item.name || String(item.id);
-        }
-
-        if (name === 'filter_beach_surface') {
-            const beachSurfaceMap: Record<string, string> = {
-                SAND: 'Песок',
-                PEBBLE: 'Галька',
-                'SAND+PEBBLE': 'Песок с галькой',
-                SAND_PEBBLE: 'Песок с галькой',
-                PLATFORM: 'Платформа',
-                CONCRETE: 'Бетон',
-                CORAL: 'Коралл',
-                ROCKS: 'Скалы',
-            };
-            return beachSurfaceMap[String(item.id)] || item.name || String(item.id);
-        }
-
-        if (name === 'filter_beach_type') {
-            const beachTypeMap: Record<string, string> = {
-                DESIGNATED: 'Собственный пляж',
-                PUBLIC: 'Общественный пляж',
-            };
-            return beachTypeMap[String(item.id)] || item.name || String(item.id);
-        }
-
-        if (name === 'filter_category') {
-            const categoryMap: Record<string, string> = {
-                FAMILY: 'Для семьи',
-                COUPLES: 'Для пар',
-                ACTIVE: 'Активный отдых',
-            };
-            return categoryMap[String(item.id)] || item.name || String(item.id);
-        }
-
-        if (name === 'filter_confirmability') {
-            const confirmabilityMap: Record<string, string> = {
-                '1': 'Мгновенное подтверждение',
-                '2': 'Быстрое подтверждение',
-                '3': 'Любое подтверждение',
-            };
-            return confirmabilityMap[String(item.id)] || item.name || String(item.id);
+        // Подписи опций фильтров отелей — единые с тегами над списком (utils/filterChips)
+        if (
+            name === 'filter_stars' ||
+            name === 'filter_rating' ||
+            name === 'filter_wifi' ||
+            name === 'filter_beach_surface' ||
+            name === 'filter_beach_type' ||
+            name === 'filter_category' ||
+            name === 'filter_confirmability' ||
+            name === 'filter_line'
+        ) {
+            return formatFilterOptionName(name, item);
         }
 
         if (
@@ -166,8 +119,6 @@ export default function CheckboxGroup({
             if (item.luggage_type === 'hold') return 'С багажом';
             if (item.luggage_type === 'heavy') return 'С багажом от 20кг';
         }
-
-        if (name === 'filter_line') return `${item.id}-я линия`;
 
         if (name === 'flight_classes') {
             if (item.flight_class === 'econom') return 'Эконом';
@@ -213,7 +164,7 @@ export default function CheckboxGroup({
                                     {option?.hotel_count} отелей от{' '}
                                     {option?.min_price
                                         ?.toString()
-                                        ?.replace(/\B(?=(\d{3})+(?!\d))/g, '\u202F')}
+                                        ?.replace(/\B(?=(\d{3})+(?!\d))/g, ' ')}
                                     ₽
                                 </span>
                             )}
@@ -229,7 +180,7 @@ export default function CheckboxGroup({
                                     от{' '}
                                     {(netPrice + option?.min_fuel_charge)
                                         ?.toString()
-                                        ?.replace(/\B(?=(\d{3})+(?!\d))/g, '\u202F')}
+                                        ?.replace(/\B(?=(\d{3})+(?!\d))/g, ' ')}
                                     ₽
                                 </span>
                             )}
