@@ -125,7 +125,7 @@ function parseCsv(value: unknown): string[] {
 }
 
 function formatPrice(value: number): string {
-    return String(Math.round(value)).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+    return String(Math.round(value)).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
 }
 
 export function getPriceBounds(hotels: AnyRecord | null | undefined): { min: number; max: number } | null {
