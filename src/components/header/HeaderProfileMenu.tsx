@@ -1,18 +1,20 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import Icon from '@/components/icons/Icon';
 import useAuth from '@/hooks/useAuth';
 import { logout } from '@/store/slices/authSlice';
 import { deleteToken } from '@/utils/auth';
+import type { RootState } from '@/store';
 import styles from './header.module.css';
 
 type MenuItem = {
   id: string;
   label: string;
-  icon: 'profile' | 'order' | 'favorite' | 'logout';
+  icon: 'profile' | 'order' | 'favorite' | 'logout' | 'message';
   href?: string;
   danger?: boolean;
+  badge?: boolean;
   onSelect?: () => void;
 };
 
@@ -20,6 +22,7 @@ const HeaderProfileMenu = () => {
   const router = useRouter();
   const dispatch = useDispatch();
   const { user } = useAuth();
+  const supportUnread = useSelector((state: RootState) => state.supportChat?.unreadCount ?? 0);
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
 
@@ -49,6 +52,7 @@ const HeaderProfileMenu = () => {
     { id: 'profile', label: 'Профиль', icon: 'profile', href: '/profile' },
     { id: 'orders', label: 'Мои заказы', icon: 'order', href: '/profile/my-orders' },
     { id: 'favorites', label: 'Избранное', icon: 'favorite', href: '/profile/favorites' },
+    { id: 'support', label: 'Чат с поддержкой', icon: 'message', href: '/profile/support-chat', badge: supportUnread > 0 },
     { id: 'logout', label: 'Выйти', icon: 'logout', danger: true, onSelect: handleLogout },
   ];
 
@@ -103,6 +107,7 @@ const HeaderProfileMenu = () => {
       >
         <span className={styles.profileAvatar} aria-hidden>
           {initials}
+          {supportUnread > 0 ? <span className={styles.profileAvatarBadge} /> : null}
         </span>
         <span className={styles.profileTriggerText}>
           <span className={styles.profileTriggerName}>{displayName}</span>
@@ -144,6 +149,7 @@ const HeaderProfileMenu = () => {
                   color={item.danger ? 'var(--core_Orange)' : 'var(--textPrimary)'}
                 />
                 <span>{item.label}</span>
+                {item.badge ? <span className={styles.profileDropdownBadge} aria-label="Есть непрочитанные" /> : null}
               </button>
             ))}
           </div>

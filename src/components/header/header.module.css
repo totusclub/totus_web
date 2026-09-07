@@ -91,6 +91,7 @@
 }
 
 .profileAvatar {
+  position: relative;
   width: 36px;
   height: 36px;
   font-size: 13px;
@@ -101,6 +102,28 @@
   width: 42px;
   height: 42px;
   font-size: 14px;
+}
+
+/* Точка непрочитанных сообщений чата с поддержкой */
+.profileAvatarBadge {
+  position: absolute;
+  top: -1px;
+  right: -1px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--core_Orange);
+  border: 2px solid var(--bgPrimary);
+  box-sizing: content-box;
+}
+
+.profileDropdownBadge {
+  margin-left: auto;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--core_Orange);
+  flex-shrink: 0;
 }
 
 .profileTriggerText {

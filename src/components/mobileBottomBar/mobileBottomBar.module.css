@@ -1,6 +1,24 @@
 .mobileTab{
     display: none;
 }
+.tabIconWrap{
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+/* Точка непрочитанных сообщений чата с поддержкой на иконке профиля */
+.tabBadge{
+    position: absolute;
+    top: -2px;
+    right: -4px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--core_Orange);
+    border: 2px solid var(--bgPrimary);
+    box-sizing: content-box;
+}
 @media (max-width: 1024px) {
     .mobileTab{
         display: flex;
