@@ -17,6 +17,7 @@ import MobileBottomBar from "@/components/mobileBottomBar";
 import SiteSeo from "@/components/seo/SiteSeo";
 import CookieConsent from "@/components/cookieConsent";
 import GlobalAiChat from '@/components/GlobalAiChat';
+import SupportChatGate from '@/components/support/SupportChatGate';
 import { useStopSearchPollOnLeave } from '@/hooks/useStopSearchPollOnLeave';
 // import ScrollRestoration from '@/components/ScrollRestoration';
 
@@ -103,6 +104,8 @@ function MyApp({ Component, pageProps }: AppProps) {
                 {!isAiRoute && <CookieConsent />}
                 {/* Мила FAB on all site pages; /ai home redirects to / */}
                 {!isAiRoute && <GlobalAiChat />}
+                {/* Чат с поддержкой: сокет + счётчик непрочитанных (без UI) */}
+                <SupportChatGate />
             </div>
         </>
     );
