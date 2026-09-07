@@ -1,13 +1,14 @@
 import styles from './profile.module.css'
 import Icon from "@/components/icons/Icon";
 import useAuth from "@/hooks/useAuth";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { logout } from "@/store/slices/authSlice";
 import { deleteToken } from "@/utils/auth";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import SwitchToggle from "@/components/UI/switch";
 import { useTheme } from "@/hooks/useTheme";
+import type { RootState } from "@/store";
 
 const MenuProfile = () => {
     const router = useRouter();
@@ -15,6 +16,7 @@ const MenuProfile = () => {
     const { user, token } = useAuth()
     const [deleteModal, setDeleteModal] = useState<boolean>(false)
     const { theme, toggleTheme } = useTheme();
+    const supportUnread = useSelector((state: RootState) => state.supportChat?.unreadCount ?? 0);
 
     const handleLogout = () => {
         deleteToken();
@@ -94,6 +96,19 @@ const MenuProfile = () => {
                 <div onClick={() => router.push('/profile/favorites')} className={styles.profileMenuItem}>
                     <Icon name={'favorite'} size={24} />
                     <p>Избранное</p>
+                </div>
+                <div
+                    onClick={() => router.push('/profile/support-chat')}
+                    className={`${styles.profileMenuItem} ${styles.profileMenuItemChat} ${router.pathname === '/profile/support-chat' ? styles.profileMenuItemActive : ''}`}
+                >
+                    <div className={styles.profileMenuChatIcon}>
+                        <Icon name={'message'} size={24} color={'var(--textPrimary)'} />
+                        {supportUnread > 0 && <span className={styles.profileMenuBadge} aria-label={`Непрочитанных: ${supportUnread}`} />}
+                    </div>
+                    <div className={styles.profileMenuItemText}>
+                        <p>Чат с поддержкой</p>
+                        <span className={styles.profileMenuItemSub}>Напишите нам — ответим в чате</span>
+                    </div>
                 </div>
                 <div onClick={() => router.push('/privacy-policy')} className={styles.profileMenuItem}>
                     <Icon name={'faq'} size={24} />
