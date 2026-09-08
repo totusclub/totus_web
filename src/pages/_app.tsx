@@ -18,6 +18,7 @@ import SiteSeo from "@/components/seo/SiteSeo";
 import CookieConsent from "@/components/cookieConsent";
 import GlobalAiChat from '@/components/GlobalAiChat';
 import SupportChatGate from '@/components/support/SupportChatGate';
+import NotificationsBridge from '@/components/notifications/NotificationsBridge';
 import { useStopSearchPollOnLeave } from '@/hooks/useStopSearchPollOnLeave';
 // import ScrollRestoration from '@/components/ScrollRestoration';
 
@@ -106,6 +107,8 @@ function MyApp({ Component, pageProps }: AppProps) {
                 {!isAiRoute && <GlobalAiChat />}
                 {/* Чат с поддержкой: сокет + счётчик непрочитанных (без UI) */}
                 <SupportChatGate />
+                {/* Уведомления: непрочитанные, notify:* на сокете, service worker, тосты */}
+                <NotificationsBridge />
             </div>
         </>
     );
