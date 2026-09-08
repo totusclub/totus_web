@@ -42,6 +42,8 @@ const Header = () => {
                 return <p className={styles.pageName}>Мои заказы</p>
             } else if (pageName === '[order_id]') {
                 return <p className={styles.pageName}>Детали заказа</p>
+            } else if (pageName === 'support-chat') {
+                return <p className={styles.pageName}>Чат с поддержкой</p>
             } else if (FOOTER_STATIC_MOBILE_TITLES[pageName]) {
                 return <p className={styles.pageName}>{FOOTER_STATIC_MOBILE_TITLES[pageName]}</p>
             } else if (pageName === 'favorites') {
