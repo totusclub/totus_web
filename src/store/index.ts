@@ -6,6 +6,7 @@ import destinationsReducer from './slices/destinationsSlice';
 import searchReducer from './slices/searchSlice';
 import authReducer from './slices/authSlice';
 import supportChatReducer from './slices/supportChatSlice';
+import notificationsReducer from './slices/notificationsSlice';
 
 const makeStore = () =>
     configureStore({
@@ -16,6 +17,7 @@ const makeStore = () =>
             search: searchReducer,
             auth:authReducer,
             supportChat: supportChatReducer,
+            notifications: notificationsReducer,
         },
     });
 
