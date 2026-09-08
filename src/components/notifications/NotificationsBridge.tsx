@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import { useDispatch } from 'react-redux';
 import useAuth from '@/hooks/useAuth';
 import { AUTH_LOGOUT_EVENT } from '@/api/http';
-import type { NotificationEvent } from '@/api/notificationsApi';
+import { categoryForType, type NotificationData, type NotificationEvent } from '@/api/notificationsApi';
 import { onSupportEvent } from '@/lib/supportSocket';
 import {
     isWebPushSupported,
@@ -18,6 +18,7 @@ import { NotificationToastStack } from './NotificationToast';
 import { useOpenNotification } from './useOpenNotification';
 
 const MAX_TOASTS = 3;
+const SEEN_LIMIT = 200;
 
 /**
  * Глобальный «мост» уведомлений (рядом с SupportChatGate в _app.tsx):
@@ -37,10 +38,40 @@ export default function NotificationsBridge() {
     const [mounted, setMounted] = useState(false);
     const [toasts, setToasts] = useState<NotificationEvent[]>([]);
     const syncedForRef = useRef<string | number | null>(null);
+    /** id уже показанных уведомлений — дедуп notify:new (сокет) и notification-push (sw.js) */
+    const seenRef = useRef<Set<number>>(new Set());
 
     useEffect(() => {
         setMounted(true);
     }, []);
+
+    const markSeen = useCallback((id: number): boolean => {
+        const seen = seenRef.current;
+        if (seen.has(id)) return false;
+        seen.add(id);
+        if (seen.size > SEEN_LIMIT) {
+            const first = seen.values().next().value;
+            if (typeof first === 'number') seen.delete(first);
+        }
+        return true;
+    }, []);
+
+    /** Новое уведомление (сокет или пуш при видимой вкладке): в Redux + тост, если вкладка видна. */
+    const handleIncoming = useCallback(
+        (event: NotificationEvent) => {
+            if (!markSeen(event.id)) return;
+            dispatch(addIncoming(event));
+            if (typeof document === 'undefined' || document.visibilityState !== 'visible') {
+                // вкладка скрыта — системное уведомление покажет push
+                return;
+            }
+            setToasts((prev) => {
+                if (prev.some((toast) => toast.id === event.id)) return prev;
+                return [...prev, event].slice(-MAX_TOASTS);
+            });
+        },
+        [dispatch, markSeen],
+    );
 
     const closeToast = useCallback((id: number) => {
         setToasts((prev) => prev.filter((toast) => toast.id !== id));
@@ -66,15 +97,7 @@ export default function NotificationsBridge() {
 
         const offNew = onSupportEvent<NotificationEvent>('notify:new', (payload) => {
             if (!payload || typeof payload.id !== 'number') return;
-            dispatch(addIncoming(payload));
-            if (typeof document === 'undefined' || document.visibilityState !== 'visible') {
-                // вкладка скрыта — системное уведомление покажет push
-                return;
-            }
-            setToasts((prev) => {
-                if (prev.some((toast) => toast.id === payload.id)) return prev;
-                return [...prev, payload].slice(-MAX_TOASTS);
-            });
+            handleIncoming(payload);
         });
 
         const offBadge = onSupportEvent<{ unread?: number }>('notify:badge', (payload) => {
@@ -85,7 +108,7 @@ export default function NotificationsBridge() {
             offNew();
             offBadge();
         };
-    }, [mounted, user, token, dispatch]);
+    }, [mounted, user, token, dispatch, handleIncoming]);
 
     // Service worker: регистрация (без подписки) + привязка существующей подписки к пользователю
     useEffect(() => {
@@ -117,9 +140,27 @@ export default function NotificationsBridge() {
             }
             if (message.type === 'push-resubscribed' && message.subscription && token) {
                 registerSubscription(message.subscription).catch(() => undefined);
+                return;
+            }
+            if (message.type === 'notification-push' && token) {
+                // пуш при видимой вкладке: sw.js не показал баннер — показываем тост (дедуп с notify:new по id)
+                const payload = message.data || {};
+                const data = (payload.data && typeof payload.data === 'object' ? payload.data : {}) as NotificationData;
+                const id = data.notificationId != null && data.notificationId !== '' ? Number(data.notificationId) : NaN;
+                if (!Number.isFinite(id)) return;
+                const type = typeof data.type === 'string' ? data.type : 'system';
+                handleIncoming({
+                    id,
+                    type,
+                    category: categoryForType(type),
+                    title: typeof payload.title === 'string' ? payload.title : 'Totus Club',
+                    body: typeof payload.body === 'string' ? payload.body : '',
+                    data,
+                    createdAt: new Date().toISOString(),
+                });
             }
         });
-    }, [mounted, token, openNotification]);
+    }, [mounted, token, openNotification, handleIncoming]);
 
     // Вкладка открыта из системного уведомления (?nid=) → отметить «открыто», убрать параметр из URL
     useEffect(() => {
@@ -141,6 +182,7 @@ export default function NotificationsBridge() {
         if (!mounted) return;
         const onLogout = () => {
             syncedForRef.current = null;
+            seenRef.current = new Set();
             setToasts([]);
             dispatch(reset());
         };

@@ -6,6 +6,8 @@ import useAuth from '@/hooks/useAuth';
 import { logout } from '@/store/slices/authSlice';
 import { deleteToken } from '@/utils/auth';
 import type { RootState } from '@/store';
+import { unregisterDevice } from '@/api/notificationsApi';
+import { getDeviceId } from '@/lib/webPush';
 import styles from './header.module.css';
 
 type MenuItem = {
@@ -40,6 +42,8 @@ const HeaderProfileMenu = () => {
   }, [user?.name, user?.l_name]);
 
   const handleLogout = () => {
+    // отвязать этот браузер от push-уведомлений пользователя (до удаления токена; fire-and-forget)
+    unregisterDevice({ deviceId: getDeviceId() }).catch(() => undefined);
     deleteToken();
     dispatch(logout());
     setOpen(false);

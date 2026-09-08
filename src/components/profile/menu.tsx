@@ -9,6 +9,8 @@ import { useState } from "react";
 import SwitchToggle from "@/components/UI/switch";
 import { useTheme } from "@/hooks/useTheme";
 import type { RootState } from "@/store";
+import { unregisterDevice } from "@/api/notificationsApi";
+import { getDeviceId } from "@/lib/webPush";
 
 const MenuProfile = () => {
     const router = useRouter();
@@ -20,6 +22,8 @@ const MenuProfile = () => {
     const notificationsUnread = useSelector((state: RootState) => state.notifications?.unread ?? 0);
 
     const handleLogout = () => {
+        // отвязать этот браузер от push-уведомлений пользователя (до удаления токена; fire-and-forget)
+        unregisterDevice({ deviceId: getDeviceId() }).catch(() => undefined);
         deleteToken();
         dispatch(logout());
         router.push('/');
