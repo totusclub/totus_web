@@ -52,8 +52,23 @@ function parsePayload(event) {
     return { title: DEFAULT_TITLE, body: text || '', data: {} };
 }
 
-self.addEventListener('push', (event) => {
-    const payload = parsePayload(event);
+function isSameOrigin(url) {
+    try {
+        return new URL(url).origin === self.location.origin;
+    } catch (e) {
+        return false;
+    }
+}
+
+/* Видимая вкладка сайта (в фокусе или visibilityState === 'visible') — ей отдаём пуш как тост. */
+function findVisibleClient() {
+    return self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clients) => {
+        const own = clients.filter((c) => isSameOrigin(c.url));
+        return own.find((c) => c.focused === true) || own.find((c) => c.visibilityState === 'visible') || null;
+    });
+}
+
+function showPush(payload) {
     const data = payload.data && typeof payload.data === 'object' ? payload.data : {};
     const title = typeof payload.title === 'string' && payload.title ? payload.title : DEFAULT_TITLE;
     const options = {
@@ -69,7 +84,23 @@ self.addEventListener('push', (event) => {
         delete options.tag;
         delete options.renotify;
     }
-    event.waitUntil(self.registration.showNotification(title, options));
+    return self.registration.showNotification(title, options);
+}
+
+self.addEventListener('push', (event) => {
+    const payload = parsePayload(event);
+    event.waitUntil(
+        findVisibleClient()
+            .then((client) => {
+                if (client) {
+                    // вкладка видна — страница покажет тост (NotificationsBridge), системный баннер не нужен
+                    client.postMessage({ type: 'notification-push', data: payload });
+                    return undefined;
+                }
+                return showPush(payload);
+            })
+            .catch(() => showPush(payload)),
+    );
 });
 
 /* Маршрут уведомления → URL сайта (маршруты ЛК: /profile/my-orders/[order_id], /profile/support-chat, /profile/notifications). */
@@ -111,13 +142,15 @@ function safeExternalUrl(value) {
     }
 }
 
+/* ?nid=<id> добавляем только для URL своего origin (внешние ссылки не трогаем). */
 function withNotificationId(url, data) {
     const id = data && data.notificationId != null ? String(data.notificationId) : '';
     if (!id) return url;
     try {
         const u = new URL(url, self.location.origin);
+        if (u.origin !== self.location.origin) return url;
         u.searchParams.set('nid', id);
-        return u.origin === self.location.origin ? u.pathname + u.search + u.hash : u.href;
+        return u.href;
     } catch (e) {
         return url;
     }
@@ -135,13 +168,7 @@ self.addEventListener('notificationclick', (event) => {
         self.clients
             .matchAll({ type: 'window', includeUncontrolled: true })
             .then((clients) => {
-                const sameOrigin = clients.filter((c) => {
-                    try {
-                        return new URL(c.url).origin === self.location.origin;
-                    } catch (e) {
-                        return false;
-                    }
-                });
+                const sameOrigin = clients.filter((c) => isSameOrigin(c.url));
                 const client = sameOrigin.find((c) => c.focused) || sameOrigin[0];
                 if (client) {
                     const focusPromise = 'focus' in client ? client.focus() : Promise.resolve(client);

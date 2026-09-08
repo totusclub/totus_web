@@ -327,7 +327,16 @@ export interface ServiceWorkerResubscribed {
     subscription: WebPushSubscriptionJSON;
 }
 
-export type ServiceWorkerMessage = ServiceWorkerNotificationClick | ServiceWorkerResubscribed;
+/** Пуш пришёл при видимой вкладке — sw.js не показывает системный баннер, страница показывает тост. */
+export interface ServiceWorkerNotificationPush {
+    type: 'notification-push';
+    data: { title?: string; body?: string; data?: Record<string, unknown> | null };
+}
+
+export type ServiceWorkerMessage =
+    | ServiceWorkerNotificationClick
+    | ServiceWorkerResubscribed
+    | ServiceWorkerNotificationPush;
 
 /** Сообщения от sw.js (клик по уведомлению, переподписка). Возвращает функцию отписки. */
 export function listenServiceWorkerMessages(handler: (message: ServiceWorkerMessage) => void): () => void {
@@ -335,7 +344,11 @@ export function listenServiceWorkerMessages(handler: (message: ServiceWorkerMess
     const listener = (event: MessageEvent) => {
         const message = event.data as ServiceWorkerMessage | null;
         if (!message || typeof message !== 'object' || typeof message.type !== 'string') return;
-        if (message.type === 'notification-click' || message.type === 'push-resubscribed') {
+        if (
+            message.type === 'notification-click' ||
+            message.type === 'push-resubscribed' ||
+            message.type === 'notification-push'
+        ) {
             handler(message);
         }
     };

@@ -162,6 +162,32 @@ export interface NotificationsListParams {
     unread?: boolean;
 }
 
+/** Категория по типу (API.md §2) — для пуша, где category в payload нет. */
+export function categoryForType(type: string | null | undefined): NotificationCategory {
+    switch (type) {
+        case 'order_created':
+        case 'payment_success':
+        case 'payment_failed':
+        case 'order_request_status':
+            return 'orders';
+        case 'order_confirmed':
+        case 'order_status':
+        case 'order_cancelled':
+        case 'documents_ready':
+            return 'documents';
+        case 'trip_reminder':
+            return 'reminders';
+        case 'support_message':
+        case 'missed_call':
+            return 'support';
+        case 'promo':
+            return 'promo';
+        case 'system':
+        default:
+            return 'system';
+    }
+}
+
 export const NOTIFICATIONS_UNAVAILABLE = 'Уведомления временно недоступны';
 
 const ERROR_MESSAGES: Record<string, string> = {
