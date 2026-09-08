@@ -17,6 +17,7 @@ const MenuProfile = () => {
     const [deleteModal, setDeleteModal] = useState<boolean>(false)
     const { theme, toggleTheme } = useTheme();
     const supportUnread = useSelector((state: RootState) => state.supportChat?.unreadCount ?? 0);
+    const notificationsUnread = useSelector((state: RootState) => state.notifications?.unread ?? 0);
 
     const handleLogout = () => {
         deleteToken();
@@ -96,6 +97,23 @@ const MenuProfile = () => {
                 <div onClick={() => router.push('/profile/favorites')} className={styles.profileMenuItem}>
                     <Icon name={'favorite'} size={24} />
                     <p>Избранное</p>
+                </div>
+                <div
+                    onClick={() => router.push('/profile/notifications')}
+                    className={`${styles.profileMenuItem} ${styles.profileMenuItemChat} ${router.pathname.startsWith('/profile/notifications') ? styles.profileMenuItemActive : ''}`}
+                >
+                    <div className={styles.profileMenuChatIcon}>
+                        <Icon name={'notification'} size={24} color={'var(--textPrimary)'} />
+                    </div>
+                    <div className={styles.profileMenuItemText}>
+                        <p>Уведомления</p>
+                        <span className={styles.profileMenuItemSub}>Заказы, оплата, напоминания и акции</span>
+                    </div>
+                    {notificationsUnread > 0 && (
+                        <span className={styles.profileMenuCount} aria-label={`Непрочитанных: ${notificationsUnread}`}>
+                            {notificationsUnread > 99 ? '99+' : notificationsUnread}
+                        </span>
+                    )}
                 </div>
                 <div
                     onClick={() => router.push('/profile/support-chat')}

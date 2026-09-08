@@ -11,7 +11,7 @@ import styles from './header.module.css';
 type MenuItem = {
   id: string;
   label: string;
-  icon: 'profile' | 'order' | 'favorite' | 'logout' | 'message';
+  icon: 'profile' | 'order' | 'favorite' | 'logout' | 'message' | 'notification';
   href?: string;
   danger?: boolean;
   badge?: boolean;
@@ -23,6 +23,7 @@ const HeaderProfileMenu = () => {
   const dispatch = useDispatch();
   const { user } = useAuth();
   const supportUnread = useSelector((state: RootState) => state.supportChat?.unreadCount ?? 0);
+  const notificationsUnread = useSelector((state: RootState) => state.notifications?.unread ?? 0);
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
 
@@ -52,6 +53,7 @@ const HeaderProfileMenu = () => {
     { id: 'profile', label: 'Профиль', icon: 'profile', href: '/profile' },
     { id: 'orders', label: 'Мои заказы', icon: 'order', href: '/profile/my-orders' },
     { id: 'favorites', label: 'Избранное', icon: 'favorite', href: '/profile/favorites' },
+    { id: 'notifications', label: 'Уведомления', icon: 'notification', href: '/profile/notifications', badge: notificationsUnread > 0 },
     { id: 'support', label: 'Чат с поддержкой', icon: 'message', href: '/profile/support-chat', badge: supportUnread > 0 },
     { id: 'logout', label: 'Выйти', icon: 'logout', danger: true, onSelect: handleLogout },
   ];
