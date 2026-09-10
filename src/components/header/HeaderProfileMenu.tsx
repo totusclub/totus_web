@@ -6,12 +6,14 @@ import useAuth from '@/hooks/useAuth';
 import { logout } from '@/store/slices/authSlice';
 import { deleteToken } from '@/utils/auth';
 import type { RootState } from '@/store';
+import { unregisterDevice } from '@/api/notificationsApi';
+import { getDeviceId } from '@/lib/webPush';
 import styles from './header.module.css';
 
 type MenuItem = {
   id: string;
   label: string;
-  icon: 'profile' | 'order' | 'favorite' | 'logout' | 'message';
+  icon: 'profile' | 'order' | 'favorite' | 'logout' | 'message' | 'notification';
   href?: string;
   danger?: boolean;
   badge?: boolean;
@@ -23,6 +25,7 @@ const HeaderProfileMenu = () => {
   const dispatch = useDispatch();
   const { user } = useAuth();
   const supportUnread = useSelector((state: RootState) => state.supportChat?.unreadCount ?? 0);
+  const notificationsUnread = useSelector((state: RootState) => state.notifications?.unread ?? 0);
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
 
@@ -39,6 +42,8 @@ const HeaderProfileMenu = () => {
   }, [user?.name, user?.l_name]);
 
   const handleLogout = () => {
+    // отвязать этот браузер от push-уведомлений пользователя (до удаления токена; fire-and-forget)
+    unregisterDevice({ deviceId: getDeviceId() }).catch(() => undefined);
     deleteToken();
     dispatch(logout());
     setOpen(false);
@@ -52,6 +57,7 @@ const HeaderProfileMenu = () => {
     { id: 'profile', label: 'Профиль', icon: 'profile', href: '/profile' },
     { id: 'orders', label: 'Мои заказы', icon: 'order', href: '/profile/my-orders' },
     { id: 'favorites', label: 'Избранное', icon: 'favorite', href: '/profile/favorites' },
+    { id: 'notifications', label: 'Уведомления', icon: 'notification', href: '/profile/notifications', badge: notificationsUnread > 0 },
     { id: 'support', label: 'Чат с поддержкой', icon: 'message', href: '/profile/support-chat', badge: supportUnread > 0 },
     { id: 'logout', label: 'Выйти', icon: 'logout', danger: true, onSelect: handleLogout },
   ];

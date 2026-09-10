@@ -13,6 +13,7 @@ import { useDispatch } from 'react-redux';
 import LogoDesktopIcon from "@/components/icons/logoDesktop";
 import { FOOTER_STATIC_MOBILE_TITLES } from "@/config/footerStaticPages";
 import HeaderProfileMenu from "@/components/header/HeaderProfileMenu";
+import NotificationsBell from "@/components/notifications/NotificationsBell";
 
 const Header = () => {
     const dispatch = useDispatch();
@@ -44,6 +45,10 @@ const Header = () => {
                 return <p className={styles.pageName}>Детали заказа</p>
             } else if (pageName === 'support-chat') {
                 return <p className={styles.pageName}>Чат с поддержкой</p>
+            } else if (pathname === '/profile/notifications') {
+                return <p className={styles.pageName}>Уведомления</p>
+            } else if (pathname === '/profile/notifications/settings') {
+                return <p className={styles.pageName}>Настройки уведомлений</p>
             } else if (FOOTER_STATIC_MOBILE_TITLES[pageName]) {
                 return <p className={styles.pageName}>{FOOTER_STATIC_MOBILE_TITLES[pageName]}</p>
             } else if (pageName === 'favorites') {
@@ -110,12 +115,16 @@ const Header = () => {
 
                 <div className={`${styles.headerRow} ${styles.headerRowPc}`}>
                     {token ? (
-                        <HeaderProfileMenu />
+                        <>
+                            <NotificationsBell />
+                            <HeaderProfileMenu />
+                        </>
                     ) : (
                         <Button onClick={() => setAuthModalOpen(true)} title={'Войти'} />
                     )}
                 </div>
                 <div className={styles.headerRowM}>
+                    {token && showSearch !== 'hotel-details' ? <NotificationsBell variant="link" /> : null}
                 </div>
             </header>
             <AuthModal open={authModalOpen} setOpen={setAuthModalOpen} />
