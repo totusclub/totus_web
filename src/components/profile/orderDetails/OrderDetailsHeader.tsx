@@ -6,6 +6,8 @@ import OrderSbpPayButton from '@/components/profile/OrderSbpPayButton';
 import OrderChangeRequest from '@/components/profile/OrderChangeRequest/OrderChangeRequest';
 import { isOrderAwaitingPayment } from '@/utils/orderPayment';
 import { getStatusColor, getStatusLabel } from '@/utils/orderDisplay';
+import { getTotusBooking, getTotusBookingStatusColor } from '@/utils/totusBooking';
+import TotusBookingSummary from '@/components/totusBooking/TotusBookingSummary';
 import useAuth from '@/hooks/useAuth';
 import { decodeToken } from '@/utils/auth';
 
@@ -49,19 +51,25 @@ const OrderDetailsHeader: React.FC<OrderDetailsHeaderProps> = ({
   const { user, token } = useAuth();
   const orderId = order?.order_id ?? order?.id ?? '—';
 
+  // Внутреннее бронирование (наш номер, оператор Arlekino) — статус и блок из totus_booking
+  const totusBooking = useMemo(() => getTotusBooking(order), [order]);
+
   const statusColor = useMemo(
-    () => getStatusColor(order?.package ?? pkg, order),
-    [order, pkg],
+    () =>
+      totusBooking
+        ? getTotusBookingStatusColor(totusBooking.status)
+        : getStatusColor(order?.package ?? pkg, order),
+    [order, pkg, totusBooking],
   );
 
   const statusLabel = useMemo(
-    () => getStatusLabel(order, pkg),
-    [order, pkg],
+    () => (totusBooking ? totusBooking.statusLabel : getStatusLabel(order, pkg)),
+    [order, pkg, totusBooking],
   );
 
   const price = useMemo(() => {
     const amount = order?.package?.price ?? order?.package?.full_price ?? pkg?.price ?? 0;
-    return Number(amount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '\u202F');
+    return Number(amount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
   }, [pkg, order]);
 
   const clientEmail = useMemo(
@@ -78,7 +86,7 @@ const OrderDetailsHeader: React.FC<OrderDetailsHeaderProps> = ({
           </div>
 
           <div className={styles.orderDetailsTitleContainer}>
-            <h1 className={styles.orderDetailsTitle}>Тур </h1>
+            <h1 className={styles.orderDetailsTitle}>{totusBooking ? 'Заказ' : 'Тур'} </h1>
             <p className={styles.orderDetailsTitleId}>№ {orderId}</p>
           </div>
         </div>
@@ -90,6 +98,14 @@ const OrderDetailsHeader: React.FC<OrderDetailsHeaderProps> = ({
         </span>
       </div>
 
+      {totusBooking ? (
+        <div className={styles.orderDetailsPanel}>
+          <TotusBookingSummary
+            booking={totusBooking}
+            fallbackAmount={Number(String(price).replace(/\D/g, '')) || null}
+          />
+        </div>
+      ) : (
       <div className={styles.orderDetailsPanel}>
         <div className={styles.orderDetailsSection}>
           <p className={styles.orderDetailsSectionTitle}>Получение заказа</p>
@@ -117,6 +133,7 @@ const OrderDetailsHeader: React.FC<OrderDetailsHeaderProps> = ({
           <p className={styles.orderDetailsAmount}>Итого {price} ₽</p>
         </div>
       </div>
+      )}
 
       {isOrderAwaitingPayment(order) && (
         <div className={styles.orderDetailsPayWrap}>

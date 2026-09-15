@@ -6,6 +6,7 @@ import DocumentsModal from './DocumentsModal';
 import TicketModal from '@/components/modals/ticketModal';
 import { getOrderFlightData } from '@/utils/orderPayment';
 import { collectOrderDocuments, formatTravelPeriod } from '@/utils/orderDisplay';
+import { getTotusBooking } from '@/utils/totusBooking';
 
 interface OrderDetailsSectionsProps {
   pkg: any;
@@ -35,9 +36,21 @@ const OrderDetailsSections: React.FC<OrderDetailsSectionsProps> = ({
     [order, pkg],
   );
 
+  // Внутреннее бронирование (наш номер, оператор Arlekino): ваучер из totus_booking + документы из /orders/documents
+  const totusBooking = useMemo(() => getTotusBooking(order), [order]);
+
   const documents = useMemo(
-    () => collectOrderDocuments(order, apiDocuments),
-    [order, apiDocuments],
+    () =>
+      collectOrderDocuments(
+        order,
+        totusBooking?.voucher?.url
+          ? [
+              ...apiDocuments,
+              { title: totusBooking.voucher.title || 'Ваучер', url: totusBooking.voucher.url },
+            ]
+          : apiDocuments,
+      ),
+    [order, apiDocuments, totusBooking],
   );
 
   const formatFlightDate = useMemo(() => formatTravelPeriod(pkg), [pkg]);
@@ -69,7 +82,11 @@ const OrderDetailsSections: React.FC<OrderDetailsSectionsProps> = ({
   const documentsDescription =
     documents.length > 0
       ? `${documents.length} ${documents.length === 1 ? 'документ' : documents.length < 5 ? 'документа' : 'документов'} доступно для скачивания`
-      : 'Документы по заказу появятся здесь после подтверждения тура';
+      : totusBooking
+        ? totusBooking.status === 'rejected' || totusBooking.status === 'cancelled'
+          ? 'Бронирование отклонено — ваучер не выдаётся'
+          : 'Ваучер появится здесь после подтверждения бронирования'
+        : 'Документы по заказу появятся здесь после подтверждения тура';
 
   return (
     <>
@@ -96,7 +113,7 @@ const OrderDetailsSections: React.FC<OrderDetailsSectionsProps> = ({
           <p className={styles.sectionHeader}>Самое важное</p>
           <div className={styles.infoPanel}>
             <InfoRow
-              label="Даты перелёта"
+              label={totusBooking ? 'Даты' : 'Даты перелёта'}
               value={formatFlightDate}
               showArrow={Boolean(flightData)}
               onClick={flightData ? () => setModalTicket(true) : undefined}
@@ -110,7 +127,7 @@ const OrderDetailsSections: React.FC<OrderDetailsSectionsProps> = ({
             <div className={styles.divider}></div>
             <InfoRow
               label="Туроператор"
-              value={pkg?.operator?.name || 'Level.Travel'}
+              value={totusBooking ? totusBooking.operator : pkg?.operator?.name || 'Level.Travel'}
             />
           </div>
         </div>
@@ -126,16 +143,17 @@ const OrderDetailsSections: React.FC<OrderDetailsSectionsProps> = ({
             <div className={styles.divider}></div>
             <InfoRow
               label="Номер"
-              value={pkg?.room_info?.name_ru || pkg?.room_type || '—'}
+              value={totusBooking?.room || pkg?.room_info?.name_ru || pkg?.room_type || '—'}
             />
             <div className={styles.divider}></div>
             <InfoRow
               label="Питание"
-              value={pkg?.pansion_description || 'Без питания'}
+              value={totusBooking?.mealName || pkg?.pansion_description || 'Без питания'}
             />
           </div>
         </div>
 
+        {totusBooking ? null : (
         <div className={styles.sectionWrapper}>
           <p className={styles.sectionHeader}>Включено в тур</p>
           <div className={styles.infoPanel}>
@@ -152,6 +170,7 @@ const OrderDetailsSections: React.FC<OrderDetailsSectionsProps> = ({
             />
           </div>
         </div>
+        )}
 
         <div className={styles.sectionWrapper}>
           <p className={styles.sectionHeader}>Туристы</p>
