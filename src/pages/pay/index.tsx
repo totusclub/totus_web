@@ -3,11 +3,17 @@ import {checkPay} from "@/api/levelTravelApi";
 import {useRouter} from "next/router";
 import Button from "@/components/UI/button";
 import { isSbpPaymentPaid } from '@/utils/sbpPayment';
+import TotusBookingSuccess from '@/components/totusBooking/TotusBookingSuccess';
+import { getTotusBooking, isTotusInternalOrder, type TotusBooking } from '@/utils/totusBooking';
 
 
 export default function Pay() {
     const router = useRouter();
     const [status, setStatus] = useState(null);
+    // Внутренний заказ (наш номер, оператор Arlekino): после оплаты — экран «Оплата прошла»
+    const [totusBooking, setTotusBooking] = useState<TotusBooking | null>(null);
+    const [isInternal, setIsInternal] = useState(false);
+    const [paidOrderId, setPaidOrderId] = useState<string>('');
 
     useEffect(()=>{
         const orderIdRaw = router?.query?.orderId;
@@ -21,6 +27,10 @@ export default function Pay() {
 
         checkPay({ orderId, ...(qrcId ? { qrcId } : {}) }).then((e) => {
             setStatus(isSbpPaymentPaid(e) ? "RECONCILED" : e?.status);
+            const booking = getTotusBooking(e);
+            setTotusBooking(booking);
+            setIsInternal(Boolean(booking) || e?.internal === true || isTotusInternalOrder(e));
+            setPaidOrderId(String(e?.order_id ?? booking?.orderId ?? orderId));
         });
     },[router])
 
@@ -28,6 +38,14 @@ export default function Pay() {
         if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
             window.ReactNativeWebView.postMessage({status:status});
         }
+    }
+
+    if (status === 'RECONCILED' && isInternal) {
+        return (
+            <div className="content">
+                <TotusBookingSuccess orderId={paidOrderId} booking={totusBooking} />
+            </div>
+        );
     }
 
     return (

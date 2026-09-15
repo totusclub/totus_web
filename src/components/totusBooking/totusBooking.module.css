@@ -1,0 +1,442 @@
+/* Статусы бронирования наших номеров (оператор Arlekino) — Light + Dark через токены темы */
+
+/* ---------- Баннер статуса ---------- */
+.banner {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  width: 100%;
+  padding: 16px;
+  border-radius: 16px;
+  background: var(--bgSecondary);
+  border: 1px solid var(--borderTertiary);
+}
+
+.bannerIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.bannerBody {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.bannerTitle {
+  margin: 0;
+  color: var(--textPrimary);
+  font-family: "Golos Text";
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 20px;
+  letter-spacing: -0.3px;
+}
+
+.bannerText {
+  margin: 0;
+  color: var(--textSecondary);
+  font-family: "Golos Text";
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 18px;
+  letter-spacing: -0.28px;
+}
+
+.bannerPending {
+  background: rgba(206, 133, 8, 0.12);
+  border-color: rgba(206, 133, 8, 0.3);
+}
+.bannerPending .bannerIcon {
+  color: var(--primary_yellow);
+}
+
+.bannerSuccess {
+  background: rgba(40, 133, 86, 0.12);
+  border-color: rgba(40, 133, 86, 0.3);
+}
+.bannerSuccess .bannerIcon {
+  color: var(--primary_green);
+}
+
+.bannerDanger {
+  background: rgba(207, 48, 48, 0.1);
+  border-color: rgba(207, 48, 48, 0.3);
+}
+.bannerDanger .bannerIcon {
+  color: var(--primary_red);
+}
+
+.bannerInfo {
+  background: rgba(13, 119, 211, 0.1);
+  border-color: rgba(13, 119, 211, 0.3);
+}
+.bannerInfo .bannerIcon {
+  color: var(--primary_blue);
+}
+
+/* ---------- Пилюля статуса (список и карточка) ---------- */
+.statusPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  min-height: 24px;
+  padding: 2px 12px;
+  border-radius: 15px;
+  color: #fff;
+  white-space: nowrap;
+  font-family: "Golos Text";
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 16px;
+}
+
+/* ---------- Блок «Оплачено / Возврат» ---------- */
+.payRow {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: rgba(40, 133, 86, 0.12);
+  color: var(--primary_green);
+  font-family: "Golos Text";
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 20px;
+}
+
+.payRowDanger {
+  background: rgba(207, 48, 48, 0.1);
+  color: var(--primary_red);
+}
+
+.payRowMuted {
+  background: var(--bgSecondary);
+  color: var(--textSecondary);
+}
+
+.payRow > p {
+  margin: 0;
+}
+
+/* ---------- Детали бронирования (строки «label — value») ---------- */
+.detailsGrid {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  width: 100%;
+}
+
+.detailRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  padding: 8px 0;
+}
+
+.detailLabel {
+  margin: 0;
+  color: var(--textTertiary);
+  font-family: "Golos Text";
+  font-size: 14px;
+  line-height: 18px;
+}
+
+.detailValue {
+  margin: 0;
+  text-align: right;
+  color: var(--textPrimary);
+  font-family: "Golos Text";
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 18px;
+}
+
+.detailValueMuted {
+  color: var(--textTertiary);
+  font-weight: 400;
+}
+
+/* ---------- Действия ---------- */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  width: 100%;
+  margin-top: 16px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 12px 24px;
+  border-radius: 24px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  font-family: "Golos Text";
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 20px;
+  text-decoration: none;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.btnPrimary {
+  background: var(--core_Orange);
+  color: #fff;
+}
+.btnPrimary:hover {
+  background: var(--secondary_orange);
+}
+
+.btnSecondary {
+  background: var(--bgPrimary);
+  color: var(--textPrimary);
+  border-color: var(--borderSecondary);
+}
+.btnSecondary:hover {
+  background: var(--bgSecondary);
+}
+
+.btnFull {
+  width: 100%;
+}
+
+/* ---------- Строка оператора в списке заказов ---------- */
+.operatorLine {
+  color: var(--textPrimary);
+  font-family: "Golos Text";
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 18px;
+  letter-spacing: -0.28px;
+  margin: 0;
+}
+.operatorLine > span {
+  color: var(--textTertiary);
+  font-weight: 400;
+}
+
+/* ---------- Ваучер / документы ---------- */
+.voucherRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: var(--bgSecondary);
+  border: 1px solid var(--borderTertiary);
+  color: var(--textPrimary);
+  text-decoration: none;
+}
+.voucherRow:hover {
+  background: var(--hoverPrimary);
+}
+.voucherRowIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: var(--bgPrimary);
+  color: var(--textPrimary);
+  flex-shrink: 0;
+}
+.voucherRowBody {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+.voucherRowTitle {
+  margin: 0;
+  font-family: "Golos Text";
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 20px;
+  color: var(--textPrimary);
+}
+.voucherRowSub {
+  margin: 0;
+  font-family: "Golos Text";
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--textTertiary);
+}
+.voucherRowAction {
+  margin: 0;
+  font-family: "Golos Text";
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--core_Orange);
+  white-space: nowrap;
+}
+.voucherRowActionMuted {
+  color: var(--textDisabled);
+}
+
+/* ---------- Экран «Оплата прошла» ---------- */
+.successWrap {
+  width: 100%;
+  max-width: 700px;
+  margin: 24px auto 44px;
+  padding: 40px 40px 32px;
+  border-radius: 24px;
+  background: var(--bgPrimary);
+  box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.12),
+    0px 4px 12px 0px rgba(0, 0, 0, 0.12);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+.successIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: rgba(40, 133, 86, 0.12);
+  color: var(--primary_green);
+}
+
+.successHead {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+}
+
+.successTitle {
+  margin: 0;
+  color: var(--textPrimary);
+  font-family: "Golos Text";
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 34px;
+  letter-spacing: -0.56px;
+}
+
+.successSubtitle {
+  margin: 0;
+  max-width: 600px;
+  color: var(--textSecondary);
+  font-family: "Golos Text";
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 22px;
+}
+
+.successSteps {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.successStepsTitle {
+  margin: 0;
+  color: var(--textPrimary);
+  font-family: "Golos Text";
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 22px;
+}
+
+.successStep {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.successStepNum {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: rgba(254, 115, 46, 0.14);
+  color: var(--core_Orange);
+  font-family: "Golos Text";
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.successStepBody {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.successStepTitle {
+  margin: 0;
+  color: var(--textPrimary);
+  font-family: "Golos Text";
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 20px;
+}
+
+.successStepText {
+  margin: 0;
+  color: var(--textTertiary);
+  font-family: "Golos Text";
+  font-size: 14px;
+  line-height: 18px;
+}
+
+.successActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .successWrap {
+    padding: 28px 16px 24px;
+    margin-top: 16px;
+    border-radius: 20px;
+  }
+  .successTitle {
+    font-size: 24px;
+    line-height: 30px;
+  }
+  .successSubtitle {
+    font-size: 14px;
+    line-height: 20px;
+  }
+  .actions,
+  .successActions {
+    flex-direction: column;
+  }
+  .btn {
+    width: 100%;
+  }
+  .payRow {
+    font-size: 15px;
+  }
+}
