@@ -69,7 +69,8 @@ const OrderDetailsHeader: React.FC<OrderDetailsHeaderProps> = ({
 
   const price = useMemo(() => {
     const amount = order?.package?.price ?? order?.package?.full_price ?? pkg?.price ?? 0;
-    return Number(amount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '\\u202F');
+    // U+202F (узкий неразрывный пробел) — как раньше, без escape-последовательности
+    return Number(amount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, String.fromCharCode(0x202f));
   }, [pkg, order]);
 
   const clientEmail = useMemo(
