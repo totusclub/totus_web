@@ -1,0 +1,18 @@
+/* Чип туроператора у названия номера — для наших Room Type (lt_extras.totus.custom),
+   у которых название/фото/описание совпадают с исходным номером Level.Travel. */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 10px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--core_Orange);
+  color: var(--core_Orange);
+  background: var(--bgPrimary);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
+  letter-spacing: -0.24px;
+  vertical-align: middle;
+  white-space: nowrap;
+}
