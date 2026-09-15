@@ -69,7 +69,7 @@ const OrderDetailsHeader: React.FC<OrderDetailsHeaderProps> = ({
 
   const price = useMemo(() => {
     const amount = order?.package?.price ?? order?.package?.full_price ?? pkg?.price ?? 0;
-    return Number(amount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+    return Number(amount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '\\u202F');
   }, [pkg, order]);
 
   const clientEmail = useMemo(
