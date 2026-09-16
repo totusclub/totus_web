@@ -23,6 +23,15 @@ export const OFFER_GROUP_LABELS: Record<OfferSource, string> = {
 /** Порядок групп в списке предложений номера: сначала наши, затем Level.Travel. */
 export const OFFER_GROUP_ORDER: OfferSource[] = ['arlekino', 'levelTravel'];
 
+/** Наши операторы в offers: `operator_id = 990000 + roomTypeId` (totus_API custom rooms). */
+export const ARLEKINO_OPERATOR_ID_BASE = 990000;
+
+/** Оператор «Arlekino» (id ≥ 990000) — Level.Travel такого оператора не знает, в API-фильтры не передаём. */
+export function isArlekinoOperatorId(id: unknown): boolean {
+    const value = Number(id);
+    return Number.isFinite(value) && value >= ARLEKINO_OPERATOR_ID_BASE;
+}
+
 export function isArlekinoOffer(offer: unknown): boolean {
     const record = offer as RoomOfferLike | null | undefined;
     return Boolean(record?.lt_extras?.totus?.custom);

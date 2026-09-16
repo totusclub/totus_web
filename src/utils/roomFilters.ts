@@ -1,3 +1,5 @@
+import { ARLEKINO_OPERATOR_ID_BASE, isArlekinoOperatorId } from './roomOffers';
+
 export type RoomFilterOption = {
     id: string | number | boolean;
     name?: string;
@@ -198,8 +200,11 @@ export function buildOperatorsFilterFromRooms(
             if (!Array.isArray(offerList)) return;
 
             offerList.forEach((offer) => {
-                const id = Number(offer.operator_id);
-                if (!Number.isFinite(id)) return;
+                const rawId = Number(offer.operator_id);
+                if (!Number.isFinite(rawId)) return;
+                // Room Type v3: у каждой нашей Room Type свой operator_id (990000 + id) с одним
+                // именем «Arlekino» — в фильтре показываем один пункт (id 990000), не дедуплицируя offers.
+                const id = isArlekinoOperatorId(rawId) ? ARLEKINO_OPERATOR_ID_BASE : rawId;
 
                 const price = Number(offer.analytics_price ?? offer.price);
                 const safePrice = Number.isFinite(price) ? price : Number.POSITIVE_INFINITY;
@@ -249,7 +254,12 @@ export function buildOperatorsFilterFromRooms(
 
 function offerMatchesOperator(offer: Record<string, unknown>, selectedOperatorIds: number[]): boolean {
     if (!selectedOperatorIds.length) return true;
-    return selectedOperatorIds.includes(Number(offer.operator_id));
+    const operatorId = Number(offer.operator_id);
+    if (isArlekinoOperatorId(operatorId)) {
+        // Единый пункт «Arlekino» в фильтре покрывает все наши operator_id (≥ 990000).
+        return selectedOperatorIds.some(isArlekinoOperatorId);
+    }
+    return selectedOperatorIds.includes(operatorId);
 }
 
 function offerMatchesFreeCancel(offer: Record<string, unknown>, requireFreeCancel: boolean): boolean {
@@ -648,8 +658,11 @@ export function buildHotelRoomsQueryParams(
         .map((item) => String(item.id))
         .filter((id) => id !== '3');
 
+    // Room Type v3: оператор «Arlekino» (id ≥ 990000) существует только в наших предложениях —
+    // в запрос /hotels-rooms его не передаём (LT его не знает), фильтруем на клиенте.
     const operators = (filters.operators ?? [])
         .filter(isSelectedFilterOption)
+        .filter((operator) => !isArlekinoOperatorId(operator.id))
         .map((operator) => String(operator.id));
 
     const requireFreeCancel = (filters.free_cancel ?? []).some(
