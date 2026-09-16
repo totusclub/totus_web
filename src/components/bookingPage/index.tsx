@@ -79,6 +79,9 @@ const OFFER_UNAVAILABLE_MESSAGE =
 const ORDER_CREATE_FAILED_MESSAGE =
     'Не удалось создать заказ у туроператора. Пожалуйста, выберите предложение заново или попробуйте позже.';
 
+const PREBOOK_FAILED_MESSAGE =
+    'Не удалось закрепить бронь этого номера у поставщика. Пожалуйста, выберите другой вариант или попробуйте позже.';
+
 /**
  * Level.Travel возвращает объект `package` и в теле отказа (`success: false`, `rotten: true`,
  * `package.available: false`, `exception`), поэтому наличие пакета ещё не значит, что предложение
@@ -116,6 +119,8 @@ const extractCreateErrorMessage = (payload: any): string => {
         pickErrorText(payload?.error) ||
         pickErrorText(payload?.response?.data) ||
         pickErrorText(payload?.message);
+    // Level.Travel: "Prebooking failed: unsuccessful prebook" — бронь у поставщика не закрепилась.
+    if (/prebook/i.test(text)) return PREBOOK_FAILED_MESSAGE;
     return text ? `Не удалось создать заказ у туроператора: ${text}` : ORDER_CREATE_FAILED_MESSAGE;
 };
 
@@ -478,6 +483,8 @@ const BookingCard = () => {
             const packageId = router?.query?.package;
             const flightPairId = router?.query?.flight_pair_id;
             const searchType = getSearchTypeFromQuery(router.query);
+            // packageData из состояния не обновится внутри этого обработчика — держим свежий пакет локально
+            let actualPackage: any = packageData;
 
             // 1) Fresh actualize before create (required by LT docs every 15–20 min)
             try {
@@ -499,6 +506,7 @@ const BookingCard = () => {
                         actualizeResult.package,
                         flightPairId as string | string[] | undefined,
                     );
+                    actualPackage = resolved;
                     setPackageData(resolved);
                 }
             } catch {
@@ -637,84 +645,89 @@ const BookingCard = () => {
                 return;
             }
 
-            // 4) Prebook only for regular flights when operator supports it.
-            // If partner token has no prebook API version access, skip and create order.
-            if (flightPairId) {
-                try {
-                    const misc = (packageData as any)?.misc_data || {};
-                    const prebookResult = await prebookPackage({
-                        package_id: packageId,
-                        flight_pair_id: flightPairId,
-                        client,
-                        tourists: touristsData,
-                        prebook_data: {
-                            ...(misc.book_hash ? { book_hash: misc.book_hash } : {}),
-                            ...(misc.bundle_id ? { bundle_id: misc.bundle_id } : {}),
-                            ...(misc.route_component_id
-                                ? { route_component_id: misc.route_component_id }
-                                : {}),
-                            ...(misc.acm_component_id ? { acm_component_id: misc.acm_component_id } : {}),
-                            ...(misc.operator_organization_id
-                                ? { operator_organization_id: String(misc.operator_organization_id) }
-                                : {}),
-                            ...(misc.supplier_id != null ? { supplier_id: misc.supplier_id } : {}),
-                        },
-                    });
+            // 4) Prebook — бронь у поставщика. Нужен и турам с регулярными рейсами, и отельным
+            // пакетам Level.Travel (оператор 78): без него orders/create отвечает
+            // "Prebooking failed: unsuccessful prebook". prebook_data (book_hash) появляется
+            // только в ответе actualize, поэтому берём его из actualPackage, а не из состояния.
+            // Если у партнёрского токена нет доступа к версии API с prebook, шаг пропускается
+            // (skippable) — как было раньше.
+            try {
+                const misc = (actualPackage as any)?.misc_data || {};
+                const prebookResult = await prebookPackage({
+                    package_id: packageId,
+                    ...(flightPairId ? { flight_pair_id: flightPairId } : {}),
+                    client,
+                    tourists: touristsData,
+                    prebook_data: {
+                        ...(misc.book_hash ? { book_hash: misc.book_hash } : {}),
+                        ...(misc.bundle_id ? { bundle_id: misc.bundle_id } : {}),
+                        ...(misc.route_component_id
+                            ? { route_component_id: misc.route_component_id }
+                            : {}),
+                        ...(misc.acm_component_id ? { acm_component_id: misc.acm_component_id } : {}),
+                        ...(misc.operator_organization_id
+                            ? { operator_organization_id: String(misc.operator_organization_id) }
+                            : {}),
+                        ...(misc.supplier_id != null ? { supplier_id: misc.supplier_id } : {}),
+                    },
+                });
 
-                    const prebookErrorText = String(
-                        typeof prebookResult?.error === 'string'
-                            ? prebookResult.error
-                            : prebookResult?.error?.message ||
-                                  prebookResult?.message ||
-                                  '',
+                const prebookErrorText = String(
+                    typeof prebookResult?.error === 'string'
+                        ? prebookResult.error
+                        : prebookResult?.error?.message ||
+                              prebookResult?.message ||
+                              '',
+                );
+                const canSkipPrebook =
+                    prebookResult?.skippable === true ||
+                    /incorrect api version|api version|not supported|недоступ/i.test(
+                        prebookErrorText,
                     );
-                    const canSkipPrebook =
-                        prebookResult?.skippable === true ||
-                        /incorrect api version|api version|not supported|недоступ/i.test(
-                            prebookErrorText,
+
+                if (prebookResult?.success === false || prebookResult?.isAxiosError) {
+                    if (canSkipPrebook) {
+                        console.warn(
+                            'Prebook skipped (partner/API limitation):',
+                            prebookErrorText || prebookResult,
                         );
-
-                    if (prebookResult?.success === false || prebookResult?.isAxiosError) {
-                        if (canSkipPrebook) {
-                            console.warn(
-                                'Prebook skipped (partner/API limitation):',
-                                prebookErrorText || prebookResult,
-                            );
-                        } else {
-                            const prebookMessage =
-                                prebookErrorText ||
-                                'Не удалось забронировать перелёт у туроператора. Попробуйте другой рейс.';
-                            setErrors({ general: String(prebookMessage) });
-                            setLoading(false);
-                            return;
-                        }
-                    }
-
-                    if (prebookResult?.booking_id) {
-                        orderPayload.booking_id = prebookResult.booking_id;
-                    }
-                } catch (prebookError: any) {
-                    const message =
-                        prebookError?.response?.data?.error?.message ||
-                        prebookError?.response?.data?.error ||
-                        prebookError?.response?.data?.message ||
-                        prebookError?.message ||
-                        '';
-                    const canSkip =
-                        prebookError?.response?.data?.skippable === true ||
-                        /incorrect api version|api version|not supported|недоступ/i.test(
-                            String(message),
-                        );
-
-                    if (canSkip) {
-                        console.warn('Prebook skipped after exception:', message);
                     } else {
-                        setErrors({
-                            general: String(message || 'Не удалось выполнить пребук перелёта.'),
-                        });
+                        const prebookMessage = flightPairId
+                            ? prebookErrorText ||
+                              'Не удалось забронировать перелёт у туроператора. Попробуйте другой рейс.'
+                            : PREBOOK_FAILED_MESSAGE;
+                        setErrors({ general: String(prebookMessage) });
                         setLoading(false);
                         return;
                     }
+                }
+
+                if (prebookResult?.booking_id) {
+                    orderPayload.booking_id = prebookResult.booking_id;
+                }
+            } catch (prebookError: any) {
+                const message =
+                    prebookError?.response?.data?.error?.message ||
+                    prebookError?.response?.data?.error ||
+                    prebookError?.response?.data?.message ||
+                    prebookError?.message ||
+                    '';
+                const canSkip =
+                    prebookError?.response?.data?.skippable === true ||
+                    /incorrect api version|api version|not supported|недоступ/i.test(
+                        String(message),
+                    );
+
+                if (canSkip) {
+                    console.warn('Prebook skipped after exception:', message);
+                } else {
+                    setErrors({
+                        general: flightPairId
+                            ? String(message || 'Не удалось выполнить пребук перелёта.')
+                            : PREBOOK_FAILED_MESSAGE,
+                    });
+                    setLoading(false);
+                    return;
                 }
             }
 
@@ -743,6 +756,7 @@ const BookingCard = () => {
                 Boolean(orderResult?.error);
 
             if (createFailed) {
+                console.warn('Order create failed:', orderResult);
                 setErrors({ general: extractCreateErrorMessage(orderResult) });
                 setLoading(false);
                 return;
