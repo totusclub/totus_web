@@ -1,0 +1,21 @@
+/* Заголовки групп предложений внутри номера («Arlekino» / «Level.Travel»).
+   Скромные подзаголовки списка — как .HotelDetailsPriceListHead, токены темы (light/dark). */
+.groupTitle {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px 0;
+  color: var(--textTertiary);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
+  letter-spacing: -0.24px;
+}
+.groupTitle + .groupTitle {
+  padding-top: 0;
+}
+.groupTitleCount {
+  color: var(--textTertiary);
+  font-weight: 400;
+}

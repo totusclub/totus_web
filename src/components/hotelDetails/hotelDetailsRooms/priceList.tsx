@@ -1,4 +1,5 @@
 import styles from '../hotelDetails.module.css';
+import groupStyles from './offerGroups.module.css';
 import Button from "@/components/UI/button";
 import { useRouter } from "next/router";
 import React, { useMemo, useState } from "react";
@@ -11,6 +12,12 @@ import {
 import { formatPriceRub } from '@/utils/formatPrice';
 import { getOfferConfirmabilityDisplayLabel } from '@/utils/roomFilters';
 import { getOfferDisplayInfo, OFFER_TAG_BEST_PRICE } from '@/utils/offerDisplay';
+import {
+    OFFER_GROUP_LABELS,
+    OFFER_GROUP_ORDER,
+    splitOffersBySource,
+    type OfferSource,
+} from '@/utils/roomOffers';
 import Icon from '@/components/icons/Icon';
 
 interface HotelDetailsPriceListProps {
@@ -35,11 +42,15 @@ const roomTypeName: Record<string, string> = {
     HBL:'Завтрак и обед'
 };
 
+type OfferGroup = { source: OfferSource; label: string; offers: any[] };
+
 const HotelDetailsPriceList: React.FC<HotelDetailsPriceListProps> = ({ item, type }) => {
     const router = useRouter();
     const searchType = getSearchTypeFromQuery(router.query);
     const [showAll, setShowAll] = useState(false);
 
+    // Переход по выбранной строке: tour_id = id именно этого предложения
+    // (для наших `t…` backend перехватит package_details сам, для LT — обычный поток).
     const handleBook = async (id) => {
       const requestId = Array.isArray(router.query.request_id)
         ? router.query.request_id[0]
@@ -59,39 +70,38 @@ const HotelDetailsPriceList: React.FC<HotelDetailsPriceListProps> = ({ item, typ
         return `С ${day}.${month}`;
     };
 
-    const offersForType = useMemo(() => {
+    // Room Type v3: одна карточка номера, внутри две группы предложений —
+    // «Arlekino» (lt_extras.totus.custom) и «Level.Travel»; внутри группы сортировка по цене.
+    const offerGroups = useMemo<OfferGroup[]>(() => {
         const list = (item ?? []).filter((room) => room.type === type);
-        return [...list].sort((a, b) => {
-            const priceA = Number(a?.analytics_price ?? a?.price) || Number.POSITIVE_INFINITY;
-            const priceB = Number(b?.analytics_price ?? b?.price) || Number.POSITIVE_INFINITY;
-            return priceA - priceB;
-        });
+        const split = splitOffersBySource(list);
+        return OFFER_GROUP_ORDER
+            .map((source) => ({ source, label: OFFER_GROUP_LABELS[source], offers: split[source] }))
+            .filter((group) => group.offers.length > 0);
     }, [item, type]);
 
-    const hiddenCount = Math.max(0, offersForType.length - 1);
-    const visibleOffers = showAll ? offersForType : offersForType.slice(0, 1);
+    const totalCount = offerGroups.reduce((sum, group) => sum + group.offers.length, 0);
+    // Заголовки групп показываем только у номеров с нашими предложениями —
+    // у обычных номеров LT список выглядит как раньше.
+    const showGroupTitles = offerGroups.some((group) => group.source === 'arlekino');
+    // Свёрнуто: по самому дешёвому предложению каждой группы; «Показать ещё» — общая.
+    const visibleCount = showAll ? totalCount : offerGroups.length;
+    const hiddenCount = Math.max(0, totalCount - visibleCount);
 
-    if (!offersForType.length) return null;
+    if (!totalCount) return null;
 
-    return (
-        <div className={styles.HotelDetailsPriceList}>
-            <div className={styles.HotelDetailsPriceListHead}>
-                <p>{roomTypeName?.[type]}</p>
-                {item?.description?.length > 1 && <p>{item?.description}</p>}
-            </div>
-            <div className={styles.HotelDetailsPriceListItems}>
-                {visibleOffers.map((room) => {
-                        const confirmabilityLabel = getOfferConfirmabilityDisplayLabel(room);
-                        const displayInfo = getOfferDisplayInfo(room);
-                        const secondaryTags = displayInfo.tags.filter(
-                            (tag) => tag !== confirmabilityLabel,
-                        );
-                        const hasBestPrice = secondaryTags.includes(OFFER_TAG_BEST_PRICE);
-                        const otherTags = secondaryTags.filter(
-                            (tag) => tag !== OFFER_TAG_BEST_PRICE,
-                        );
+    const renderOffer = (room: any) => {
+        const confirmabilityLabel = getOfferConfirmabilityDisplayLabel(room);
+        const displayInfo = getOfferDisplayInfo(room);
+        const secondaryTags = displayInfo.tags.filter(
+            (tag) => tag !== confirmabilityLabel,
+        );
+        const hasBestPrice = secondaryTags.includes(OFFER_TAG_BEST_PRICE);
+        const otherTags = secondaryTags.filter(
+            (tag) => tag !== OFFER_TAG_BEST_PRICE,
+        );
 
-                        return (
+        return (
                     <div key={room.id} className={styles.HotelDetailsPriceListItem}>
                         <div>
                             <p className={styles.HotelDetailsPriceListItemMeta}>
@@ -148,8 +158,34 @@ const HotelDetailsPriceList: React.FC<HotelDetailsPriceListProps> = ({ item, typ
                             />
                         </div>
                     </div>
-                        );
-                    })}
+        );
+    };
+
+    return (
+        <div className={styles.HotelDetailsPriceList}>
+            <div className={styles.HotelDetailsPriceListHead}>
+                <p>{roomTypeName?.[type]}</p>
+                {item?.description?.length > 1 && <p>{item?.description}</p>}
+            </div>
+            <div className={styles.HotelDetailsPriceListItems}>
+                {offerGroups.map((group) => {
+                    const visibleOffers = showAll ? group.offers : group.offers.slice(0, 1);
+                    return (
+                        <React.Fragment key={group.source}>
+                            {showGroupTitles ? (
+                                <div className={groupStyles.groupTitle}>
+                                    <span>{group.label}</span>
+                                    {group.offers.length > 1 ? (
+                                        <span className={groupStyles.groupTitleCount}>
+                                            {group.offers.length}
+                                        </span>
+                                    ) : null}
+                                </div>
+                            ) : null}
+                            {visibleOffers.map(renderOffer)}
+                        </React.Fragment>
+                    );
+                })}
 
                 {hiddenCount > 0 ? (
                     <button

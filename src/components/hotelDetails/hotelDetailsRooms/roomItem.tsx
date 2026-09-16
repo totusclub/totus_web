@@ -1,5 +1,4 @@
 import styles from '../hotelDetails.module.css';
-import chipStyles from './roomOperatorChip.module.css';
 import HotelDetailsPriceList from "@/components/hotelDetails/hotelDetailsRooms/priceList";
 import SmallSlider from "@/components/UI/smallSlide";
 import GalleryModal from "@/components/UI/galleryModal";
@@ -49,6 +48,9 @@ const HotelDetailsRoomItem = ({
         [listRoomPick],
     );
 
+    // Room Type v3: наши предложения («Arlekino», lt_extras.totus.custom) приходят внутри
+    // offers[meal] исходного номера — карточка одна (LT), группы рисует priceList.
+    // Цена «от» по типу питания — минимум по всем предложениям на выбранную дату/ночи.
     const offersForDate = useMemo(() => {
         if (!selectedDate || !item?.offers) return [];
 
@@ -62,21 +64,6 @@ const HotelDetailsRoomItem = ({
                 .map((offer) => ({ type, ...offer })),
         );
     }, [selectedDate, item?.offers, nightsConstraint]);
-
-    // Own Room Type (totus_API custom rooms) shares name/photos/description with the
-    // Level.Travel source room — mark the card with its operator so the two are distinguishable.
-    const isCustomRoom = Boolean(item?.lt_extras?.totus?.custom);
-    const customOperatorLabel = useMemo(() => {
-        if (!isCustomRoom) return null;
-        const names = Array.from(
-            new Set(
-                offersForDate
-                    .map((offer) => String(offer?.operator_name ?? '').trim())
-                    .filter(Boolean),
-            ),
-        );
-        return names.length ? names.join(', ') : null;
-    }, [isCustomRoom, offersForDate]);
 
     // Meals are already filtered by active room filters — do not re-lock to search URL meals
     // (that hid UAI when the user switched from «Всё включено» to «Ультра всё включено»).
@@ -153,17 +140,7 @@ const HotelDetailsRoomItem = ({
                 {renderRoomImage()}
 
                 <div className={styles.HotelDetailsRoomInforamation}>
-                    <p>
-                        {item?.room?.name_ru}
-                        {customOperatorLabel ? (
-                            <span
-                                className={chipStyles.chip}
-                                title={`Предложение туроператора ${customOperatorLabel}`}
-                            >
-                                {customOperatorLabel}
-                            </span>
-                        ) : null}
-                    </p>
+                    <p>{item?.room?.name_ru}</p>
                     <div className={styles.HotelDetailsRoomOptions}>
                         <div className={styles.HotelDetailsRoomOption}>
                             <p>{item?.room?.description}</p>
