@@ -2,7 +2,7 @@ import styles from './booking.module.css';
 import BookingOrderForm from "@/components/bookingPage/bookingForm";
 import BookingOrderCard from "@/components/bookingPage/orderCard";
 import { useEffect, useState, useMemo } from "react";
-import { createOrder, getOrdersUsers, PackagesActualize, PackagesActualizeFlight, Packagesflights, prebookPackage, prebuildOrder, validateTourist } from "@/api/levelTravelApi";
+import { createOrder, PackagesActualize, PackagesActualizeFlight, Packagesflights, prebookPackage, prebuildOrder, validateTourist } from "@/api/levelTravelApi";
 import { useRouter } from "next/router";
 import useAuth from "@/hooks/useAuth";
 import { validateBookingForm, flattenBookingErrors, mapLevelTravelTouristValidateErrors, type Tourist, type TouristErrors, type BookingValidationErrors } from "@/utils/bookingValidation";
@@ -73,26 +73,50 @@ const extractOrderIdFromResponse = (payload: any): string | null => {
     return null;
 };
 
-const pickLatestOrderId = (orders: any[]): string | null => {
-    if (!Array.isArray(orders) || orders.length === 0) return null;
+const OFFER_UNAVAILABLE_MESSAGE =
+    'Это предложение больше недоступно у туроператора. Вернитесь к выбору номера и выберите другой вариант.';
 
-    const normalized = [...orders].sort((a, b) => {
-        const dateA = Date.parse(a?.created_at || a?.createdAt || '') || 0;
-        const dateB = Date.parse(b?.created_at || b?.createdAt || '') || 0;
-        if (dateA !== dateB) return dateB - dateA;
-        const idA = Number(a?.order_id || a?.id || 0);
-        const idB = Number(b?.order_id || b?.id || 0);
-        return idB - idA;
-    });
+const ORDER_CREATE_FAILED_MESSAGE =
+    'Не удалось создать заказ у туроператора. Пожалуйста, выберите предложение заново или попробуйте позже.';
 
-    for (const item of normalized) {
-        const id = item?.order_id || item?.id || item?.order?.id;
-        if (id !== undefined && id !== null && String(id).trim() !== '') {
-            return String(id);
-        }
+/**
+ * Level.Travel возвращает объект `package` и в теле отказа (`success: false`, `rotten: true`,
+ * `package.available: false`, `exception`), поэтому наличие пакета ещё не значит, что предложение
+ * можно забронировать. Возвращает текст ошибки или null, если предложение живое.
+ */
+const getOfferBlockReason = (payload: any): string | null => {
+    if (!payload) return OFFER_UNAVAILABLE_MESSAGE;
+    if (
+        payload.success === false ||
+        payload.rotten === true ||
+        payload.package?.available === false
+    ) {
+        return OFFER_UNAVAILABLE_MESSAGE;
     }
-
     return null;
+};
+
+/** Достаёт текст ошибки из разных форм ответа (строка, { message }, { error }, { errors: [] }). */
+const pickErrorText = (value: any): string => {
+    if (!value) return '';
+    if (typeof value === 'string') return value.trim();
+    if (Array.isArray(value)) return value.filter(Boolean).map(String).join('; ');
+    if (typeof value === 'object') {
+        return (
+            pickErrorText(value.message) ||
+            pickErrorText(value.error) ||
+            pickErrorText(value.errors)
+        );
+    }
+    return '';
+};
+
+const extractCreateErrorMessage = (payload: any): string => {
+    const text =
+        pickErrorText(payload?.error) ||
+        pickErrorText(payload?.response?.data) ||
+        pickErrorText(payload?.message);
+    return text ? `Не удалось создать заказ у туроператора: ${text}` : ORDER_CREATE_FAILED_MESSAGE;
 };
 
 
@@ -139,12 +163,22 @@ const BookingCard = () => {
 
         loadPackage
             .then(async (e) => {
+                const blockReason = getOfferBlockReason(e);
                 const pkg = e?.package || null;
-                if (!pkg) {
+                if (blockReason || !pkg) {
+                    // Форму не показываем: бронировать протухшее предложение нельзя.
                     setPackageData(null);
+                    setParams((prev) => ({ ...prev, tourist: [] }));
+                    setErrors({ general: blockReason || OFFER_UNAVAILABLE_MESSAGE });
                     setDataLoading(false);
                     return;
                 }
+
+                setErrors((prev) => {
+                    const next = { ...prev };
+                    delete next.general;
+                    return next;
+                });
 
                 // Price only from Level Travel: actualize + selected flight fuel_charge
                 const resolved = await resolvePackageWithFlightFees(pkg, flightPairId);
@@ -453,8 +487,9 @@ const BookingCard = () => {
                         search_type: isHotelOnlySearch(searchType) ? 'hotel' : 'package',
                     });
 
-                if (actualizeResult?.success === false) {
-                    setErrors({ general: 'Не удалось актуализировать предложение. Пожалуйста, обновите страницу и попробуйте снова.' });
+                const blockReason = getOfferBlockReason(actualizeResult);
+                if (blockReason) {
+                    setErrors({ general: blockReason });
                     setLoading(false);
                     return;
                 }
@@ -701,28 +736,25 @@ const BookingCard = () => {
             // 5) Create order after successful validation / prebuild / (optional) prebook
             const orderResult = await createOrder(dataOrderCreate);
 
-            if (orderResult?.success === false || orderResult?.isAxiosError) {
-                const createMessage =
-                    orderResult?.error?.message ||
-                    orderResult?.response?.data?.message ||
-                    orderResult?.message ||
-                    'Не удалось создать заказ. Пожалуйста, попробуйте еще раз.';
-                setErrors({ general: String(createMessage) });
+            // totus_API отдаёт отказ Level.Travel как 200 { error: ... } — это не успех.
+            const createFailed =
+                orderResult?.success === false ||
+                orderResult?.isAxiosError === true ||
+                Boolean(orderResult?.error);
+
+            if (createFailed) {
+                setErrors({ general: extractCreateErrorMessage(orderResult) });
                 setLoading(false);
                 return;
             }
 
-            // Extract order id from different backend response shapes
-            let orderId = extractOrderIdFromResponse(orderResult);
-
-            // Fallback: some backend responses create order but don't return id
-            if (!orderId && user?.id) {
-                const userOrders = await getOrdersUsers(user.id);
-                orderId = pickLatestOrderId(userOrders || []);
-            }
+            // Номер заказа берём только из ответа на создание. Прежний fallback
+            // «взять последний заказ пользователя» уводил на уже существующий чужой заказ,
+            // когда Level.Travel отказывал в создании нового.
+            const orderId = extractOrderIdFromResponse(orderResult);
 
             if (!orderId) {
-                setErrors({ general: 'Заказ создан, но не удалось получить номер заказа. Пожалуйста, проверьте заказы в профиле.' });
+                setErrors({ general: ORDER_CREATE_FAILED_MESSAGE });
                 setLoading(false);
                 return;
             }
