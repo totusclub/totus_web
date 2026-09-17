@@ -5,6 +5,10 @@
  * не попадают: страница меняет ticket через POST /api/auth/yandex/exchange,
  * кладёт токены в localStorage (как после кода из письма) и возвращает туда,
  * откуда начинали. Макеты — claude/YANDEX_AUTH_DESIGN_RU.md.
+ *
+ * Если Яндекс не отдал почту — это не тупик: есть «Разрешить доступ к почте»
+ * (повтор с force_confirm — Яндекс снова покажет экран прав) и «Войти по email»
+ * (возврат на страницу с ?login=1 — шапка откроет модалку входа).
  */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
@@ -24,15 +28,11 @@ type Stage = 'loading' | 'phone' | 'error';
 const ERROR_TEXT: Record<string, { title: string; text: string }> = {
     yandex_email_required: {
         title: 'Яндекс не передал адрес почты',
-        text: 'Почта нужна, чтобы связать вход с вашим аккаунтом Totus Club. Разрешите доступ к почте на странице Яндекса или войдите по email.',
+        text: 'Почта нужна, чтобы связать вход с вашим аккаунтом Totus Club. Можно вернуться на страницу Яндекса и разрешить доступ — или войти по email, это займёт минуту.',
     },
     yandex_access_denied: {
         title: 'Вход отменён',
         text: 'Вы не разрешили доступ на странице Яндекса. Можно попробовать снова или войти по email.',
-    },
-    user_blocked: {
-        title: 'Вход закрыт',
-        text: 'Доступ к этому аккаунту ограничен. Напишите в поддержку — мы разберёмся.',
     },
     ticket_invalid: {
         title: 'Ссылка устарела',
@@ -49,6 +49,14 @@ function safePath(value: unknown): string {
     const raw = typeof value === 'string' ? value : '';
     if (!raw.startsWith('/') || raw.startsWith('//')) return '/';
     return raw;
+}
+
+/** Тот же путь, но с ?login=1 — шапка по нему открывает модалку входа по email. */
+function withLoginQuery(path: string): string {
+    const [pathname, query] = path.split('?');
+    const params = new URLSearchParams(query || '');
+    params.set('login', '1');
+    return `${pathname || '/'}?${params.toString()}`;
 }
 
 const YandexAuthPage: React.FC = () => {
@@ -157,6 +165,12 @@ const YandexAuthPage: React.FC = () => {
         }
     };
 
+    const goYandex = (force: boolean) => {
+        window.location.href = yandexStartUrl(returnPath, { force });
+    };
+    const goEmailLogin = () => finish(withLoginQuery(returnPath));
+
+    const needsEmailPermission = errorCode === 'yandex_email_required';
     const error = ERROR_TEXT[errorCode] || DEFAULT_ERROR;
 
     return (
@@ -202,22 +216,23 @@ const YandexAuthPage: React.FC = () => {
 
                     {stage === 'error' ? (
                         <>
-                            <h1 className={styles.title}>Не получилось войти</h1>
+                            <h1 className={styles.title}>
+                                {needsEmailPermission ? 'Нужен доступ к почте' : 'Не получилось войти'}
+                            </h1>
                             <div className={styles.error}>
                                 <p className={styles.errorTitle}>{error.title}</p>
                                 <p className={styles.errorText}>{error.text}</p>
                             </div>
-                            <button
-                                type="button"
-                                className={styles.yandexButton}
-                                onClick={() => {
-                                    window.location.href = yandexStartUrl(returnPath);
-                                }}
-                            >
+                            <button type="button" className={styles.yandexButton} onClick={() => goYandex(needsEmailPermission)}>
                                 <span className={styles.logoSmall} aria-hidden="true">Я</span>
-                                <span>Попробовать снова</span>
+                                <span>{needsEmailPermission ? 'Разрешить доступ к почте' : 'Попробовать снова'}</span>
                             </button>
-                            <Button title="Войти по email" full onClick={() => finish(returnPath)} />
+                            {needsEmailPermission ? (
+                                <p className={styles.hint}>
+                                    На странице Яндекса отметьте «Адрес электронной почты» и нажмите «Разрешить».
+                                </p>
+                            ) : null}
+                            <Button title="Войти по email" full onClick={goEmailLogin} />
                         </>
                     ) : null}
                 </div>
