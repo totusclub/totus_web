@@ -55,6 +55,13 @@
     font-size: 15px;
     line-height: 22px;
 }
+.hint{
+    margin: -6px 0 0;
+    color: var(--textTertiary, #8a8a8a);
+    font-size: 13px;
+    line-height: 18px;
+    text-align: left;
+}
 .error{
     display: flex;
     flex-direction: column;

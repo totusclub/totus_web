@@ -17,6 +17,7 @@ import { setAuth } from '@/store/slices/authSlice';
 import { decodeToken, saveToken, saveRefreshToken } from '@/utils/auth';
 import { getMe } from '@/api/AuthApi';
 import { yandexExchange, updateProfilePhone, yandexStartUrl } from '@/api/YandexAuthApi';
+import { formatRuPhoneInput, normalizeRuPhone, RU_PHONE_HINT } from '@/utils/phone';
 
 type Stage = 'loading' | 'phone' | 'error';
 
@@ -123,16 +124,21 @@ const YandexAuthPage: React.FC = () => {
             });
     }, [router.isReady, router.query, dispatch, finish]);
 
+    const onPhoneChange = (value: string | number) => {
+        setPhone(formatRuPhoneInput(String(value)));
+        if (phoneError) setPhoneError('');
+    };
+
     const handleSavePhone = async () => {
-        const digits = phone.replace(/\D/g, '');
-        if (digits.length < 10) {
-            setPhoneError('Введите номер целиком');
+        const normalized = normalizeRuPhone(phone);
+        if (!normalized) {
+            setPhoneError(RU_PHONE_HINT);
             return;
         }
         setPhoneError('');
         setSaving(true);
         try {
-            const data = await updateProfilePhone(phone);
+            const data = await updateProfilePhone(normalized);
             const token = data?.accessToken || data?.authToken;
             if (token) {
                 saveToken(token);
@@ -141,7 +147,11 @@ const YandexAuthPage: React.FC = () => {
             }
             finish(returnPath);
         } catch (error: any) {
-            setPhoneError(error?.response?.data?.error === 'phone_invalid' ? 'Проверьте номер' : 'Не удалось сохранить номер');
+            setPhoneError(
+                error?.response?.data?.error === 'phone_invalid'
+                    ? error?.response?.data?.message || RU_PHONE_HINT
+                    : 'Не удалось сохранить номер',
+            );
         } finally {
             setSaving(false);
         }
@@ -175,12 +185,14 @@ const YandexAuthPage: React.FC = () => {
                             </p>
                             <Input
                                 value={phone}
-                                onChange={(value) => setPhone(String(value))}
+                                onChange={onPhoneChange}
                                 placeholder="+7 999 123-45-67"
                                 type="tel"
                                 inputMode="tel"
+                                maxLength={18}
                                 error={phoneError}
                             />
+                            <p className={styles.hint}>Только российские номера: +7 или 8</p>
                             <Button title="Сохранить" full loading={saving} onClick={handleSavePhone} />
                             <button type="button" className={styles.link} onClick={() => finish(returnPath)}>
                                 Пропустить
