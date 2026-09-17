@@ -1,5 +1,4 @@
 import styles from '../hotelDetails.module.css';
-import groupStyles from './offerGroups.module.css';
 import Button from "@/components/UI/button";
 import { useRouter } from "next/router";
 import React, { useMemo, useState } from "react";
@@ -13,7 +12,7 @@ import { formatPriceRub } from '@/utils/formatPrice';
 import { getOfferConfirmabilityDisplayLabel } from '@/utils/roomFilters';
 import { getOfferDisplayInfo, OFFER_TAG_BEST_PRICE } from '@/utils/offerDisplay';
 import {
-    OFFER_GROUP_LABELS,
+    getOfferPrice,
     OFFER_GROUP_ORDER,
     splitOffersBySource,
     type OfferSource,
@@ -42,7 +41,7 @@ const roomTypeName: Record<string, string> = {
     HBL:'Завтрак и обед'
 };
 
-type OfferGroup = { source: OfferSource; label: string; offers: any[] };
+type OfferGroup = { source: OfferSource; offers: any[] };
 
 const HotelDetailsPriceList: React.FC<HotelDetailsPriceListProps> = ({ item, type }) => {
     const router = useRouter();
@@ -70,20 +69,41 @@ const HotelDetailsPriceList: React.FC<HotelDetailsPriceListProps> = ({ item, typ
         return `С ${day}.${month}`;
     };
 
+    const offersForType = useMemo(
+        () => (item ?? []).filter((room) => room.type === type),
+        [item, type],
+    );
+
     // Room Type v3: одна карточка номера, внутри две группы предложений —
     // «Arlekino» (lt_extras.totus.custom) и «Level.Travel»; внутри группы сортировка по цене.
+    // Заголовки групп не выводим: оператор и так указан в каждой строке предложения.
     const offerGroups = useMemo<OfferGroup[]>(() => {
-        const list = (item ?? []).filter((room) => room.type === type);
-        const split = splitOffersBySource(list);
+        const split = splitOffersBySource(offersForType);
         return OFFER_GROUP_ORDER
-            .map((source) => ({ source, label: OFFER_GROUP_LABELS[source], offers: split[source] }))
+            .map((source) => ({ source, offers: split[source] }))
             .filter((group) => group.offers.length > 0);
-    }, [item, type]);
+    }, [offersForType]);
+
+    // «Лучшая цена»: флаг extras.best_price приходит от Level.Travel и относится только к его
+    // собственным ценам — нашим предложениям backend ставит best_price = false. Поэтому бейдж
+    // показываем там, где его показал бы Level.Travel (если флаг есть хоть у одного предложения),
+    // но вешаем на самое дешёвое предложение списка — включая наше, если оно дешевле.
+    const bestPriceOfferId = useMemo(() => {
+        if (!offersForType.some((offer) => offer?.extras?.best_price)) return null;
+        let bestId: string | number | null = null;
+        let bestPrice: number | null = null;
+        for (const offer of offersForType) {
+            const price = getOfferPrice(offer);
+            if (price == null) continue;
+            if (bestPrice == null || price < bestPrice) {
+                bestPrice = price;
+                bestId = offer?.id ?? null;
+            }
+        }
+        return bestId;
+    }, [offersForType]);
 
     const totalCount = offerGroups.reduce((sum, group) => sum + group.offers.length, 0);
-    // Заголовки групп показываем только у номеров с нашими предложениями —
-    // у обычных номеров LT список выглядит как раньше.
-    const showGroupTitles = offerGroups.some((group) => group.source === 'arlekino');
     // Свёрнуто: по самому дешёвому предложению каждой группы; «Показать ещё» — общая.
     const visibleCount = showAll ? totalCount : offerGroups.length;
     const hiddenCount = Math.max(0, totalCount - visibleCount);
@@ -96,7 +116,7 @@ const HotelDetailsPriceList: React.FC<HotelDetailsPriceListProps> = ({ item, typ
         const secondaryTags = displayInfo.tags.filter(
             (tag) => tag !== confirmabilityLabel,
         );
-        const hasBestPrice = secondaryTags.includes(OFFER_TAG_BEST_PRICE);
+        const hasBestPrice = bestPriceOfferId != null && room?.id === bestPriceOfferId;
         const otherTags = secondaryTags.filter(
             (tag) => tag !== OFFER_TAG_BEST_PRICE,
         );
@@ -172,16 +192,6 @@ const HotelDetailsPriceList: React.FC<HotelDetailsPriceListProps> = ({ item, typ
                     const visibleOffers = showAll ? group.offers : group.offers.slice(0, 1);
                     return (
                         <React.Fragment key={group.source}>
-                            {showGroupTitles ? (
-                                <div className={groupStyles.groupTitle}>
-                                    <span>{group.label}</span>
-                                    {group.offers.length > 1 ? (
-                                        <span className={groupStyles.groupTitleCount}>
-                                            {group.offers.length}
-                                        </span>
-                                    ) : null}
-                                </div>
-                            ) : null}
                             {visibleOffers.map(renderOffer)}
                         </React.Fragment>
                     );
