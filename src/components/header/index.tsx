@@ -3,7 +3,7 @@ import styles from './header.module.css';
 import Icon from "@/components/icons/Icon";
 import Button from "@/components/UI/button";
 import SearchForm from "@/components/search/searchForm";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import AuthModal from "@/components/auth";
 import useAuth from "@/hooks/useAuth";
 import { useRouter } from "next/router";
@@ -21,6 +21,16 @@ const Header = () => {
     const { token } = useAuth();
     const router = useRouter();
     const pathname = router.pathname || '';
+
+    // ?login=1 — открыть модалку входа (с ней возвращает страница /auth/yandex,
+    // когда Яндекс не отдал почту и пользователь выбрал вход по email).
+    useEffect(() => {
+        if (!router.isReady) return;
+        if (router.query.login !== '1') return;
+        if (!token) setAuthModalOpen(true);
+        const { login, ...rest } = router.query as Record<string, any>;
+        router.replace({ pathname: router.pathname, query: rest }, undefined, { shallow: true });
+    }, [router.isReady, router.query.login, token]);
 
     const showSearch = useMemo(() => {
         if (!pathname) return 'home';

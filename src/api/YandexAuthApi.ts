@@ -20,10 +20,15 @@ export interface YandexExchangeResult {
     needsPhone?: boolean;
 }
 
-/** Куда ведёт кнопка: сервер сам редиректит на oauth.yandex.ru. */
-export function yandexStartUrl(returnPath = '/'): string {
+/**
+ * Куда ведёт кнопка: сервер сам редиректит на oauth.yandex.ru.
+ * force — повтор после «почта не выдана»: Яндекс снова покажет экран прав
+ * (без этого он молча вернёт тот же набор прав, и повтор бессмыслен).
+ */
+export function yandexStartUrl(returnPath = '/', options: { force?: boolean } = {}): string {
     const safe = returnPath.startsWith('/') && !returnPath.startsWith('//') ? returnPath : '/';
-    return `${BASE_URL}/api/auth/yandex/start?client=web&return=${encodeURIComponent(safe)}`;
+    const force = options.force ? '&force=1' : '';
+    return `${BASE_URL}/api/auth/yandex/start?client=web&return=${encodeURIComponent(safe)}${force}`;
 }
 
 export async function yandexExchange(ticket: string): Promise<YandexExchangeResult> {
