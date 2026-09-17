@@ -6,6 +6,7 @@ import {SignInRequest} from "@/api/AuthApi";
 import YandexSmartCaptcha, {
     YANDEX_SMARTCAPTCHA_SITEKEY,
 } from '@/components/auth/YandexSmartCaptcha';
+import YandexIdButton from '@/components/auth/YandexIdButton';
 
 const SignInForm: React.FC = ({setScreen,setEmail}:any) => {
     const [login, setLogin] = useState("");
@@ -63,6 +64,7 @@ const SignInForm: React.FC = ({setScreen,setEmail}:any) => {
          <YandexSmartCaptcha onTokenChange={setCaptchaToken} />
          {error ? <p className={styles.captchaError}>{error}</p> : null}
          <Button disabled={disabled} onClick={()=>handelLogin()} title={'Войти'}/>
+         <YandexIdButton />
      </div>
     );
 };

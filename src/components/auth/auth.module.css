@@ -66,3 +66,44 @@
 .containerVerify>p{
     margin-top: 32px;
 }
+
+/* Вход через Яндекс ID (макеты: claude/YANDEX_AUTH_DESIGN_RU.md).
+   Светлая тема — чёрная кнопка, тёмная — белая: так она заметна на обоих фонах
+   и не спорит с брендовой оранжевой «Войти». */
+.yandexButton{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    height: 52px;
+    padding: 0 16px;
+    border: none;
+    border-radius: 24px;
+    background: #000000;
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 20px;
+    cursor: pointer;
+}
+.yandexButton:hover{
+    opacity: 0.9;
+}
+.yandexLogo{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    background: #FC3F1D;
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 24px;
+}
+[data-theme="dark"] .yandexButton{
+    background: #ffffff;
+    color: #141414;
+}
