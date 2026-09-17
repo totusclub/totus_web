@@ -38,19 +38,30 @@ export async function updateProfilePhone(phone: string) {
 }
 
 /**
- * Раздел включён? Пока на сервере нет настроек, /status отвечает 503 — кнопку не показываем.
- * Когда всё готово, он отвечает 200 (есть токен) или 401 (гость). Ответ кэшируем на сессию.
+ * Раздел включён? Ответы /api/auth/yandex/status:
+ *   200 / 401 / 403 — маршруты есть, раздел работает → кнопка показывается;
+ *   503 — нет настроек или миграции; 404 — роутер ещё не смонтирован в app.js;
+ *   сеть недоступна — тоже считаем выключенным.
+ *
+ * NEXT_PUBLIC_YANDEX_AUTH перекрывает пробу: '1' — показывать кнопку всегда (удобно проверить
+ * вёрстку до раскатки сервера), '0' — прятать всегда, пусто — по ответу сервера.
+ *
+ * Запрос идёт отдельным экземпляром axios — без глобальных интерсепторов (‘@/api/http’),
+ * чтобы проба ни при каких ответах не трогала сессию (401 → refresh → возможный выход).
+ * Результат кэшируется на жизнь страницы: один запрос, а не по одному на каждое открытие модалки.
  */
-let enabledCache: boolean | null = null;
+const FORCE = process.env.NEXT_PUBLIC_YANDEX_AUTH;
+const probeClient = axios.create({ timeout: 8000, validateStatus: () => true });
+let enabledPromise: Promise<boolean> | null = null;
 
-export async function isYandexAuthEnabled(): Promise<boolean> {
-    if (enabledCache !== null) return enabledCache;
-    try {
-        await axios.get(`${BASE_URL}/api/auth/yandex/status`);
-        enabledCache = true;
-    } catch (error: any) {
-        const status = error?.response?.status;
-        enabledCache = status === 401 || status === 403;
+export function isYandexAuthEnabled(): Promise<boolean> {
+    if (FORCE === '1') return Promise.resolve(true);
+    if (FORCE === '0') return Promise.resolve(false);
+    if (!enabledPromise) {
+        enabledPromise = probeClient
+            .get(`${BASE_URL}/api/auth/yandex/status`)
+            .then(response => [200, 401, 403].includes(response.status))
+            .catch(() => false);
     }
-    return enabledCache;
+    return enabledPromise;
 }
