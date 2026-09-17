@@ -43,14 +43,20 @@ export async function updateProfilePhone(phone: string) {
  *   503 — нет настроек или миграции; 404 — роутер ещё не смонтирован в app.js;
  *   сеть недоступна — тоже считаем выключенным.
  *
+ * NEXT_PUBLIC_YANDEX_AUTH перекрывает пробу: '1' — показывать кнопку всегда (удобно проверить
+ * вёрстку до раскатки сервера), '0' — прятать всегда, пусто — по ответу сервера.
+ *
  * Запрос идёт отдельным экземпляром axios — без глобальных интерсепторов (‘@/api/http’),
  * чтобы проба ни при каких ответах не трогала сессию (401 → refresh → возможный выход).
  * Результат кэшируется на жизнь страницы: один запрос, а не по одному на каждое открытие модалки.
  */
+const FORCE = process.env.NEXT_PUBLIC_YANDEX_AUTH;
 const probeClient = axios.create({ timeout: 8000, validateStatus: () => true });
 let enabledPromise: Promise<boolean> | null = null;
 
 export function isYandexAuthEnabled(): Promise<boolean> {
+    if (FORCE === '1') return Promise.resolve(true);
+    if (FORCE === '0') return Promise.resolve(false);
     if (!enabledPromise) {
         enabledPromise = probeClient
             .get(`${BASE_URL}/api/auth/yandex/status`)
