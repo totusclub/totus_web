@@ -190,7 +190,7 @@ async function applyRemoteAnswer(callId: string, answer: RTCSessionDescriptionIn
         setState('answered');
         onCallActiveChange?.(true, activeCallStartedAt);
     } catch {
-        // «wrong state» означает, что answer уже стоит — состояние всả равно обновляем
+        // «wrong state» означает, что answer уже стоит — состояние всё равно обновляем
         if (pc.signalingState === 'stable') {
             await processQueuedIceCandidates(callId);
             if (!activeCallStartedAt) activeCallStartedAt = Date.now();
@@ -547,6 +547,8 @@ export function setCallActiveChangeCallback(cb: ((isActive: boolean, startedAt: 
 /** Полный сброс при выходе из аккаунта. */
 export function shutdownSupportCall(): void {
     teardown({ notifyBackend: true });
+    // Чат при logout делает removeAllListeners на общем сокете — подписки ставим заново.
+    socketBound = false;
     isInitialized = false;
     currentLoyaltyId = null;
     currentDeviceId = null;
