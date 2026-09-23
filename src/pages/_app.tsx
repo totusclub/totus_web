@@ -19,6 +19,7 @@ import CookieConsent from "@/components/cookieConsent";
 import GlobalAiChat from '@/components/GlobalAiChat';
 import SupportChatGate from '@/components/support/SupportChatGate';
 import NotificationsBridge from '@/components/notifications/NotificationsBridge';
+import SupportCallProvider from '@/components/support/SupportCallProvider';
 import { useStopSearchPollOnLeave } from '@/hooks/useStopSearchPollOnLeave';
 // import ScrollRestoration from '@/components/ScrollRestoration';
 
@@ -98,6 +99,7 @@ function MyApp({ Component, pageProps }: AppProps) {
             <div id="root">
                 {/* <ScrollRestoration /> */}
 
+                <SupportCallProvider>
                 {!isAiRoute && <Header />}
                 <Component {...pageProps} />
                 {!isAiRoute && <Footer />}
@@ -109,6 +111,7 @@ function MyApp({ Component, pageProps }: AppProps) {
                 <SupportChatGate />
                 {/* Уведомления: непрочитанные, notify:* на сокете, service worker, тосты */}
                 <NotificationsBridge />
+                </SupportCallProvider>
             </div>
         </>
     );

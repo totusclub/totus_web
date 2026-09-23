@@ -11,6 +11,7 @@ import { useTheme } from "@/hooks/useTheme";
 import type { RootState } from "@/store";
 import { unregisterDevice } from "@/api/notificationsApi";
 import { getDeviceId } from "@/lib/webPush";
+import { useSupportCall } from "@/components/support/SupportCallProvider";
 
 const MenuProfile = () => {
     const router = useRouter();
@@ -19,6 +20,8 @@ const MenuProfile = () => {
     const [deleteModal, setDeleteModal] = useState<boolean>(false)
     const { theme, toggleTheme } = useTheme();
     const supportUnread = useSelector((state: RootState) => state.supportChat?.unreadCount ?? 0);
+    // Звонок в поддержку: доступен, если calling_api_v2 отдал access === 0 (как в приложении)
+    const { available: canCallSupport, call: callSupport } = useSupportCall();
     const notificationsUnread = useSelector((state: RootState) => state.notifications?.unread ?? 0);
 
     const handleLogout = () => {
@@ -30,13 +33,6 @@ const MenuProfile = () => {
         if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
             window.ReactNativeWebView.postMessage('logout');
         }
-    }
-
-    const handelCall = () => {
-        if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
-            window.ReactNativeWebView.postMessage("openModal")
-        }
-
     }
 
     return (
@@ -74,16 +70,6 @@ const MenuProfile = () => {
             {/*        <Icon name={'tourist'} size={24}/>*/}
             {/*        <p>Туристы</p>*/}
             {/*    </div>*/}
-            {/*</div>*/}
-            {/*<div onClick={() => handelCall()} className={styles.profileSupport}>*/}
-            {/*    <div className={styles.profileSupport}>*/}
-            {/*        <div style={{ position: 'relative' }}>*/}
-            {/*            <div className={styles.indicatorSupport} />*/}
-            {/*            <Icon name={'support'} size={24} />*/}
-            {/*        </div>*/}
-            {/*        <p>Звонок в поддержку </p>*/}
-            {/*    </div>*/}
-            {/*    <Icon name={'phone'} size={18} />*/}
             {/*</div>*/}
             <div className={styles.profileMenu}>
                 {/*<div className={styles.profileMenuHead}>*/}
@@ -132,6 +118,25 @@ const MenuProfile = () => {
                         <span className={styles.profileMenuItemSub}>Напишите нам — ответим в чате</span>
                     </div>
                 </div>
+                {canCallSupport && (
+                    <div
+                        onClick={callSupport}
+                        className={`${styles.profileMenuItem} ${styles.profileMenuItemChat}`}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') callSupport();
+                        }}
+                    >
+                        <div className={styles.profileMenuChatIcon}>
+                            <Icon name={'phone'} size={24} color={'var(--textPrimary)'} />
+                        </div>
+                        <div className={styles.profileMenuItemText}>
+                            <p>Звонок в поддержку</p>
+                            <span className={styles.profileMenuItemSub}>Голосовой звонок из браузера</span>
+                        </div>
+                    </div>
+                )}
                 <div onClick={() => router.push('/privacy-policy')} className={styles.profileMenuItem}>
                     <Icon name={'faq'} size={24} />
                     <p>Политика конфиденциальности</p>

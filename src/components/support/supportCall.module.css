@@ -1,0 +1,300 @@
+/* Звонок в поддержку — макет «SUPPORT CALL · Light/Dark».
+   Значения по умолчанию в var(...) страхуют, если переменной нет в теме. */
+
+.overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    background: var(--overlay, rgba(31, 31, 31, 0.58));
+}
+
+.card {
+    position: relative;
+    width: 100%;
+    max-width: 420px;
+    padding: 32px 28px 28px;
+    border-radius: 24px;
+    background: var(--bgElevated, var(--bgPrimary, #ffffff));
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.minimize {
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--textTertiary, #7a7a7a);
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.minimize:hover {
+    background: var(--bgSecondary, #f5f5f5);
+}
+
+.avatar {
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    background: var(--core_Orange, #fe732e);
+    color: #ffffff;
+    font-size: 32px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.name {
+    margin: 16px 0 0;
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--textPrimary, #1f1f1f);
+}
+
+.status {
+    margin: 6px 0 0;
+    font-size: 16px;
+    color: var(--textSecondary, #3d3d3d);
+}
+
+.statusTimer {
+    font-size: 28px;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    color: var(--textPrimary, #1f1f1f);
+}
+
+.statusError {
+    color: var(--error, var(--primary_red, #cf3030));
+}
+
+.hint {
+    margin: 10px 0 0;
+    max-width: 320px;
+    font-size: 13px;
+    line-height: 18px;
+    color: var(--textTertiary, #7a7a7a);
+}
+
+.hintOk {
+    color: var(--success, var(--secondary_green, #39bf87));
+}
+
+.controls {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 28px;
+    margin-top: 28px;
+}
+
+.ctrl {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    border: none;
+    background: none;
+    padding: 0;
+    cursor: pointer;
+}
+
+.ctrlButton {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--bgSecondary, #f5f5f5);
+    color: var(--textPrimary, #1f1f1f);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.15s ease;
+}
+
+.ctrl:hover .ctrlButton {
+    transform: scale(1.04);
+}
+
+.ctrlActive {
+    background: var(--textPrimary, #1f1f1f);
+    color: var(--bgPrimary, #ffffff);
+}
+
+.ctrlDanger {
+    background: var(--error, var(--primary_red, #cf3030));
+    color: #ffffff;
+}
+
+.ctrlAnswer {
+    background: var(--success, var(--secondary_green, #39bf87));
+    color: #ffffff;
+    transform: rotate(180deg);
+}
+
+.ctrlLabel {
+    font-size: 12px;
+    color: var(--textTertiary, #7a7a7a);
+}
+
+.actions {
+    margin-top: 24px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.primaryBtn,
+.secondaryBtn {
+    width: 100%;
+    padding: 14px 24px;
+    border-radius: 24px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid transparent;
+}
+
+.primaryBtn {
+    background: var(--core_Orange, #fe732e);
+    color: #ffffff;
+}
+
+.secondaryBtn {
+    background: transparent;
+    border-color: var(--borderTertiary, #e0e0e0);
+    color: var(--textPrimary, #1f1f1f);
+}
+
+.phoneLink {
+    font-size: 13px;
+    color: var(--textTertiary, #7a7a7a);
+    text-decoration: none;
+}
+
+.closeLink {
+    border: none;
+    background: none;
+    font-size: 13px;
+    color: var(--textTertiary, #7a7a7a);
+    cursor: pointer;
+    padding: 4px;
+}
+
+/* --- свёрнутая плашка --- */
+
+.miniBar {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 1200;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    width: 320px;
+    max-width: calc(100vw - 32px);
+    border-radius: 16px;
+    background: var(--bgElevated, var(--bgPrimary, #ffffff));
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14);
+}
+
+.miniAvatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--core_Orange, #fe732e);
+    color: #ffffff;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.miniText {
+    flex: 1;
+    min-width: 0;
+    text-align: left;
+}
+
+.miniTitle {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--textPrimary, #1f1f1f);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.miniStatus {
+    font-size: 12px;
+    color: var(--textTertiary, #7a7a7a);
+    font-variant-numeric: tabular-nums;
+}
+
+.miniHangUp {
+    width: 36px;
+    height: 36px;
+    border: none;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.miniExpand {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 0;
+}
+
+.srOnly {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+}
+
+@media (max-width: 480px) {
+    .card {
+        max-width: 343px;
+        padding: 28px 20px 24px;
+    }
+
+    .avatar {
+        width: 80px;
+        height: 80px;
+        font-size: 28px;
+    }
+
+    .controls {
+        gap: 24px;
+    }
+
+    .miniBar {
+        right: 16px;
+        left: 16px;
+        bottom: 16px;
+        width: auto;
+    }
+}
