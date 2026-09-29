@@ -1,0 +1,7 @@
+/* Desktop: заголовок hero показывается в Header (только на главной), в hero-блоке его нет.
+   Мобильная версия (до 1024px) — без изменений. */
+@media (min-width: 1025px) {
+  .desktopHidden {
+    display: none;
+  }
+}

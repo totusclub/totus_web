@@ -145,7 +145,12 @@
     align-items: center;
 }
 @media (max-width: 1024px) {
+    /* Footer в мобильной версии: снизу место под фиксированную нижнюю панель (60px) */
     .footer{
+        padding-bottom: calc(60px + env(safe-area-inset-bottom));
+    }
+    /* Кнопки магазинов в мобильной версии — одним рядом в колонке с реквизитами */
+    .footerColumnM .appStore{
         display: none;
     }
     .footerRow{
