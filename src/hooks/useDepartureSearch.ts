@@ -53,9 +53,14 @@ export const useDepartureSearch = (searchValue: string) => {
                 ));
             };
 
-            // Список городов уже на клиенте: вариант в другой раскладке («vjcrdf» → «москва»)
-            // проверяется локально, без запросов к API. Текст в поле ввода не меняется.
-            const { results: filtered } = filterWithLayoutFallback(searchValue, filterByQuery);
+            // Поле «Откуда?»: список городов уже на клиенте, поэтому вариант в другой раскладке
+            // («vjcrdf» → «москва», «ьщыс» → «mosc») проверяется локально, без запросов к API.
+            // Сначала — введённый текст; вариант — только если детектор уверен или по тексту
+            // ничего не нашлось (тогда пробуем другую раскладку даже для 1–2 букв: «Vj» → «Мо»).
+            // Текст в поле ввода не меняется.
+            const { results: filtered } = filterWithLayoutFallback(searchValue.trim(), filterByQuery, {
+                convertWhenEmpty: true,
+            });
 
             // Popular (prioritized) cities first, then the rest of the full list.
             const sorted = [...filtered].sort((a, b) => {
