@@ -1,6 +1,7 @@
 .search {
   display: flex;
-  padding: 56px 80px;
+  /* 48px сверху и снизу: заголовок hero на Desktop перенесён в Header, высота — минимально нужная */
+  padding: 48px 80px;
   flex-direction: column;
   align-items: flex-start;
   align-self: stretch;

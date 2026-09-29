@@ -1,4 +1,5 @@
 .header {
+  position: relative;
   display: flex;
   height: 80px;
   padding: 0 12px;
@@ -249,12 +250,21 @@
   }
 }
 /* Заголовок hero в Header — только главная, только Desktop.
+   Строго по центру экрана: позиционируется от ширины Header (= ширина окна),
+   а не от соседних блоков, поэтому логотип и правый блок («Войти» или профиль)
+   его не сдвигают. По 320px с каждой стороны зарезервировано под них —
+   длинный текст обрезается многоточием симметрично, центр остаётся на месте.
    Цвета из темы: читается и в светлой, и в тёмной теме (фон Header — --bgPrimary). */
 .heroTitle {
-  flex: 1;
-  min-width: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: max-content;
+  max-width: calc(100% - 640px);
   margin: 0;
-  padding: 0 24px;
+  padding: 0;
+  pointer-events: none;
   color: var(--textPrimary);
   font-size: 24px;
   font-style: normal;
