@@ -4,8 +4,8 @@
   flex-direction: column;
   align-items: flex-start;
   align-self: stretch;
+  /* Фон hero — только изображение с бэкенда (см. index.tsx), статической заглушки нет */
   background-color: var(--bgSecondary);
-  background-image: url("./../../assets/images/cover.webp");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;

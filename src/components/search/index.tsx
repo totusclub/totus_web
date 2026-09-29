@@ -12,7 +12,8 @@ const Search = () => {
     const dispatch = useDispatch();
     // null — ответ бэкенда ещё не пришёл: заголовок скрыт, чтобы не мелькал текст по умолчанию
     const [heroTitle, setHeroTitle] = useState<string | null>(null);
-    // Только изображение с бэкенда, и только после полной загрузки — без локальной заглушки
+    // Только изображение с бэкенда (он случайно выбирает одно из всех hero-изображений админки),
+    // и только после полной загрузки — без локальной заглушки
     const [heroImage, setHeroImage] = useState('');
 
     useEffect(() => {
@@ -39,10 +40,7 @@ const Search = () => {
     return (
         <div
             className={styles.search}
-            style={{
-                // перекрывает background-image из search.module.css
-                backgroundImage: heroImage ? `url(${heroImage})` : 'none',
-            }}
+            style={heroImage ? { backgroundImage: `url(${heroImage})` } : undefined}
         >
             <div className={`content ${styles.searchContent}`}>
                 <div className={styles.logoHomeM}>
