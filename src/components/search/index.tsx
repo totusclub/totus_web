@@ -1,4 +1,5 @@
 import styles from './search.module.css';
+import heroTitleStyles from './heroTitle.module.css';
 import SearchForm from "@/components/search/searchForm";
 import Icon from "@/components/icons/Icon";
 import { useDispatch } from 'react-redux';
@@ -51,7 +52,7 @@ const Search = () => {
                 </div>
                 {/* На Desktop заголовок перенесён в Header, здесь он виден только в мобильной версии */}
                 <h1
-                    className={styles.searchTitle}
+                    className={`${styles.searchTitle} ${heroTitleStyles.desktopHidden}`}
                     style={heroTitle === null ? { visibility: 'hidden' } : undefined}
                 >
                     {heroTitle ?? DEFAULT_TITLE}
