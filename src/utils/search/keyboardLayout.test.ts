@@ -142,3 +142,58 @@ test('локальный фильтр: vjcrdf → Москва', () => {
     assert.deepEqual(filterWithLayoutFallback('Каз', filter).results, ['Казань']);
     assert.deepEqual(filterWithLayoutFallback('', filter).results, cities);
 });
+
+// Поле «Откуда?»: та же фильтрация, что в useDepartureSearch (name / name_ru / name_en, includes)
+const DEPARTURES = [
+    { name: 'Москва', name_ru: 'Москва', name_en: 'Moscow' },
+    { name: 'Санкт-Петербург', name_ru: 'Санкт-Петербург', name_en: 'Saint Petersburg' },
+    { name: 'Казань', name_ru: 'Казань', name_en: 'Kazan' },
+    { name: 'Мурманск', name_ru: 'Мурманск', name_en: 'Murmansk' },
+    { name: 'Сургут', name_ru: 'Сургут', name_en: 'Surgut' },
+    { name: 'Нижнекамск', name_ru: 'Нижнекамск', name_en: 'Nizhnekamsk' },
+];
+const filterDepartures = (q: string) => {
+    const s = q.toLowerCase();
+    return DEPARTURES.filter((c) => [c.name, c.name_ru, c.name_en].some((n) => n.toLowerCase().includes(s))).map(
+        (c) => c.name,
+    );
+};
+const whereFrom = (q: string) => filterWithLayoutFallback(q, filterDepartures, { convertWhenEmpty: true });
+
+test('«Откуда?»: EN-раскладка вместо RU', () => {
+    assert.deepEqual(whereFrom('vjcrdf').results, ['Москва']);
+    assert.deepEqual(whereFrom('Vjcrdf').results, ['Москва']);
+    assert.deepEqual(whereFrom('rfpfym').results, ['Казань']);
+    assert.deepEqual(whereFrom('cfyrn-gtnth,ehu').results, ['Санкт-Петербург']);
+    // города не из словаря детектора находятся по самому списку вылетов
+    assert.deepEqual(whereFrom('cehuen').results, ['Сургут']);
+    assert.deepEqual(whereFrom('yb;ytrfv').results, ['Нижнекамск']);
+    // начало названия, в том числе 1–2 буквы
+    assert.deepEqual(whereFrom('vjc').results, ['Москва']);
+    assert.deepEqual(whereFrom('Vj').results, ['Москва']);
+    assert.deepEqual(whereFrom('v').results, ['Москва', 'Мурманск', 'Нижнекамск']);
+});
+
+test('«Откуда?»: RU-раскладка вместо EN', () => {
+    assert.deepEqual(whereFrom('ьщысщц').results, ['Москва']);
+    assert.deepEqual(whereFrom('лфяфт').results, ['Казань']);
+    assert.deepEqual(whereFrom('ыгкпге').results, ['Сургут']);
+});
+
+test('«Откуда?»: корректный ввод не меняется', () => {
+    for (const [q, expected] of [
+        ['Москва', ['Москва']],
+        ['моск', ['Москва']],
+        ['Moscow', ['Москва']],
+        ['kaz', ['Казань']],
+        ['Санкт', ['Санкт-Петербург']],
+    ] as const) {
+        const r = whereFrom(q);
+        assert.equal(r.candidate.source, 'original', q);
+        assert.deepEqual(r.results, expected, q);
+    }
+    // пустой ввод — весь список
+    assert.equal(whereFrom('').results.length, DEPARTURES.length);
+    // ничего не найдено ни в одной раскладке — пустой список, без «случайных» совпадений
+    assert.deepEqual(whereFrom('qqqq').results, []);
+});
