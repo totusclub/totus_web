@@ -14,6 +14,9 @@ import LogoDesktopIcon from "@/components/icons/logoDesktop";
 import { FOOTER_STATIC_MOBILE_TITLES } from "@/config/footerStaticPages";
 import HeaderProfileMenu from "@/components/header/HeaderProfileMenu";
 import NotificationsBell from "@/components/notifications/NotificationsBell";
+import { useHomeHeroTitle } from "@/hooks/useHomeHeroTitle";
+
+const DEFAULT_HERO_TITLE = 'Путешествия начинаются здесь';
 
 const Header = () => {
     const dispatch = useDispatch();
@@ -21,6 +24,9 @@ const Header = () => {
     const { token } = useAuth();
     const router = useRouter();
     const pathname = router.pathname || '';
+    // Заголовок hero главной: на Desktop показывается в Header (в мобильной версии — в hero-блоке)
+    const isHomePage = pathname === '/';
+    const heroTitle = useHomeHeroTitle();
 
     const showSearch = useMemo(() => {
         if (!pathname) return 'home';
@@ -110,6 +116,14 @@ const Header = () => {
                         </div>
                     )}
                 </div>
+                {isHomePage && (
+                    <h1
+                        className={styles.heroTitle}
+                        style={heroTitle === null ? { visibility: 'hidden' } : undefined}
+                    >
+                        {heroTitle ?? DEFAULT_HERO_TITLE}
+                    </h1>
+                )}
                 {headerMobileRender}
 
 

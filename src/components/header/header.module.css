@@ -248,6 +248,24 @@
     transform: translateY(0);
   }
 }
+/* Заголовок hero в Header — только главная, только Desktop.
+   Цвета из темы: читается и в светлой, и в тёмной теме (фон Header — --bgPrimary). */
+.heroTitle {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  padding: 0 24px;
+  color: var(--textPrimary);
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 32px;
+  letter-spacing: -0.48px;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .headBanner {
   width: 100%;
   height: 80px;
@@ -302,6 +320,9 @@
     height: auto;
   }
   .headerRowPc {
+    display: none;
+  }
+  .heroTitle {
     display: none;
   }
   .headerRowM {

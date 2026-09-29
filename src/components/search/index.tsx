@@ -5,6 +5,7 @@ import { useDispatch } from 'react-redux';
 import { useEffect, useState } from 'react';
 import { clearSearch } from '@/store/slices/searchSlice';
 import { getHomeHero } from '@/api/homeHeroApi';
+import { publishHomeHeroTitle } from '@/hooks/useHomeHeroTitle';
 
 const DEFAULT_TITLE = 'Путешествия начинаются здесь';
 
@@ -25,6 +26,8 @@ const Search = () => {
         getHomeHero().then((hero) => {
             if (cancelled) return;
             setHeroTitle(hero.title || DEFAULT_TITLE);
+            // На Desktop этот же текст показывает Header (см. useHomeHeroTitle)
+            publishHomeHeroTitle(hero.title || DEFAULT_TITLE);
             if (!hero.image) return;
             const img = new window.Image();
             img.onload = () => {
@@ -46,6 +49,7 @@ const Search = () => {
                 <div className={styles.logoHomeM}>
                     <Icon name={"logo"} color={'white'} size={100} />
                 </div>
+                {/* На Desktop заголовок перенесён в Header, здесь он виден только в мобильной версии */}
                 <h1
                     className={styles.searchTitle}
                     style={heroTitle === null ? { visibility: 'hidden' } : undefined}
