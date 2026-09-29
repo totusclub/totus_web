@@ -5,13 +5,14 @@ import { useDispatch } from 'react-redux';
 import { useEffect, useState } from 'react';
 import { clearSearch } from '@/store/slices/searchSlice';
 import { getHomeHero } from '@/api/homeHeroApi';
-import coverImage from '@/assets/images/cover.webp';
 
 const DEFAULT_TITLE = 'Путешествия начинаются здесь';
 
 const Search = () => {
     const dispatch = useDispatch();
-    const [heroTitle, setHeroTitle] = useState(DEFAULT_TITLE);
+    // null — ответ бэкенда ещё не пришёл: заголовок скрыт, чтобы не мелькал текст по умолчанию
+    const [heroTitle, setHeroTitle] = useState<string | null>(null);
+    // Только изображение с бэкенда, и только после полной загрузки — без локальной заглушки
     const [heroImage, setHeroImage] = useState('');
 
     useEffect(() => {
@@ -19,24 +20,40 @@ const Search = () => {
     }, [dispatch]);
 
     useEffect(() => {
+        let cancelled = false;
         getHomeHero().then((hero) => {
+            if (cancelled) return;
             setHeroTitle(hero.title || DEFAULT_TITLE);
-            setHeroImage(hero.image || '');
+            if (!hero.image) return;
+            const img = new window.Image();
+            img.onload = () => {
+                if (!cancelled) setHeroImage(hero.image);
+            };
+            img.src = hero.image;
         });
+        return () => {
+            cancelled = true;
+        };
     }, []);
 
     return (
         <div
             className={styles.search}
             style={{
-                backgroundImage: `url(${heroImage || coverImage.src})`,
+                // перекрывает background-image из search.module.css
+                backgroundImage: heroImage ? `url(${heroImage})` : 'none',
             }}
         >
             <div className={`content ${styles.searchContent}`}>
                 <div className={styles.logoHomeM}>
                     <Icon name={"logo"} color={'white'} size={100} />
                 </div>
-                <h1 className={styles.searchTitle}>{heroTitle}</h1>
+                <h1
+                    className={styles.searchTitle}
+                    style={heroTitle === null ? { visibility: 'hidden' } : undefined}
+                >
+                    {heroTitle ?? DEFAULT_TITLE}
+                </h1>
                 <SearchForm pageName={'home'} />
             </div>
         </div>
