@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store";
 import { fetchDepartures } from "@/store/slices/departuresSlice";
+import { filterWithLayoutFallback } from "@/utils/search/searchCandidates";
 
 interface SearchItem {
     id: string;
@@ -43,14 +44,18 @@ export const useDepartureSearch = (searchValue: string) => {
                 return [cityEntry];
             });
 
-            const filtered = citiesWithAirports.filter(item => {
-                const lowerSearch = searchValue.toLowerCase();
-                return (
+            const filterByQuery = (query: string): SearchItem[] => {
+                const lowerSearch = query.toLowerCase();
+                return citiesWithAirports.filter(item => (
                     (item.name && item.name.toLowerCase().includes(lowerSearch)) ||
                     (item.name_ru && item.name_ru.toLowerCase().includes(lowerSearch)) ||
                     (item.name_en && item.name_en.toLowerCase().includes(lowerSearch))
-                );
-            });
+                ));
+            };
+
+            // Список городов уже на клиенте: вариант в другой раскладке («vjcrdf» → «москва»)
+            // проверяется локально, без запросов к API. Текст в поле ввода не меняется.
+            const { results: filtered } = filterWithLayoutFallback(searchValue, filterByQuery);
 
             // Popular (prioritized) cities first, then the rest of the full list.
             const sorted = [...filtered].sort((a, b) => {

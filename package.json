@@ -6,7 +6,8 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test:search": "npx --yes tsx --test src/utils/search/keyboardLayout.test.ts"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.8.1",
