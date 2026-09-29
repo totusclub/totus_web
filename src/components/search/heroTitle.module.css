@@ -4,4 +4,11 @@
   .desktopHidden {
     display: none;
   }
+
+  /* Hero на Desktop — 350px, вкладки и форма поиска по центру по вертикали.
+     Если контент выше (на 1025–1280px форма в столбик), hero растёт по контенту. */
+  .desktopHeight {
+    min-height: 350px;
+    justify-content: center;
+  }
 }
