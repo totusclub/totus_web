@@ -43,10 +43,10 @@ const Search = () => {
 
     return (
         <div
-            className={styles.search}
+            className={`${styles.search} ${heroTitleStyles.desktopHeight}`}
             style={heroImage ? { backgroundImage: `url(${heroImage})` } : undefined}
         >
-            <div className={`content ${styles.searchContent}`}>
+            <div className={`content ${styles.searchContent} ${heroTitleStyles.desktopContent}`}>
                 <div className={styles.logoHomeM}>
                     <Icon name={"logo"} color={'white'} size={100} />
                 </div>

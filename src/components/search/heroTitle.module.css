@@ -4,4 +4,15 @@
   .desktopHidden {
     display: none;
   }
+
+  /* Hero на Desktop — 500px. Если контент выше (на 1025–1280px форма в столбик), hero растёт по контенту. */
+  .desktopHeight {
+    min-height: 500px;
+  }
+
+  /* Hero Content (вкладки + форма поиска) занимает всю высоту hero и прижат к низу */
+  .desktopContent {
+    flex: 1 1 auto;
+    justify-content: flex-end;
+  }
 }
