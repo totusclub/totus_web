@@ -11,6 +11,7 @@
  * 3. Не больше трёх запросов на один ввод (оригинал + 2 варианта), обычно — один.
  */
 
+import { convertLayout, detectScript, directionFor } from './keyboardLayout';
 import { analyzeQuery, type LayoutConfidence } from './searchNormalizer';
 
 export type SearchCandidateSource = 'original' | 'layout' | 'layoutFallback';
@@ -91,6 +92,30 @@ export async function searchWithLayoutFallback<T>(
 }
 
 /**
+ * Весь запрос в другой раскладке — пословно, без оценки уверенности
+ * (каждое слово переводится в раскладку, противоположную той, в которой набрано).
+ */
+export function convertQueryLayout(query: string): string {
+    return query
+        .split(/(\s+)/)
+        .map((part) => {
+            const direction = directionFor(detectScript(part));
+            return direction ? convertLayout(part, direction) : part;
+        })
+        .join('');
+}
+
+export interface LocalFilterOptions {
+    /**
+     * Если ни оригинал, ни найденные детектором варианты ничего не нашли —
+     * проверить весь запрос в другой раскладке без оценки уверенности, даже 1–2 буквы.
+     * Подходит для локальных списков: сам список служит словарём, лишних запросов
+     * к API нет, а результат показывается только вместо пустого списка.
+     */
+    convertWhenEmpty?: boolean;
+}
+
+/**
  * Синхронный вариант для локальной фильтрации (списки, уже загруженные на клиент).
  * Правила те же: high — предпочитаем вариант, если он что-то нашёл;
  * иначе вариант используется, только если оригинал пуст.
@@ -98,22 +123,33 @@ export async function searchWithLayoutFallback<T>(
 export function filterWithLayoutFallback<T>(
     query: string,
     filter: (q: string) => T[],
+    options: LocalFilterOptions = {},
 ): { results: T[]; candidate: SearchCandidate; candidates: SearchCandidate[] } {
     const candidates = buildSearchCandidates(query);
     const [original, ...alternatives] = candidates;
     const originalResults = filter(original.query);
-    if (!alternatives.length) return { results: originalResults, candidate: original, candidates };
 
     const first = alternatives[0];
-    if (first.confidence === 'high') {
+    if (first?.confidence === 'high') {
         const results = filter(first.query);
         if (results.length) return { results, candidate: first, candidates };
     }
     if (originalResults.length) return { results: originalResults, candidate: original, candidates };
 
-    for (const candidate of first.confidence === 'high' ? alternatives.slice(1) : alternatives) {
+    for (const candidate of first?.confidence === 'high' ? alternatives.slice(1) : alternatives) {
         const results = filter(candidate.query);
         if (results.length) return { results, candidate, candidates };
+    }
+
+    if (options.convertWhenEmpty && query.trim()) {
+        const converted = convertQueryLayout(query);
+        if (converted !== query && !candidates.some((c) => c.query === converted)) {
+            const results = filter(converted);
+            if (results.length) {
+                const candidate: SearchCandidate = { query: converted, source: 'layoutFallback', confidence: 'low' };
+                return { results, candidate, candidates: [...candidates, candidate] };
+            }
+        }
     }
     return { results: originalResults, candidate: original, candidates };
 }
