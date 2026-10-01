@@ -180,8 +180,14 @@ export const useHotelRooms = (
           readyCount > lastReadyCount ||
           (!sawAnyRooms && readyCount > 0);
 
+        // Result of a fetch made on this poll after the search was already complete.
+        let fetchedAfterDone: Awaited<ReturnType<typeof fetchRooms>> | null = null;
+
         if (shouldFetchRooms) {
           const fetched = await fetchRooms();
+          // Reuse only a successful response with rooms; on an empty/failed response
+          // the final refresh below still runs (it doubles as an immediate retry).
+          if (searchDone && fetched.gotRooms) fetchedAfterDone = fetched;
           if (!isMounted) return;
 
           if (fetched.requestFailed) {
@@ -199,8 +205,10 @@ export const useHotelRooms = (
         }
 
         if (searchDone) {
-          // Final refresh after all operators finished.
-          const finalFetch = await fetchRooms();
+          // Final refresh after all operators finished. The fetch above already ran
+          // with searchDone=true (same request_id, same data) — reuse it instead of
+          // sending an identical /hotels-rooms request.
+          const finalFetch = fetchedAfterDone ?? (await fetchRooms());
           if (!isMounted) return;
 
           if (finalFetch.requestFailed && !sawAnyRooms) {
