@@ -160,7 +160,7 @@ const SmallSlider = ({ images }) => {
                                 }`}
                         >
                             {/*<img  src={`https://image.totus.club/imagePath?directory=${img['x900'].replace("https://img.cdn.level.travel/", "")}`} alt={`No Image`} className={styles.thumbnail} />*/}
-                            <img src={img['x900']} alt={`No Image`} className={styles.thumbnail} />
+                            <img src={img['x900']} alt={`No Image`} className={styles.thumbnail} loading="lazy" decoding="async" />
                         </div>
                     </div>
                 ))}

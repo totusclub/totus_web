@@ -158,6 +158,9 @@ const VerticalSlider = ({ images, loading }: any) => {
                                             : ''
                                             }`}
                                         tabIndex={index}
+                                        // Видимые миниатюры (до 6 в колонке) — сразу, остальные — по мере прокрутки слайдера.
+                                        loading={index < 6 ? 'eager' : 'lazy'}
+                                        decoding="async"
                                     />
                                 </div>
                             );
@@ -178,6 +181,8 @@ const VerticalSlider = ({ images, loading }: any) => {
                         src={selectedImage || initialImage}
                         alt="Selected"
                         className={styles.selectedImage}
+                        // Главное фото страницы отеля (LCP) — грузим первым.
+                        fetchPriority="high"
                     />
                     <button
                         type="button"
