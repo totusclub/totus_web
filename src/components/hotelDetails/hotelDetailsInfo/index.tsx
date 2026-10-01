@@ -161,7 +161,7 @@ const HotelDetailsInfo = ({
 
     const priceFormatted =
         offerPrice != null
-            ? String(Math.round(Number(offerPrice))).replace(/\B(?=(\d{3})+(?!\d))/g, "\u202F")
+            ? String(Math.round(Number(offerPrice))).replace(/\B(?=(\d{3})+(?!\d))/g, "\u{202F}")
             : "—";
 
     const roomOfferLabel = useMemo(() => {
@@ -272,7 +272,9 @@ const HotelDetailsInfo = ({
             ) : (
                 <div className={"content"}>
                     <div className={styles.HotelDetailsInfoRow}>
-                        <VerticalSlider loading={panding} images={images} />
+                        {/* Фото отеля уже есть (/references/hotels) — не ждём поиск номеров.
+                            Пока images пустые, VerticalSlider сам показывает тот же плейсхолдер. */}
+                        <VerticalSlider loading={false} images={images} />
                         <div className={styles.HotelDetailsInfo}>
                             <div className={styles.HotelDetailsInfoPrice}>
                                 <div className={styles.animationTextlazy1}></div>

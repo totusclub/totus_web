@@ -47,6 +47,8 @@ function PartnerLogo({ partner }: { partner: HomePartner }) {
         <img
             src={partner.image}
             alt={partner.name || 'Партнёр'}
+            loading="lazy"
+            decoding="async"
             style={{ width: '100%', height: 'auto', objectFit: 'contain', maxHeight: 80 }}
         />
     );

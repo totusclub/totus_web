@@ -14,7 +14,6 @@ import { useLoadHomeData } from "@/hooks/loadHomeData";
 export default function Home() {
 
     const { homeData } = useLoadHomeData();
-    console.log('homeData', homeData);
 
     return (
         <main>

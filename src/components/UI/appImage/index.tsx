@@ -56,7 +56,7 @@ export default function AppImage({ imageUrl }: Props) {
                     height:'200px'
                 }}
             >
-                <img src={imageUrl} alt=""   style={{
+                <img src={imageUrl} alt="" loading="lazy" decoding="async"   style={{
                     position: "absolute",
                     top: 0,
                     left: 0,
