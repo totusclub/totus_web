@@ -7,6 +7,7 @@
  */
 import axios from 'axios';
 import { API_BASE_URL } from '@/config/api';
+import { YANDEX_EXCHANGE_TIMEOUT_MS } from '@/utils/yandexAuthErrors';
 
 const BASE_URL = API_BASE_URL;
 
@@ -27,7 +28,12 @@ export function yandexStartUrl(returnPath = '/'): string {
 }
 
 export async function yandexExchange(ticket: string): Promise<YandexExchangeResult> {
-    const response = await axios.post(`${BASE_URL}/api/auth/yandex/exchange`, { ticket });
+    // Тайм-аут: без него зависший запрос держал «Завершаем вход…» бесконечно.
+    const response = await axios.post(
+        `${BASE_URL}/api/auth/yandex/exchange`,
+        { ticket },
+        { timeout: YANDEX_EXCHANGE_TIMEOUT_MS },
+    );
     return response.data;
 }
 
