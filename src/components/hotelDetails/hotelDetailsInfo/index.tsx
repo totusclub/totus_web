@@ -161,7 +161,7 @@ const HotelDetailsInfo = ({
 
     const priceFormatted =
         offerPrice != null
-            ? String(Math.round(Number(offerPrice))).replace(/\B(?=(\d{3})+(?!\d))/g, " ")
+            ? String(Math.round(Number(offerPrice))).replace(/\B(?=(\d{3})+(?!\d))/g, "\\u202F")
             : "—";
 
     const roomOfferLabel = useMemo(() => {
