@@ -18,32 +18,9 @@ import { decodeToken, saveToken, saveRefreshToken } from '@/utils/auth';
 import { getMe } from '@/api/AuthApi';
 import { yandexExchange, updateProfilePhone, yandexStartUrl } from '@/api/YandexAuthApi';
 import { formatRuPhoneInput, normalizeRuPhone, RU_PHONE_HINT } from '@/utils/phone';
+import { yandexAuthErrorText, yandexExchangeErrorCode } from '@/utils/yandexAuthErrors';
 
 type Stage = 'loading' | 'phone' | 'error';
-
-const ERROR_TEXT: Record<string, { title: string; text: string }> = {
-    yandex_email_required: {
-        title: 'Яндекс не передал адрес почты',
-        text: 'Почта нужна, чтобы связать вход с вашим аккаунтом Totus Club. Разрешите доступ к почте на странице Яндекса или войдите по email.',
-    },
-    yandex_access_denied: {
-        title: 'Вход отменён',
-        text: 'Вы не разрешили доступ на странице Яндекса. Можно попробовать снова или войти по email.',
-    },
-    user_blocked: {
-        title: 'Вход закрыт',
-        text: 'Доступ к этому аккаунту ограничен. Напишите в поддержку — мы разберёмся.',
-    },
-    ticket_invalid: {
-        title: 'Ссылка устарела',
-        text: 'На подтверждение даётся две минуты. Начните вход заново.',
-    },
-};
-
-const DEFAULT_ERROR = {
-    title: 'Не получилось войти',
-    text: 'Попробуйте ещё раз или войдите по email.',
-};
 
 function safePath(value: unknown): string {
     const raw = typeof value === 'string' ? value : '';
@@ -119,7 +96,8 @@ const YandexAuthPage: React.FC = () => {
                 finish(path);
             })
             .catch((error: any) => {
-                setErrorCode(error?.response?.data?.error || 'yandex_failed');
+                // Тайм-аут и сетевой сбой тоже ведут на экран ошибки с «Попробовать снова».
+                setErrorCode(yandexExchangeErrorCode(error));
                 setStage('error');
             });
     }, [router.isReady, router.query, dispatch, finish]);
@@ -157,7 +135,7 @@ const YandexAuthPage: React.FC = () => {
         }
     };
 
-    const error = ERROR_TEXT[errorCode] || DEFAULT_ERROR;
+    const error = yandexAuthErrorText(errorCode);
 
     return (
         <>
