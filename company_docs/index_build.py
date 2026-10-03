@@ -21,26 +21,28 @@ WHERE = {
 def a(url, text):
     return f'<a href="{url}" target="_blank" rel="noopener">{html.escape(text)}</a>'
 
+PUB = {s: '<span class="pill ok">На сайте</span>' if s in ('terms','privacy','cookies') else '<span class="pill plan">После деплоя</span>' for s in b.SITE}
+
 rows1 = ''
 for d in docs:
     oz = b.OZON.get(d['slug'])
     ozc = a(oz[1], oz[0]) if oz else '<span class="muted">нет — раздел их политики ПДн</span>'
     rows1 += f'''<tr>
-<td class="d"><a href="{d['file']}">{html.escape(d['title'])}</a><span class="path mono">totus.club/legal/{d['slug']}</span></td>
+<td class="d"><a href="{d['file']}">{html.escape(d['title'])}</a><span class="path mono">totus.club/{b.SITE[d['slug']]}</span></td>
 <td>{WHERE[d['slug']]}</td>
 <td>{ozc}</td>
-<td class="n"><span class="pill ok">Черновик</span><span class="cnt">{d['ph']} {'поле' if d['ph']==1 else 'полей' if d['ph']>=5 else 'поля'}</span></td>
+<td class="n">{PUB[d['slug']]}<span class="cnt">{d['ph']} {b.plural(d['ph'])}</span></td>
 </tr>'''
 
 PACK2 = [
  ('Оферта о заключении договора о реализации туристского продукта', 'tour-offer', 'ТОТУСКЛАБ — турагент. Строго по типовой форме приказа Минэкономразвития № 766, прил. 2 (турагент ↔ турист), с заявкой на бронирование и «Информацией о турагенте»', ('Оферта о заключении договора реализации туристского продукта', 'https://docs.ozon.ru/legal/terms-of-use/ozon-travel/travel-product/')),
  ('Условия бронирования размещения', 'hotel-booking', 'Номера без перелёта. Модель Ozon: бесплатная лицензия на платформу, договор проживания — напрямую со средством размещения. Нужно решение по схеме Level.Travel', ('Условия бронирования мест размещения', 'https://docs.ozon.ru/common/pravila-prodayoi-i-rekvizity/ozon-travel/conditions-booking-hotel/')),
- ('Оферта ООО «АРЛЕКИНОТУР» на бронирование размещения', 'arlekino-booking', 'Номера категории Arlekino: продавец — Арлекинотур, оплата сразу, подтверждение в админке, ваучер от Arlekino Tour', None),
  ('Изменение, отмена и возврат', 'cancellation', 'Для туров и для размещения отдельно; связь с кнопкой «Изменить заказ»; сроки возврата денег', ('Изменить или отменить тур', 'https://docs.ozon.ru/ozon-travel/tours/change-tour/')),
  ('Памятка туристу', 'tourist-memo', 'Документы в поездку, правила въезда, выезд детей, страхование, что делать в поездке, контакты экстренных служб', ('Подтверждение тура и документы', 'https://docs.ozon.ru/ozon-travel/tours/documents/')),
  ('Оплата и возврат денег', 'payment', 'СБП и карты через Банк ВТБ, кто получатель платежа, кассовый чек, сроки возврата на карту', ('Оплата и возврат денег', 'https://docs.ozon.ru/ozon-travel/pay-return/')),
 ]
 PACK3 = [
+ ('Оферта ООО «АРЛЕКИНОТУР» на бронирование размещения', 'Номера категории Arlekino: продавец — Арлекинотур, оплата сразу, подтверждение в админке, ваучер от Arlekino Tour. Отложено по решению владельца 03.10', None),
  ('Архив редакций', 'Все прошлые версии документов с датами — доказательство условий каждого заказа', ('Архив условий', 'https://docs.ozon.ru/legal/terms-of-use/ozon-travel/archive/')),
  ('Правила публикации отзывов', 'Когда появятся отзывы об отелях', ('Правила публикации отзывов для средств размещения', 'https://docs.ozon.ru/legal/terms-of-use/ozon-travel/publishing-rules-for-hotels/')),
  ('Правила акций и промокодов', 'При первой акции; отдельная страница на каждую', ('Акции Ozon Travel', 'https://docs.ozon.ru/legal/promo/ozon-travel/')),
@@ -51,7 +53,7 @@ rows2 = ''.join(f'''<tr><td class="d"><span class="t">{html.escape(t)}</span><sp
 rows3 = ''.join(f'''<tr><td class="d"><span class="t">{html.escape(t)}</span></td><td>{w}</td><td>{a(o[1], o[0]) if o else '<span class="muted">—</span>'}</td><td class="n"><span class="pill none">Пачка 3</span></td></tr>''' for t, w, o in PACK3)
 
 ASKS = [
- ('Реквизиты', ['Номер в реестре турагентов (РТА)', 'Регистрационный номер в реестре операторов ПДн Роскомнадзора', 'Наименование на английском, почтовый адрес']),
+ ('Реквизиты', ['Номер в реестре турагентов (РТА)', 'Регистрационный номер в реестре операторов ПДн Роскомнадзора', 'Наименование на английском, почтовый адрес', 'Даты редакций документов']),
  ('Контакты', ['E-mail поддержки, для претензий и для запросов по ПДн', 'Телефон поддержки и режим работы', 'Ответственный за обработку ПДн — ФИО и должность']),
  ('Подрядчики', ['Юрлицо Level.Travel', 'Хостинг-провайдер сервера и город', 'Оператор фискальных данных', 'SMS-провайдер, если есть', 'Провайдер языковой модели для Милы и страна']),
  ('Решения', ['Записываем ли звонки в поддержку', 'Кто правообладатель программ: ТОТУСКЛАБ или прежнее юрлицо по лицензии', 'Схема продажи номеров Level.Travel без перелёта', 'Вебвизор и рекламные пиксели — включать ли', 'Тихие часы и лимит рекламных пушей']),
@@ -60,6 +62,7 @@ ASKS = [
 asks = ''.join(f'<div class="ask"><h3>{h}</h3><ul>{"".join(f"<li>{html.escape(x)}</li>" for x in items)}</ul></div>' for h, items in ASKS)
 
 total_ph = sum(d['ph'] for d in docs)
+miss_rows = ''.join(f'<tr><td><mark class="ph">{html.escape(k)}</mark></td><td>{html.escape(", ".join(v))}</td></tr>' for k, v in sorted(meta['ph'].items(), key=lambda kv: (-len(kv[1]), kv[0].lower())))
 
 page = f'''<title>Документы Totus Club</title>
 {b.FONTS}
@@ -105,6 +108,9 @@ td a{{color:var(--accent-ink)}}
 .ask h3::before{{content:"";width:10px;height:10px;border-radius:3px;background:var(--ph);border:1px solid var(--ph-ink);opacity:.8}}
 .ask ul{{margin:0;padding-left:18px;font-size:14px;color:var(--ink-2)}}
 .ask li{{margin:3px 0}}
+.red{{color:var(--ph-ink)}}
+.miss{{margin-top:14px}}
+.miss td:first-child{{width:55%}}
 .legend{{font-size:13.5px;color:var(--muted);margin-top:10px}}
 .caveat{{margin-top:44px;padding:14px 18px;border:1px dashed var(--line-strong);border-radius:10px;font-size:14px;color:var(--ink-2)}}
 .caveat b{{color:var(--ink)}}
@@ -129,7 +135,7 @@ td a{{color:var(--accent-ink)}}
     <thead><tr><th>Наш документ</th><th>Где показывать</th><th>Аналог у Ozon Travel</th><th>Статус</th></tr></thead>
     <tbody>{rows1}</tbody>
   </table></div>
-  <p class="legend">Жёлтым в документах выделены поля, которые нужно заполнить. Синие блоки — служебные заметки для вас и юриста, на сайт они не идут.</p>
+  <p class="legend"><b class="red">Красным</b> в документах выделены поля, которых пока не хватает. Синие блоки — служебные заметки для вас и юриста, на сайт они не идут. 3 документа уже заменены на сайте через админку; 4 новых появятся после деплоя PR в totus_API и totus_WEB; в приложениях iPhone, iPad, Android — после релиза totus_APP.</p>
 
   <h2>Пачка 2 · Туры и размещение <span class="sub">следующая</span></h2>
   <div class="tbl"><table>
@@ -143,8 +149,13 @@ td a{{color:var(--accent-ink)}}
     <tbody>{rows3}</tbody>
   </table></div>
 
-  <h2>Что нужно от вас <span class="sub">чтобы убрать жёлтые поля</span></h2>
+  <h2>Чего не хватает <span class="sub">{len(meta['ph'])} разных данных · {total_ph} мест в текстах</span></h2>
+  <p class="note">Опубликовано как есть: на сайте пустые места видны в квадратных скобках. Пришлите данные — подставлю во всех документах сразу.</p>
   <div class="asks">{asks}</div>
+  <div class="tbl miss"><table>
+    <thead><tr><th>Поле в тексте</th><th>В каких документах</th></tr></thead>
+    <tbody>{miss_rows}</tbody>
+  </table></div>
 
   <div class="caveat"><b>Черновики, а не финальные тексты.</b> Документы написаны по образцу Ozon Travel (прочитан 01.10.2026) с учётом 152-ФЗ в ред. 156-ФЗ, 38-ФЗ, ст. 10.2-2 149-ФЗ и 243-ФЗ об ИИ. Перед публикацией на сайте их должен проверить юрист. Ссылки вида totus.club/legal/… — будущие адреса на сайте; здесь между документами работают внутренние ссылки.</div>
 </div>
