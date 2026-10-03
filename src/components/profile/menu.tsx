@@ -139,7 +139,7 @@ const MenuProfile = () => {
                 )}
                 <div onClick={() => router.push('/privacy-policy')} className={styles.profileMenuItem}>
                     <Icon name={'faq'} size={24} />
-                    <p>Политика конфиденциальности</p>
+                    <p>Политика обработки ПДн</p>
                 </div>
 
                 {/*<div className={styles.profileMenuItem}>*/}
