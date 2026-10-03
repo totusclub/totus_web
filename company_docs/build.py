@@ -69,7 +69,7 @@ TOKENS = '''
   --bg:#F4F6F5; --paper:#FFFFFF; --ink:#1A2329; --ink-2:#46535B; --muted:#76848B;
   --line:#DCE3E1; --line-strong:#BAC6C2;
   --accent:#0E6B70; --accent-soft:#DDEFEF; --accent-ink:#0A4F53;
-  --ph:#FCE8B2; --ph-ink:#6B4A00;
+  --ph:#FDE4E2; --ph-ink:#B42318;
   --svc:#EEF1F7; --svc-line:#9AA7C7; --svc-ink:#3A4566;
   --ok:#0E6B70; --ok-bg:#DDEFEF; --plan:#9A6412; --plan-bg:#F7EBD3; --none:#5B6570; --none-bg:#E9EDEF;
   --code:#EEF2F1;
@@ -79,7 +79,7 @@ TOKENS = '''
     --bg:#101618; --paper:#161E20; --ink:#E6ECEA; --ink-2:#B5C0BD; --muted:#8696A0;
     --line:#29343A; --line-strong:#3C4A4F;
     --accent:#5FC1C4; --accent-soft:#173335; --accent-ink:#8FD8DA;
-    --ph:#4A3A10; --ph-ink:#F5D98A;
+    --ph:#4A1D1A; --ph-ink:#FF9C94;
     --svc:#1C2336; --svc-line:#53608A; --svc-ink:#B7C2E6;
     --ok:#5FC1C4; --ok-bg:#173335; --plan:#E0A94A; --plan-bg:#3A2C12; --none:#A8B3BA; --none-bg:#242E32;
     --code:#1E282B;
@@ -89,7 +89,7 @@ TOKENS = '''
     --bg:#101618; --paper:#161E20; --ink:#E6ECEA; --ink-2:#B5C0BD; --muted:#8696A0;
     --line:#29343A; --line-strong:#3C4A4F;
     --accent:#5FC1C4; --accent-soft:#173335; --accent-ink:#8FD8DA;
-    --ph:#4A3A10; --ph-ink:#F5D98A;
+    --ph:#4A1D1A; --ph-ink:#FF9C94;
     --svc:#1C2336; --svc-line:#53608A; --svc-ink:#B7C2E6;
     --ok:#5FC1C4; --ok-bg:#173335; --plan:#E0A94A; --plan-bg:#3A2C12; --none:#A8B3BA; --none-bg:#242E32;
     --code:#1E282B;
@@ -102,7 +102,7 @@ h1,h2,h3{text-wrap:balance;margin:0}
 a{color:var(--accent-ink);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:2px}
 a:hover{color:var(--accent)}
 a:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:2px}
-mark.ph{background:var(--ph);color:var(--ph-ink);padding:0 4px;border-radius:3px;font-family:"Onest",sans-serif;font-size:.86em;font-weight:500;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+mark.ph{background:var(--ph);color:var(--ph-ink);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--ph-ink) 35%,transparent);padding:0 4px;border-radius:3px;font-family:"Onest",sans-serif;font-size:.86em;font-weight:500;box-decoration-break:clone;-webkit-box-decoration-break:clone}
 .mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
 '''
 
@@ -111,7 +111,7 @@ DOC_CSS = TOKENS + '''
 .top .in{max-width:1120px;margin:0 auto;padding:10px 24px;display:flex;gap:16px;align-items:center;justify-content:space-between;font-family:"Onest",sans-serif;font-size:14px}
 .top a{text-decoration:none;color:var(--ink-2)}
 .top a:hover{color:var(--accent)}
-.top .draft{font-size:12px;color:var(--plan);background:var(--plan-bg);padding:2px 10px;border-radius:999px;font-weight:600;white-space:nowrap}
+.top .draft{font-size:12px;color:var(--ph-ink);background:var(--ph);padding:2px 10px;border-radius:999px;font-weight:600;white-space:nowrap}
 .layout{max-width:1120px;margin:0 auto;padding:36px 24px 96px;display:grid;grid-template-columns:240px minmax(0,1fr);gap:48px;align-items:start}
 nav.toc{position:sticky;top:64px;font-family:"Onest",sans-serif;font-size:13.5px;line-height:1.4;max-height:calc(100vh - 90px);overflow:auto}
 nav.toc .k{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;display:block}
@@ -154,6 +154,15 @@ aside.svc a{color:inherit}
 @media print{ .top,nav.toc,aside.svc{display:none} article{border:0;padding:0} .layout{display:block} }
 '''
 
+def plural(n):
+    if n % 10 == 1 and n % 100 != 11: return 'поле'
+    if 2 <= n % 10 <= 4 and not 12 <= n % 100 <= 14: return 'поля'
+    return 'полей'
+
+# where the document lives on the site (totus.club/<slug>)
+SITE = {'terms':'terms','privacy':'privacy-policy','consent':'consent','ads-consent':'ads-consent',
+        'cookies':'cookie-settings','recommendations':'recommendations','requisites':'requisites'}
+
 def doc_page(d, idx, total):
     body = render_body(d['body'])
     heads = re.findall(r'<h2 id="([^"]+)">(.*?)</h2>', body)
@@ -169,13 +178,13 @@ def doc_page(d, idx, total):
 <html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{html.escape(d['short'])} · Totus Club</title>{FONTS}<style>{DOC_CSS}</style></head>
 <body>
-<div class="top"><div class="in"><a href="index.html">← Все документы Totus Club</a><span class="draft">Черновик · {len(ph)} полей заполнить</span></div></div>
+<div class="top"><div class="in"><a href="index.html">← Все документы Totus Club</a><span class="draft">Черновик · {len(ph)} {plural(len(ph))} заполнить</span></div></div>
 <div class="layout">
 <nav class="toc" aria-label="Содержание"><span class="k">Содержание</span><ol>{toc}</ol></nav>
 <article>
 <div class="eyebrow">ООО «ТОТУСКЛАБ» · документ {idx+1} из {total} пачки 1</div>
 <h1>{html.escape(d['title'])}</h1>
-<div class="meta"><span><b>{edition}</b></span><span>Будет на сайте: <span class="mono">totus.club/legal/{d['slug']}</span></span>{oz_html}</div>
+<div class="meta"><span><b>{edition}</b></span><span>На сайте: <a class="mono" href="https://totus.club/{SITE[d['slug']]}" target="_blank" rel="noopener">totus.club/{SITE[d['slug']]}</a></span>{oz_html}</div>
 <div class="doc">{body}</div>
 <div class="foot">{' '.join(prev_next)}</div>
 </article></div>
