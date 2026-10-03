@@ -1,6 +1,6 @@
 # company_docs — юридические документы ООО «ТОТУСКЛАБ»
 
-Черновики документов Totus Club, составленные по образцу Ozon Travel. **На сайт пока не выкладываются**: папка лежит вне `src/` и `public/`, сборка Next.js её не использует.
+Документы Totus Club, составленные по образцу Ozon Travel. Папка лежит вне `src/` и `public/`, сборка Next.js её не использует. На сайт и в приложения тексты попадают через CMS (админка → «Страницы сайта»): HTML для неё — в `cms/`.
 
 Просмотр: артефакт «Документы Totus Club» — https://claude.ai/artifact/Xt4nZ2vbZuP93GAcV7BeMS
 
@@ -10,34 +10,36 @@
 |---|---|
 | `src/*.md` | тексты документов (Markdown с front matter: `title`, `short`, `slug`, `edition`, `ozon`) |
 | `html/` | готовые страницы: `index.html` — оглавление, остальные — по одной на документ; стили в `doc.css` и `index.css` |
-| `build.py`, `index_build.py` | сборщик HTML из `src/` (Python 3 + пакет `markdown`) |
+| `build.py`, `index_build.py` | сборщик HTML-просмотра из `src/` (Python 3 + пакет `markdown`) |
+| `cms_build.py` → `cms/<slug>.html` | тело документа для CMS сайта и приложений: без служебных заметок, пустые поля видны в `[квадратных скобках]` |
 
 Пачка 1 — платформа:
 
-| Файл | Документ | Будущий адрес |
+| Файл | Документ | Адрес на сайте |
 |---|---|---|
-| `01-terms.md` | Пользовательское соглашение | totus.club/legal/terms |
-| `02-privacy.md` | Политика обработки персональных данных | totus.club/legal/privacy |
-| `03-consent.md` | Согласие на обработку персональных данных | totus.club/legal/consent |
-| `04-ads-consent.md` | Согласие на получение рекламы | totus.club/legal/ads-consent |
-| `05-cookies.md` | Политика использования файлов cookie | totus.club/legal/cookies |
-| `06-recommendations.md` | Правила применения рекомендательных технологий | totus.club/legal/recommendations |
-| `07-requisites.md` | Реквизиты и контакты | totus.club/legal/requisites |
+| `01-terms.md` | Пользовательское соглашение | totus.club/terms |
+| `02-privacy.md` | Политика обработки персональных данных | totus.club/privacy-policy |
+| `03-consent.md` | Согласие на обработку персональных данных | totus.club/consent |
+| `04-ads-consent.md` | Согласие на получение рекламы | totus.club/ads-consent |
+| `05-cookies.md` | Политика использования файлов cookie | totus.club/cookie-settings |
+| `06-recommendations.md` | Правила применения рекомендательных технологий | totus.club/recommendations |
+| `07-requisites.md` | Реквизиты и контакты | totus.club/requisites |
 
-Пачка 2 (туры и размещение) и пачка 3 — в работе, список в оглавлении.
+Пачка 2 (туры и размещение) и пачка 3 — в работе, список в оглавлении. Оферта ООО «АРЛЕКИНОТУР» на бронирование размещения отложена (пачка 3).
 
 ## Разметка
 
-- `[[…]]` — поле, которое нужно заполнить (в HTML подсвечено жёлтым).
+- `[[…]]` — поле, которое нужно заполнить (в HTML-просмотре подсвечено красным, на сайте — в квадратных скобках).
 - Блоки `> …` — служебные заметки для владельца и юриста, на сайт не публикуются.
 
 ## Сборка
 
 ```bash
 pip install markdown
-python3 build.py && python3 index_build.py   # результат — в build/
+python3 build.py && python3 index_build.py   # просмотр — в build/
+python3 cms_build.py                         # для CMS — в cms/
 ```
 
 ## Статус
 
-Черновики. Перед публикацией на сайте — заполнить поля и согласовать с юристом.
+03.10.2026 опубликованы как есть (с пустыми полями) по решению владельца. Осталось заполнить поля и согласовать с юристом; после правки `src/` пересобрать `cms/` и заменить тексты в админке.
