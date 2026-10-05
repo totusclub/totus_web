@@ -10,9 +10,12 @@ export type LegalDoc = {
     description: string;
 };
 
-export type UpcomingLegalDoc = {
-    title: string;
-    description: string;
+/** Страница «Реквизиты и контакты» — седьмой документ; на неё же ведёт ссылка из карточки компании. */
+export const LEGAL_REQUISITES: LegalDoc = {
+    slug: 'requisites',
+    href: '/requisites',
+    title: 'Реквизиты и контакты',
+    description: 'Реквизиты ООО «ТОТУСКЛАБ» и контакты поддержки',
 };
 
 /** Опубликованные документы — блок «Пользователям» на /legal. */
@@ -53,34 +56,8 @@ export const LEGAL_DOCS: LegalDoc[] = [
         title: 'Правила применения рекомендательных технологий',
         description: 'Как формируются подборки и порядок отелей в выдаче',
     },
+    LEGAL_REQUISITES,
 ];
-
-/** Документы в подготовке — блок «Готовятся» на /legal (без ссылок). */
-export const LEGAL_DOCS_UPCOMING: UpcomingLegalDoc[] = [
-    {
-        title: 'Оферта о реализации туристского продукта',
-        description: 'Договор при покупке тура',
-    },
-    {
-        title: 'Условия бронирования размещения',
-        description: 'Бронирование отелей без перелёта',
-    },
-    {
-        title: 'Изменение, отмена и возврат',
-        description: 'Сроки и порядок возврата денег',
-    },
-    {
-        title: 'Архив редакций',
-        description: 'Прошлые версии всех документов',
-    },
-];
-
-/** Страница «Реквизиты и контакты» — седьмой документ, ссылка из карточки компании. */
-export const LEGAL_REQUISITES = {
-    slug: 'requisites',
-    href: '/requisites',
-    title: 'Реквизиты и контакты',
-};
 
 /** Карточка компании на /legal. */
 export const LEGAL_COMPANY = {

@@ -10,21 +10,14 @@
 .layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 360px;
-  grid-template-areas:
-    "users company"
-    "upcoming company";
-  grid-template-rows: auto 1fr;
+  grid-template-areas: "users company";
   column-gap: 24px;
-  row-gap: 28px;
+  row-gap: 24px;
   align-items: start;
 }
 
 .usersGroup {
   grid-area: users;
-}
-
-.upcomingGroup {
-  grid-area: upcoming;
 }
 
 .groupTitle {
@@ -105,17 +98,6 @@ a.row:focus-visible {
   stroke: var(--textTertiary);
 }
 
-.itemMuted {
-  opacity: 0.55;
-}
-
-.soon {
-  flex-shrink: 0;
-  color: var(--textTertiary);
-  font-size: 14px;
-  line-height: 18px;
-}
-
 .company {
   grid-area: company;
   padding: 20px;
@@ -171,10 +153,7 @@ a.row:focus-visible {
     grid-template-columns: minmax(0, 1fr);
     grid-template-areas:
       "users"
-      "company"
-      "upcoming";
-    grid-template-rows: auto;
-    row-gap: 24px;
+      "company";
   }
 
   .company {
