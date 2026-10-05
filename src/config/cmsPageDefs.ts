@@ -45,8 +45,8 @@ const EXTRA_DEFS: Record<'about-us' | 'privacy-policy', CmsPageDef> = {
         slug: 'privacy-policy',
         section: 'legal',
         title: 'Политика обработки персональных данных',
-        currentLabel: 'Политика обработки ПДн',
-        mobileHeaderTitle: 'Политика обработки ПДн',
+        currentLabel: 'Политика обработки персональных данных',
+        mobileHeaderTitle: 'Политика обработки персональных данных',
         paragraphs: [
             'На этой странице опубликована политика обработки персональных данных ООО «ТОТУСКЛАБ».',
         ],
