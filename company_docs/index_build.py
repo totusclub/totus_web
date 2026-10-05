@@ -15,32 +15,33 @@ WHERE = {
  'ads-consent': 'отдельный чекбокс при регистрации; настройки уведомлений',
  'cookies': 'баннер при первом визите; ссылка «Настройки cookie» в футере',
  'recommendations': 'футер; подборки «Вам подойдёт»; окно Милы',
- 'requisites': 'футер; «Контакты»; «О приложении»',
+ 'requisites': 'страница «Правовая информация»; «Контакты»; «О приложении»',
+ 'tour-offer': 'чекбокс на шаге оплаты тура; письмо с заказом; Заявка на бронирование',
+ 'hotel-booking': 'чекбокс на шаге оплаты номера без перелёта; карточка номера',
+ 'cancellation': 'заказ → «Изменить заказ» / «Отменить»; карточка тура и номера',
+ 'tourist-memo': 'письмо с документами по туру; заказ в Аккаунте',
+ 'payment': 'шаг оплаты; письмо с чеком; страница «Правовая информация»',
 }
 
 def a(url, text):
     return f'<a href="{url}" target="_blank" rel="noopener">{html.escape(text)}</a>'
 
-PUB = {s: '<span class="pill ok">На сайте</span>' if s in ('terms','privacy','cookies') else '<span class="pill plan">После деплоя</span>' for s in b.SITE}
+PUB = {s: '<span class="pill ok">На сайте</span>' if s in b.PACK1_SLUGS else '<span class="pill plan">На проверке</span>' for s in b.SITE}
 
 rows1 = ''
+rows2 = ''
 for d in docs:
     oz = b.OZON.get(d['slug'])
     ozc = a(oz[1], oz[0]) if oz else '<span class="muted">нет — раздел их политики обработки персональных данных</span>'
-    rows1 += f'''<tr>
+    row = f'''<tr>
 <td class="d"><a href="{d['file']}">{html.escape(d['title'])}</a><span class="path mono">totus.club/{b.SITE[d['slug']]}</span></td>
 <td>{WHERE[d['slug']]}</td>
 <td>{ozc}</td>
 <td class="n">{PUB[d['slug']]}<span class="cnt">{d['ph']} {b.plural(d['ph'])}</span></td>
 </tr>'''
+    if d['slug'] in b.PACK1_SLUGS: rows1 += row
+    else: rows2 += row
 
-PACK2 = [
- ('Оферта о заключении договора о реализации туристского продукта', 'tour-offer', 'ТОТУСКЛАБ — турагент. Строго по типовой форме приказа Минэкономразвития № 766, прил. 2 (турагент ↔ турист), с заявкой на бронирование и «Информацией о турагенте»', ('Оферта о заключении договора реализации туристского продукта', 'https://docs.ozon.ru/legal/terms-of-use/ozon-travel/travel-product/')),
- ('Условия бронирования размещения', 'hotel-booking', 'Номера без перелёта. Модель Ozon: бесплатная лицензия на платформу, договор проживания — напрямую со средством размещения. Нужно решение по схеме Level.Travel', ('Условия бронирования мест размещения', 'https://docs.ozon.ru/common/pravila-prodayoi-i-rekvizity/ozon-travel/conditions-booking-hotel/')),
- ('Изменение, отмена и возврат', 'cancellation', 'Для туров и для размещения отдельно; связь с кнопкой «Изменить заказ»; сроки возврата денег', ('Изменить или отменить тур', 'https://docs.ozon.ru/ozon-travel/tours/change-tour/')),
- ('Памятка туристу', 'tourist-memo', 'Документы в поездку, правила въезда, выезд детей, страхование, что делать в поездке, контакты экстренных служб', ('Подтверждение тура и документы', 'https://docs.ozon.ru/ozon-travel/tours/documents/')),
- ('Оплата и возврат денег', 'payment', 'СБП и карты через Банк ВТБ, кто получатель платежа, кассовый чек, сроки возврата на карту', ('Оплата и возврат денег', 'https://docs.ozon.ru/ozon-travel/pay-return/')),
-]
 PACK3 = [
  ('Архив редакций', 'Все прошлые версии документов с датами — доказательство условий каждого заказа', ('Архив условий', 'https://docs.ozon.ru/legal/terms-of-use/ozon-travel/archive/')),
  ('Правила публикации отзывов', 'Когда появятся отзывы об отелях', ('Правила публикации отзывов для средств размещения', 'https://docs.ozon.ru/legal/terms-of-use/ozon-travel/publishing-rules-for-hotels/')),
@@ -48,7 +49,6 @@ PACK3 = [
  ('Внутренние документы по 152-ФЗ', 'Не публикуются: приказ об ответственном, положение о персональных данных, модель угроз, журналы, акт оценки вреда', None),
 ]
 
-rows2 = ''.join(f'''<tr><td class="d"><span class="t">{html.escape(t)}</span><span class="path mono">totus.club/legal/{s}</span></td><td>{w}</td><td>{a(o[1], o[0]) if o else '<span class="muted">у Ozon нет — наш случай</span>'}</td><td class="n"><span class="pill plan">Пачка 2</span></td></tr>''' for t, s, w, o in PACK2)
 rows3 = ''.join(f'''<tr><td class="d"><span class="t">{html.escape(t)}</span></td><td>{w}</td><td>{a(o[1], o[0]) if o else '<span class="muted">—</span>'}</td><td class="n"><span class="pill none">Пачка 3</span></td></tr>''' for t, w, o in PACK3)
 
 ASKS = [
@@ -118,8 +118,8 @@ td a{{color:var(--accent-ink)}}
 <div class="wrap">
   <div class="eyebrow">ООО «ТОТУСКЛАБ» · по образцу Ozon Travel</div>
   <h1>Документы Totus Club</h1>
-  <p class="lead">Полный набор юридических документов для сайта и приложений, собранный по структуре Ozon Travel и подогнанный под нашу схему: ТОТУСКЛАБ — владелец сервиса, турагент и оператор персональных данных. Первая пачка уже написана — каждый документ открывается отдельной страницей.</p>
-  <div class="stats"><span><b>{len(docs)}</b>готовых черновиков</span><span><b>{len(PACK2)}</b>в пачке 2</span><span><b>{len(PACK3)}</b>в пачке 3</span><span><b>{total_ph}</b>полей заполнить</span></div>
+  <p class="lead">Полный набор юридических документов для сайта и приложений, собранный по структуре Ozon Travel и подогнанный под нашу схему: ТОТУСКЛАБ — владелец сервиса, турагент и оператор персональных данных. Пачка 1 опубликована на сайте, пачка 2 (туры и размещение) написана и ждёт проверки — каждый документ открывается отдельной страницей.</p>
+  <div class="stats"><span><b>{len(b.PACK1_SLUGS)}</b>на сайте</span><span><b>{len(docs)-len(b.PACK1_SLUGS)}</b>в пачке 2 на проверке</span><span><b>{len(PACK3)}</b>в пачке 3</span><span><b>{total_ph}</b>полей заполнить</span></div>
 
   <h2>Три контура, как у Ozon Travel</h2>
   <p class="note">У Ozon Travel туры, отели и сама площадка закрыты разными документами — у нас так же.</p>
@@ -134,11 +134,11 @@ td a{{color:var(--accent-ink)}}
     <thead><tr><th>Наш документ</th><th>Где показывать</th><th>Аналог у Ozon Travel</th><th>Статус</th></tr></thead>
     <tbody>{rows1}</tbody>
   </table></div>
-  <p class="legend"><b class="red">Красным</b> в документах выделены поля, которых пока не хватает. Синие блоки — служебные заметки для вас и юриста, на сайт они не идут. 3 документа уже заменены на сайте через админку; 4 новых появятся после деплоя PR в totus_API и totus_WEB; в приложениях iPhone, iPad, Android — после релиза totus_APP.</p>
+  <p class="legend"><b class="red">Красным</b> в документах выделены поля, которых пока не хватает. Синие блоки — служебные заметки для вас и юриста, на сайт они не идут. Все 7 документов пачки 1 опубликованы на сайте (страница «Правовая информация»); в приложениях — после релиза totus_APP.</p>
 
-  <h2>Пачка 2 · Туры и размещение <span class="sub">следующая</span></h2>
+  <h2>Пачка 2 · Туры и размещение <span class="sub">написано, на проверке — на сайт не загружено</span></h2>
   <div class="tbl"><table>
-    <thead><tr><th>Наш документ</th><th>Что в нём</th><th>Аналог у Ozon Travel</th><th>Статус</th></tr></thead>
+    <thead><tr><th>Наш документ</th><th>Где показывать</th><th>Аналог у Ozon Travel</th><th>Статус</th></tr></thead>
     <tbody>{rows2}</tbody>
   </table></div>
 

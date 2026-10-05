@@ -14,13 +14,16 @@ OZON = {
  'cookies': None,
  'recommendations': ('Алгоритм рекомендаций на Ozon', 'https://docs.ozon.ru/legal/terms-of-use/site/algorithms/recomendation-algorithms/'),
  'requisites': ('Реквизиты ООО «Интернет Трэвел»', 'https://docs.ozon.ru/ozon-travel/contacts/law/'),
+ 'tour-offer': ('Оферта о заключении договора реализации туристского продукта', 'https://docs.ozon.ru/legal/terms-of-use/ozon-travel/travel-product/'),
+ 'hotel-booking': ('Условия использования Платформы для бронирования отелей', 'https://docs.ozon.ru/common/pravila-prodayoi-i-rekvizity/ozon-travel/conditions-booking-hotel/'),
+ 'cancellation': ('Изменить или отменить тур', 'https://docs.ozon.ru/ozon-travel/tours/change-tour/'),
+ 'tourist-memo': ('Подтверждение тура и документы', 'https://docs.ozon.ru/ozon-travel/tours/documents/'),
+ 'payment': ('Оплата и возврат денег', 'https://docs.ozon.ru/ozon-travel/pay-return/'),
 }
+PACK1_SLUGS = ['terms','privacy','consent','ads-consent','cookies','recommendations','requisites']
 
 # planned docs (pack 2/3) for index + pending links
 PLANNED = {
- 'tour-offer': 'Оферта о заключении договора о реализации туристского продукта',
- 'hotel-booking': 'Условия бронирования размещения',
- 'cancellation': 'Изменение, отмена и возврат',
  'archive': 'Архив редакций',
 }
 
@@ -161,7 +164,9 @@ def plural(n):
 
 # where the document lives on the site (totus.club/<slug>)
 SITE = {'terms':'terms','privacy':'privacy-policy','consent':'consent','ads-consent':'ads-consent',
-        'cookies':'cookie-settings','recommendations':'recommendations','requisites':'requisites'}
+        'cookies':'cookie-settings','recommendations':'recommendations','requisites':'requisites',
+        'tour-offer':'tour-offer','hotel-booking':'hotel-booking','cancellation':'cancellation',
+        'tourist-memo':'tourist-memo','payment':'payment'}
 
 def doc_page(d, idx, total):
     body = render_body(d['body'])
@@ -182,9 +187,9 @@ def doc_page(d, idx, total):
 <div class="layout">
 <nav class="toc" aria-label="Содержание"><span class="k">Содержание</span><ol>{toc}</ol></nav>
 <article>
-<div class="eyebrow">ООО «ТОТУСКЛАБ» · документ {idx+1} из {total} пачки 1</div>
+<div class="eyebrow">ООО «ТОТУСКЛАБ» · {'пачка 1 · платформа' if d['slug'] in PACK1_SLUGS else 'пачка 2 · туры и размещение'} · документ {idx+1} из {total}</div>
 <h1>{html.escape(d['title'])}</h1>
-<div class="meta"><span><b>{edition}</b></span><span>На сайте: <a class="mono" href="https://totus.club/{SITE[d['slug']]}" target="_blank" rel="noopener">totus.club/{SITE[d['slug']]}</a></span>{oz_html}</div>
+<div class="meta"><span><b>{edition}</b></span><span>{'На сайте' if d['slug'] in PACK1_SLUGS else 'Адрес на сайте после публикации'}: <a class="mono" href="https://totus.club/{SITE[d['slug']]}" target="_blank" rel="noopener">totus.club/{SITE[d['slug']]}</a></span>{oz_html}</div>
 <div class="doc">{body}</div>
 <div class="foot">{' '.join(prev_next)}</div>
 </article></div>
