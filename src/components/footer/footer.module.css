@@ -1,51 +1,54 @@
 .footer{
-    padding-top: 32px;
+    padding-top: 40px;
     border-top: 1px solid var(--borderTertiary);
     background: var(--bgPrimary);
 }
+/* Колонки: приложение и соцсети | Компания | Помощь | юридический блок */
 .footerRow{
     display: flex;
+    gap: 24px;
     border-bottom: 1px solid var(--borderTertiary);
-    padding-bottom: 32px;
+    padding-bottom: 24px;
+}
+.colApp{
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    flex: 0 1 300px;
+    min-width: 180px;
 }
 .footerColumn{
     display: flex;
     flex-direction: column;
-    flex: 1;
 }
-.footerColumnM{
-    display: none;
+.colCompany{
+    flex: 0 0 155px;
+}
+.colHelp{
+    flex: 1 1 auto;
+    min-width: 0;
 }
 .footerColumn>ul{
     display: flex;
     flex-direction: column;
-    flex: 1;
     list-style-type: none;
     gap: 16px;
-
 }
 .footerColumn>ul>li{
-    overflow: hidden;
     color: var(--textTertiary);
-    text-overflow: ellipsis;
     /* Body - Caption/Regular */
-    /*font-family: "Golos Text";*/
     font-size: 14px;
     font-style: normal;
     font-weight: 400;
     line-height: 18px; /* 128.571% */
     letter-spacing: -0.28px;
-    cursor: pointer;
-    transition: 0.4s;
-}
-.footerColumn>ul>li:hover{
-    text-decoration: underline;
 }
 .footerLink{
     color: inherit;
     text-decoration: none;
+    transition: color 0.2s;
 }
-.footerColumn>ul>li:hover .footerLink{
+.footerLink:hover{
     text-decoration: underline;
 }
 .footerColumnTitle{
@@ -53,7 +56,6 @@
     color: var(--textPrimary);
     text-overflow: ellipsis;
     /* Headline - Body/Medium */
-    /*font-family: "Golos Text";*/
     font-size: 16px;
     font-style: normal;
     font-weight: 500;
@@ -61,133 +63,154 @@
     letter-spacing: -0.32px;
     padding-bottom: 16px;
 }
-.footerBottom{
-    padding-top: 24px;
-    padding-bottom: 32px;
-}
-.footerBottom >ul{
+.stores{
     display: flex;
-    list-style: none;
-    align-items: center;
-    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
 }
-.footerBottom >ul>li{
-    /*overflow: hidden;*/
-    color: var(--textTertiary, #7A7A7A);
-    text-overflow: ellipsis;
-    /* Body - Caption/Regular */
-    /*font-family: "Golos Text";*/
-    font-size: 14px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: 18px; /* 128.571% */
-    letter-spacing: -0.28px;
-    cursor: pointer;
-}
-.footerBottom >ul>li:hover{
-    text-decoration: underline;
-}
-.footerBottomLink{
-    color: inherit;
-    text-decoration: none;
-}
-.footerBottom >ul>li:hover .footerBottomLink{
-    text-decoration: underline;
-}
-.appStore{
-    width: 160px;
-    height: 42px;
-    margin-bottom: 16px;
-    cursor: pointer;
+.storeTile{
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: var(--bgSecondary);
     display: flex;
     align-items: center;
-    gap: 16px;
+    justify-content: center;
 }
-.googlePlay{
-    width: 126px;
-    height: 42px;
-    cursor: pointer;
+.storeTile svg{
+    width: 24px;
+    height: 24px;
 }
-.social{
-    /*margin-top: 24px;*/
+/* Значки сторов нарисованы чёрным — в тёмной теме инвертируем. */
+:global([data-theme="dark"]) .storeTile svg{
+    filter: invert(1);
 }
 .social>ul{
-   list-style-type: none;
+    list-style-type: none;
     display: flex;
+    flex-wrap: wrap;
     gap: 8px;
-    margin-top: 16px;
 }
 .social>ul>li{
-    border-radius: 8px;
-    border: 1px solid var(--borderTertiary);
-    width: 32px;
-    height: 32px;
+    border-radius: 12px;
+    background: var(--bgSecondary);
+    width: 40px;
+    height: 40px;
     display: flex;
     justify-content: center;
     align-items: center;
-    cursor: pointer;
 }
-.socialTitle{
-    overflow: hidden;
-    color: var(--textPrimary, #1F1F1F);
-    text-overflow: ellipsis;
-    /* Headline - Body/Medium */
-    /*font-family: "Golos Text";*/
-    font-size: 16px;
-    font-style: normal;
-    font-weight: 500;
-    line-height: 20px; /* 125% */
-    letter-spacing: -0.32px;
+.social>ul>li>a{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+/* Юридический блок справа */
+.legalBlock{
+    flex: 0 1 400px;
+    min-width: 300px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+.legalText{
+    color: var(--textTertiary);
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 18px;
+    letter-spacing: -0.26px;
+}
+.legalText>span{
+    display: block;
 }
 .footerPayList{
     display: flex;
     gap: 16px;
     align-items: center;
 }
+.legalLinks{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+}
+.legalLinkMain{
+    color: var(--textPrimary);
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 18px;
+    letter-spacing: -0.28px;
+    text-decoration: none;
+}
+.legalLink{
+    color: var(--textTertiary);
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 18px;
+    letter-spacing: -0.28px;
+    text-decoration: none;
+}
+.legalLinkMain:hover,
+.legalLink:hover{
+    text-decoration: underline;
+}
+.footerBottom{
+    padding-top: 24px;
+    padding-bottom: 32px;
+}
+.copyright{
+    max-width: 960px;
+    color: var(--textTertiary);
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 18px;
+    letter-spacing: -0.26px;
+}
+.copyright a{
+    color: inherit;
+    text-decoration: underline;
+}
+.copyright a:hover{
+    color: var(--textPrimary);
+}
 @media (max-width: 1024px) {
     /* Footer в мобильной версии: снизу место под фиксированную нижнюю панель (60px) */
     .footer{
+        padding-top: 32px;
         padding-bottom: calc(60px + env(safe-area-inset-bottom));
     }
-    /* Кнопки магазинов в мобильной версии — одним рядом в колонке с реквизитами */
-    .footerColumnM .appStore{
-        display: none;
-    }
+    /* Столбиком: приложение → Компания → Помощь → соцсети → юридический блок */
     .footerRow{
         flex-direction: column;
+        gap: 32px;
     }
-    .footerBottom >ul{
-        flex-direction: column;
+    .colApp{
+        display: contents;
     }
-    .footerColumnM{
-        display: flex;
-        flex-direction: column;
-        flex: 1;
+    .appBlock{
+        order: 1;
     }
-    .noneMobile{
-        display: none;
+    .colCompany{
+        order: 2;
+        flex: none;
     }
-    .social > ul{
-        margin-bottom: 16px;
-        justify-content: space-between;
+    .colHelp{
+        order: 3;
+        flex: none;
     }
-    .social > ul > li{
-        width: 40px;
-        height: 40px;
+    .social{
+        order: 4;
     }
-    .appStore{
-        width: 50%;
-        height: 62px;
+    .legalBlock{
+        order: 5;
+        flex: none;
+        min-width: 0;
+        padding-top: 24px;
+        border-top: 1px solid var(--borderTertiary);
     }
-    .footerPayList{
-        margin-bottom: 16px;
-    }
-    .footerColumn > ul{
-        margin-bottom: 16px;
-    }
-    .footerBottom > ul{
-        flex-direction: column-reverse;
-        align-items: flex-start;
-        gap: 16px;
+    .footerBottom{
+        padding-top: 16px;
     }
 }
