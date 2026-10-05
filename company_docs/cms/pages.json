@@ -40,5 +40,35 @@
   "source": "requisites",
   "name": "Реквизиты и контакты Totus Club",
   "short": "Реквизиты и контакты"
+ },
+ {
+  "slug": "tour-offer",
+  "source": "tour-offer",
+  "name": "Оферта о заключении договора о реализации туристского продукта",
+  "short": "Оферта на туры"
+ },
+ {
+  "slug": "hotel-booking",
+  "source": "hotel-booking",
+  "name": "Условия бронирования размещения",
+  "short": "Бронирование размещения"
+ },
+ {
+  "slug": "cancellation",
+  "source": "cancellation",
+  "name": "Изменение, отмена и возврат",
+  "short": "Изменение, отмена и возврат"
+ },
+ {
+  "slug": "tourist-memo",
+  "source": "tourist-memo",
+  "name": "Памятка туристу",
+  "short": "Памятка туристу"
+ },
+ {
+  "slug": "payment",
+  "source": "payment",
+  "name": "Оплата и возврат денег",
+  "short": "Оплата и возврат денег"
  }
 ]
