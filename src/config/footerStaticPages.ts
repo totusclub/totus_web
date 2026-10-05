@@ -320,8 +320,8 @@ const defs: FooterStaticDef[] = [
         slug: "consent",
         section: "legal",
         title: "Согласие на обработку персональных данных",
-        currentLabel: "Согласие на обработку ПДн",
-        mobileHeaderTitle: "Согласие на обработку ПДн",
+        currentLabel: "Согласие на обработку персональных данных",
+        mobileHeaderTitle: "Согласие на обработку персональных данных",
         paragraphs: [
             "Согласие пользователя на обработку персональных данных ООО «ТОТУСКЛАБ».",
             p,
@@ -397,7 +397,7 @@ const fromDefs: Record<string, string> = Object.fromEntries(
 /** Last URL segment → mobile header title (includes footer static + manual entries). */
 export const FOOTER_STATIC_MOBILE_TITLES: Record<string, string> = {
     "about-us": "О нас",
-    "privacy-policy": "Политика обработки ПДн",
+    "privacy-policy": "Политика обработки персональных данных",
     legal: "Правовая информация",
     apps: "Приложения",
     ...fromDefs,
