@@ -4,7 +4,6 @@ import RightIcon from '@/components/icons/right';
 import {
     LEGAL_COMPANY,
     LEGAL_DOCS,
-    LEGAL_DOCS_UPCOMING,
     LEGAL_REQUISITES,
 } from '@/config/legalDocs';
 import styles from '@/components/legalPage/legalPage.module.css';
@@ -60,23 +59,6 @@ export default function LegalPage() {
                         Все реквизиты и контакты →
                     </Link>
                 </aside>
-
-                <section className={styles.upcomingGroup} aria-labelledby="legal-upcoming">
-                    <h2 id="legal-upcoming" className={styles.groupTitle}>Готовятся</h2>
-                    <ul className={styles.list}>
-                        {LEGAL_DOCS_UPCOMING.map((doc) => (
-                            <li key={doc.title} className={`${styles.item} ${styles.itemMuted}`}>
-                                <div className={styles.row}>
-                                    <span className={styles.rowText}>
-                                        <span className={styles.rowTitle}>{doc.title}</span>
-                                        <span className={styles.rowDesc}>{doc.description}</span>
-                                    </span>
-                                    <span className={styles.soon}>Скоро</span>
-                                </div>
-                            </li>
-                        ))}
-                    </ul>
-                </section>
             </div>
         </StaticInfoPage>
     );

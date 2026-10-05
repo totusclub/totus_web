@@ -186,23 +186,19 @@ check('футер: мобильная версия — столбиком и с 
     has(footerCss, /@media \(max-width: 1024px\)[\s\S]*\.footerRow\{\s*flex-direction: column;/);
 });
 
-check('legalDocs.ts: 6 документов «Пользователям» + 4 «Готовятся», реквизиты — седьмой', () => {
-    const { LEGAL_DOCS, LEGAL_DOCS_UPCOMING, LEGAL_REQUISITES, LEGAL_COMPANY } = cfg();
-    assert.equal(LEGAL_DOCS.length, 6);
-    assert.equal(LEGAL_DOCS_UPCOMING.length, 4);
-    const all = [...LEGAL_DOCS, LEGAL_REQUISITES];
-    assert.deepEqual(all.map((d) => d.slug).sort(), DOCS.map((d) => d.slug).sort(), 'набор документов ≠ 7 юр. страниц');
-    for (const d of all) {
+check('legalDocs.ts: ровно 7 опубликованных документов, реквизиты — седьмым', () => {
+    const { LEGAL_DOCS, LEGAL_REQUISITES, LEGAL_COMPANY } = cfg();
+    assert.equal(LEGAL_DOCS.length, 7);
+    assert.deepEqual(LEGAL_DOCS.map((d) => d.slug), DOCS.map((d) => d.slug), 'порядок/набор документов ≠ 7 юр. страниц');
+    assert.equal(LEGAL_DOCS[6], LEGAL_REQUISITES, 'седьмой пункт — «Реквизиты и контакты»');
+    assert.equal(LEGAL_REQUISITES.description, 'Реквизиты ООО «ТОТУСКЛАБ» и контакты поддержки');
+    for (const d of LEGAL_DOCS) {
         const ref = DOCS.find((x) => x.slug === d.slug);
         assert.equal(d.title, ref.title, `${d.slug}: название ≠ заголовку страницы`);
         assert.equal(d.href, `/${d.slug}`);
         assert.ok(existsSync(join(root, `src/pages/${d.slug}/index.tsx`)), `нет страницы ${d.href}`);
+        assert.ok(d.description && d.description.length > 10, `${d.slug}: нет описания`);
     }
-    for (const d of LEGAL_DOCS) assert.ok(d.description && d.description.length > 10, `${d.slug}: нет описания`);
-    assert.deepEqual(
-        LEGAL_DOCS_UPCOMING.map((d) => d.title),
-        ['Оферта о реализации туристского продукта', 'Условия бронирования размещения', 'Изменение, отмена и возврат', 'Архив редакций'],
-    );
     assert.equal(LEGAL_COMPANY.inn, '9729424935');
     assert.equal(LEGAL_COMPANY.kpp, '772901001');
     assert.equal(LEGAL_COMPANY.ogrn, '1267700310382');
@@ -216,15 +212,22 @@ check('/legal: страница существует, шаблон StaticInfoPag
     has(legalPage, /export default function/);
 });
 
-check('/legal: 6 документов — ссылки из конфига, 4 «Готовятся» — без ссылок, «Скоро»', () => {
+check('/legal: все 7 документов — ссылки из конфига', () => {
     has(legalPage, /from '@\/config\/legalDocs'/);
     has(legalPage, /\{LEGAL_DOCS\.map\(\(doc\) => \([\s\S]*?<Link href=\{doc\.href\}/, 'LEGAL_DOCS → <Link href={doc.href}>');
-    const upcoming = legalPage.match(/\{LEGAL_DOCS_UPCOMING\.map\(\(doc\) => \(([\s\S]*?)\)\)\}/);
-    assert.ok(upcoming, 'нет LEGAL_DOCS_UPCOMING.map');
-    assert.ok(!/<Link|<a\s/.test(upcoming[1]), '«Готовятся» не должны быть ссылками');
-    has(upcoming[1], /Скоро/);
+    assert.equal((legalPage.match(/\.map\(/g) || []).length, 1, 'на странице один список — LEGAL_DOCS');
     has(legalPage, />Пользователям</);
-    has(legalPage, />Готовятся</);
+});
+
+check('/legal: нет «Скоро», «Готовятся» и неопубликованных документов (боевой сайт)', () => {
+    const cfgSrc = existsSync(join(root, 'src/config/legalDocs.ts')) ? read('src/config/legalDocs.ts') : '';
+    assert.ok(legalPage && cfgSrc, 'нет страницы /legal или legalDocs.ts');
+    const css = read('src/components/legalPage/legalPage.module.css');
+    for (const [name, text] of [['страница', legalPage], ['конфиг', cfgSrc], ['CSS', css]]) {
+        assert.ok(!/Скоро|Готовятся|UPCOMING|upcoming|itemMuted|\.soon\b/.test(text), `${name}: остались «Скоро»/«Готовятся»/приглушённые строки`);
+    }
+    const exported = Object.keys(cfg());
+    assert.deepEqual(exported.sort(), ['LEGAL_COMPANY', 'LEGAL_DOCS', 'LEGAL_REQUISITES'], 'в конфиге лишние экспорты');
 });
 
 check('/legal: карточка ООО «ТОТУСКЛАБ» со ссылкой «Все реквизиты и контакты →» на /requisites', () => {
