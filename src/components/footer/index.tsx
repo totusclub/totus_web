@@ -127,18 +127,38 @@ const Footer = () => {
                     <ul>
                         <li>©2026 Totus Club</li>
                         <li>
-                            <Link href="/cookie-settings" className={styles.footerBottomLink}>
-                                Настройки куки-файлов
+                            <Link href="/terms" className={styles.footerBottomLink}>
+                                Пользовательское соглашение
                             </Link>
                         </li>
                         <li>
                             <Link href="/privacy-policy" className={styles.footerBottomLink}>
-                                Конфиденциальность
+                                Политика обработки ПДн
                             </Link>
                         </li>
                         <li>
-                            <Link href="/terms" className={styles.footerBottomLink}>
-                                Условия и положения
+                            <Link href="/consent" className={styles.footerBottomLink}>
+                                Согласие на обработку ПДн
+                            </Link>
+                        </li>
+                        <li>
+                            <Link href="/ads-consent" className={styles.footerBottomLink}>
+                                Согласие на рекламу
+                            </Link>
+                        </li>
+                        <li>
+                            <Link href="/cookie-settings" className={styles.footerBottomLink}>
+                                Политика cookie
+                            </Link>
+                        </li>
+                        <li>
+                            <Link href="/recommendations" className={styles.footerBottomLink}>
+                                Рекомендательные технологии
+                            </Link>
+                        </li>
+                        <li>
+                            <Link href="/requisites" className={styles.footerBottomLink}>
+                                Реквизиты и контакты
                             </Link>
                         </li>
                     </ul>

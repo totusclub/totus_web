@@ -24,7 +24,11 @@ export type FooterStaticSlug =
     | "security"
     | "cookie-settings"
     | "terms"
-    | "ad-choices";
+    | "ad-choices"
+    | "consent"
+    | "ads-consent"
+    | "recommendations"
+    | "requisites";
 
 type FooterStaticDef = {
     slug: FooterStaticSlug;
@@ -267,33 +271,33 @@ const defs: FooterStaticDef[] = [
     {
         slug: "cookie-settings",
         section: "legal",
-        title: "Настройки файлов cookie",
-        currentLabel: "Cookie",
-        mobileHeaderTitle: "Настройки cookie",
+        title: "Политика использования файлов cookie",
+        currentLabel: "Политика cookie",
+        mobileHeaderTitle: "Политика cookie",
         paragraphs: [
-            "Управление категориями cookie на сайте Totus Club. Вы можете изменить выбор в любой момент.",
+            "Какие файлы cookie использует сайт Totus Club, для чего они нужны и как управлять ими в браузере.",
             p,
         ],
         seo: {
-            title: "Настройки cookie",
-            description: "Настройки файлов cookie на сайте Totus Club.",
-            keywords: "Totus Club, cookie, куки, настройки",
+            title: "Политика использования файлов cookie",
+            description: "Политика использования файлов cookie на сайте Totus Club (ООО «ТОТУСКЛАБ»).",
+            keywords: "Totus Club, cookie, куки, политика cookie, файлы cookie",
         },
     },
     {
         slug: "terms",
         section: "legal",
-        title: "Условия и положения",
-        currentLabel: "Условия",
-        mobileHeaderTitle: "Условия",
+        title: "Пользовательское соглашение",
+        currentLabel: "Пользовательское соглашение",
+        mobileHeaderTitle: "Пользовательское соглашение",
         paragraphs: [
             "Пользовательское соглашение и условия использования сервиса Totus Club, включая правила бронирования и оплаты.",
             p,
         ],
         seo: {
-            title: "Условия и положения",
-            description: "Условия использования Totus Club.",
-            keywords: "Totus Club, условия, пользовательское соглашение",
+            title: "Пользовательское соглашение",
+            description: "Пользовательское соглашение сервиса Totus Club (ООО «ТОТУСКЛАБ»): условия использования, бронирования и оплаты.",
+            keywords: "Totus Club, пользовательское соглашение, условия использования, оферта",
         },
     },
     {
@@ -310,6 +314,70 @@ const defs: FooterStaticDef[] = [
             title: "Выбор рекламы",
             description: "Настройки рекламы и персонализации на Totus Club.",
             keywords: "Totus Club, реклама, персонализация, настройки",
+        },
+    },
+    {
+        slug: "consent",
+        section: "legal",
+        title: "Согласие на обработку персональных данных",
+        currentLabel: "Согласие на обработку ПДн",
+        mobileHeaderTitle: "Согласие на обработку ПДн",
+        paragraphs: [
+            "Согласие пользователя на обработку персональных данных ООО «ТОТУСКЛАБ».",
+            p,
+        ],
+        seo: {
+            title: "Согласие на обработку персональных данных",
+            description: "Согласие на обработку персональных данных пользователей Totus Club (ООО «ТОТУСКЛАБ»).",
+            keywords: "Totus Club, согласие на обработку персональных данных, персональные данные, 152-ФЗ",
+        },
+    },
+    {
+        slug: "ads-consent",
+        section: "legal",
+        title: "Согласие на получение рекламы",
+        currentLabel: "Согласие на рекламу",
+        mobileHeaderTitle: "Согласие на рекламу",
+        paragraphs: [
+            "Согласие на получение рекламных и информационных рассылок Totus Club.",
+            p,
+        ],
+        seo: {
+            title: "Согласие на получение рекламы",
+            description: "Согласие на получение рекламы и рассылок от Totus Club (ООО «ТОТУСКЛАБ»).",
+            keywords: "Totus Club, согласие на рекламу, рассылки, реклама",
+        },
+    },
+    {
+        slug: "recommendations",
+        section: "legal",
+        title: "Правила применения рекомендательных технологий",
+        currentLabel: "Рекомендательные технологии",
+        mobileHeaderTitle: "Рекомендательные технологии",
+        paragraphs: [
+            "Как Totus Club применяет рекомендательные технологии при подборе туров и отелей.",
+            p,
+        ],
+        seo: {
+            title: "Правила применения рекомендательных технологий",
+            description: "Правила применения рекомендательных технологий на сайте и в приложении Totus Club (ООО «ТОТУСКЛАБ»).",
+            keywords: "Totus Club, рекомендательные технологии, рекомендации, правила",
+        },
+    },
+    {
+        slug: "requisites",
+        section: "legal",
+        title: "Реквизиты и контакты",
+        currentLabel: "Реквизиты и контакты",
+        mobileHeaderTitle: "Реквизиты и контакты",
+        paragraphs: [
+            "Реквизиты и контактные данные ООО «ТОТУСКЛАБ».",
+            p,
+        ],
+        seo: {
+            title: "Реквизиты и контакты",
+            description: "Реквизиты и контакты ООО «ТОТУСКЛАБ» — оператора сервиса Totus Club.",
+            keywords: "Totus Club, ТОТУСКЛАБ, реквизиты, контакты, ИНН, ОГРН",
         },
     },
 ];
@@ -329,7 +397,7 @@ const fromDefs: Record<string, string> = Object.fromEntries(
 /** Last URL segment → mobile header title (includes footer static + manual entries). */
 export const FOOTER_STATIC_MOBILE_TITLES: Record<string, string> = {
     "about-us": "О нас",
-    "privacy-policy": "Политика конфиденциальности",
+    "privacy-policy": "Политика обработки ПДн",
     apps: "Приложения",
     ...fromDefs,
 };
