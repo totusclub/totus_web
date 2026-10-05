@@ -398,6 +398,7 @@ const fromDefs: Record<string, string> = Object.fromEntries(
 export const FOOTER_STATIC_MOBILE_TITLES: Record<string, string> = {
     "about-us": "О нас",
     "privacy-policy": "Политика обработки ПДн",
+    legal: "Правовая информация",
     apps: "Приложения",
     ...fromDefs,
 };

@@ -11,12 +11,26 @@ const FALLBACK_SOCIAL: FooterSocialLink[] = [
     { id: 4, title: 'VC', icon: 'vc', url: '', sort_order: 4, is_active: true },
 ];
 
+const COMPANY_LINKS = [
+    { href: '/about-us', label: 'О нас' },
+    { href: '/partners', label: 'Партнёры' },
+    { href: '/advertise', label: 'Рекламируйтесь у нас' },
+    { href: '/requisites', label: 'Реквизиты и контакты' },
+];
+
+const HELP_LINKS = [
+    { href: '/help-faq', label: 'Помощь и FAQ' },
+    { href: '/low-fare-tips', label: 'Советы по низким тарифам' },
+    { href: '/airlines', label: 'Авиакомпании' },
+    { href: '/security', label: 'Безопасность' },
+];
+
 function SocialLinks({ items }: { items: FooterSocialLink[] }) {
     if (!items.length) return null;
 
     return (
         <div className={styles.social}>
-            <p className={styles.socialTitle}></p>
+            <p className={styles.footerColumnTitle}>Будьте с нами</p>
             <ul>
                 {items.map((item) => {
                     const content = <Icon name={item.icon} size={24} color="var(--textPrimary)" />;
@@ -36,6 +50,23 @@ function SocialLinks({ items }: { items: FooterSocialLink[] }) {
     );
 }
 
+function LinkColumn({ title, links, className }: { title: string; links: { href: string; label: string }[]; className: string }) {
+    return (
+        <nav className={`${styles.footerColumn} ${className}`} aria-label={title}>
+            <p className={styles.footerColumnTitle}>{title}</p>
+            <ul>
+                {links.map((link) => (
+                    <li key={link.href}>
+                        <Link href={link.href} className={styles.footerLink}>
+                            {link.label}
+                        </Link>
+                    </li>
+                ))}
+            </ul>
+        </nav>
+    );
+}
+
 const Footer = () => {
     const [socialLinks, setSocialLinks] = useState<FooterSocialLink[]>(FALLBACK_SOCIAL);
 
@@ -49,121 +80,57 @@ const Footer = () => {
         <footer className={styles.footer}>
             <div className={'content'}>
                 <div className={styles.footerRow}>
-                    <div className={styles.footerColumnM}>
-                        <p className={styles.footerColumnTitle}></p>
-                        <div className={styles.appStore}>
-                            <Icon name={"appStore"} size={'100%'}/>
-                        </div>
-                        <SocialLinks items={socialLinks} />
-                        <p className={styles.footerColumnTitle}></p>
-                        <div className={styles.footerPayList}>
-                            <div><Icon name={'mir'} size={41}/></div>
-                            <div><Icon name={'visa'} size={38}/></div>
-                            <div><Icon name={'master'} size={29}/></div>
-                        </div>
-                    </div>
-                    <div className={styles.footerColumn}>
-                        <p className={styles.footerColumnTitle}></p>
-                        <ul>
-                            <li className={styles.footerColumn}>
-                                ООО «Арлекинотур»,ИНН 9729298840, <br/> ОГРН 1207700285033, 119361, город Москва, Малая Очаковская ул., д. 4, офис 7
-                            </li>
-                            <div className={styles.appStore}>
-                                <Icon name={"appStore"} size={'100%'}/>
-                                <Icon name={"googlePlay"} size={'100%'}/>
-                                <Icon name={"ruStore"} size={'48px'}/>
+                    <div className={styles.colApp}>
+                        <div className={styles.appBlock}>
+                            <p className={styles.footerColumnTitle}>Приложение Totus Club</p>
+                            <div className={styles.stores}>
+                                <span className={styles.storeTile} title="App Store" aria-label="App Store">
+                                    <Icon name={'appStore'} />
+                                </span>
+                                <span className={styles.storeTile} title="Google Play" aria-label="Google Play">
+                                    <Icon name={'googlePlay'} />
+                                </span>
+                                <span className={styles.storeTile} title="RuStore" aria-label="RuStore">
+                                    <Icon name={'ruStore'} />
+                                </span>
                             </div>
-                        </ul>
+                        </div>
+                        <SocialLinks items={socialLinks} />
                     </div>
-                    <div className={styles.footerColumn}>
-                        <p className={styles.footerColumnTitle}></p>
-                        <ul>
-                            <li>
-                                <Link href="/about-us" className={styles.footerLink}>
-                                    О Нас
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="/help-faq" className={styles.footerLink}>
-                                    Помощь/Часто задаваемые вопросы
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="/partners" className={styles.footerLink}>Партнеры</Link>
-                            </li>
-                            <li>
-                                <Link href="/advertise" className={styles.footerLink}>Рекламируйтесь у нас</Link>
-                            </li>
-                        </ul>
 
-                    </div>
-                    <div className={styles.footerColumn}>
-                        <p className={styles.footerColumnTitle}></p>
-                        <ul>
-                            <li>
-                                <Link href="/airlines" className={styles.footerLink}>Авиакомпании</Link>
-                            </li>
-                            <li>
-                                <Link href="/low-fare-tips" className={styles.footerLink}>Советы по низким тарифам</Link>
-                            </li>
-                            <li>
-                                <Link href="/badges-certificates" className={styles.footerLink}>Документы</Link>
-                            </li>
-                            <li>
-                                <Link href="/security" className={styles.footerLink}>Безопасность</Link>
-                            </li>
-                        </ul>
-                    </div>
-                    <div className={`${styles.footerColumn} ${styles.noneMobile}`}>
-                        <p className={styles.footerColumnTitle}></p>
+                    <LinkColumn title="Компания" links={COMPANY_LINKS} className={styles.colCompany} />
+                    <LinkColumn title="Помощь" links={HELP_LINKS} className={styles.colHelp} />
+
+                    <div className={styles.legalBlock}>
+                        <p className={styles.legalText}>
+                            <span>
+                                Турагент: ООО «ТОТУСКЛАБ», ИНН 9729424935, ОГРН 1267700310382, 119361, г. Москва, вн.тер.г. муниципальный округ Очаково-Матвеевское, пер. 2-й Очаковский, д. 4, помещ. 1/2. Реестровый номер турагента: [РТА …]
+                            </span>
+                            <span>
+                                Продавец номеров категории Arlekino: ООО «АРЛЕКИНОТУР», ИНН 9729298840, ОГРН 1207700285033
+                            </span>
+                            <span>Приём платежей: Банк ВТБ (ПАО)</span>
+                        </p>
+                        <p className={styles.legalText}>
+                            Информация на сайте носит справочный характер. Условия проживания в отелях, в том числе концепция питания, могут изменяться по решению администрации отелей. Сумма, отображаемая на сайте, включает стоимость туристского продукта. Копирование материалов без письменного согласия запрещено.
+                        </p>
                         <div className={styles.footerPayList}>
                             <div><Icon name={'mir'} size={41}/></div>
                             <div><Icon name={'visa'} size={38}/></div>
                         </div>
-                        <SocialLinks items={socialLinks} />
+                        <div className={styles.legalLinks}>
+                            <Link href="/legal" className={styles.legalLinkMain}>Правовая информация</Link>
+                            <Link href="/privacy-policy" className={styles.legalLink}>Политика обработки персональных данных</Link>
+                        </div>
                     </div>
                 </div>
                 <div className={styles.footerBottom}>
-                    <ul>
-                        <li>©2026 Totus Club</li>
-                        <li>
-                            <Link href="/terms" className={styles.footerBottomLink}>
-                                Пользовательское соглашение
-                            </Link>
-                        </li>
-                        <li>
-                            <Link href="/privacy-policy" className={styles.footerBottomLink}>
-                                Политика обработки ПДн
-                            </Link>
-                        </li>
-                        <li>
-                            <Link href="/consent" className={styles.footerBottomLink}>
-                                Согласие на обработку ПДн
-                            </Link>
-                        </li>
-                        <li>
-                            <Link href="/ads-consent" className={styles.footerBottomLink}>
-                                Согласие на рекламу
-                            </Link>
-                        </li>
-                        <li>
-                            <Link href="/cookie-settings" className={styles.footerBottomLink}>
-                                Политика cookie
-                            </Link>
-                        </li>
-                        <li>
-                            <Link href="/recommendations" className={styles.footerBottomLink}>
-                                Рекомендательные технологии
-                            </Link>
-                        </li>
-                        <li>
-                            <Link href="/requisites" className={styles.footerBottomLink}>
-                                Реквизиты и контакты
-                            </Link>
-                        </li>
-                    </ul>
+                    <p className={styles.copyright}>
+                        © 2026 ООО «ТОТУСКЛАБ». Все права защищены. Используя сайт, вы принимаете условия{' '}
+                        <Link href="/terms">пользовательского соглашения</Link>. Информация на сайте не является публичной офертой.{' '}
+                        <Link href="/privacy-policy">Политика обработки персональных данных</Link>.
+                    </p>
                 </div>
-
             </div>
         </footer>
     );

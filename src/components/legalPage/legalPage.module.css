@@ -1,0 +1,195 @@
+/* Страница /legal «Правовая информация» */
+.subtitle {
+  margin: -8px 0 24px;
+  color: var(--textTertiary);
+  font-size: 16px;
+  line-height: 22px;
+  letter-spacing: -0.02em;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  grid-template-areas:
+    "users company"
+    "upcoming company";
+  grid-template-rows: auto 1fr;
+  column-gap: 24px;
+  row-gap: 28px;
+  align-items: start;
+}
+
+.usersGroup {
+  grid-area: users;
+}
+
+.upcomingGroup {
+  grid-area: upcoming;
+}
+
+.groupTitle {
+  margin: 0 0 12px;
+  color: var(--textPrimary);
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 24px;
+  letter-spacing: -0.02em;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--borderTertiary);
+  border-radius: 16px;
+  background: var(--bgPrimary);
+  overflow: hidden;
+}
+
+.item + .item {
+  border-top: 1px solid var(--borderTertiary);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  color: inherit;
+  text-decoration: none;
+}
+
+a.row:hover {
+  background: var(--bgSecondary);
+}
+
+a.row:focus-visible {
+  outline: 2px solid var(--core_Orange, #fe732e);
+  outline-offset: -2px;
+}
+
+.rowText {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+.rowTitle {
+  color: var(--textPrimary);
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 20px;
+  letter-spacing: -0.02em;
+}
+
+.rowDesc {
+  color: var(--textTertiary);
+  font-size: 14px;
+  line-height: 18px;
+  letter-spacing: -0.02em;
+}
+
+.chevron {
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+.chevron svg {
+  width: 20px;
+  height: 20px;
+}
+
+.chevron svg path {
+  stroke: var(--textTertiary);
+}
+
+.itemMuted {
+  opacity: 0.55;
+}
+
+.soon {
+  flex-shrink: 0;
+  color: var(--textTertiary);
+  font-size: 14px;
+  line-height: 18px;
+}
+
+.company {
+  grid-area: company;
+  padding: 20px;
+  border-radius: 16px;
+  background: var(--bgSecondary);
+  /* Выравнивание по первой карточке списка (под заголовком группы). */
+  margin-top: 36px;
+}
+
+.companyName {
+  margin: 0 0 16px;
+  color: var(--textPrimary);
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 24px;
+  letter-spacing: -0.02em;
+}
+
+.companyList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0 0 16px;
+}
+
+.companyList dt {
+  color: var(--textTertiary);
+  font-size: 13px;
+  line-height: 18px;
+}
+
+.companyList dd {
+  margin: 2px 0 0;
+  color: var(--textPrimary);
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.companyLink {
+  color: var(--core_Orange, #fe732e);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 18px;
+  text-decoration: none;
+}
+
+.companyLink:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 1024px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "users"
+      "company"
+      "upcoming";
+    grid-template-rows: auto;
+    row-gap: 24px;
+  }
+
+  .company {
+    margin-top: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .subtitle {
+    margin-top: -4px;
+    font-size: 15px;
+    line-height: 20px;
+  }
+
+  .row {
+    padding: 14px 16px;
+  }
+}
