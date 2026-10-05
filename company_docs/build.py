@@ -8,8 +8,8 @@ os.makedirs(OUT, exist_ok=True)
 
 OZON = {
  'terms': ('Условия использования Ozon ID', 'https://docs.ozon.ru/legal/terms-of-use/site/ozon-id-terms/'),
- 'privacy': ('Политика ООО «Интернет Трэвел» в отношении обработки ПДн', 'https://docs.ozon.ru/legal/personal-data/ru/it/'),
- 'consent': ('Общие условия согласия на обработку ПДн (Ozon Travel)', 'https://docs.ozon.ru/legal/partners/web/travel/'),
+ 'privacy': ('Политика ООО «Интернет Трэвел» в отношении обработки персональных данных', 'https://docs.ozon.ru/legal/personal-data/ru/it/'),
+ 'consent': ('Общие условия согласия на обработку персональных данных (Ozon Travel)', 'https://docs.ozon.ru/legal/partners/web/travel/'),
  'ads-consent': ('Согласие на получение рекламы', 'https://docs.ozon.ru/legal/terms-of-use/site/ads-agreement-ozon-tech/'),
  'cookies': None,
  'recommendations': ('Алгоритм рекомендаций на Ozon', 'https://docs.ozon.ru/legal/terms-of-use/site/algorithms/recomendation-algorithms/'),
