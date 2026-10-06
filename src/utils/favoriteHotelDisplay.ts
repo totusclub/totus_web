@@ -118,7 +118,7 @@ export function normalizeHotelFavoritePayload(raw: Record<string, unknown>): Rec
 function slimImageSlotForFavorite(img: unknown): Record<string, string> {
     if (typeof img === "string") {
         const u = resolveCdnImageUrl(img);
-        return { webp_x620: u, x500: u };
+        return { webp_x620: u, x500: u, uri: u };
     }
     if (!img || typeof img !== "object" || Array.isArray(img)) return {};
     const o = img as Record<string, unknown>;
@@ -133,7 +133,17 @@ function slimImageSlotForFavorite(img: unknown): Record<string, string> {
         const fallback = firstImageUrlFromObject(o);
         if (fallback) slim.x500 = resolveCdnImageUrl(fallback);
     }
-    return slim;
+    return withAppImageUri(slim);
+}
+
+/**
+ * Приложение (React Native <Image source>) показывает картинку только из поля `uri`;
+ * без него отель, добавленный на сайте, был в избранном приложения без фото.
+ * `uri` — тот же адрес (JPEG раньше WebP), остальные поля сайта не меняются.
+ */
+function withAppImageUri(slim: Record<string, string>): Record<string, string> {
+    const uri = slim.x620 || slim.x500 || slim.x900 || slim.webp_x620 || slim.webp_x900;
+    return uri ? { ...slim, uri } : slim;
 }
 
 function slimTagsForFavorite(raw: unknown): string[] {
