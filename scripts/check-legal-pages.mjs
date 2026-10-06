@@ -1,11 +1,13 @@
 // Проверка юридических страниц ООО «ТОТУСКЛАБ» на чистом Node ≥ 22, без npm install:
 //   node scripts/check-legal-pages.mjs
-// Для каждого из 7 документов: есть страница src/pages/<slug>/index.tsx с <CmsStaticPage slug="<slug>" />,
+// Для каждого из 12 документов: есть страница src/pages/<slug>/index.tsx с <CmsStaticPage slug="<slug>" />,
 // slug объявлен в типах/defs (getCmsPageDef его находит, SEO и моб. заголовок берутся из defs),
 // заголовок страницы — полное название.
 // Футер v2 (Figma 2291:105683): из юр. документов в футере только «Правовая информация» (/legal),
-// политика обработки персональных данных и пользовательское соглашение в копирайте; все 7 документов —
-// ссылки на странице /legal (список в src/config/legalDocs.ts). Юр. блок — только ООО «ТОТУСКЛАБ».
+// политика обработки персональных данных и пользовательское соглашение в копирайте; все 12 документов —
+// ссылки на странице /legal (список в src/config/legalDocs.ts), «Реквизиты и контакты» — последним.
+// Пачка 2 (оферта на туры, бронирование размещения, отмена и возврат, памятка, оплата) — только на /legal,
+// в футер не выводится. Юр. блок — только ООО «ТОТУСКЛАБ».
 // В пользовательских текстах футера, /legal, конфигов и меню профиля нет сокращений вместо «персональных данных»
 // и упоминаний стороннего юрлица-продавца номеров (см. FORBIDDEN ниже).
 import assert from 'node:assert/strict';
@@ -16,6 +18,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');
 
+// Порядок = порядок на /legal; «Реквизиты и контакты» — последним.
 const DOCS = [
     { slug: 'terms', title: 'Пользовательское соглашение', short: 'Пользовательское соглашение' },
     { slug: 'privacy-policy', title: 'Политика обработки персональных данных', short: 'Политика обработки персональных данных' },
@@ -23,6 +26,14 @@ const DOCS = [
     { slug: 'ads-consent', title: 'Согласие на получение рекламы', short: 'Согласие на рекламу' },
     { slug: 'cookie-settings', title: 'Политика использования файлов cookie', short: 'Политика cookie' },
     { slug: 'recommendations', title: 'Правила применения рекомендательных технологий', short: 'Рекомендательные технологии' },
+    // Пачка 2: полные названия везде, без сокращений (title = currentLabel = mobileHeaderTitle).
+    ...[
+        ['tour-offer', 'Оферта о заключении договора о реализации туристского продукта'],
+        ['hotel-booking', 'Условия бронирования размещения'],
+        ['cancellation', 'Изменение, отмена и возврат'],
+        ['tourist-memo', 'Памятка туристу'],
+        ['payment', 'Оплата и возврат денег'],
+    ].map(([slug, title]) => ({ slug, title, short: title, pack2: true })),
     { slug: 'requisites', title: 'Реквизиты и контакты', short: 'Реквизиты и контакты' },
 ];
 
@@ -120,6 +131,7 @@ const cfg = () => {
 
 // Тексты, которые видит пользователь: футер, /legal, конфиги юр. страниц, SEO, меню профиля.
 const USER_TEXT_FILES = [
+    ...DOCS.map((d) => `src/pages/${d.slug}/index.tsx`),
     'src/components/footer/index.tsx',
     'src/components/footer/footer.module.css',
     'src/pages/legal/index.tsx',
@@ -196,10 +208,14 @@ check('футер: юридический блок ООО «ТОТУСКЛАБ»
 check('футер: из юр. документов только /legal, /privacy-policy и /terms (в копирайте)', () => {
     has(footer, /<Link href="\/legal" className=\{styles\.legalLinkMain\}>Правовая информация<\/Link>/);
     has(footer, /<Link href="\/privacy-policy" className=\{styles\.legalLink\}>Политика обработки персональных данных<\/Link>/);
-    for (const slug of ['consent', 'ads-consent', 'cookie-settings', 'recommendations', 'badges-certificates']) {
+    const pack2 = DOCS.filter((d) => d.pack2).map((d) => d.slug);
+    for (const slug of ['consent', 'ads-consent', 'cookie-settings', 'recommendations', 'badges-certificates', ...pack2]) {
         assert.ok(!footer.includes(`"/${slug}"`), `в футере осталась ссылка /${slug} (теперь она на /legal)`);
     }
     assert.ok(!/footerBottomLink/.test(footer), 'строка из 7 документов внизу футера должна быть убрана');
+    for (const d of DOCS.filter((x) => x.pack2)) {
+        assert.ok(!footer.includes(d.title), `в футере название «${d.title}» (документы пачки 2 — только на /legal)`);
+    }
 });
 
 check('футер: копирайт-строка целиком, ссылки на соглашение и политику обработки персональных данных', () => {
@@ -219,11 +235,11 @@ check('футер: мобильная версия — столбиком и с 
     has(footerCss, /@media \(max-width: 1024px\)[\s\S]*\.footerRow\{\s*flex-direction: column;/);
 });
 
-check('legalDocs.ts: ровно 7 опубликованных документов, реквизиты — седьмым', () => {
+check('legalDocs.ts: ровно 12 опубликованных документов, реквизиты — последним', () => {
     const { LEGAL_DOCS, LEGAL_REQUISITES, LEGAL_COMPANY } = cfg();
-    assert.equal(LEGAL_DOCS.length, 7);
-    assert.deepEqual(LEGAL_DOCS.map((d) => d.slug), DOCS.map((d) => d.slug), 'порядок/набор документов ≠ 7 юр. страниц');
-    assert.equal(LEGAL_DOCS[6], LEGAL_REQUISITES, 'седьмой пункт — «Реквизиты и контакты»');
+    assert.equal(LEGAL_DOCS.length, 12);
+    assert.deepEqual(LEGAL_DOCS.map((d) => d.slug), DOCS.map((d) => d.slug), 'порядок/набор документов ≠ 12 юр. страниц');
+    assert.equal(LEGAL_DOCS[LEGAL_DOCS.length - 1], LEGAL_REQUISITES, 'последний пункт — «Реквизиты и контакты»');
     assert.equal(LEGAL_REQUISITES.description, 'Реквизиты ООО «ТОТУСКЛАБ» и контакты поддержки');
     for (const d of LEGAL_DOCS) {
         const ref = DOCS.find((x) => x.slug === d.slug);
@@ -231,6 +247,16 @@ check('legalDocs.ts: ровно 7 опубликованных документ�
         assert.equal(d.href, `/${d.slug}`);
         assert.ok(existsSync(join(root, `src/pages/${d.slug}/index.tsx`)), `нет страницы ${d.href}`);
         assert.ok(d.description && d.description.length > 10, `${d.slug}: нет описания`);
+    }
+    const pack2Desc = {
+        'tour-offer': 'Условия покупки тура: заявка, цена и оплата, права сторон, отмена, претензии',
+        'hotel-booking': 'Бронирование отелей без перелёта: подтверждение, оплата, заселение, отмена',
+        cancellation: 'Как изменить или отменить тур и бронирование, сроки возврата денег',
+        'tourist-memo': 'Документы, визы, страхование, аэропорт, что делать на месте, важные контакты',
+        payment: 'Способы оплаты, кассовый чек, возврат денег, безопасность платежей',
+    };
+    for (const [slug, desc] of Object.entries(pack2Desc)) {
+        assert.equal(LEGAL_DOCS.find((d) => d.slug === slug)?.description, desc, `${slug}: описание на /legal`);
     }
     assert.equal(LEGAL_COMPANY.inn, '9729424935');
     assert.equal(LEGAL_COMPANY.kpp, '772901001');
@@ -245,7 +271,7 @@ check('/legal: страница существует, шаблон StaticInfoPag
     has(legalPage, /export default function/);
 });
 
-check('/legal: все 7 документов — ссылки из конфига', () => {
+check('/legal: все 12 документов — ссылки из конфига', () => {
     has(legalPage, /from '@\/config\/legalDocs'/);
     has(legalPage, /\{LEGAL_DOCS\.map\(\(doc\) => \([\s\S]*?<Link href=\{doc\.href\}/, 'LEGAL_DOCS → <Link href={doc.href}>');
     assert.equal((legalPage.match(/\.map\(/g) || []).length, 1, 'на странице один список — LEGAL_DOCS');
