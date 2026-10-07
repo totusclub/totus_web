@@ -621,11 +621,13 @@
   height: 100%;
   flex-shrink: 0;
   aspect-ratio: 479/100;
-  background: lightgray 50% / cover no-repeat;
+  background: 50% / cover no-repeat;
   mix-blend-mode: overlay;
 }
-/* картинка подключается, когда блок рядом с экраном (callRequest.tsx, useNearViewport) */
+/* картинка подключается, когда блок рядом с экраном (callRequest.tsx, useNearViewport);
+   серая подложка — вместе с ней (до загрузки блок просто оранжевый, без серой «плашки») */
 .callRequestLeyerLoaded {
+  background-color: lightgray;
   background-image: url("/images/layer.png");
 }
 .callRequestGirl {
