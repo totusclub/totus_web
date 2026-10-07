@@ -100,6 +100,10 @@ export default function HotDealsSlide({ slidesToShow, title, recomendHotels }: {
                 settings: {
                     slidesToShow: 1.2,
                     slidesToScroll: 1,
+                    // Без бесконечной прокрутки: при дробном slidesToShow react-slick с infinite
+                    // сдвигает ленту на 0,2 карточки — первая карточка обрезалась слева на телефоне.
+                    // Теперь первая карточка у левого края, следующая выглядывает справа.
+                    infinite: false,
                     dots: false,
                     arrows: false
                 }
