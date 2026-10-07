@@ -5,6 +5,8 @@ import Script from 'next/script'; // ✅ ADD
 import { useRouter } from 'next/router';
 import { wrapper } from '../store';
 import '../styles/globals.css';
+// Тема слайдеров без шрифта slick (см. файл); вместо slick-carousel/slick/slick-theme.css в компонентах
+import '../styles/slick-theme.css';
 import '@/utils/themeInit';
 import '@/api/http'; // Bearer + refresh для всех запросов к totus_API
 import Header from '@/components/header';

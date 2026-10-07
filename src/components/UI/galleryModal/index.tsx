@@ -4,7 +4,6 @@ import Modal from 'react-modal';
 import styles from './galleryModal.module.css';
 import Icon from "@/components/icons/Icon";
 import 'slick-carousel/slick/slick.css';
-import 'slick-carousel/slick/slick-theme.css';
 
 interface ArrowProps {
     onClick?: () => void;

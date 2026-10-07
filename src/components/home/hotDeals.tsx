@@ -1,12 +1,12 @@
 import React, { CSSProperties } from "react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
 import styles from './home.module.css'
 import HotelBoxCard from "@/components/hotelBox/hotelBoxCard";
 import Icon from "@/components/icons/Icon";
 import { useRouter } from "next/router";
 import { buildHotelDetailsDeepLinkQuery } from "@/utils/hotelDetailsUtils";
+import { useNearViewport } from "@/hooks/useNearViewport";
 
 interface HotelItem {
     id: number | string;
@@ -42,6 +42,9 @@ const PrevArrow = ({ onClick }: ArrowProps) => {
 
 export default function HotDealsSlide({ slidesToShow, title, recomendHotels }: { slidesToShow: number, title: string, recomendHotels?: HotelItem[] | null }) {
     const router = useRouter();
+    // Фото отелей грузим, когда блок рядом с экраном (PageSpeed: не мешать главной картинке)
+    const [desktopListRef, desktopListVisible] = useNearViewport<HTMLDivElement>();
+    const [mobileListRef, mobileListVisible] = useNearViewport<HTMLDivElement>();
 
     const handlePressHotel = React.useCallback(
         (hotelId: number | string) => {
@@ -107,7 +110,7 @@ export default function HotDealsSlide({ slidesToShow, title, recomendHotels }: {
     return (
         <div className={`${styles.contentFull} ${styles.contentFullHide}`}>
             <p className={styles.hotProductTitle}>{title}</p>
-            <div className={styles.recomendlist}>
+            <div className={styles.recomendlist} ref={desktopListRef}>
                 {recomendHotels?.map((item: HotelItem, index: number) => (
                     <HotelBoxCard
                         key={item.id ?? index}
@@ -118,12 +121,13 @@ export default function HotDealsSlide({ slidesToShow, title, recomendHotels }: {
                         price={item.price || 0}
                         review={item.review || 0}
                         image={item.image || ''}
+                        showImage={desktopListVisible}
                         url=""
                         onClick={() => handlePressHotel(item.id)}
                     />
                 ))}
             </div>
-            <div className={styles.recomendlistMob}>
+            <div className={styles.recomendlistMob} ref={mobileListRef}>
                 <Slider {...settings}>
                     {recomendHotels?.map((item: HotelItem, index: number) => (
                         <div key={item.id ?? index} className={styles.hotDealSlide}>
@@ -135,6 +139,7 @@ export default function HotDealsSlide({ slidesToShow, title, recomendHotels }: {
                                 price={item.price || 0}
                                 review={item.review || 0}
                                 image={item.image || ''}
+                                showImage={mobileListVisible}
                                 url=""
                                 onClick={() => handlePressHotel(item.id)}
                             />

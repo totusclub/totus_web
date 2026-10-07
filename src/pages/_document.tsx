@@ -14,11 +14,22 @@ export default function Document() {
                 <link rel="preconnect" href="https://api.totus.club" />
                 <link rel="preconnect" href="https://api.totus.club" crossOrigin="" />
                 <link rel="preconnect" href="https://img.cdn.level.travel" />
-                <link rel="preconnect" href="https://fonts.googleapis.com" />
+                {/* Шрифт Golos Text: @font-face в globals.css, файлы — сразу с fonts.gstatic.com
+                    (без блокирующего CSS fonts.googleapis.com). Кириллица и латиница нужны на любой странице. */}
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
                 <link
-                    href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700;800&display=swap"
-                    rel="stylesheet"
+                    rel="preload"
+                    as="font"
+                    type="font/woff2"
+                    href="https://fonts.gstatic.com/s/golostext/v7/q5uCsoe9Lv5t7Meb31EcExd8hLxR.woff2"
+                    crossOrigin=""
+                />
+                <link
+                    rel="preload"
+                    as="font"
+                    type="font/woff2"
+                    href="https://fonts.gstatic.com/s/golostext/v7/q5uCsoe9Lv5t7Meb31EcExN8hA.woff2"
+                    crossOrigin=""
                 />
             </Head>
             <body>

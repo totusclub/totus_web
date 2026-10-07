@@ -12,10 +12,12 @@ interface ProductCardProps {
     image:string,
     url:string,
     onClick?: (e: React.MouseEvent) => void;
+    /** false — фото ещё не грузить (блок ниже экрана); по умолчанию true, как раньше */
+    showImage?: boolean;
 }
 
 
-const HotelBoxCard = ({id,name,rate,city,price,review,image,url, onClick }: ProductCardProps) => {
+const HotelBoxCard = ({id,name,rate,city,price,review,image,url, onClick, showImage = true }: ProductCardProps) => {
     const router = useRouter();
     
     const handleClick = (e: React.MouseEvent) => {
@@ -36,7 +38,7 @@ const HotelBoxCard = ({id,name,rate,city,price,review,image,url, onClick }: Prod
 
     return (
         <div onClick={handleClick} className={styles.hotelBoxCard} key={id} style={{ cursor: onClick ? 'pointer' : undefined }}>
-            <div className={styles.hotelBoxCardImage} style={{backgroundImage: `url(${image})`}}>
+            <div className={styles.hotelBoxCardImage} style={showImage && image ? {backgroundImage: `url(${image})`} : undefined}>
                 <div className={styles.hotelBoxCardImageInfo}>
                     <div className={styles.hotelBoxCardStatus}>
                         <p>Самый популярный</p>
