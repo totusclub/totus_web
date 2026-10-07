@@ -37,9 +37,13 @@ export const clearSession = () => {
     deleteToken();
 };
 
+// Значение флага «код введён». Меняется вместе с кодом доступа (UI/modalPin), чтобы
+// после смены кода его спросили заново у всех, кто вводил прежний ('YES' — код 2103).
+export const PIN_ACCESS_VALUE = 'v2-1289';
+
 export const savePin = () => {
     if (!hasStorage()) return;
-    localStorage.setItem('pin_code', 'YES');
+    localStorage.setItem('pin_code', PIN_ACCESS_VALUE);
 };
 export const getPin = () => {
     if (!hasStorage()) return null;
