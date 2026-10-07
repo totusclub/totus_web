@@ -1,4 +1,4 @@
-// PageSpeed mobile: критический CSS в HTML (optimizeCss + beasties), включается только при установленном пакете.
+// PageSpeed mobile: критический CSS в HTML (optimizeCss + critters), включается только при установленном пакете.
 // Запуск: node scripts/check-css-inline.mjs (без npm install).
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -23,9 +23,9 @@ function check(name, fn) {
 
 console.log('Критический CSS в HTML');
 
-check('next.config: optimizeCss только если пакет beasties установлен', () => {
+check('next.config: optimizeCss только если пакет critters установлен (его требует Next 15.3)', () => {
   const cfg = read('next.config.ts');
-  assert.match(cfg, /optimizeCss: hasPackage\('beasties'\),/);
+  assert.match(cfg, /optimizeCss: hasPackage\('critters'\),/);
   assert.match(cfg, /typeof require === 'function' && Boolean\(require\.resolve\(name\)\)/);
   assert.match(cfg, /\} catch \{\s*return false;\s*\}/);
 });
