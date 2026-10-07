@@ -49,6 +49,8 @@ function PartnerLogo({ partner }: { partner: HomePartner }) {
             alt={partner.name || 'Партнёр'}
             loading="lazy"
             decoding="async"
+            width={160}
+            height={64}
             style={{ width: '100%', height: 'auto', objectFit: 'contain', maxHeight: 80 }}
         />
     );
@@ -69,16 +71,18 @@ function PartnerLogo({ partner }: { partner: HomePartner }) {
     return <div className={styles.partnerItem}>{content}</div>;
 }
 
-export default function Partner() {
-    const [partners, setPartners] = useState<HomePartner[]>([]);
-    const [loading, setLoading] = useState(true);
+/** initialPartners — с сервера (главная, getServerSideProps); null — запросить в браузере, как раньше. */
+export default function Partner({ initialPartners = null }: { initialPartners?: HomePartner[] | null }) {
+    const [partners, setPartners] = useState<HomePartner[]>(initialPartners ?? []);
+    const [loading, setLoading] = useState(initialPartners === null);
 
     useEffect(() => {
+        if (initialPartners) return;
         getHomePartners()
             .then(setPartners)
             .catch(() => setPartners([]))
             .finally(() => setLoading(false));
-    }, []);
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     if (!loading && partners.length === 0) {
         return null;

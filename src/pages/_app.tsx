@@ -104,7 +104,7 @@ function MyApp({ Component, pageProps }: AppProps) {
                 {/* <ScrollRestoration /> */}
 
                 <SupportCallProvider>
-                {!isAiRoute && <Header />}
+                {!isAiRoute && <Header heroTitle={pageProps?.homeHero?.title ?? null} />}
                 <Component {...pageProps} />
                 {!isAiRoute && <Footer />}
                 {!isAiRoute && <MobileBottomBar />}
