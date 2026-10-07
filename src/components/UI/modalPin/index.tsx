@@ -4,7 +4,8 @@ import VerificationCodeInput from "@/components/UI/verificationCodeInput";
 import {savePin} from "@/utils/auth";
 
 
-const PIN = 2103
+// Код доступа к сайту (с 08.10.2026; прежний — 2103). При смене кода поменять и PIN_ACCESS_VALUE в utils/auth.
+const PIN = 1289
 
 const ModalPin = ({open,setOpen}: { open:boolean,setOpen:any}) => {
     const [valid, setValid] = useState(false);

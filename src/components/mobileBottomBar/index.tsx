@@ -6,7 +6,7 @@ import AuthModal from "@/components/auth/LazyAuthModal";
 import useAuth from "@/hooks/useAuth";
 import {useRouter} from "next/router";
 import ModalPin from "@/components/UI/modalPin";
-import {getPin} from "@/utils/auth";
+import {getPin, PIN_ACCESS_VALUE} from "@/utils/auth";
 import {clearSearch} from '@/store/slices/searchSlice';
 import {useDispatch, useSelector} from 'react-redux';
 import type {RootState} from '@/store';
@@ -15,8 +15,8 @@ import type {RootState} from '@/store';
 const MobileBottomBar = () => {
     const router = useRouter();
     const dispatch = useDispatch();
-    // Код доступа 2103 при первом открытии сайта (возвращён по решению владельца 07.10.2026;
-    // после верного кода браузер помнит его — localStorage pin_code = YES).
+    // Код доступа при первом открытии сайта (UI/modalPin; с 08.10.2026 — 1289, раньше 2103);
+    // после верного кода браузер помнит его — localStorage pin_code = PIN_ACCESS_VALUE.
     // Открывается эффектом ниже, если кода нет: у вернувшихся окно больше не мигает на первом кадре.
     const [pinModalOpen, setPinModalOpen] = useState(false);
     const [authModalOpen, setAuthModalOpen] = useState(false);
@@ -33,7 +33,7 @@ const MobileBottomBar = () => {
 
     useEffect(()=>{
         const checkPin = getPin()
-        if(checkPin === 'YES'){
+        if(checkPin === PIN_ACCESS_VALUE){
             setPinModalOpen(false);
         }else{
             setPinModalOpen(true);
