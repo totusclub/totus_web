@@ -287,3 +287,4 @@ const GalleryModal: React.FC<GalleryModalProps> = ({ isOpen, onClose, images, in
 };
 
 export default GalleryModal;
+
