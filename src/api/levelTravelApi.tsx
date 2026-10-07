@@ -397,7 +397,15 @@ function toPackageIdNumber(value: unknown): number | null {
     return Number.isFinite(n) && n > 0 ? n : null;
 }
 
-export async function Packagesflights(params: Record<string, unknown>) {
+/**
+ * options.view = 'list' — лёгкий ответ totus_API (только поля страницы билетов, без srcset,
+ * источников багажа и т.п.); без него — полный ответ LT (бронирование, оформление заказа).
+ * options.signal — отмена устаревшего запроса (переключение фильтров).
+ */
+export async function Packagesflights(
+    params: Record<string, unknown>,
+    options?: { view?: 'list'; signal?: AbortSignal },
+) {
     const packageId = toPackageIdNumber(params?.package_id ?? params?.packageId);
     if (packageId == null) {
         throw new Error('Missing or invalid package_id');
@@ -408,7 +416,10 @@ export async function Packagesflights(params: Record<string, unknown>) {
         package_id: packageId,
     });
 
-    const response = await axios.post(`${BASE_URL}/packages/flights`, body);
+    const response = await axios.post(`${BASE_URL}/packages/flights`, body, {
+        ...(options?.view ? { params: { view: options.view } } : {}),
+        ...(options?.signal ? { signal: options.signal } : {}),
+    });
     return response.data;
 }
 

@@ -1,6 +1,6 @@
 import Steps from "@/components/searchPage/steps";
 import SearchResult from "@/components/searchPage/searchResult";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { PackagesActualize, Packagesflights } from "@/api/levelTravelApi";
 import { useRouter } from "next/router";
 import axios from "axios";
@@ -29,6 +29,13 @@ function pickActiveFlightFilters(data: Record<string, unknown> | null | undefine
     return out;
 }
 
+/** Пауза перед запросом при переключении фильтров: несколько быстрых кликов — один запрос к API. */
+const FLIGHTS_FILTERS_DEBOUNCE_MS = 400;
+
+function isAbortError(err: unknown): boolean {
+    return axios.isCancel(err) || (err as { name?: string } | null)?.name === 'CanceledError';
+}
+
 function isPackageGoneError(err: unknown): boolean {
     if (!axios.isAxiosError(err)) return false;
     const status = err.response?.status;
@@ -55,18 +62,38 @@ export default function Tickets() {
         ? router.query.package[0]
         : router.query.package;
 
+    // Только последний запрос перелётов имеет значение: предыдущий отменяется,
+    // а его ответ (если всё же пришёл) не перетирает новый список.
+    const requestSeqRef = useRef(0);
+    const abortRef = useRef<AbortController | null>(null);
+    const filtersTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    useEffect(() => () => {
+        if (filtersTimerRef.current) clearTimeout(filtersTimerRef.current);
+        abortRef.current?.abort();
+    }, []);
+
     const requestFlights = useCallback(async (
         paramsFlight: Record<string, unknown>,
         options?: { allowRetry?: boolean },
     ) => {
         const allowRetry = options?.allowRetry !== false;
+        abortRef.current?.abort();
+        const controller = new AbortController();
+        abortRef.current = controller;
+        const seq = ++requestSeqRef.current;
+        const isCurrent = () => seq === requestSeqRef.current;
         try {
             setError(null);
-            const f = await Packagesflights(paramsFlight);
+            // view: 'list' — лёгкий ответ API (только поля, которые показывает страница билетов)
+            const f = await Packagesflights(paramsFlight, { view: 'list', signal: controller.signal });
+            if (!isCurrent()) return f;
             setAllFlights(f.flights || []);
             setFlightsFilter(f.filters || null);
             return f;
         } catch (err) {
+            // Запрос отменён новым (фильтр переключили ещё раз) — это не ошибка.
+            if (!isCurrent() || isAbortError(err)) return undefined;
             console.error('Flights loading failed:', err);
 
             // Expired / stale package → actualize once and retry with fresh id.
@@ -95,7 +122,7 @@ export default function Tickets() {
             setError('Не удалось загрузить варианты перелёта. Попробуйте выбрать тур заново.');
             throw err;
         } finally {
-            setLoading(false);
+            if (isCurrent()) setLoading(false);
         }
     }, [packageQuery]);
 
@@ -137,9 +164,14 @@ export default function Tickets() {
             ...pickActiveFlightFilters(data),
             package_id: packageId,
         };
-        requestFlights(filterParams).catch(() => {
-            /* error state already set */
-        });
+        // Несколько быстрых кликов по фильтрам → один запрос с последним набором фильтров.
+        if (filtersTimerRef.current) clearTimeout(filtersTimerRef.current);
+        filtersTimerRef.current = setTimeout(() => {
+            filtersTimerRef.current = null;
+            requestFlights(filterParams).catch(() => {
+                /* error state already set */
+            });
+        }, FLIGHTS_FILTERS_DEBOUNCE_MS);
     }
 
     return (
