@@ -4,8 +4,8 @@ import type { NextConfig } from 'next';
  * Критический CSS прямо в HTML (PageSpeed mobile: 3 CSS-файла блокировали первую отрисовку,
  * ~1,5 с на «медленном 4G», и задерживали показ hero — Element render delay 1,8 с).
  * Next (pages router) с experimental.optimizeCss встраивает нужные первому экрану правила
- * в <style>, а полные CSS-файлы подгружает без блокировки. Нужен пакет `beasties`
- * (`npm install beasties`); пока он не установлен — настройка выключена, сайт работает как раньше.
+ * в <style>, а полные CSS-файлы подгружает без блокировки. Next 15.3 использует пакет `critters`
+ * (`npm install critters`; пакет beasties эта версия Next не использует); пока он не установлен — настройка выключена, сайт работает как раньше.
  */
 function hasPackage(name: string): boolean {
     try {
@@ -28,7 +28,7 @@ const nextConfig: NextConfig = {
         ignoreDuringBuilds: true,
     },
     experimental: {
-        optimizeCss: hasPackage('beasties'),
+        optimizeCss: hasPackage('critters'),
     },
 };
 
