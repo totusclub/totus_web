@@ -3,12 +3,14 @@ import styles from './home.module.css'
 import { getHomeBanners, HomeBanner } from "@/api/homeBannersApi";
 
 
-export default function HomeBanners() {
-    const [banners, setBanners] = useState<HomeBanner[]>([]);
+/** initialBanners — с сервера (главная, getServerSideProps); null — запросить в браузере, как раньше. */
+export default function HomeBanners({ initialBanners = null }: { initialBanners?: HomeBanner[] | null }) {
+    const [banners, setBanners] = useState<HomeBanner[]>(initialBanners ?? []);
 
     useEffect(() => {
+        if (initialBanners) return;
         getHomeBanners().then(setBanners).catch(() => setBanners([]));
-    }, []);
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     const getBanner = (position: number) => banners.find((b) => b.position === position);
 

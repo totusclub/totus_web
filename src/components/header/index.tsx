@@ -21,7 +21,8 @@ const DEFAULT_HERO_TITLE = 'Путешествия начинаются здес
 // Форма поиска в шапке нужна только на /search и /tickets — отдельный чанк (с SSR), а не общий бандл.
 const SearchForm = dynamic(() => import("@/components/search/searchForm"));
 
-const Header = () => {
+/** heroTitle — заголовок hero главной с сервера (pageProps.homeHero), чтобы он был в HTML сразу. */
+const Header = ({ heroTitle: ssrHeroTitle = null }: { heroTitle?: string | null }) => {
     const dispatch = useDispatch();
     const [authModalOpen, setAuthModalOpen] = useState(false);
     const { token } = useAuth();
@@ -29,7 +30,7 @@ const Header = () => {
     const pathname = router.pathname || '';
     // Заголовок hero главной: на Desktop показывается в Header (в мобильной версии — в hero-блоке)
     const isHomePage = pathname === '/';
-    const heroTitle = useHomeHeroTitle();
+    const heroTitle = useHomeHeroTitle() ?? ssrHeroTitle;
 
     const showSearch = useMemo(() => {
         if (!pathname) return 'home';

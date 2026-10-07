@@ -5,24 +5,33 @@ import Icon from "@/components/icons/Icon";
 import { useDispatch } from 'react-redux';
 import { useEffect, useState } from 'react';
 import { clearSearch } from '@/store/slices/searchSlice';
-import { getHomeHero } from '@/api/homeHeroApi';
+import { getHomeHero, type HomeHero } from '@/api/homeHeroApi';
 import { publishHomeHeroTitle } from '@/hooks/useHomeHeroTitle';
 
 const DEFAULT_TITLE = 'Путешествия начинаются здесь';
 
-const Search = () => {
+/**
+ * initialHero — hero с сервера (getServerSideProps главной): заголовок и картинка сразу в HTML,
+ * картинка предзагружается из <head> (LCP). null — запросить в браузере, как раньше.
+ */
+const Search = ({ initialHero = null }: { initialHero?: HomeHero | null }) => {
     const dispatch = useDispatch();
     // null — ответ бэкенда ещё не пришёл: заголовок скрыт, чтобы не мелькал текст по умолчанию
-    const [heroTitle, setHeroTitle] = useState<string | null>(null);
+    const [heroTitle, setHeroTitle] = useState<string | null>(initialHero ? initialHero.title || DEFAULT_TITLE : null);
     // Только изображение с бэкенда (он случайно выбирает одно из всех hero-изображений админки),
     // и только после полной загрузки — без локальной заглушки
-    const [heroImage, setHeroImage] = useState('');
+    const [heroImage, setHeroImage] = useState(initialHero?.image || '');
 
     useEffect(() => {
         dispatch(clearSearch());
     }, [dispatch]);
 
     useEffect(() => {
+        if (initialHero) {
+            // Header на Desktop показывает тот же заголовок (см. useHomeHeroTitle)
+            publishHomeHeroTitle(initialHero.title || DEFAULT_TITLE);
+            return;
+        }
         let cancelled = false;
         getHomeHero().then((hero) => {
             if (cancelled) return;
@@ -39,7 +48,7 @@ const Search = () => {
         return () => {
             cancelled = true;
         };
-    }, []);
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     return (
         <div
