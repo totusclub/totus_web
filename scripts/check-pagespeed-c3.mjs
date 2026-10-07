@@ -78,7 +78,7 @@ check('блок «Оставьте номер»: layer.png и girl.png толь�
   const css = read('src/components/home/home.module.css');
   const c = code(read('src/components/home/callRequest.tsx'));
   assert.equal((css.match(/url\("\/images\/layer\.png"\)/g) || []).length, 1);
-  assert.match(css, /\.callRequestLeyerLoaded \{\s*background-image: url\("\/images\/layer\.png"\);/);
+  assert.match(css, /\.callRequestLeyerLoaded \{\s*(background-color: lightgray;\s*)?background-image: url\("\/images\/layer\.png"\);/);
   assert.match(css, /\.callRequestGirlLoaded \{\s*background-image: url\("\/images\/girl\.png"\);/);
   assert.match(c, /blockVisible \? styles\.callRequestLeyerLoaded : ''/);
   assert.match(c, /blockVisible \? styles\.callRequestGirlLoaded : ''/);
