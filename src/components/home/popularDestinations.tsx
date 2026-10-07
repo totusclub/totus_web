@@ -1,7 +1,6 @@
 import React, { useMemo, useCallback } from "react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
 import styles from './home.module.css'
 import Icon from "@/components/icons/Icon";
 import { useRouter } from "next/router";
@@ -10,6 +9,7 @@ import { runFullSearchFlow, setHeaderName, setStartSearch } from "@/store/slices
 import { AppDispatch } from "@/store";
 import { stayRangeFromDeparture } from "@/utils/calendarDateRange";
 import { replaceSearchListFilters, writeSearchListState } from "@/utils/searchListState";
+import { useNearViewport } from "@/hooks/useNearViewport";
 
 // Helper function to get default start date (7 days from today)
 const getDefaultStartDate = (): string => {
@@ -70,6 +70,9 @@ export default function PopularDestinations({
 }) {
     const router = useRouter();
     const dispatch = useDispatch<AppDispatch>();
+    // Фото направлений — ниже первого экрана: грузим, когда блок рядом с экраном (PageSpeed)
+    const [desktopListRef, desktopListVisible] = useNearViewport<HTMLDivElement>();
+    const [mobileListRef, mobileListVisible] = useNearViewport<HTMLDivElement>();
     const date = useMemo(() => {
         return getDefaultStartDate();
     }, []);
@@ -211,7 +214,7 @@ export default function PopularDestinations({
         <div className={styles.popularDestinationsWrapper}>
             <p className={styles.hotProductTitle}>{title}</p>
 
-            <div className={styles.recomendDeslist}>
+            <div className={styles.recomendDeslist} ref={desktopListRef}>
                 {popularDestinations?.map((item, index) => {
                     const destinationName = item?.name || item?.name_ru || item?.name_en || '';
                     const destinationImage = item?.image || '';
@@ -222,7 +225,7 @@ export default function PopularDestinations({
                             onClick={() => handlePressHotel(item)}
                             className={styles.recomendDeslistItem}
                             style={{
-                                backgroundImage: `url(${destinationImage})`,
+                                backgroundImage: desktopListVisible && destinationImage ? `url(${destinationImage})` : undefined,
                                 cursor: 'pointer'
                             }}
                         >
@@ -236,13 +239,13 @@ export default function PopularDestinations({
                 })}
             </div>
 
-            <div className={styles.recomendDeslistMob}>
+            <div className={styles.recomendDeslistMob} ref={mobileListRef}>
                 <Slider {...settings}>
                     {popularDestinations?.map((item, index) => {
                         return (
                             <div   key={item?.id || index}>
                             <div  style={{
-                                    backgroundImage: `url(${item?.image})`,
+                                    backgroundImage: mobileListVisible && item?.image ? `url(${item.image})` : undefined,
                                     cursor: 'pointer'
 
                                 }}

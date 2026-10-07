@@ -2,7 +2,6 @@ import React, { CSSProperties, useEffect, useState } from 'react';
 import Slider from 'react-slick';
 import styles from './verticalSlide.module.css';
 import 'slick-carousel/slick/slick.css';
-import 'slick-carousel/slick/slick-theme.css';
 import Icon from "@/components/icons/Icon";
 import GalleryModal from "@/components/UI/galleryModal";
 

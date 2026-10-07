@@ -621,16 +621,22 @@
   height: 100%;
   flex-shrink: 0;
   aspect-ratio: 479/100;
-  background: url("/images/layer.png") lightgray 50% / cover no-repeat;
+  background: lightgray 50% / cover no-repeat;
   mix-blend-mode: overlay;
+}
+/* картинка подключается, когда блок рядом с экраном (callRequest.tsx, useNearViewport) */
+.callRequestLeyerLoaded {
+  background-image: url("/images/layer.png");
 }
 .callRequestGirl {
   width: 477px;
   height: 100%;
-  background-image: url("/images/girl.png");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+}
+.callRequestGirlLoaded {
+  background-image: url("/images/girl.png");
 }
 .callRequestInfo {
   position: absolute;
