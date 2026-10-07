@@ -1,5 +1,6 @@
 import type { AppProps } from 'next/app';
 import { useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import Script from 'next/script'; // ✅ ADD
 import { useRouter } from 'next/router';
 import { wrapper } from '../store';
@@ -16,12 +17,15 @@ import { useDispatch } from "react-redux";
 import MobileBottomBar from "@/components/mobileBottomBar";
 import SiteSeo from "@/components/seo/SiteSeo";
 import CookieConsent from "@/components/cookieConsent";
-import GlobalAiChat from '@/components/GlobalAiChat';
-import SupportChatGate from '@/components/support/SupportChatGate';
-import NotificationsBridge from '@/components/notifications/NotificationsBridge';
 import SupportCallProvider from '@/components/support/SupportCallProvider';
+import AuthOnly from '@/components/AuthOnly';
 import { useStopSearchPollOnLeave } from '@/hooks/useStopSearchPollOnLeave';
 // import ScrollRestoration from '@/components/ScrollRestoration';
+
+// Только для вошедших: отдельные чанки, гостям не загружаются (Мила, сокет поддержки, уведомления).
+const GlobalAiChat = dynamic(() => import('@/components/GlobalAiChat'), { ssr: false });
+const SupportChatGate = dynamic(() => import('@/components/support/SupportChatGate'), { ssr: false });
+const NotificationsBridge = dynamic(() => import('@/components/notifications/NotificationsBridge'), { ssr: false });
 
 function MyApp({ Component, pageProps }: AppProps) {
     const dispatch = useDispatch();
@@ -105,12 +109,14 @@ function MyApp({ Component, pageProps }: AppProps) {
                 {!isAiRoute && <Footer />}
                 {!isAiRoute && <MobileBottomBar />}
                 {!isAiRoute && <CookieConsent />}
+                <AuthOnly>
                 {/* Мила FAB on all site pages; /ai home redirects to / */}
                 {!isAiRoute && <GlobalAiChat />}
                 {/* Чат с поддержкой: сокет + счётчик непрочитанных (без UI) */}
                 <SupportChatGate />
                 {/* Уведомления: непрочитанные, notify:* на сокете, service worker, тосты */}
                 <NotificationsBridge />
+                </AuthOnly>
                 </SupportCallProvider>
             </div>
         </>

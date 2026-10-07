@@ -5,7 +5,7 @@ import Icon from "@/components/icons/Icon";
 import TicketModal from "@/components/modals/ticketModal";
 import { useState, FC } from "react";
 import useAuth from "@/hooks/useAuth";
-import AuthModal from "@/components/auth";
+import AuthModal from "@/components/auth/LazyAuthModal";
 import { formatRussianDateTime, formatRussianDate, secondsToRussianTime } from "@/utils/dateTimeUtils";
 import { formatMoneyRub, getFlightOfferTotal, toMoney } from "@/utils/packagePrice";
 

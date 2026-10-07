@@ -2,11 +2,9 @@ import styles from './mobileBottomBar.module.css';
 import Icon from "@/components/icons/Icon";
 import {useEffect, useMemo, useState} from "react";
 import {usePathname} from "next/navigation";
-import Link from "next/link";
-import AuthModal from "@/components/auth";
+import AuthModal from "@/components/auth/LazyAuthModal";
 import useAuth from "@/hooks/useAuth";
 import {useRouter} from "next/router";
-import Support from "@/components/support";
 import ModalPin from "@/components/UI/modalPin";
 import {getPin} from "@/utils/auth";
 import {clearSearch} from '@/store/slices/searchSlice';
@@ -19,7 +17,8 @@ const MobileBottomBar = () => {
     const dispatch = useDispatch();
     // Код доступа 2103 при первом открытии сайта (возвращён по решению владельца 07.10.2026;
     // после верного кода браузер помнит его — localStorage pin_code = YES).
-    const [pinModalOpen, setPinModalOpen] = useState(true);
+    // Открывается эффектом ниже, если кода нет: у вернувшихся окно больше не мигает на первом кадре.
+    const [pinModalOpen, setPinModalOpen] = useState(false);
     const [authModalOpen, setAuthModalOpen] = useState(false);
 
     const {user,token} = useAuth()

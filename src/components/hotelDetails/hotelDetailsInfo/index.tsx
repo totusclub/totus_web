@@ -15,7 +15,7 @@ import {
     getSearchTypeFromQuery,
 } from "@/utils/bookingFlowUtils";
 import HotelFavoriteButton from "@/components/hotelDetails/HotelFavoriteButton";
-import AuthModal from "@/components/auth";
+import AuthModal from "@/components/auth/LazyAuthModal";
 import {
     buildListRoomPickFromQuery,
     findListMatchedOfferAcrossRooms,

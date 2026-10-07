@@ -19,10 +19,20 @@ import {
     type ReactNode,
 } from 'react';
 import { useRouter } from 'next/router';
+import dynamic from 'next/dynamic';
 import useAuth from '@/hooks/useAuth';
 import { getVoipUser } from '@/api/supportCallApi';
-import { callSupport, initSupportCall, shutdownSupportCall } from '@/lib/supportCall';
-import SupportCallModal from './SupportCallModal';
+
+// Звонок (WebRTC, lib/supportCall) и его карточка — отдельные чанки: грузятся только
+// вошедшему пользователю с доступом к звонку, а не каждому посетителю.
+const SupportCallModal = dynamic(() => import('./SupportCallModal'), { ssr: false });
+
+type SupportCallModule = typeof import('@/lib/supportCall');
+let supportCallModule: Promise<SupportCallModule> | null = null;
+const loadSupportCall = () => {
+    if (!supportCallModule) supportCallModule = import('@/lib/supportCall');
+    return supportCallModule;
+};
 
 interface SupportCallContextValue {
     /** Показывать ли пункт «Звонок в поддержку». */
@@ -51,7 +61,10 @@ const SupportCallProvider = ({ children }: { children: ReactNode }) => {
 
         if (!userId || !loyaltyId) {
             setAvailable(false);
-            shutdownSupportCall();
+            // Модуль звонка ещё не загружался — останавливать нечего.
+            if (supportCallModule) {
+                void supportCallModule.then((m) => m.shutdownSupportCall()).catch(() => undefined);
+            }
             return () => {
                 cancelled = true;
             };
@@ -63,9 +76,15 @@ const SupportCallProvider = ({ children }: { children: ReactNode }) => {
 
             // Как в приложении: раздел скрыт, если доступ ограничен.
             const allowed = Number(profile?.access ?? 0) === 0;
-            setAvailable(allowed);
-            if (allowed) initSupportCall(loyaltyId);
-        })();
+            if (!allowed) {
+                setAvailable(false);
+                return;
+            }
+            const supportCall = await loadSupportCall();
+            if (cancelled) return;
+            supportCall.initSupportCall(loyaltyId);
+            setAvailable(true);
+        })().catch(() => undefined);
 
         return () => {
             cancelled = true;
@@ -73,9 +92,11 @@ const SupportCallProvider = ({ children }: { children: ReactNode }) => {
     }, [userId, loyaltyId]);
 
     const call = useCallback(() => {
-        void callSupport().catch(() => {
-            // причина уже записана в состояние звонка и показана в карточке
-        });
+        void loadSupportCall()
+            .then((m) => m.callSupport())
+            .catch(() => {
+                // причина уже записана в состояние звонка и показана в карточке
+            });
     }, []);
 
     const goToChat = useCallback(() => {
