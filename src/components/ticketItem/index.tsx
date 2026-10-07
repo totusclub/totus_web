@@ -84,7 +84,7 @@ const TicketItem: FC<TicketItemProps> = ({ green, item, price, lazy }) => {
                                 <div className={styles.ticketItemLineBody}>
                                     <div className={styles.ticketItemLineItem}>
                                         <div className={styles.ticketItemLogo}>
-                                            <img src={item?.to?.airline?.logo?.src} alt={item?.to?.airline?.name} />
+                                            <img src={item?.to?.airline?.logo?.src} alt={item?.to?.airline?.name} loading="lazy" decoding="async" />
                                         </div>
                                         <div className={styles.ticketItemDate}>
                                             <p>{formatRussianDateTime(item?.to?.departure)} - {formatRussianDateTime(item?.to?.arrival)}</p>
@@ -113,7 +113,7 @@ const TicketItem: FC<TicketItemProps> = ({ green, item, price, lazy }) => {
                                 <div className={styles.ticketItemLineBody}>
                                     <div className={styles.ticketItemLineItem}>
                                         <div className={styles.ticketItemLogo}>
-                                            <img src={item?.back?.airline?.logo?.src} alt={item?.back?.airline?.name} />
+                                            <img src={item?.back?.airline?.logo?.src} alt={item?.back?.airline?.name} loading="lazy" decoding="async" />
                                         </div>
                                         <div className={styles.ticketItemDate}>
                                             <p>{formatRussianDateTime(item?.back?.departure)} - {formatRussianDateTime(item?.back?.arrival)}</p>
@@ -180,7 +180,8 @@ const TicketItem: FC<TicketItemProps> = ({ green, item, price, lazy }) => {
                     )}
                 </div>
 
-                <TicketModal open={open} setOpen={setOpen} item={item} />
+                {/* Окно деталей монтируется только при открытии — не по экземпляру react-modal на каждый рейс */}
+                {open && <TicketModal open={open} setOpen={setOpen} item={item} />}
                 <AuthModal open={authModal} setOpen={setAuthModal} />
             </>
         );
