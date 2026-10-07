@@ -96,7 +96,7 @@ const Header = ({ heroTitle: ssrHeroTitle = null }: { heroTitle?: string | null 
             <header className={`${styles.header} ${showHeader === 'home' ? styles.hide : ''}`}>
                 <div className={styles.headerRow}>
                     <div className={styles.logo}>
-                        <Link href="/">
+                        <Link href="/" aria-label="Totus Club — на главную">
                             {/* Desktop/Tablet Logo */}
                             <div className={styles.logoDesktop}>
                                 <LogoDesktopIcon />

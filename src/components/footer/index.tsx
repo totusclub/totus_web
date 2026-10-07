@@ -84,13 +84,13 @@ const Footer = () => {
                         <div className={styles.appBlock}>
                             <p className={styles.footerColumnTitle}>Приложение Totus Club</p>
                             <div className={styles.stores}>
-                                <span className={styles.storeTile} title="App Store" aria-label="App Store">
+                                <span className={styles.storeTile} title="App Store" role="img" aria-label="App Store">
                                     <Icon name={'appStore'} />
                                 </span>
-                                <span className={styles.storeTile} title="Google Play" aria-label="Google Play">
+                                <span className={styles.storeTile} title="Google Play" role="img" aria-label="Google Play">
                                     <Icon name={'googlePlay'} />
                                 </span>
-                                <span className={styles.storeTile} title="RuStore" aria-label="RuStore">
+                                <span className={styles.storeTile} title="RuStore" role="img" aria-label="RuStore">
                                     <Icon name={'ruStore'} />
                                 </span>
                             </div>

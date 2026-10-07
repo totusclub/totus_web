@@ -40,7 +40,8 @@ body {
   --bgActive: #e0e0e0;
   --textPrimary: #1f1f1f;
   --textSecondary: #3d3d3d;
-  --textTertiary: #7a7a7a;
+  /* #737373 вместо #7a7a7a: контраст на белом 4,74:1 (нужно ≥ 4,5:1, было 4,29:1), на глаз почти то же */
+  --textTertiary: #737373;
   --textDisabled: #b8b8b8;
   --textPrimaryB: #ffffff;
   --borderPrimary: #1f1f1f;
@@ -163,6 +164,13 @@ body {
 }
 
 @media (max-width: 1024px) {
+  /* Масштаб страницы разрешён (SiteSeo): iOS увеличивает страницу при фокусе на поле с шрифтом < 16px.
+     Правило по тегу — поля, где размер задан в CSS-модуле, не меняются. */
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
   html,
   body {
     overflow-x: hidden;

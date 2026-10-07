@@ -28,6 +28,7 @@ const ModalPin = ({open,setOpen}: { open:boolean,setOpen:any}) => {
             isOpen={open}
             // onClose={() => setOpen(false)}
             title={''}
+            contentLabel="Код доступа к сайту"
             width="450px"
             scroll={false}
         >

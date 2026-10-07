@@ -50,10 +50,9 @@ export default function SiteSeo({ pageProps }: SiteSeoProps) {
 
     return (
         <Head>
-            <meta
-                name="viewport"
-                content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-            />
+            {/* Масштабирование пальцами разрешено (доступность, PageSpeed «meta-viewport»).
+                Чтобы iPhone не увеличивал страницу при фокусе на поле, поля ввода на телефоне — 16px (globals.css). */}
+            <meta name="viewport" content="width=device-width, initial-scale=1.0" />
             <title>{title}</title>
             <meta name="description" content={description} />
             <meta name="keywords" content={keywords} />
