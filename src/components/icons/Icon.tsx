@@ -1,3 +1,4 @@
+import dynamic from 'next/dynamic';
 import BurgerIcon from './burger'
 import LogoIcon from './logo'
 import HeartIcon from './heart'
@@ -50,12 +51,6 @@ import FavoriteIcon from "@/components/icons/favorite";
 import LogoutIcon from "@/components/icons/logout";
 import ProfileIcon from "@/components/icons/profile";
 import BackIcon from "@/components/icons/back";
-import tezTour from "@/components/icons/partner/tezTour";
-import onexTour from "@/components/icons/partner/onexTour";
-import funAndSun from "@/components/icons/partner/funAndSun";
-import biblioGlobus from "@/components/icons/partner/biblioGlobus";
-import pegasTour from "@/components/icons/partner/pegasTour";
-import coralTravel from "@/components/icons/partner/coralTravel";
 import NextIcon from "@/components/icons/next";
 import MasterIcon from "@/components/icons/master";
 import VisaIcon from "@/components/icons/visa";
@@ -77,6 +72,15 @@ import ReatingIcon from '@/components/icons/reating';
 import OptionCheckIcon from '@/components/icons/optionCheck';
 import BirdIcon from '@/components/icons/bird';
 import RuStoreIcon from "@/components/icons/ruStore";
+
+// Логотипы туроператоров (onexTour ~51 КБ, biblioGlobus ~19 КБ…) — отдельными чанками:
+// на главной партнёры приходят картинками из API, в общий бандл каждой страницы эти SVG не нужны.
+const tezTour = dynamic(() => import("@/components/icons/partner/tezTour"));
+const onexTour = dynamic(() => import("@/components/icons/partner/onexTour"));
+const funAndSun = dynamic(() => import("@/components/icons/partner/funAndSun"));
+const biblioGlobus = dynamic(() => import("@/components/icons/partner/biblioGlobus"));
+const pegasTour = dynamic(() => import("@/components/icons/partner/pegasTour"));
+const coralTravel = dynamic(() => import("@/components/icons/partner/coralTravel"));
 
 
 const icons = {

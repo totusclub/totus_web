@@ -2,9 +2,9 @@ import Link from 'next/link';
 import styles from './header.module.css';
 import Icon from "@/components/icons/Icon";
 import Button from "@/components/UI/button";
-import SearchForm from "@/components/search/searchForm";
+import dynamic from "next/dynamic";
 import { useMemo, useState } from "react";
-import AuthModal from "@/components/auth";
+import AuthModal from "@/components/auth/LazyAuthModal";
 import useAuth from "@/hooks/useAuth";
 import { useRouter } from "next/router";
 import { clearSearch } from '@/store/slices/searchSlice';
@@ -17,6 +17,9 @@ import NotificationsBell from "@/components/notifications/NotificationsBell";
 import { useHomeHeroTitle } from "@/hooks/useHomeHeroTitle";
 
 const DEFAULT_HERO_TITLE = 'Путешествия начинаются здесь';
+
+// Форма поиска в шапке нужна только на /search и /tickets — отдельный чанк (с SSR), а не общий бандл.
+const SearchForm = dynamic(() => import("@/components/search/searchForm"));
 
 const Header = () => {
     const dispatch = useDispatch();

@@ -28,10 +28,12 @@ const auth = code(read('src/utils/auth.tsx'));
 const app = code(read('src/pages/_app.tsx'));
 
 console.log('Код доступа к сайту');
-check('окно кода показывается на каждой странице (MobileBottomBar в _app) и открыто до проверки', () => {
+check('окно кода показывается на каждой странице (MobileBottomBar в _app), если код ещё не вводили', () => {
   assert.match(app, /<MobileBottomBar\s*\/>/);
   assert.match(bar, /import ModalPin from "@\/components\/UI\/modalPin";/);
-  assert.match(bar, /useState\(true\)/);
+  // 07.10: начальное false, открывает эффект — у вернувшихся окно не мигает на первом кадре
+  assert.match(bar, /const \[pinModalOpen, setPinModalOpen\] = useState\(false\);/);
+  assert.match(bar, /\}else\{\s*setPinModalOpen\(true\);/);
   assert.match(bar, /<ModalPin open=\{pinModalOpen\} setOpen=\{setPinModalOpen\}\/>/);
 });
 check('код 2103; верный код запоминается, окно закрывается', () => {
