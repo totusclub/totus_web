@@ -14,8 +14,10 @@ interface AppModalProps {
     auth?: boolean;
     back?:boolean
     scroll?:boolean
+    /** Имя окна для экранного диктора, если заголовка нет (например, окно кода доступа) */
+    contentLabel?: string
 }
-const AppModal: React.FC<AppModalProps> = ({ isOpen, onClose, title, width = '500px', children,subTitle,auth,back,onBack,scroll }:AppModalProps) => {
+const AppModal: React.FC<AppModalProps> = ({ isOpen, onClose, title, width = '500px', children,subTitle,auth,back,onBack,scroll,contentLabel }:AppModalProps) => {
     useEffect(() => {
         if (typeof document !== 'undefined') {
             Modal.setAppElement('#root');
@@ -28,6 +30,8 @@ const AppModal: React.FC<AppModalProps> = ({ isOpen, onClose, title, width = '50
             onRequestClose={onClose}
             overlayClassName={styles.modalOverlay}
             className={styles.appModal}
+            // У role="dialog" должно быть имя (доступность): заголовок окна или contentLabel
+            contentLabel={contentLabel || title || 'Диалоговое окно'}
             style={{
                 content: {
                     width,

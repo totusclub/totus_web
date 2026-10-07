@@ -39,6 +39,8 @@ export default function VerificationCodeInput({ onComplete,valid }) {
                     key={idx}
                     type="text"
                     inputMode="numeric"
+                    autoComplete={idx === 0 ? 'one-time-code' : 'off'}
+                    aria-label={`Цифра ${idx + 1} из ${code.length}`}
                     maxLength={1}
                     value={digit}
                     onChange={(e) => handleChange(e, idx)}

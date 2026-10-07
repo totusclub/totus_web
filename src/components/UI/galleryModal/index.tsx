@@ -193,6 +193,7 @@ const GalleryModal: React.FC<GalleryModalProps> = ({ isOpen, onClose, images, in
             className={styles.galleryModal}
             closeTimeoutMS={300}
             shouldCloseOnOverlayClick={true}
+            contentLabel="Фотографии"
         >
             <div
                 className={styles.galleryModalContent}
