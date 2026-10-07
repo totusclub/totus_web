@@ -1,4 +1,4 @@
-// PageSpeed C3–C4: шрифт без блокирующего CSS Google Fonts, тема слайдеров без шрифта slick,
+// PageSpeed C3–C4: шрифт только с нашего сервера (08.10: Google Fonts убраны по решению владельца), тема слайдеров без шрифта slick,
 // картинки ниже первого экрана грузятся по мере приближения. Запуск: node scripts/check-pagespeed-c3.mjs
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -31,22 +31,14 @@ const theme = read('src/styles/slick-theme.css');
 
 console.log('PageSpeed: шрифт, слайдеры, картинки ниже экрана');
 
-check('шрифт: @font-face "Golos Text" с fonts.gstatic.com (кириллица, латиница + ext), без TTF и без CSS googleapis', () => {
+check('шрифт: только с нашего сервера (файл из src/assets/fonts), без Google Fonts; запасные шрифты без засечек', () => {
   const faces = globals.match(/@font-face\s*\{[^}]*\}/g) || [];
-  assert.equal(faces.length, 4);
-  for (const f of faces) {
-    assert.match(f, /font-family: "Golos Text";/);
-    assert.match(f, /font-weight: 400 800;/);
-    assert.match(f, /font-display: swap;/);
-    assert.match(f, /src: url\(https:\/\/fonts\.gstatic\.com\/s\/golostext\/v7\/[A-Za-z0-9]+\.woff2\) format\("woff2"\);/);
-    assert.match(f, /unicode-range: /);
-  }
-  assert.ok(!/GolosText-VariableFont_wght\.ttf/.test(globals));
-  assert.ok(!/fonts\.googleapis\.com/.test(doc), 'нет блокирующего CSS Google Fonts');
-  for (const file of ['q5uCsoe9Lv5t7Meb31EcExd8hLxR', 'q5uCsoe9Lv5t7Meb31EcExN8hA']) {
-    assert.ok(globals.includes(file), file);
-    assert.match(doc, new RegExp(`rel="preload"\\s*as="font"\\s*type="font/woff2"\\s*href="https://fonts\\.gstatic\\.com/s/golostext/v7/${file}\\.woff2"\\s*crossOrigin=""`));
-  }
+  assert.equal(faces.length, 1);
+  assert.match(faces[0], /font-family: "Golos Text";/);
+  assert.match(faces[0], /src: url\("\.\/\.\.\/assets\/fonts\/GolosText-VariableFont_wght\.ttf"\) format\("truetype"\),\s*local\("Arial"\)/);
+  assert.match(faces[0], /font-display: swap;/);
+  for (const f of [globals, doc]) assert.ok(!/fonts\.gstatic\.com|fonts\.googleapis\.com/.test(f), 'нет Google Fonts');
+  assert.match(globals, /body \{[\s\S]*?font-family: "Golos Text", [^;]*sans-serif;/);
 });
 
 check('тема слайдеров: своя, без шрифта slick и gif; подключена в _app; в компонентах не импортируется', () => {
