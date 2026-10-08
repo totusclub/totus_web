@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "test:search": "npx --yes tsx --test src/utils/search/keyboardLayout.test.ts",
-    "check": "node scripts/check-perf-stage1.mjs && node scripts/check-legal-pages.mjs && node scripts/check-profile-orders.mjs && node scripts/check-favorites-sync.mjs && node scripts/check-site-pin.mjs && node scripts/check-bundle-split.mjs && node scripts/check-home-ssr.mjs && node scripts/check-pagespeed-c3.mjs && node scripts/check-a11y-c6.mjs && node scripts/check-css-inline.mjs && node scripts/check-tickets-paging.mjs && node scripts/check-flights-request.mjs && node scripts/check-mobile-sliders.mjs && node scripts/check-home-hero-mobile.mjs && node scripts/check-where-to-list.mjs && node scripts/check-hotel-offers-mobile.mjs && node scripts/check-hotel-photos.mjs && node scripts/check-room-photos.mjs && node scripts/check-theme-mode.mjs"
+    "check": "node scripts/check-perf-stage1.mjs && node scripts/check-legal-pages.mjs && node scripts/check-profile-orders.mjs && node scripts/check-favorites-sync.mjs && node scripts/check-site-pin.mjs && node scripts/check-bundle-split.mjs && node scripts/check-home-ssr.mjs && node scripts/check-pagespeed-c3.mjs && node scripts/check-a11y-c6.mjs && node scripts/check-css-inline.mjs && node scripts/check-tickets-paging.mjs && node scripts/check-flights-request.mjs && node scripts/check-mobile-sliders.mjs && node scripts/check-home-hero-mobile.mjs && node scripts/check-where-to-list.mjs && node scripts/check-hotel-offers-mobile.mjs && node scripts/check-hotel-photos.mjs && node scripts/check-room-photos.mjs && node scripts/check-theme-mode.mjs && node scripts/check-info-pages.mjs"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.8.1",
