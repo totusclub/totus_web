@@ -6,14 +6,14 @@
 
 .sliderWrapper {
   width: 92px;
-  height: 480px;
+  height: 384px;
   position: relative;
 }
 
 .sliderWrapper :global(.slick-slider),
 .sliderWrapper :global(.slick-list),
 .sliderWrapper :global(.slick-track) {
-  height: 480px !important;
+  height: 384px !important;
 }
 
 .sliderWrapper :global(.slick-list) {
@@ -21,18 +21,20 @@
 }
 
 .sliderWrapper :global(.slick-slide) {
-  height: 80px !important;
+  height: 64px !important;
 }
 
 .sliderWrapper :global(.slick-slide > div) {
-  height: 80px;
+  height: 64px;
 }
 
 .thumbnail {
   cursor: pointer;
   width: 88px;
-  height: 80px;
+  height: 58px;
   object-fit: cover;
+  /* Фото 5:3, верх кадра: нижняя полоса с надписью Level.Travel обрезается */
+  object-position: center top;
   border: 2px solid transparent;
   transition: border 0.3s;
   border-radius: 8px;
@@ -50,9 +52,10 @@
 }
 
 .selectedImage {
-  width: 560px;
-  height: 480px;
+  width: 640px;
+  height: 384px;
   object-fit: cover;
+  object-position: center top;
   border-radius: 13.666px;
   transition: opacity 0.2s ease;
 }
@@ -143,8 +146,8 @@
 
 /* Desktop skeleton styles */
 .image_placeholder {
-  width: 560px;
-  height: 480px;
+  width: 640px;
+  height: 384px;
   background: linear-gradient(90deg, var(--bgSecondary) 25%, var(--bgTertiary) 37%, var(--bgSecondary) 63%);
   background-size: 400% 100%; /* Important for shimmer effect */
   animation: placeholderShimmer 1.5s ease-in-out infinite;
@@ -156,12 +159,12 @@
   }
   .sliderWrapper {
     width: 100%;
-    height: 300px;
+    height: auto;
   }
   .sliderWrapper :global(.slick-slider),
   .sliderWrapper :global(.slick-list),
   .sliderWrapper :global(.slick-track) {
-    height: 300px !important;
+    height: auto !important;
   }
   .sliderWrapper :global(.slick-list) {
     overflow: hidden;
@@ -172,14 +175,15 @@
   }
   .sliderWrapper :global(.slick-slide),
   .sliderWrapper :global(.slick-slide > div) {
-    height: 300px !important;
+    height: auto !important;
   }
   .showAllButton {
     display: none;
   }
   .thumbnail {
     width: 100%;
-    height: 300px;
+    height: auto;
+    aspect-ratio: 5 / 3;
     border: none !important;
   }
   .selectedThumbnail {
@@ -194,7 +198,8 @@
   /* Mobile skeleton overrides */
   .image_placeholder {
     width: 100%;
-    height: 300px;
+    height: auto;
+    aspect-ratio: 5 / 3;
     border-radius: 8px;
   }
 }
