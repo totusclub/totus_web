@@ -6,19 +6,55 @@ import { logout } from "@/store/slices/authSlice";
 import { deleteToken } from "@/utils/auth";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import SwitchToggle from "@/components/UI/switch";
 import { useTheme } from "@/hooks/useTheme";
+import type { ThemeMode } from "@/utils/theme";
 import type { RootState } from "@/store";
 import { unregisterDevice } from "@/api/notificationsApi";
 import { getDeviceId } from "@/lib/webPush";
 import { useSupportCall } from "@/components/support/SupportCallProvider";
+
+// Тема оформления: по умолчанию «Системная» — как в настройках устройства
+const THEME_OPTIONS: { value: ThemeMode; label: string }[] = [
+    { value: 'light', label: 'Светлая' },
+    { value: 'dark', label: 'Тёмная' },
+    { value: 'system', label: 'Системная' },
+];
+const THEME_SUBTITLE: Record<ThemeMode, string> = {
+    light: 'Светлая',
+    dark: 'Тёмная',
+    system: 'Как в системе',
+};
+
+const ThemeOptionIcon = ({ mode }: { mode: ThemeMode }) => {
+    if (mode === 'light') {
+        return (
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <circle cx="12" cy="12" r="4.2" stroke="currentColor" strokeWidth="1.8" />
+                <path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+            </svg>
+        );
+    }
+    if (mode === 'dark') {
+        return (
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
+            </svg>
+        );
+    }
+    return (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <rect x="3" y="4.5" width="18" height="12" rx="2" stroke="currentColor" strokeWidth="1.8" />
+            <path d="M9 20h6M12 16.5V20" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+        </svg>
+    );
+};
 
 const MenuProfile = () => {
     const router = useRouter();
     const dispatch = useDispatch();
     const { user, token } = useAuth()
     const [deleteModal, setDeleteModal] = useState<boolean>(false)
-    const { theme, toggleTheme } = useTheme();
+    const { theme, mode, setMode } = useTheme();
     const supportUnread = useSelector((state: RootState) => state.supportChat?.unreadCount ?? 0);
     // Звонок в поддержку: доступен, если calling_api_v2 отдал access === 0 (как в приложении)
     const { available: canCallSupport, call: callSupport } = useSupportCall();
@@ -148,18 +184,30 @@ const MenuProfile = () => {
                 {/*</div>*/}
             </div>
             <div className={styles.profileMenu}>
-                <div className={styles.profileMenuItem} style={{ justifyContent: 'space-between', cursor: 'pointer', width: '100%' }} onClick={toggleTheme}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <Icon name={theme === 'light' ? 'light' : 'moon'} size={24} />
-                        <p style={{ color: 'var(--textPrimary)' }}>Темная тема</p>
+                <div className={styles.themeHead}>
+                    <Icon name={theme === 'light' ? 'light' : 'moon'} size={24} />
+                    <div className={styles.profileMenuItemText}>
+                        <p>Оформление</p>
+                        <span className={styles.profileMenuItemSub}>{THEME_SUBTITLE[mode]}</span>
                     </div>
-                    <div onClick={(e) => e.stopPropagation()}>
-                        <SwitchToggle isOn={theme === 'dark'} setIsOn={(value) => {
-                            if (value !== (theme === 'dark')) {
-                                toggleTheme();
-                            }
-                        }} />
-                    </div>
+                </div>
+                <div className={styles.themeSegment} role="radiogroup" aria-label="Тема оформления">
+                    {THEME_OPTIONS.map((option) => {
+                        const active = mode === option.value;
+                        return (
+                            <button
+                                key={option.value}
+                                type="button"
+                                role="radio"
+                                aria-checked={active}
+                                className={`${styles.themeSegmentBtn} ${active ? styles.themeSegmentActive : ''}`}
+                                onClick={() => setMode(option.value)}
+                            >
+                                <ThemeOptionIcon mode={option.value} />
+                                {option.label}
+                            </button>
+                        );
+                    })}
                 </div>
             </div>
             {/*<div className={styles.profileMenu}>*/}

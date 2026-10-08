@@ -6,6 +6,7 @@ import Icon from "@/components/icons/Icon";
 import Image from "next/image";
 import AppImage from "@/components/UI/appImage";
 import GalleryModal from "@/components/UI/galleryModal";
+import { useIconColor } from "@/hooks/useTheme";
 
 
 interface ArrowProps {
@@ -15,17 +16,19 @@ interface ArrowProps {
 }
 
 const NextArrow = ({ onClick }: ArrowProps) => {
+    const iconColor = useIconColor();
     return (
         <div className={styles.nextArrowSmall} onClick={onClick}>
-            <Icon name="rightArrow" size={24} color="#000" />
+            <Icon name="rightArrow" size={24} color={iconColor} />
         </div>
     );
 };
 
 const PrevArrow = ({ onClick }: ArrowProps) => {
+    const iconColor = useIconColor();
     return (
         <div className={styles.prevArrowSmall} onClick={onClick}>
-            <Icon name="leftArrow" size={24} color="#000" />
+            <Icon name="leftArrow" size={24} color={iconColor} />
         </div>
     );
 };

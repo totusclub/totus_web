@@ -15,6 +15,7 @@ import { FOOTER_STATIC_MOBILE_TITLES } from "@/config/footerStaticPages";
 import HeaderProfileMenu from "@/components/header/HeaderProfileMenu";
 import NotificationsBell from "@/components/notifications/NotificationsBell";
 import { useHomeHeroTitle } from "@/hooks/useHomeHeroTitle";
+import { useIconColor } from "@/hooks/useTheme";
 
 const DEFAULT_HERO_TITLE = 'Путешествия начинаются здесь';
 
@@ -31,6 +32,8 @@ const Header = ({ heroTitle: ssrHeroTitle = null }: { heroTitle?: string | null 
     // Заголовок hero главной: на Desktop показывается в Header (в мобильной версии — в hero-блоке)
     const isHomePage = pathname === '/';
     const heroTitle = useHomeHeroTitle() ?? ssrHeroTitle;
+    // Логотип и кнопки мобильной шапки: чёрные, в тёмной теме — белые
+    const iconColor = useIconColor();
 
     const showSearch = useMemo(() => {
         if (!pathname) return 'home';
@@ -104,19 +107,19 @@ const Header = ({ heroTitle: ssrHeroTitle = null }: { heroTitle?: string | null 
                             {/* Mobile Logo - Only show on home page */}
                             {showHeader === 'home' && (
                                 <div className={styles.logoMobile}>
-                                    <Icon name={"logo"} size={120} color="#000" />
+                                    <Icon name={"logo"} size={120} color={iconColor} />
                                 </div>
                             )}
                         </Link>
                     </div>
                     <div className={styles.backM}>
                         <div onClick={() => handleGoBack()}>
-                            <Icon name={"back"} size={24} color="#000" />
+                            <Icon name={"back"} size={24} color={iconColor} />
                         </div>
                     </div>
                     {showSearch === 'hotel-details' && (
                         <div className={styles.shareBtn}>
-                            <Icon name="share" size={24} color="#000" />
+                            <Icon name="share" size={24} color={iconColor} />
                         </div>
                     )}
                 </div>
