@@ -9,6 +9,7 @@ import {
     navigateAfterPackageCreate,
 } from "@/utils/bookingFlowUtils";
 import { formatPriceRub } from '@/utils/formatPrice';
+import { formatNightsCount } from '@/utils/formatRussianPlural';
 import { getOfferConfirmabilityDisplayLabel } from '@/utils/roomFilters';
 import { getOfferDisplayInfo, OFFER_TAG_BEST_PRICE } from '@/utils/offerDisplay';
 import {
@@ -64,10 +65,14 @@ const HotelDetailsPriceList: React.FC<HotelDetailsPriceListProps> = ({ item, typ
       navigateAfterPackageCreate(router, packageId, searchType);
     };
 
+    // «7 ночей · с 15.10» (было «7 ночей  С 15.10» — «ночей» при любом числе, заглавная «С»)
     const formatDate = (dateStr) => {
-        const [year, month, day] = dateStr.split('-');
-        return `С ${day}.${month}`;
+        if (!dateStr || typeof dateStr !== 'string') return '';
+        const [, month, day] = dateStr.split('-');
+        return day && month ? `с ${day}.${month}` : '';
     };
+    const formatWhen = (room: any) =>
+        [formatNightsCount(room?.nights_count), formatDate(room?.start_date)].filter(Boolean).join(' · ');
 
     const offersForType = useMemo(
         () => (item ?? []).filter((room) => room.type === type),
@@ -108,6 +113,21 @@ const HotelDetailsPriceList: React.FC<HotelDetailsPriceListProps> = ({ item, typ
     const visibleCount = showAll ? totalCount : offerGroups.length;
     const hiddenCount = Math.max(0, totalCount - visibleCount);
 
+    // Видимые предложения; основная (оранжевая) кнопка — у самого дешёвого из них,
+    // у остальных на телефоне — контур (hotelDetails.module.css, макет 08.10).
+    const visibleOffers = offerGroups.flatMap((group) => (showAll ? group.offers : group.offers.slice(0, 1)));
+    let primaryOfferId: string | number | null = null;
+    let primaryPrice: number | null = null;
+    for (const offer of visibleOffers) {
+        const price = getOfferPrice(offer);
+        if (price == null) continue;
+        if (primaryPrice == null || price < primaryPrice) {
+            primaryPrice = price;
+            primaryOfferId = offer?.id ?? null;
+        }
+    }
+    if (primaryOfferId == null && visibleOffers.length) primaryOfferId = visibleOffers[0]?.id ?? null;
+
     if (!totalCount) return null;
 
     const renderOffer = (room: any) => {
@@ -120,9 +140,13 @@ const HotelDetailsPriceList: React.FC<HotelDetailsPriceListProps> = ({ item, typ
         const otherTags = secondaryTags.filter(
             (tag) => tag !== OFFER_TAG_BEST_PRICE,
         );
+        const isPrimary = room?.id === primaryOfferId;
 
         return (
-                    <div key={room.id} className={styles.HotelDetailsPriceListItem}>
+                    <div
+                        key={room.id}
+                        className={`${styles.HotelDetailsPriceListItem}${isPrimary ? '' : ` ${styles.HotelDetailsPriceListItemSecondary}`}`}
+                    >
                         <div>
                             <p className={styles.HotelDetailsPriceListItemMeta}>
                                 {hasBestPrice ? (
@@ -135,9 +159,7 @@ const HotelDetailsPriceList: React.FC<HotelDetailsPriceListProps> = ({ item, typ
                                         </span>
                                     </span>
                                 ) : null}
-                                <span>
-                                    {room.nights_count} ночей  {formatDate(room?.start_date)}
-                                </span>
+                                <span>{formatWhen(room)}</span>
                             </p>
                             <p>{room?.operator_name}</p>
                             {confirmabilityLabel ? (
