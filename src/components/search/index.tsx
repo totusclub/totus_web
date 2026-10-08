@@ -3,12 +3,26 @@ import heroTitleStyles from './heroTitle.module.css';
 import SearchForm from "@/components/search/searchForm";
 import Icon from "@/components/icons/Icon";
 import { useDispatch } from 'react-redux';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type CSSProperties } from 'react';
 import { clearSearch } from '@/store/slices/searchSlice';
-import { getHomeHero, type HomeHero } from '@/api/homeHeroApi';
+import { getHomeHero, HERO_MOBILE_MEDIA, type HomeHero } from '@/api/homeHeroApi';
 import { publishHomeHeroTitle } from '@/hooks/useHomeHeroTitle';
 
 const DEFAULT_TITLE = 'Путешествия начинаются здесь';
+
+/**
+ * Фон hero. Есть мобильная версия — обе картинки в CSS-переменных, а какую показать, решает
+ * search.module.css (.searchHeroMobile): до 600 px — мобильную, шире — полную. Браузер качает
+ * только показанную. Нет мобильной — полная картинка в style, как раньше.
+ */
+function heroBackground(image: string, imageMobile: string): CSSProperties | undefined {
+    if (!image) return undefined;
+    if (!imageMobile) return { backgroundImage: `url(${image})` };
+    return {
+        ['--hero-desktop' as string]: `url(${image})`,
+        ['--hero-mobile' as string]: `url(${imageMobile})`,
+    } as CSSProperties;
+}
 
 /**
  * initialHero — hero с сервера (getServerSideProps главной): заголовок и картинка сразу в HTML,
@@ -21,6 +35,7 @@ const Search = ({ initialHero = null }: { initialHero?: HomeHero | null }) => {
     // Только изображение с бэкенда (он случайно выбирает одно из всех hero-изображений админки),
     // и только после полной загрузки — без локальной заглушки
     const [heroImage, setHeroImage] = useState(initialHero?.image || '');
+    const [heroImageMobile, setHeroImageMobile] = useState(initialHero?.image ? initialHero.imageMobile || '' : '');
 
     useEffect(() => {
         dispatch(clearSearch());
@@ -39,11 +54,16 @@ const Search = ({ initialHero = null }: { initialHero?: HomeHero | null }) => {
             // На Desktop этот же текст показывает Header (см. useHomeHeroTitle)
             publishHomeHeroTitle(hero.title || DEFAULT_TITLE);
             if (!hero.image) return;
+            const mobile = hero.imageMobile || '';
+            // заранее грузим ту версию, которую покажет этот экран
+            const useMobile = Boolean(mobile) && window.matchMedia?.(HERO_MOBILE_MEDIA).matches;
             const img = new window.Image();
             img.onload = () => {
-                if (!cancelled) setHeroImage(hero.image);
+                if (cancelled) return;
+                setHeroImageMobile(mobile);
+                setHeroImage(hero.image);
             };
-            img.src = hero.image;
+            img.src = useMobile ? mobile : hero.image;
         });
         return () => {
             cancelled = true;
@@ -52,8 +72,8 @@ const Search = ({ initialHero = null }: { initialHero?: HomeHero | null }) => {
 
     return (
         <div
-            className={`${styles.search} ${heroTitleStyles.desktopHeight}`}
-            style={heroImage ? { backgroundImage: `url(${heroImage})` } : undefined}
+            className={`${styles.search} ${heroTitleStyles.desktopHeight}${heroImage && heroImageMobile ? ` ${styles.searchHeroMobile}` : ''}`}
+            style={heroBackground(heroImage, heroImageMobile)}
         >
             <div className={`content ${styles.searchContent} ${heroTitleStyles.desktopContent}`}>
                 <div className={styles.logoHomeM}>

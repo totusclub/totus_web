@@ -59,8 +59,8 @@ check('фото направлений: фон только когда блок 
 
 check('фото отелей в «Начните планирование»: только когда блок рядом с экраном', () => {
   const s = code(read('src/components/home/hotDeals.tsx'));
-  assert.match(s, /showImage=\{desktopListVisible\}/);
-  assert.match(s, /showImage=\{mobileListVisible\}/);
+  assert.match(s, /showImage=\{desktopListVisible( && pageLoaded)?\}/);
+  assert.match(s, /showImage=\{mobileListVisible( && pageLoaded)?\}/);
   const card = code(read('src/components/hotelBox/hotelBoxCard.tsx'));
   assert.match(card, /showImage = true \}: ProductCardProps/);
   assert.match(card, /style=\{showImage && image \? \{backgroundImage: `url\(\$\{image\}\)`\} : undefined\}/);

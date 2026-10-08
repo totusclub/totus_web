@@ -47,6 +47,8 @@ check('сервер: 4 запроса параллельно, таймаут, о
 check('страница: getServerSideProps отдаёт данные; hero предзагружается с fetchPriority=high', () => {
   assert.match(page, /const homeSsr = await loadHomeSsrData\(\);\s*return \{\s*props: homeSsr,/);
   assert.match(page, /<link rel="preload" as="image" href=\{homeHero\.image\} fetchPriority="high"/);
+  // мобильная версия hero (08.10): отдельные preload по media — scripts/check-home-hero-mobile.mjs
+  assert.match(page, /href=\{homeHero\.imageMobile\} media=\{HERO_MOBILE_MEDIA\} fetchPriority="high"/);
   assert.match(page, /<Search initialHero=\{homeHero\} \/>/);
   assert.match(page, /<HomeBanners initialBanners=\{homeBanners\} \/>/);
   assert.match(page, /<Partner initialPartners=\{homePartners\} \/>/);
@@ -57,7 +59,8 @@ check('hero: заголовок и картинка из HTML; без данны
   assert.match(search, /useState<string \| null>\(initialHero \? initialHero\.title \|\| DEFAULT_TITLE : null\)/);
   assert.match(search, /useState\(initialHero\?\.image \|\| ''\)/);
   assert.match(search, /if \(initialHero\) \{\s*publishHomeHeroTitle\(initialHero\.title \|\| DEFAULT_TITLE\);\s*return;\s*\}\s*let cancelled = false;\s*getHomeHero\(\)/);
-  assert.match(search, /style=\{heroImage \? \{ backgroundImage: `url\(\$\{heroImage\}\)` \} : undefined\}/);
+  assert.match(search, /style=\{heroBackground\(heroImage, heroImageMobile\)\}/);
+  assert.match(search, /if \(!imageMobile\) return \{ backgroundImage: `url\(\$\{image\}\)` \};/);
 });
 
 check('шапка (desktop): заголовок hero с сервера, без мигания', () => {

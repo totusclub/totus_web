@@ -11,6 +11,7 @@ import CallRequest from "@/components/home/callRequest";
 import Faq from "@/components/home/faq";
 import { useLoadHomeData } from "@/hooks/loadHomeData";
 import { loadHomeSsrData, type HomeSsrData } from "@/lib/homeSsr";
+import { HERO_DESKTOP_MEDIA, HERO_MOBILE_MEDIA } from "@/api/homeHeroApi";
 
 
 export default function Home({ homeHero = null, homeData: initialHomeData = null, homeBanners = null, homePartners = null }: Partial<HomeSsrData>) {
@@ -19,11 +20,19 @@ export default function Home({ homeHero = null, homeData: initialHomeData = null
 
     return (
         <main>
-            {homeHero?.image ? (
+            {homeHero?.image && !homeHero.imageMobile ? (
                 <Head>
                     {/* Картинка hero — главный элемент первого экрана (LCP): браузер начинает её
                         загрузку сразу из HTML, не дожидаясь JS и CSS. */}
                     <link rel="preload" as="image" href={homeHero.image} fetchPriority="high" key="home-hero-image" />
+                </Head>
+            ) : null}
+            {homeHero?.image && homeHero.imageMobile ? (
+                <Head>
+                    {/* Есть мобильная версия: телефон (до 600 px) грузит только её (~50 КБ),
+                        остальные экраны — полную картинку. Те же условия — в search.module.css. */}
+                    <link rel="preload" as="image" href={homeHero.imageMobile} media={HERO_MOBILE_MEDIA} fetchPriority="high" key="home-hero-image-mobile" />
+                    <link rel="preload" as="image" href={homeHero.image} media={HERO_DESKTOP_MEDIA} fetchPriority="high" key="home-hero-image" />
                 </Head>
             ) : null}
             <Search initialHero={homeHero} />
