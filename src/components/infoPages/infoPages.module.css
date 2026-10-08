@@ -1,0 +1,370 @@
+/* Общие стили страниц «О нас», «Частые вопросы», «Авиакомпании» (макеты в Figma, 08.10.2026). */
+
+.body {
+  color: var(--textPrimary);
+  font-size: 16px;
+  line-height: 24px;
+  letter-spacing: -0.02em;
+}
+
+.body p {
+  margin: 0 0 16px;
+}
+
+.lead {
+  margin: 0 0 16px;
+  font-size: 20px;
+  line-height: 28px;
+  font-weight: 500;
+  color: var(--textPrimary);
+}
+
+.muted {
+  color: var(--textTertiary, #888);
+}
+
+.link {
+  color: var(--core_Orange, #f5a623);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.link:hover {
+  opacity: 0.85;
+}
+
+.divider {
+  border: none;
+  border-top: 1px solid var(--borderTertiary, #e0e0e0);
+  margin: 20px 0 32px;
+}
+
+.sectionTitle {
+  margin: 0 0 24px;
+  font-size: 20px;
+  line-height: 24px;
+  font-weight: 500;
+  color: var(--textPrimary);
+}
+
+/* Заголовок с оранжевым номером: «1 Туры и отели», «1 Поиск и бронирование» */
+.numHeading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 32px 0 16px;
+  font-size: 24px;
+  line-height: 32px;
+  font-weight: 500;
+  color: var(--textPrimary);
+}
+
+.step .numHeading {
+  margin: 0 0 8px;
+}
+
+.step + .step {
+  margin-top: 24px;
+}
+
+.num {
+  flex: 0 0 40px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--core_Orange, #f5a623);
+  color: #fff;
+  font-size: 20px;
+  line-height: 1;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ---------- О нас ---------- */
+
+.photos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin: 0;
+}
+
+.photo {
+  margin: 0;
+  height: 300px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--bgSecondary, #f2f2f2);
+}
+
+.photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.body .stepText {
+  margin: 0;
+}
+
+.logos {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 16px;
+  margin: 0 0 24px;
+}
+
+.logoTile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 112px;
+  padding: 16px 24px;
+  border: 1px solid var(--borderTertiary, #e0e0e0);
+  border-radius: 20px;
+  background: #fff;
+}
+
+.logoTile img {
+  max-width: 100%;
+  max-height: 56px;
+  object-fit: contain;
+  filter: grayscale(1);
+  opacity: 0.75;
+}
+
+.requisites {
+  margin: 0;
+}
+
+.requisites p {
+  margin: 0;
+}
+
+/* ---------- FAQ ---------- */
+
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.faqItem {
+  border: 1px solid var(--borderTertiary, #e0e0e0);
+  border-radius: 20px;
+  background: var(--bgPrimary);
+}
+
+.faqItem summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 30px;
+  font-size: 16px;
+  line-height: 20px;
+  font-weight: 500;
+  color: var(--textPrimary);
+}
+
+.faqItem summary::-webkit-details-marker {
+  display: none;
+}
+
+.chevron {
+  flex: 0 0 auto;
+  width: 20px;
+  height: 20px;
+  transition: transform 0.2s ease;
+  color: var(--textPrimary);
+  transform: rotate(180deg);
+}
+
+.faqItem[open] .chevron {
+  transform: rotate(0deg);
+}
+
+.faqAnswer {
+  margin: 0 30px;
+  padding: 20px 0;
+  border-top: 1px solid var(--borderTertiary, #e0e0e0);
+  font-size: 16px;
+  line-height: 26px;
+  color: var(--textPrimary);
+}
+
+.faqAnswer p {
+  margin: 0 0 10px;
+}
+
+.faqAnswer p:last-child {
+  margin-bottom: 0;
+}
+
+.faqAnswer ol {
+  margin: 0 0 10px;
+  padding-left: 22px;
+}
+
+.faqAnswer li {
+  margin-bottom: 6px;
+}
+
+.body .faqCta {
+  margin: 32px 0 0;
+}
+
+/* ---------- Авиакомпании ---------- */
+
+.airlines {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.airline {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 84px;
+  padding: 12px 14px;
+  border: 1px solid var(--borderTertiary, #e0e0e0);
+  border-radius: 18px;
+  background: var(--bgPrimary);
+}
+
+.airlineLogo {
+  flex: 0 0 96px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 96px;
+  height: 56px;
+  border: 1px solid var(--borderTertiary, #e0e0e0);
+  border-radius: 10px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.airlineLogo img {
+  max-width: 84px;
+  max-height: 44px;
+  object-fit: contain;
+}
+
+.iata {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background: #fdeee6;
+  color: #e5541b;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.airlineLogo:has(.iata) {
+  border-color: transparent;
+}
+
+.body .airlineName {
+  margin: 0 0 2px;
+  font-size: 16px;
+  line-height: 20px;
+  font-weight: 500;
+  color: var(--textPrimary);
+}
+
+.body .airlineMeta {
+  margin: 0;
+  font-size: 14px;
+  line-height: 18px;
+  color: var(--textTertiary, #888);
+}
+
+.tips p {
+  margin: 0 0 10px;
+}
+
+@media (max-width: 1024px) {
+  .airlines {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .logos {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .body {
+    font-size: 15px;
+    line-height: 22px;
+  }
+
+  .lead {
+    font-size: 17px;
+    line-height: 24px;
+  }
+
+  .divider {
+    margin: 16px 0 24px;
+  }
+
+  .numHeading {
+    font-size: 18px;
+    line-height: 24px;
+    margin-top: 24px;
+  }
+
+  .num {
+    flex-basis: 32px;
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+  }
+
+  .photos {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .photo {
+    height: 180px;
+  }
+
+  .logos {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .logoTile {
+    height: 80px;
+    padding: 12px 16px;
+  }
+
+  .faqItem summary {
+    padding: 16px 18px;
+  }
+
+  .faqAnswer {
+    margin: 0 18px;
+    padding: 16px 0;
+    font-size: 15px;
+    line-height: 24px;
+  }
+
+  .airlines {
+    grid-template-columns: 1fr;
+  }
+}
