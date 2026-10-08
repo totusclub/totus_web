@@ -60,6 +60,18 @@ const HangUpIcon = () => (
     </svg>
 );
 
+const ChevronDownIcon = () => (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+);
+
+const ChevronUpIcon = () => (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M6 15l6-6 6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+);
+
 const SupportCallModal = ({ onWriteToChat, onRetry }: Props) => {
     const [state, setState] = useState<CallState>('idle');
     const [muted, setMuted] = useState(false);
@@ -94,6 +106,11 @@ const SupportCallModal = ({ onWriteToChat, onRetry }: Props) => {
         setMinimized(false);
     }, []);
 
+    // Звонок завершился, пока карточка свёрнута: плашка исчезает сама (без экрана «Звонок завершён»).
+    useEffect(() => {
+        if (minimized && (state === 'ended' || state === 'rejected')) close();
+    }, [minimized, state, close]);
+
     if (state === 'idle') return null;
 
     const duration = formatDuration(startedAt);
@@ -101,8 +118,23 @@ const SupportCallModal = ({ onWriteToChat, onRetry }: Props) => {
     const isIncoming = state === 'ringing';
 
     if (minimized) {
+        // Звонок уже завершён — плашку не показываем (её закрывает эффект выше).
+        if (isFinished) return null;
+        const expand = () => setMinimized(false);
         return (
-            <div className={styles.miniBar} role="status">
+            <div
+                className={styles.miniBar}
+                role="button"
+                tabIndex={0}
+                aria-label="Развернуть звонок"
+                onClick={expand}
+                onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        expand();
+                    }
+                }}
+            >
                 <div className={styles.miniAvatar} aria-hidden="true">П</div>
                 <div className={styles.miniText}>
                     <p className={styles.miniTitle}>{SUPPORT_DISPLAY_NAME}</p>
@@ -113,14 +145,18 @@ const SupportCallModal = ({ onWriteToChat, onRetry }: Props) => {
                 <button
                     type="button"
                     className={`${styles.ctrlButton} ${styles.ctrlDanger} ${styles.miniHangUp}`}
-                    onClick={() => (isIncoming ? void rejectCall() : endCall())}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        if (isIncoming) void rejectCall();
+                        else endCall();
+                    }}
                     aria-label="Завершить звонок"
                 >
                     <HangUpIcon />
                 </button>
-                <button type="button" className={styles.miniExpand} onClick={() => setMinimized(false)}>
-                    Развернуть
-                </button>
+                <span className={styles.miniExpand} aria-hidden="true">
+                    <ChevronUpIcon />
+                </span>
             </div>
         );
     }
@@ -163,8 +199,10 @@ const SupportCallModal = ({ onWriteToChat, onRetry }: Props) => {
                         className={styles.minimize}
                         onClick={() => setMinimized(true)}
                         aria-label="Свернуть звонок"
+                        title="Свернуть"
                     >
-                        ×
+                        <ChevronDownIcon />
+                        <span>Свернуть</span>
                     </button>
                 )}
 
