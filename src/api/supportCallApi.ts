@@ -146,19 +146,27 @@ export async function sendCandidate(
     });
 }
 
+/**
+ * keepalive: true — запрос уходит, даже если страница закрывается (вкладка закрыта крестиком,
+ * перезагрузка, переход на другой сайт): браузер доводит его после выгрузки страницы.
+ */
+type ExitOptions = { keepalive?: boolean };
+
 /** POST /api/calls/:callId/reject */
-export async function rejectCallRequest(callId: string, deviceId: string): Promise<void> {
+export async function rejectCallRequest(callId: string, deviceId: string, options: ExitOptions = {}): Promise<void> {
     await request(`/api/calls/${encodeURIComponent(callId)}/reject`, {
         method: 'POST',
         body: JSON.stringify({ deviceId }),
+        keepalive: options.keepalive === true,
     });
 }
 
 /** POST /api/calls/:callId/end */
-export async function endCallRequest(callId: string, deviceId: string): Promise<void> {
+export async function endCallRequest(callId: string, deviceId: string, options: ExitOptions = {}): Promise<void> {
     await request(`/api/calls/${encodeURIComponent(callId)}/end`, {
         method: 'POST',
         body: JSON.stringify({ deviceId }),
+        keepalive: options.keepalive === true,
     });
 }
 
