@@ -30,6 +30,16 @@ const nextConfig: NextConfig = {
     experimental: {
         optimizeCss: hasPackage('critters'),
     },
+    // Картинки стран в списке «Куда» (src/utils/countryImages.ts): кеш браузера на 30 дней.
+    // Заменили картинку — меняйте и имя файла (или ждите 30 дней).
+    async headers() {
+        return [
+            {
+                source: '/countries/:file*',
+                headers: [{ key: 'Cache-Control', value: 'public, max-age=2592000, stale-while-revalidate=86400' }],
+            },
+        ];
+    },
 };
 
 export default nextConfig;
