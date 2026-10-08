@@ -7,6 +7,7 @@ import Icon from "@/components/icons/Icon";
 import { useRouter } from "next/router";
 import { buildHotelDetailsDeepLinkQuery } from "@/utils/hotelDetailsUtils";
 import { useNearViewport } from "@/hooks/useNearViewport";
+import { useAfterPageLoad } from "@/hooks/useAfterPageLoad";
 
 interface HotelItem {
     id: number | string;
@@ -42,9 +43,12 @@ const PrevArrow = ({ onClick }: ArrowProps) => {
 
 export default function HotDealsSlide({ slidesToShow, title, recomendHotels }: { slidesToShow: number, title: string, recomendHotels?: HotelItem[] | null }) {
     const router = useRouter();
-    // Фото отелей грузим, когда блок рядом с экраном (PageSpeed: не мешать главной картинке)
+    // Фото отелей грузим, когда блок рядом с экраном (PageSpeed: не мешать главной картинке).
+    // На телефоне блок виден уже на первом экране — поэтому ещё и только после загрузки страницы:
+    // 3 фото по ~110 КБ больше не делят канал с картинкой hero (LCP).
     const [desktopListRef, desktopListVisible] = useNearViewport<HTMLDivElement>();
     const [mobileListRef, mobileListVisible] = useNearViewport<HTMLDivElement>();
+    const pageLoaded = useAfterPageLoad();
 
     const handlePressHotel = React.useCallback(
         (hotelId: number | string) => {
@@ -125,7 +129,7 @@ export default function HotDealsSlide({ slidesToShow, title, recomendHotels }: {
                         price={item.price || 0}
                         review={item.review || 0}
                         image={item.image || ''}
-                        showImage={desktopListVisible}
+                        showImage={desktopListVisible && pageLoaded}
                         url=""
                         onClick={() => handlePressHotel(item.id)}
                     />
@@ -143,7 +147,7 @@ export default function HotDealsSlide({ slidesToShow, title, recomendHotels }: {
                                 price={item.price || 0}
                                 review={item.review || 0}
                                 image={item.image || ''}
-                                showImage={mobileListVisible}
+                                showImage={mobileListVisible && pageLoaded}
                                 url=""
                                 onClick={() => handlePressHotel(item.id)}
                             />

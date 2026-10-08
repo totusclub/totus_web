@@ -62,6 +62,7 @@ export function toHomeHero(body: any): HomeHero | null {
     return {
         title: body?.data?.title || DEFAULT_HERO_TITLE,
         image: body?.data?.image || '',
+        imageMobile: body?.data?.image_mobile || '',
     };
 }
 
