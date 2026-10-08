@@ -83,6 +83,26 @@ await check('airlines: 17 российских и 27 зарубежных, ко�
     has(read('src/components/infoPages/AirlinesContent.tsx'), /onError=\{\(\) => setFailed\(true\)\}/, 'запасной вариант — код IATA');
 });
 
+await check('about-us: фото лежат в репозитории (base64) и раскладываются в public/about перед сборкой', async () => {
+    const { decodeB64File } = await import(pathToFileURL(join(root, 'scripts/decode-about-photos.mjs')).href);
+    for (const name of ['couple', 'friends']) {
+        const buf = decodeB64File(join(root, `src/assets/about/${name}.webp.b64`));
+        assert.ok(buf.length > 20000, `${name}.webp слишком маленький`);
+    }
+    const pkg = JSON.parse(read('package.json'));
+    assert.equal(pkg.scripts.prebuild, 'node scripts/decode-about-photos.mjs');
+    assert.equal(pkg.scripts.predev, 'node scripts/decode-about-photos.mjs');
+});
+
+await check('_app: Header и Footer есть на /airlines и /airline-fees (скрыты только на /ai и /ai/*)', () => {
+    const app = read('src/pages/_app.tsx');
+    assert.ok(!/startsWith\('\/ai'\)/.test(app), "startsWith('/ai') ловит и /airlines");
+    has(app, /pathname === '\/ai' \|\| router\.pathname\.startsWith\('\/ai\/'\)/);
+    const isAi = (p) => p === '/ai' || p.startsWith('/ai/');
+    for (const p of ['/airlines', '/airline-fees', '/about-us', '/help-faq']) assert.equal(isAi(p), false, p);
+    for (const p of ['/ai', '/ai/tours/[id]']) assert.equal(isAi(p), true, p);
+});
+
 const FILES = [
     ...PAGES.map(([s]) => `src/pages/${s}/index.tsx`),
     'src/components/infoPages/AboutContent.tsx',

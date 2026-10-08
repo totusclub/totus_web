@@ -42,3 +42,6 @@ next-env.d.ts
 
 # IDE
 .idea/
+
+# фото «О нас» — раскладываются из src/assets/about перед сборкой (scripts/decode-about-photos.mjs)
+/public/about/
