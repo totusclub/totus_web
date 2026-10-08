@@ -8,6 +8,7 @@ import { useRouter } from "next/router";
 import { buildHotelDetailsDeepLinkQuery } from "@/utils/hotelDetailsUtils";
 import { useNearViewport } from "@/hooks/useNearViewport";
 import { useAfterPageLoad } from "@/hooks/useAfterPageLoad";
+import { useIconColor } from "@/hooks/useTheme";
 
 interface HotelItem {
     id: number | string;
@@ -26,17 +27,19 @@ interface ArrowProps {
 }
 
 const NextArrow = ({ onClick }: ArrowProps) => {
+    const iconColor = useIconColor();
     return (
         <div className={styles.nextArrowHot} onClick={onClick}>
-            <Icon name="rightArrow" size={24} color="#000" />
+            <Icon name="rightArrow" size={24} color={iconColor} />
         </div>
     );
 };
 
 const PrevArrow = ({ onClick }: ArrowProps) => {
+    const iconColor = useIconColor();
     return (
         <div className={styles.prevArrowHot} onClick={onClick}>
-            <Icon name="leftArrow" size={24} color="#000" />
+            <Icon name="leftArrow" size={24} color={iconColor} />
         </div>
     );
 };

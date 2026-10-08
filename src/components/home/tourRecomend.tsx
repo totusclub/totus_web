@@ -4,6 +4,7 @@ import "slick-carousel/slick/slick.css";
 import styles from './home.module.css'
 import Icon from "@/components/icons/Icon";
 import Rating from "@/components/UI/rating";
+import { useIconColor } from "@/hooks/useTheme";
 const MOCK_DATA= [
     {
         id:1,
@@ -38,17 +39,19 @@ interface ArrowProps {
 }
 
 const NextArrow = ({ onClick }: ArrowProps) => {
+    const iconColor = useIconColor();
     return (
         <div className={styles.nextArrowRec} onClick={onClick}>
-            <Icon name="rightArrow" size={24} color="#000" />
+            <Icon name="rightArrow" size={24} color={iconColor} />
         </div>
     );
 };
 
 const PrevArrow = ({ onClick }: ArrowProps) => {
+    const iconColor = useIconColor();
     return (
         <div className={styles.prevArrowRec} onClick={onClick}>
-            <Icon name="leftArrow" size={24} color="#000" />
+            <Icon name="leftArrow" size={24} color={iconColor} />
         </div>
     );
 };

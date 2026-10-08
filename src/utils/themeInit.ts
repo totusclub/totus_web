@@ -1,14 +1,7 @@
 /**
- * Initialize theme immediately when this module is imported
- * This runs synchronously before React renders, preventing flash of wrong theme
+ * Тема оформления в браузере: выбор пользователя («Светлая», «Тёмная», «Системная» — по умолчанию),
+ * слушатели смены темы устройства и других вкладок. До отрисовки тему ставит THEME_INIT_SCRIPT в _document.
  */
-if (typeof window !== 'undefined') {
-  try {
-    const theme = localStorage.getItem('theme');
-    const validTheme = theme === 'dark' || theme === 'light' ? theme : 'light';
-    document.documentElement.setAttribute('data-theme', validTheme);
-  } catch (e) {
-    document.documentElement.setAttribute('data-theme', 'light');
-  }
-}
+import { initTheme } from './theme';
 
+initTheme();

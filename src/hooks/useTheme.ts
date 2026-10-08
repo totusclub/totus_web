@@ -1,91 +1,47 @@
-import { useState, useEffect, useCallback } from 'react';
-
-type Theme = 'light' | 'dark';
-
-/**
- * Get initial theme synchronously (runs before React renders)
- * This prevents flash of wrong theme
- */
-const getInitialTheme = (): Theme => {
-    if (typeof window === 'undefined') return 'light';
-    
-    try {
-        // Check localStorage first
-        const saved = localStorage.getItem('theme') as Theme | null;
-        if (saved === 'dark' || saved === 'light') {
-            // Set immediately to prevent flash
-            document.documentElement.setAttribute('data-theme', saved);
-            return saved;
-        }
-    } catch (e) {
-        // localStorage might not be available
-    }
-    
-    // Default to light
-    document.documentElement.setAttribute('data-theme', 'light');
-    return 'light';
-};
+import { useCallback, useEffect, useState, useSyncExternalStore } from 'react';
+import {
+    getThemeSnapshot,
+    SERVER_THEME_SNAPSHOT,
+    setThemeMode,
+    subscribeTheme,
+    type ResolvedTheme,
+    type ThemeMode,
+} from '@/utils/theme';
 
 /**
- * Custom hook for managing theme state
- * Handles initialization, persistence, and cross-tab synchronization
+ * Тема оформления (общая для всех компонентов страницы, см. src/utils/theme.ts).
+ * theme — итоговая тема ('light' | 'dark'), mode — выбор пользователя ('light' | 'dark' | 'system').
+ * До гидрации — как на сервере ('system', светлая), поэтому mounted — для цветов, зависящих от темы.
  */
 export const useTheme = () => {
-    // Always start with 'light' to match server-side rendering
-    // This prevents hydration mismatches
-    const [theme, setTheme] = useState<Theme>('light');
+    const snapshot = useSyncExternalStore(subscribeTheme, getThemeSnapshot, () => SERVER_THEME_SNAPSHOT);
+    const [mode, theme] = snapshot.split(':') as [ThemeMode, ResolvedTheme];
     const [mounted, setMounted] = useState(false);
 
-    // Set actual theme after mount (client-side only)
     useEffect(() => {
-        if (typeof window === 'undefined') return;
-        
-        const current = getInitialTheme();
-        setTheme(current);
-        document.documentElement.setAttribute('data-theme', current);
         setMounted(true);
     }, []);
 
-    // Listen for storage changes (cross-tab synchronization)
-    useEffect(() => {
-        if (typeof window === 'undefined') return;
-
-        const handleStorageChange = (e: StorageEvent) => {
-            if (e.key === 'theme' && e.newValue) {
-                const newTheme = e.newValue as Theme;
-                if (newTheme === 'dark' || newTheme === 'light') {
-                    setTheme(newTheme);
-                    document.documentElement.setAttribute('data-theme', newTheme);
-                }
-            }
-        };
-
-        window.addEventListener('storage', handleStorageChange);
-        return () => window.removeEventListener('storage', handleStorageChange);
-    }, []);
-
     const toggleTheme = useCallback(() => {
-        setTheme((prev) => {
-            const newTheme = prev === 'light' ? 'dark' : 'light';
-            localStorage.setItem('theme', newTheme);
-            document.documentElement.setAttribute('data-theme', newTheme);
-            return newTheme;
-        });
-    }, []);
+        setThemeMode(theme === 'dark' ? 'light' : 'dark');
+    }, [theme]);
 
-    const setThemeValue = useCallback((newTheme: Theme) => {
-        if (newTheme === 'dark' || newTheme === 'light') {
-            setTheme(newTheme);
-            localStorage.setItem('theme', newTheme);
-            document.documentElement.setAttribute('data-theme', newTheme);
-        }
+    const setTheme = useCallback((next: ThemeMode) => {
+        setThemeMode(next);
     }, []);
 
     return {
         theme,
+        mode,
+        setMode: setTheme,
         toggleTheme,
-        setTheme: setThemeValue,
-        mounted, // Useful to prevent hydration mismatches
+        setTheme,
+        mounted,
     };
 };
 
+/** Цвет тёмных иконок (стрелки, «назад», логотип в мобильной шапке): в тёмной теме — белый. */
+export const useIconColor = (): string => {
+    const { theme, mounted } = useTheme();
+    return mounted && theme === 'dark' ? '#fff' : '#000';
+};
