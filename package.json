@@ -4,6 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
+    "predev": "node scripts/decode-about-photos.mjs",
+    "prebuild": "node scripts/decode-about-photos.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",

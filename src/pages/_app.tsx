@@ -32,7 +32,8 @@ const NotificationsBridge = dynamic(() => import('@/components/notifications/Not
 function MyApp({ Component, pageProps }: AppProps) {
     const dispatch = useDispatch();
     const router = useRouter();
-    const isAiRoute = router.pathname.startsWith('/ai');
+    // Только /ai и /ai/* (переадресации Милы). Проверка по префиксу «/ai» без слэша задевала /airlines и /airline-fees.
+    const isAiRoute = router.pathname === '/ai' || router.pathname.startsWith('/ai/');
     useStopSearchPollOnLeave();
 
     useEffect(() => {
