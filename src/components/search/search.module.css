@@ -1040,3 +1040,15 @@
     text-align: center;
   }
 }
+
+/* Картинка hero из CSS-переменных (index.tsx, когда у картинки есть мобильная версия):
+   шире 600 px — полная, на телефоне — та же, обрезанная по центру (~50 КБ вместо ~300 КБ).
+   Браузер качает только ту, что показана. 600 px — HERO_MOBILE_MAX_WIDTH в api/homeHeroApi.ts. */
+.searchHeroMobile {
+  background-image: var(--hero-desktop);
+}
+@media (max-width: 600px) {
+  .searchHeroMobile {
+    background-image: var(--hero-mobile);
+  }
+}
