@@ -46,6 +46,7 @@ let currentDeviceId: string | null = null;
 let activeCallStartedAt: number | null = null;
 let isInitialized = false;
 let socketBound = false;
+let pageExitBound = false;
 
 let currentCallState: CallState = 'idle';
 let callerName: string | null = null;
@@ -357,6 +358,7 @@ export function initSupportCall(loyaltyId: string): void {
     isInitialized = true;
 
     registerDevice(currentDeviceId, loyaltyId).catch(() => undefined);
+    bindPageExit();
 
     const socket = bindSocket();
     if (socket?.connected && currentDeviceId) {
@@ -494,6 +496,33 @@ function teardown({ notifyBackend, keepState }: { notifyBackend: boolean; keepSt
     if (!keepState) {
         onCallActiveChange?.(false, null);
     }
+}
+
+/**
+ * Страница закрывается (вкладка/окно закрыты крестиком, перезагрузка, переход на другой сайт)
+ * во время звонка: сообщаем серверу, что звонок завершён (входящий без ответа — отклонён),
+ * запросом с keepalive — он уходит и после выгрузки страницы. Иначе оператор оставался
+ * «на линии» с пустым звонком. Переходы внутри сайта (SPA) страницу не выгружают — звонок живёт.
+ */
+export function endCallOnPageExit(): void {
+    const state = currentCallState;
+    if (state !== 'calling' && state !== 'ringing' && state !== 'answered') return;
+
+    const callId = activeCallUUID;
+    const deviceId = currentDeviceId;
+    if (callId && deviceId) {
+        const send = state === 'ringing' ? rejectCallRequest : endCallRequest;
+        send(callId, deviceId, { keepalive: true }).catch(() => undefined);
+    }
+    setState(state === 'ringing' ? 'rejected' : 'ended');
+    teardown({ notifyBackend: false });
+}
+
+function bindPageExit(): void {
+    if (pageExitBound || typeof window === 'undefined') return;
+    pageExitBound = true;
+    // pagehide — надёжнее beforeunload/unload: срабатывает и на телефоне, и при уходе в bfcache.
+    window.addEventListener('pagehide', endCallOnPageExit);
 }
 
 /** Сбросить состояние в idle — после того, как пользователь закрыл карточку. */

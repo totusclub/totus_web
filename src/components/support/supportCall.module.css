@@ -250,6 +250,9 @@
 }
 
 .miniHangUp {
+    /* поверх невидимой кнопки «Развернуть» (она растянута на всю плашку) — иначе сброс не нажимался */
+    position: relative;
+    z-index: 1;
     width: 36px;
     height: 36px;
     border: none;
