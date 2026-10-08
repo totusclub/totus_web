@@ -21,7 +21,7 @@
   border-radius: 8px;
   cursor: pointer;
   transition: border-color 0.3s;
-  height: 88px;
+  height: auto;
   width: 97px;
   overflow: hidden;
 }
@@ -36,16 +36,20 @@
 }
 
 .thumbnail {
+  display: block;
   width: 100%;
-  height: 120%;
+  height: auto;
+  /* Фото 5:3, верх кадра: нижняя полоса с надписью Level.Travel обрезается (как у фото отеля) */
+  aspect-ratio: 5 / 3;
   object-fit: cover;
+  object-position: center top;
   border-radius: 8px;
 }
 
 .nextArrowSmall,
 .prevArrowSmall {
   position: absolute;
-  top: 40%;
+  top: 50%;
   z-index: 1;
   background: var(--bgPrimary);
   box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.12),
@@ -75,6 +79,6 @@
   }
   .slideItem {
     width: 100%;
-    height: 200px;
+    height: auto;
   }
 }
