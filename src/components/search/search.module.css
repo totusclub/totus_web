@@ -647,6 +647,23 @@
   align-items: center;
   justify-content: center;
 }
+/* Картинка страны (public/countries, 80×80 для экранов 2x) или буква, если картинки нет */
+.destinationImageImg {
+  display: block;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--bgSecondary);
+}
+.destinationImageLetter {
+  background: var(--bgSecondary);
+  color: var(--primary_orange);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1;
+  box-shadow: inset 0 0 0 1px var(--borderTertiary);
+}
 .destinationInfo {
   display: flex;
   flex-direction: column;
@@ -1021,17 +1038,5 @@
     width: 100%;
     max-width: 100%;
     text-align: center;
-  }
-}
-
-/* Картинка hero из CSS-переменных (index.tsx, когда у картинки есть мобильная версия):
-   шире 600 px — полная, на телефоне — та же, обрезанная по центру (~50 КБ вместо ~300 КБ).
-   Браузер качает только ту, что показана. 600 px — HERO_MOBILE_MAX_WIDTH в api/homeHeroApi.ts. */
-.searchHeroMobile {
-  background-image: var(--hero-desktop);
-}
-@media (max-width: 600px) {
-  .searchHeroMobile {
-    background-image: var(--hero-mobile);
   }
 }

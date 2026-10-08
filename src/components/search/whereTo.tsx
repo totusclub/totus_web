@@ -6,6 +6,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "@/store";
 import { setHeaderName } from '@/store/slices/searchSlice';
 import Image from 'next/image';
+import { API_BASE_URL } from '@/config/api';
+import {
+    countryImageSrc,
+    DEFAULT_BROWSE_COUNTRIES,
+    splitBrowseCountries,
+    toBrowseCountries,
+    type BrowseCountry,
+} from '@/utils/countryImages';
 
 interface DestinationItem {
     id?: string | number;
@@ -30,15 +38,57 @@ interface WhereToProps {
     fromCity?: string;
 }
 
+/**
+ * Страны для списка по нажатию на поле (до ввода текста): Level.Travel /references/destinations.
+ * Один запрос на город вылета за сессию; до ответа и при ошибке — DEFAULT_BROWSE_COUNTRIES.
+ * (Подсказки autocomplete_v2 с пустым текстом Level.Travel теперь возвращает пустыми.)
+ */
+const browseCountriesCache = new Map<string, Promise<BrowseCountry[] | null>>();
+function loadBrowseCountries(fromCity: string): Promise<BrowseCountry[] | null> {
+    const key = fromCity || 'Moscow';
+    if (!browseCountriesCache.has(key)) {
+        const request = fetch(`${API_BASE_URL}/references/destinations?from_city=${encodeURIComponent(key)}`)
+            .then((r) => (r.ok ? r.json() : null))
+            .then(toBrowseCountries)
+            .catch(() => null)
+            .then((list) => {
+                if (!list) browseCountriesCache.delete(key); // ошибка — попробуем при следующем открытии
+                return list;
+            });
+        browseCountriesCache.set(key, request);
+    }
+    return browseCountriesCache.get(key)!;
+}
+
+/** Кружок 40 px: картинка страны или первая буква названия. */
+function CountryAvatar({ iso2, name }: { iso2?: string; name: string }) {
+    const src = countryImageSrc(iso2);
+    if (src) {
+        return (
+            <div className={styles.destinationImage}>
+                <img src={src} alt="" width={40} height={40} loading="lazy" decoding="async" className={styles.destinationImageImg} />
+            </div>
+        );
+    }
+    return (
+        <div className={`${styles.destinationImage} ${styles.destinationImageLetter}`} aria-hidden="true">
+            {(name || '?').trim().charAt(0).toUpperCase()}
+        </div>
+    );
+}
+
 const WhereFrom = ({ handleChange, value, name, searchType = 'package', fromCity = 'Moscow' }: WhereToProps) => {
     const dispatch = useDispatch<AppDispatch>();
     const inputRef = useRef<HTMLInputElement | null>(null);
+    // Поле в окне на весь экран (телефон, до 1024 px)
+    const modalInputRef = useRef<HTMLInputElement | null>(null);
     const wrapperRef = useRef<HTMLDivElement>(null);
     const [isOpen, setIsOpen] = useState(false);
     const [searchValue, setSearchValue] = useState("");
     // Until user types after open, show default popular list (not filter by selected text).
     const [hasTyped, setHasTyped] = useState(false);
     const { data } = useSelector((state: RootState) => state.destinations);
+    const [browseCountries, setBrowseCountries] = useState<BrowseCountry[]>(DEFAULT_BROWSE_COUNTRIES);
 
     // Type guard for data structure
     interface DataGroup {
@@ -50,14 +100,31 @@ const WhereFrom = ({ handleChange, value, name, searchType = 'package', fromCity
         return typeof item === 'object' && item !== null && 'group_name' in item;
     };
 
+    // Поле, в котором печатает пользователь: на телефоне — в окне на весь экран, иначе — в форме.
+    const activeInput = () => {
+        const modalInput = modalInputRef.current;
+        return modalInput && modalInput.offsetParent !== null ? modalInput : inputRef.current;
+    };
+
     const openDropdown = () => {
         setHasTyped(false);
         setIsOpen(true);
         setTimeout(() => {
-            inputRef.current?.focus();
-            inputRef.current?.select();
+            const input = activeInput();
+            input?.focus();
+            input?.select();
         }, 0);
     };
+
+    // Телефон: окно открылось — курсор (и уже открытая клавиатура) переходит в поле окна.
+    useEffect(() => {
+        if (!isOpen) return;
+        const modalInput = modalInputRef.current;
+        if (modalInput && modalInput.offsetParent !== null && document.activeElement !== modalInput) {
+            modalInput.focus();
+            modalInput.select();
+        }
+    }, [isOpen]);
 
     // Live search only after the user types in the open field.
     useEffect(() => {
@@ -121,52 +188,40 @@ const WhereFrom = ({ handleChange, value, name, searchType = 'package', fromCity
         }
     }, [value]);
 
-    // On click/open: always load first popular list from API (ignore written value until typing).
+    // По нажатию — сразу список стран (как у Level.Travel): популярные, затем остальные.
     useEffect(() => {
-        if (isOpen && !hasTyped) {
-            dispatch(
-                fetchDestinations({
-                    query: ' ',
-                    from_city: fromCity,
-                    search_type: searchType,
-                })
-            );
-        }
-    }, [isOpen, hasTyped, dispatch, fromCity, searchType]);
+        if (!isOpen) return;
+        let cancelled = false;
+        loadBrowseCountries(fromCity).then((list) => {
+            if (!cancelled && list) setBrowseCountries(list);
+        });
+        return () => {
+            cancelled = true;
+        };
+    }, [isOpen, fromCity]);
 
     const ignorName = ['Крым', 'Донецк', 'Луганск', 'Ялта', 'Yalta']
 
     const isTypingSearch = hasTyped && searchValue.trim().length > 0;
+    const browseSplit = splitBrowseCountries(browseCountries);
 
-    // Popular list: require images when browsing; when typing, show all country matches
+    // Без ввода — популярные страны из справочника; при вводе — все найденные страны
+    // (картинки — свои, countryImageSrc: ссылки Level.Travel на картинки стран битые).
     const getPopularDestinations = (): DestinationItem[] => {
+        if (!isTypingSearch) return browseSplit.popular;
         if (!data || !Array.isArray(data)) return [];
 
         const countriesData = data.find((item: unknown) =>
             isDataGroup(item) && item.group_name === "countries"
         ) as DataGroup | undefined;
-        const apiCountries: DestinationItem[] = countriesData?.results || [];
-
-        if (isTypingSearch) return apiCountries;
-        return apiCountries.filter((c: DestinationItem) => c.image && String(c.image).trim() !== '');
+        return countriesData?.results || [];
     };
 
-    // Other countries (browse mode only — while typing, all matches are in popular)
-    const getOtherCountries = (): DestinationItem[] => {
-        if (isTypingSearch || !data || !Array.isArray(data)) return [];
+    // Остальные страны — только без ввода (при вводе все совпадения уже в списке выше)
+    const getOtherCountries = (): DestinationItem[] => (isTypingSearch ? [] : browseSplit.other);
 
-        const countriesData = data.find((item: unknown) =>
-            isDataGroup(item) && item.group_name === "countries"
-        ) as DataGroup | undefined;
-        const apiCountries: DestinationItem[] = countriesData?.results || [];
-        const popularIso2s = getPopularDestinations().map(d => d.iso2 || '');
-
-        return apiCountries.filter((c: DestinationItem) =>
-            c.image &&
-            String(c.image).trim() !== '' &&
-            !popularIso2s.includes(c.iso2 || '')
-        );
-    };
+    // Курорты, мегарегионы и отели — только результаты поиска по введённому тексту
+    const searchGroups: unknown[] = isTypingSearch && Array.isArray(data) ? data : [];
 
     return (
         <div className={`${styles.searchField} ${styles.radioFrom}`} ref={wrapperRef} onClick={handleToggle}>
@@ -202,13 +257,13 @@ const WhereFrom = ({ handleChange, value, name, searchType = 'package', fromCity
                         <input
                             className={styles.searchFieldsValue}
                             type="text"
+                            ref={modalInputRef}
                             value={searchValue}
                             onChange={handleInputChange}
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                openDropdown();
-                            }}
-                            placeholder="Москва"
+                            onClick={(e) => e.stopPropagation()}
+                            placeholder="Страна, курорт или отель"
+                            enterKeyHint="search"
+                            autoComplete="off"
                         />
                     </div>
                     <div className={styles.searchGroupTyping}>
@@ -216,24 +271,14 @@ const WhereFrom = ({ handleChange, value, name, searchType = 'package', fromCity
                             {/* Popular destinations */}
                             {getPopularDestinations().length > 0 && (
                                 <>
-                                    <p className={styles?.searchGroupListText}>Популярные страны</p>
+                                    <p className={styles?.searchGroupListText}>{isTypingSearch ? 'Страны' : 'Популярные страны'}</p>
                                     {getPopularDestinations().map((c, i) => (
                                         <div
                                             key={`popular-${c.iso2 || i}`}
                                             className={styles?.searchGroupListItem}
                                             onClick={() => handleSelect('countries', c)}
                                         >
-                                            {c.image && (
-                                                <div className={styles.destinationImage}>
-                                                    <Image
-                                                        src={c.image}
-                                                        alt={(c.name || c.name_ru || c.name_en || 'Destination') as string}
-                                                        width={40}
-                                                        height={40}
-                                                        style={{ borderRadius: '50%', objectFit: 'cover' }}
-                                                    />
-                                                </div>
-                                            )}
+                                            <CountryAvatar iso2={c.iso2} name={String(c.name || c.name_ru || c.name_en || '')} />
                                             <div className={styles.destinationInfo}>
                                                 <p>{c.name || c.name_ru || c.name_en}</p>
                                                 <p>{c.visa_type || ''}</p>
@@ -254,17 +299,7 @@ const WhereFrom = ({ handleChange, value, name, searchType = 'package', fromCity
                                             className={styles?.searchGroupListItem}
                                             onClick={() => handleSelect('countries', c)}
                                         >
-                                            {c.image && (
-                                                <div className={styles.destinationImage}>
-                                                    <Image
-                                                        src={c.image}
-                                                        alt={(c.name || c.name_ru || c.name_en || 'Destination') as string}
-                                                        width={40}
-                                                        height={40}
-                                                        style={{ borderRadius: '50%', objectFit: 'cover' }}
-                                                    />
-                                                </div>
-                                            )}
+                                            <CountryAvatar iso2={c.iso2} name={String(c.name || c.name_ru || c.name_en || '')} />
                                             <div className={styles.destinationInfo}>
                                                 <p>{c.name || c.name_ru || c.name_en}</p>
                                                 <p>{c.visa_type || ''}</p>
@@ -274,7 +309,7 @@ const WhereFrom = ({ handleChange, value, name, searchType = 'package', fromCity
                                 </>
                             )}
                             {/* Regions */}
-                            {data && Array.isArray(data) && data
+                            {searchGroups
                                 .filter((item: unknown): item is DataGroup => isDataGroup(item) && item.group_name === "regions")
                                 .flatMap((item: DataGroup) =>
                                     item?.results
@@ -305,7 +340,7 @@ const WhereFrom = ({ handleChange, value, name, searchType = 'package', fromCity
                                 )}
                         </div>
                         <div className={styles.searchGroupList}>
-                            {data && Array.isArray(data) && data
+                            {searchGroups
                                 .filter((item: unknown): item is DataGroup => isDataGroup(item) && item.group_name === "metaregions")
                                 .flatMap((item: DataGroup) =>
                                     item?.results
@@ -341,7 +376,7 @@ const WhereFrom = ({ handleChange, value, name, searchType = 'package', fromCity
                                 )}
                         </div>
                         <div className={styles.searchGroupList}>
-                            {data && Array.isArray(data) && data
+                            {searchGroups
                                 .filter((item: unknown): item is DataGroup => isDataGroup(item) && item.group_name === "hotels")
                                 .flatMap((item: DataGroup) =>
                                     item?.results
