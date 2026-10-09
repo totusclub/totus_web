@@ -1055,7 +1055,9 @@
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
-    width: calc(100% - 96px);
+    /* Шапка поиска: по 96 px с каждой стороны — «назад» слева, колокольчик и фильтр справа
+       (кнопки 40×40 с отступом 8 px). Заголовок строго по центру и не заезжает на кнопки. */
+    width: calc(100% - 192px);
     margin: 0;
     text-align: center;
     pointer-events: none;
@@ -1074,6 +1076,19 @@
     font-weight: 400;
     line-height: 16px; /* 133.333% */
     letter-spacing: -0.24px;
+  }
+  /* Две строки заголовка: направление и «дата · ночи · туристы»; длинный текст — многоточием */
+  .selectdFormM > p:nth-child(1) {
+    color: var(--textPrimary);
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 20px;
+    letter-spacing: -0.3px;
+  }
+  .selectdFormM > p {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   .radioFrom {
     border-bottom-left-radius: 0px !important;
