@@ -73,11 +73,47 @@ await check('help-faq: 12 разделов, 41 вопрос, ссылка в ч�
     for (const g of FAQ_GROUPS) for (const i of g.items) assert.ok(i.a.length > 0, `пустой ответ: ${i.q}`);
     const page = read('src/pages/help-faq/index.tsx');
     has(page, /title="Частые вопросы"/);
+    has(page, /\n\s+plain\n/, 'центр помощи без общей карточки StaticInfoPage');
     const faq = read('src/components/infoPages/FaqContent.tsx');
-    has(faq, /href="\/profile\/support-chat"/);
-    has(faq, /open=\{i === 0\}/, 'в разделе раскрыт только первый вопрос');
+    has(faq, /'\/profile\/support-chat'/);
+    has(faq, /open=\{searching \|\| i === 0\}/, 'в разделе раскрыт только первый вопрос (в поиске — все найденные)');
     const css = read('src/components/infoPages/infoPages.module.css');
     has(css, /\.faqItem\[open\] \.chevron \{\s*transform: rotate\(180deg\);/, 'раскрыт — стрелка вверх');
+});
+
+await check('help-faq: центр помощи — поиск, «Часто ищут», плитки с иконками, оглавление, «Не нашли ответ?»', async () => {
+    const { FAQ_GROUPS, HELP_HERO, HELP_POPULAR } = await load('src/config/faqContent.ts');
+    assert.equal(HELP_HERO.title, 'Чем мы можем помочь?');
+    const ids = FAQ_GROUPS.map((g) => g.id);
+    assert.equal(new Set(ids).size, 12, 'якоря разделов уникальны');
+    for (const id of ids) assert.match(id, /^[a-z]+$/);
+    const icons = read('src/components/infoPages/helpIcons.tsx');
+    for (const g of FAQ_GROUPS) assert.ok(new RegExp(`\\n    ${g.icon}: \\[`).test(icons), `нет иконки ${g.icon}`);
+    assert.equal(new Set(FAQ_GROUPS.map((g) => g.icon)).size, 12, 'у разделов разные иконки');
+    // Та же логика, что matchItem в FaqContent.tsx: все слова запроса есть в вопросе или ответе.
+    const norm = (t) => t.toLowerCase().replace(/ё/g, 'е');
+    const match = (it, q) => {
+        const text = norm([it.q, ...(it.steps ?? []), ...it.a].join(' '));
+        return norm(q).split(/\s+/).filter(Boolean).every((w) => text.includes(w));
+    };
+    assert.equal(HELP_POPULAR.length, 6);
+    for (const p of HELP_POPULAR) {
+        const n = FAQ_GROUPS.flatMap((g) => g.items).filter((it) => match(it, p.query)).length;
+        assert.ok(n > 0, `«Часто ищут: ${p.label}» ничего не находит`);
+    }
+    const faq = read('src/components/infoPages/FaqContent.tsx');
+    has(faq, /words\.every\(\(w\) => text\.includes\(w\)\)/);
+    has(faq, /href=\{`#\$\{anchor\(g\)\}`\}/, 'плитки и оглавление ведут к разделам');
+    has(faq, /new IntersectionObserver/, 'оглавление подсвечивает текущий раздел');
+    for (const s of ['Не нашли ответ?', 'Написать в чат', 'Позвонить', 'Открыть Милу', 'Разделы помощи', 'Часто ищут:']) {
+        assert.ok(faq.includes(s), `нет «${s}»`);
+    }
+    has(faq, /useSupportCall\(\)/, 'звонок — общий SupportCallProvider');
+    has(faq, /await import\('@tosmedia\/ai-assistant'\)/, 'Мила подгружается только по нажатию');
+    has(faq, /<AuthModal open=\{authOpen\} setOpen=\{setAuthOpen\} \/>/, 'гостю — окно входа');
+    const sip = read('src/components/staticInfoPage/index.tsx');
+    has(sip, /plain \? \(\s*children/);
+    has(sip, /<h1 className=\{styles\.title\}>\{title\}<\/h1>/, 'остальные страницы — как раньше');
 });
 
 await check('airlines: 17 российских и 27 зарубежных, коды IATA уникальны', async () => {
@@ -115,6 +151,7 @@ const FILES = [
     ...PAGES.map(([s]) => `src/pages/${s}/index.tsx`),
     'src/components/infoPages/AboutContent.tsx',
     'src/components/infoPages/FaqContent.tsx',
+    'src/components/infoPages/helpIcons.tsx',
     'src/components/infoPages/AirlinesContent.tsx',
     'src/config/faqContent.ts',
     'src/config/airlinesContent.ts',

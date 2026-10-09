@@ -368,3 +368,445 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ---------- Центр помощи /help-faq (Figma «Частые вопросы · Центр помощи», 09.10.2026) ---------- */
+
+.help {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  color: var(--textPrimary);
+  letter-spacing: -0.02em;
+}
+
+.helpHero,
+.helpCard {
+  border-radius: 16px;
+  background: var(--bgPrimary);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  padding: 28px 32px 32px;
+}
+
+.helpTitle {
+  margin: 0 0 8px;
+  font-size: 32px;
+  line-height: 40px;
+  font-weight: 600;
+  letter-spacing: -0.04em;
+}
+
+.helpMuted {
+  margin: 0;
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--textTertiary, #737373);
+}
+
+.searchRow {
+  display: flex;
+  gap: 12px;
+  margin: 20px 0 16px;
+}
+
+.searchField {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 52px;
+  padding: 0 18px;
+  border-radius: 14px;
+  background: var(--bgSecondary, #f5f5f5);
+  border: 1px solid transparent;
+  cursor: text;
+}
+
+.searchField:focus-within {
+  border-color: var(--core_Orange, #fe732e);
+}
+
+.searchIcon {
+  flex: 0 0 auto;
+  color: var(--textTertiary, #737373);
+}
+
+.searchField input {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  font: inherit;
+  font-size: 16px;
+  color: var(--textPrimary);
+}
+
+.searchField input::placeholder {
+  color: var(--textTertiary, #737373);
+}
+
+.searchField input::-webkit-search-cancel-button {
+  cursor: pointer;
+}
+
+.btnPrimary,
+.btnSecondary {
+  flex: 0 0 auto;
+  height: 44px;
+  padding: 0 22px;
+  border-radius: 12px;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btnPrimary {
+  border: none;
+  background: var(--core_Orange, #fe732e);
+  color: #fff;
+}
+
+.btnPrimary:hover {
+  opacity: 0.9;
+}
+
+.btnSecondary {
+  border: 1px solid var(--borderSecondary, #b8b8b8);
+  background: transparent;
+  color: var(--textPrimary);
+}
+
+.btnSecondary:hover {
+  background: var(--bgSecondary, #f5f5f5);
+}
+
+.searchBtn {
+  height: 52px;
+  padding: 0 32px;
+  border-radius: 14px;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.chipsLabel {
+  margin-right: 4px;
+  font-size: 14px;
+  color: var(--textTertiary, #737373);
+}
+
+.chip {
+  height: 34px;
+  padding: 0 14px;
+  border: 1px solid var(--borderTertiary, #e0e0e0);
+  border-radius: 999px;
+  background: var(--bgPrimary);
+  color: var(--textPrimary);
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.chip:hover {
+  border-color: var(--core_Orange, #fe732e);
+}
+
+.chipActive {
+  border-color: var(--core_Orange, #fe732e);
+  background: rgba(254, 115, 46, 0.1);
+  color: var(--core_Orange, #fe732e);
+}
+
+.tilesTitle {
+  margin: 8px 0 -4px;
+  font-size: 22px;
+  line-height: 28px;
+  font-weight: 600;
+}
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-height: 132px;
+  padding: 20px;
+  border-radius: 16px;
+  background: var(--bgPrimary);
+  border: 1px solid transparent;
+  color: var(--textPrimary);
+  text-decoration: none;
+  transition: border-color 0.15s ease;
+}
+
+.tile:hover {
+  border-color: var(--core_Orange, #fe732e);
+}
+
+.tileIcon,
+.contactIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: rgba(254, 115, 46, 0.1);
+  color: var(--core_Orange, #fe732e);
+}
+
+.tileIcon {
+  margin-bottom: auto;
+}
+
+.tileTitle {
+  margin-top: 16px;
+  font-size: 16px;
+  line-height: 20px;
+  font-weight: 500;
+}
+
+.tileCount {
+  font-size: 14px;
+  line-height: 18px;
+  color: var(--textTertiary, #737373);
+}
+
+.helpLayout {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.toc {
+  position: sticky;
+  top: 96px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 20px 12px;
+  border-radius: 16px;
+  background: var(--bgPrimary);
+}
+
+.tocTitle {
+  margin: 0 0 8px;
+  padding: 0 12px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.tocItem {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-size: 14px;
+  line-height: 18px;
+  color: var(--textSecondary, #3d3d3d);
+  text-decoration: none;
+}
+
+.tocItem:hover {
+  background: var(--bgSecondary, #f5f5f5);
+}
+
+.tocActive,
+.tocActive:hover {
+  background: rgba(254, 115, 46, 0.1);
+  color: var(--core_Orange, #fe732e);
+  font-weight: 500;
+}
+
+.tocCount {
+  color: var(--textTertiary, #737373);
+}
+
+.tocActive .tocCount {
+  color: inherit;
+}
+
+.helpSection {
+  scroll-margin-top: 96px;
+}
+
+.helpSection + .helpSection {
+  margin-top: 36px;
+}
+
+.helpSection .numHeading {
+  margin: 0 0 16px;
+}
+
+.helpCardTitle {
+  margin: 0 0 8px;
+  font-size: 24px;
+  line-height: 32px;
+  font-weight: 600;
+}
+
+.resultsHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.linkBtn {
+  border: none;
+  background: none;
+  padding: 0;
+  font: inherit;
+  font-size: 15px;
+  color: var(--core_Orange, #fe732e);
+  cursor: pointer;
+}
+
+.contactGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.contactCard {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 20px;
+  border-radius: 16px;
+  background: var(--bgSecondary, #f5f5f5);
+}
+
+.contactBody {
+  flex: 1 1 auto;
+}
+
+.contactTitle {
+  margin: 0 0 4px;
+  font-size: 16px;
+  line-height: 20px;
+  font-weight: 500;
+}
+
+.contactText {
+  margin: 0;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--textTertiary, #737373);
+}
+
+.helpLegal {
+  margin: 0;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--textTertiary, #737373);
+}
+
+@media (max-width: 1024px) {
+  .tiles {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .helpLayout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .toc {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .help {
+    gap: 16px;
+  }
+
+  .helpHero,
+  .helpCard {
+    padding: 20px 16px 24px;
+  }
+
+  .helpTitle {
+    font-size: 24px;
+    line-height: 30px;
+  }
+
+  .helpMuted {
+    font-size: 15px;
+    line-height: 22px;
+  }
+
+  .searchBtn {
+    display: none;
+  }
+
+  .searchField {
+    height: 48px;
+  }
+
+  .chipsLabel {
+    width: 100%;
+  }
+
+  .tiles {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .tile {
+    min-height: 120px;
+    padding: 14px;
+  }
+
+  .tileIcon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .tileTitle {
+    margin-top: 12px;
+    font-size: 15px;
+  }
+
+  .helpSection + .helpSection {
+    margin-top: 28px;
+  }
+
+  .helpCardTitle {
+    font-size: 20px;
+    line-height: 26px;
+  }
+
+  .contactGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .contactCard {
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr);
+    column-gap: 12px;
+    padding: 16px;
+  }
+
+  .contactCard > button {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+}
