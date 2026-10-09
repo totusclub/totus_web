@@ -285,9 +285,10 @@
     height: auto;
     flex-direction: column;
   }
+  /* Как в приложении (totus_APP, список отелей): фото на всю ширину карточки, высота 200, радиус 8, cover */
   .hotelCardImage {
     width: 100%;
-    height: 250px;
+    height: 200px;
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -382,7 +383,7 @@
   /* Mobile skeleton overrides */
   .image_placeholder {
     width: 100%;
-    height: 210px;
+    height: 200px;
     margin-bottom: 12px;
   }
 
