@@ -4,6 +4,8 @@
  * (см. totus_API/docs/CUSTOM_ROOMS_API.md, раздел 6.2).
  */
 
+import { RUB_SUFFIX } from '@/utils/formatPrice';
+
 export type TotusBookingStatus =
   | 'pending_payment'
   | 'pending_confirmation'
@@ -262,7 +264,7 @@ const NARROW_NBSP = String.fromCharCode(0x202f);
 export function formatTotusMoney(amount: number | null | undefined): string {
   if (amount == null || !Number.isFinite(Number(amount))) return '';
   const rounded = Math.round(Number(amount));
-  return `${rounded.toString().replace(/\B(?=(\d{3})+(?!\d))/g, NARROW_NBSP)} ₽`;
+  return `${rounded.toString().replace(/\B(?=(\d{3})+(?!\d))/g, NARROW_NBSP)}${RUB_SUFFIX}`;
 }
 
 /** Строка про возврат: pending → «Возврат … ₽ выполним в течение 1–3 дней», done → «Возврат … ₽ выполнен». */

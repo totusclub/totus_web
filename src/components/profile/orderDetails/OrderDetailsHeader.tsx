@@ -10,6 +10,7 @@ import { getTotusBooking, getTotusBookingStatusColor } from '@/utils/totusBookin
 import TotusBookingSummary from '@/components/totusBooking/TotusBookingSummary';
 import useAuth from '@/hooks/useAuth';
 import { decodeToken } from '@/utils/auth';
+import { RUB_SUFFIX } from '@/utils/formatPrice';
 
 interface OrderDetailsHeaderProps {
   order: any;
@@ -125,13 +126,13 @@ const OrderDetailsHeader: React.FC<OrderDetailsHeaderProps> = ({
             {hotelName ? `Тур в ${hotelName}` : 'Данные уточняются'}
             {destination ? `, ${destination}` : ''}
           </p>
-          <p className={styles.orderDetailsSectionSubtitle}>{price} ₽</p>
+          <p className={styles.orderDetailsSectionSubtitle}>{price}{RUB_SUFFIX}</p>
         </div>
 
         <div className={styles.orderDetailsDivider}></div>
 
         <div className={styles.orderDetailsSectionLast}>
-          <p className={styles.orderDetailsAmount}>Итого {price} ₽</p>
+          <p className={styles.orderDetailsAmount}>Итого {price}{RUB_SUFFIX}</p>
         </div>
       </div>
       )}
