@@ -23,7 +23,7 @@ const ArrowTop = ({ onClick }: ArrowProps) => (
     </div>
 );
 
-const VerticalSlider = ({ images, loading }: any) => {
+const VerticalSlider = ({ images, loading, title }: any) => {
     const [selectedImage, setSelectedImage] = useState<string>("");
     const [currentSlide, setCurrentSlide] = useState(0);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -203,6 +203,7 @@ const VerticalSlider = ({ images, loading }: any) => {
                     onClose={() => setIsModalOpen(false)}
                     images={images}
                     initialIndex={selectedImageIndex}
+                    title={title}
                 />
             </div>
         );
