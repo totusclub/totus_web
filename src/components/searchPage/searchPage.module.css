@@ -412,13 +412,29 @@
     border-radius: 8px;
     margin-top: 12px;
   }
-  .resultListSorting{
-    flex-direction: row-reverse;
-    position: relative;
+  /* Телефон/планшет: сортировка слева, «Показано N из M» справа — в одну строку и без наложения.
+     Раньше счётчик стоял position: absolute поверх селекта шириной 100 % и перекрывал его.
+     Селект не сжимается (название сортировки не обрезается), счётчик при нехватке места
+     переносится на вторую строку. */
+  .resultListSorting {
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
   }
-  .resultListSorting > p{
-    position: absolute;
-    right: 0;
+  .resultListSorting > p {
+    position: static;
+    order: 2;
+    flex: 0 1 auto;
+    min-width: 0;
+    margin-left: auto;
+    text-align: right;
+    text-wrap: balance;
+  }
+  .resultListSorting > p + :last-child {
+    order: 1;
+    flex: 1 0 auto !important;
+    width: auto;
+    max-width: none;
   }
   /*.resultListSorting > :last-child {*/
   /*  width: auto;*/
@@ -444,6 +460,13 @@
   .emptyState :global(button) {
     font-size: 16px;
     line-height: 20px;
+  }
+}
+@media (max-width: 768px) {
+  /* Селект здесь без рамки и фона — боковые поля 16 px только сдвигали текст и съедали место. */
+  .resultListSorting > p + :last-child [role='combobox'] {
+    padding-left: 0;
+    padding-right: 0;
   }
 }
 @keyframes placeholderShimmer {
