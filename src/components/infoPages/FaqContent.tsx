@@ -24,8 +24,9 @@ export function FaqContent() {
                         {group.title}
                     </h2>
                     <div className={styles.faqList}>
-                        {group.items.map((item) => (
-                            <details key={item.q} className={styles.faqItem} open>
+                        {group.items.map((item, i) => (
+                            // В каждом разделе раскрыт первый вопрос, остальные — по нажатию.
+                            <details key={item.q} className={styles.faqItem} open={i === 0}>
                                 <summary>
                                     <span>{item.q}</span>
                                     <Chevron />
