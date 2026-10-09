@@ -6,6 +6,8 @@
  * Здесь же — единые русские подписи опций, которые использует и CheckboxGroup.
  */
 
+import { RUB_SUFFIX } from '@/utils/formatPrice';
+
 export type FilterChip = {
     /** ключ параметра API, напр. 'filter_stars' */
     key: string;
@@ -168,7 +170,7 @@ export function buildFilterChips(hotels: AnyRecord | null | undefined): FilterCh
             chips.push({
                 key: 'price',
                 value: null,
-                label: `от ${formatPrice(min)} ₽ – до ${formatPrice(max)} ₽`,
+                label: `от ${formatPrice(min)}${RUB_SUFFIX} – до ${formatPrice(max)}${RUB_SUFFIX}`,
             });
         }
     }

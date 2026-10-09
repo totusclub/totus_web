@@ -4,6 +4,7 @@ import {
   isOrderAwaitingPayment,
   isOrderCancelled,
 } from '@/utils/orderPayment';
+import { groupThousands, RUB_SUFFIX } from '@/utils/formatPrice';
 
 export type OrderDocument = { name: string; url: string };
 
@@ -303,7 +304,7 @@ export function formatOrderPrice(order: any): string {
   const lt = getLtOrderPackage(order);
   const amount = lt?.price ?? lt?.full_price ?? 0;
   if (amount == null) return '—';
-  return `${Number(amount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ')} ₽`;
+  return `${groupThousands(Number(amount))}${RUB_SUFFIX}`;
 }
 
 export function getNestedPackage(order: any) {
