@@ -131,11 +131,27 @@
     box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.10);
     backdrop-filter: blur(50px);
 }
-@media (max-width: 768px) {
-   .hotelBoxCard{
-       padding-right: 16px;
-   }
-    .hotelBoxCard:nth-child(1){
-        margin-left: 16px;
+/* Телефон и планшет (главная, «Начните планирование»): фото как в результатах поиска — 200px, скругление 8px.
+   Отступы между карточками задаёт лента (home.module.css, .mobScroller), у карточки своих нет:
+   прежние padding-right 16px и :nth-child(1) срабатывали на каждой карточке (каждая в своём слайде). */
+@media (max-width: 1024px) {
+    .hotelBoxCardImage{
+        height: 200px;
+        border-radius: 8px;
+        padding: 8px;
+    }
+    .hotelBoxCardStatus{
+        height: 24px;
+        padding: 2px 10px;
+        border-radius: 12px;
+    }
+    /* на оранжевой плашке — всегда белый (--textPrimaryB в тёмной теме тёмно-серый) */
+    .hotelBoxCardStatus>p{
+        color: #ffffff;
+        font-size: 12px;
+        line-height: 16px;
+    }
+    .hotelBoxCardInfo{
+        margin-top: 8px;
     }
 }

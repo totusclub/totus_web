@@ -1,45 +1,6 @@
 import React, { useEffect, useState } from "react";
-import Slider from "react-slick";
-import "slick-carousel/slick/slick.css";
 import styles from "./home.module.css";
 import { getHomePartners, type HomePartner } from "@/api/homePartnersApi";
-
-const sliderSettings = {
-    dots: true,
-    infinite: false,
-    speed: 500,
-    slidesToShow: 1,
-    slidesToScroll: 1,
-    initialSlide: 0,
-    responsive: [
-        {
-            breakpoint: 1026,
-            settings: {
-                slidesToShow: 5,
-                slidesToScroll: 3,
-                infinite: true,
-                dots: false,
-            },
-        },
-        {
-            breakpoint: 600,
-            settings: {
-                slidesToShow: 2,
-                slidesToScroll: 2,
-                initialSlide: 2,
-            },
-        },
-        {
-            breakpoint: 480,
-            settings: {
-                slidesToShow: 2.7,
-                slidesToScroll: 3,
-                dots: false,
-                arrows: false,
-            },
-        },
-    ],
-};
 
 function PartnerLogo({ partner }: { partner: HomePartner }) {
     const content = (
@@ -98,14 +59,15 @@ export default function Partner({ initialPartners = null }: { initialPartners?: 
                     <PartnerLogo key={partner.id} partner={partner} />
                 ))}
             </div>
+            {/* Телефон и планшет: горизонтальная прокрутка браузера (было react-slick, свайп листал по 3 логотипа) */}
             <div className={styles.partnerListMob}>
-                <Slider {...sliderSettings}>
+                <div className={`${styles.mobScroller} ${styles.mobScrollerPartners}`}>
                     {partners.map((partner) => (
-                        <div key={partner.id} className={styles.partnerItemMob}>
+                        <div key={partner.id} className={styles.mobScrollerItem}>
                             <PartnerLogo partner={partner} />
                         </div>
                     ))}
-                </Slider>
+                </div>
             </div>
         </div>
     );

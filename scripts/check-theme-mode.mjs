@@ -159,7 +159,8 @@ await check('тёмные иконки не пропадают в тёмной �
   const header = code(read('src/components/header/index.tsx'));
   assert.equal((header.match(/color=\{iconColor\}/g) || []).length, 3);
   assert.ok(!/color="#000"/.test(header));
-  for (const f of ['src/components/home/tourRecomend.tsx', 'src/components/home/hotDeals.tsx', 'src/components/UI/smallSlide/index.tsx']) {
+  // hotDeals.tsx: стрелок больше нет — на телефоне вместо react-slick прокрутка браузера (scripts/check-mobile-sliders.mjs)
+  for (const f of ['src/components/home/tourRecomend.tsx', 'src/components/UI/smallSlide/index.tsx']) {
     const s = code(read(f));
     assert.equal((s.match(/const iconColor = useIconColor\(\);/g) || []).length, 2, f);
     assert.ok(!/name="(right|left)Arrow" size=\{24\} color="#000"/.test(s), f);

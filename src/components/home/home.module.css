@@ -234,14 +234,6 @@
   flex: 1 1 0;
   min-width: 0;
 }
-.hotDealSlide {
-  padding: 0 12px;
-  box-sizing: border-box;
-  height: 100%;
-}
-.recomendlistMob .slick-list {
-  margin: 0 -12px;
-}
 /*.serviceListWrap{*/
 /*    border: 1px solid;*/
 /*    display: flex;*/
@@ -819,8 +811,14 @@
     gap: 0px;
     margin-top: 16px;
   }
+  /* Главная на телефоне (макет «Главная на телефоне», утверждён 09.10.2026):
+     поля 16px, шаг между секциями 32px (после поиска 24px). */
+  .faqBg {
+    margin-top: 32px;
+  }
   .faqContainer {
-    padding-top: 16px;
+    padding-top: 24px;
+    padding-bottom: 32px;
   }
   .faqContainer > p {
     font-size: 20px;
@@ -844,19 +842,39 @@
     margin-top: 16px;
     margin-bottom: 16px;
   }
+  /* Блок «Оставьте номер»: высота по содержимому (было всегда 464px) */
   .callRequest {
-    margin-top: 20px;
+    height: auto;
+    margin-top: 32px;
+    margin-bottom: 0;
+    border-radius: 24px;
+  }
+  .callRequestLeyer {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    aspect-ratio: auto;
+  }
+  .formRequestCall {
+    width: 100%;
   }
   .callRequestGirl {
     display: none;
   }
+  /* Текст на оранжевом — всегда белый: --textPrimaryB в тёмной теме тёмно-серый и сливался с фоном */
   .formRequestCallHead > p {
     font-size: 16px;
     line-height: 22px;
+    color: #ffffff;
+  }
+  .formRequestCallBtnDisable > p {
+    color: #ffffff;
   }
   .callRequestInfo {
-    padding-left: 16px;
-    padding-right: 16px;
+    position: relative;
+    height: auto;
+    padding: 24px 16px;
     display: flex;
     justify-content: center;
   }
@@ -869,25 +887,16 @@
   .recomendlistMob {
     display: block;
   }
-  .recomendlistMob .slick-slider {
-    margin: 0 16px;
-  }
-  .recomendlistMob .slick-slide > div {
-    height: 100%;
-  }
-  .recomendlistMob .slick-dots {
-    bottom: -30px;
-  }
   .contentFull {
     padding-left: 0;
     padding-right: 0;
   }
+  .contentFullHide {
+    padding-top: 24px;
+  }
   .popularDestinationsWrapper {
     width: 100%;
-    padding-left: 0;
-    padding-right: 0;
-    padding-top: 16px;
-    padding-bottom: 16px;
+    padding: 32px 0 0;
   }
 
   .contentFull {
@@ -895,29 +904,52 @@
   }
   .hotProductTitle {
     font-size: 20px;
-    margin-left: 16px;
     line-height: 24px;
     font-weight: 500;
-    padding-right: 30px;
-    margin-bottom: 16px;
+    margin: 0 16px 12px;
+    padding-right: 0;
   }
+
+  /* Карусели (отели, направления, партнёры): горизонтальная прокрутка браузера — плавно, с инерцией
+     и привязкой к карточке. Карточка — ширина экрана без 48px (следующая выглядывает), не шире 340px;
+     между карточками 12px, по краям 16px. */
+  .mobScroller {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 0 16px 4px;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: 16px;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .mobScroller::-webkit-scrollbar {
+    display: none;
+  }
+  .mobScrollerItem {
+    flex: 0 0 min(calc(100% - 48px), 340px);
+    min-width: 0;
+    scroll-snap-align: start;
+  }
+  .mobScrollerPartners .mobScrollerItem {
+    flex-basis: 120px;
+  }
+
   .partnerList {
     display: none;
   }
   .partnerListMob {
     display: block;
+    margin-top: 24px;
   }
   .partnerItem {
-    /*width: 122px;*/
-    height: 72px;
-    border-radius: 16px;
-    /*margin-left: 16px;*/
-  }
-  .partnerItem:nth-child(1) {
-    margin-left: 16px;
-  }
-  .partnerItemMob {
-    /*padding-right: 8px;*/
+    height: 64px;
+    padding: 12px;
+    border: 0;
+    border-radius: 12px;
+    background: var(--bgSecondary);
   }
   .recomendDeslist {
     display: none;
@@ -925,26 +957,12 @@
   .recomendDeslistMob {
     display: block;
   }
-
-  /* Mobile slider specific styles */
-  .recomendDeslistMob .slick-slider {
-    margin: 0 16px;
-  }
-
-  .recomendDeslistMob .slick-slide {
-    padding: 0 8px;
-  }
-
-  .recomendDeslistMob .slick-dots {
-    bottom: -30px;
-  }
+  /* Фото направлений — как фото в результатах поиска: 200px, скругление 8px */
   .recomendDeslistItem {
-    min-width: auto;
-    height: 282px;
-    margin-left: 16px;
-  }
-  .recomendDeslistItem:nth-child(1) {
-    /*margin-left: 16px;*/
+    min-width: 0;
+    height: 200px;
+    margin: 0;
+    border-radius: 8px;
   }
   .containerS {
     display: none;
@@ -1024,7 +1042,17 @@
   .contentFullHide {
     /*display: none;*/
   }
-  .recomendDeslistItemInfo{
-      height: 100%;
+  .recomendDeslistItemInfo {
+    height: 100%;
+    padding: 12px;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+  }
+  .recomendDeslistItemInfoText {
+    margin: 0;
+    color: #ffffff;
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 24px;
   }
 }

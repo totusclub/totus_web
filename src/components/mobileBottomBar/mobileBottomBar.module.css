@@ -32,8 +32,8 @@
         background-color: var(--bgPrimary);
         border-top: 1px solid var(--borderTertiary);
         box-shadow: 0 -2px 5px rgba(0,0,0,0.08);
-        padding-left: 30px;
-        padding-right: 30px;
+        padding-left: 8px;
+        padding-right: 8px;
         align-items: center;
         justify-content: space-between;
 
@@ -41,12 +41,31 @@
 
 
     }
+    /* Вкладка как в приложении: иконка 24px и подпись 12px; неактивная — цвет текста темы
+       (в тёмной теме #b0b0b0, как tabBarInactive в приложении), активная — оранжевая. */
     .itemTabNav{
-        width: 40px;
-        height: 40px;
+        flex: 1;
+        height: 100%;
         display: flex;
+        flex-direction: column;
         align-items: center;
         justify-content: center;
+        gap: 2px;
+        color: var(--textPrimary);
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+    }
+    :global([data-theme="dark"]) .itemTabNav{
+        color: #b0b0b0;
+    }
+    .itemTabNav.itemTabNavActive{
+        color: var(--core_Orange);
+    }
+    .tabLabel{
+        font-size: 12px;
+        line-height: 14px;
+        font-weight: 400;
+        letter-spacing: -0.24px;
     }
 
 }
