@@ -293,6 +293,14 @@
     clip: rect(0 0 0 0);
 }
 
+/* Телефон и планшет: внизу фиксированное меню 60px, кнопка Милы поднята над ним (bottom 80px,
+   см. globalAiChat.module.css) — плашку поднимаем так же, чтобы она осталась рядом с кнопкой. */
+@media (max-width: 1024px) {
+    .miniBar {
+        bottom: 76px;
+    }
+}
+
 @media (max-width: 480px) {
     .card {
         max-width: 343px;
@@ -312,7 +320,7 @@
     .miniBar {
         right: 88px;
         left: 16px;
-        bottom: 16px;
+        bottom: 76px;
         width: auto;
         max-width: none;
     }
