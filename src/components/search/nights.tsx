@@ -4,6 +4,7 @@ import {useEffect, useRef, useState} from "react";
 import RangeStep from "@/components/UI/range";
 // import SwitchToggle from "@/components/UI/switch"; // ±2 nights UI disabled
 import Button from "@/components/UI/button";
+import { formatNightsCount } from "@/utils/formatRussianPlural";
 
 // ±2 nights toggle (flex_dates) disabled — exact nights only.
 
@@ -57,13 +58,13 @@ const Nights = ({handleChange,value,name, flexDates = '0'}) => {
             <Icon name={'moon'} size={24} color="var(--textPrimary)"/>
             <div className={styles.searchFieldInfo}>
                 <p className={styles.searchFieldsLabel}>Количество ночей</p>
-                <p className={styles.searchFieldsValue}>{values[0]} ночей</p>
+                <p className={styles.searchFieldsValue}>{formatNightsCount(values[0])}</p>
             </div>
             <Icon name={'downArrow'} size={24} color="var(--textPrimary)"/>
             {isOpen && (
                 <div className={styles.nightsModal} onClick={(e) => e.stopPropagation()}>
                     <div className={styles.nightsModalHead}>
-                        <p>Количество ночей: {values[0]}</p>
+                        <p>{formatNightsCount(values[0])}</p>
                     </div>
                     <RangeStep  step={STEP} min={MIN} max={MAX} values={values} setValues={handleChangeNights}/>
                     {/* ±2 nights UI disabled

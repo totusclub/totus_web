@@ -141,8 +141,8 @@
 }
 
 .daysRow {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
     font-weight: bold;
     height: 48px;
     align-items: center;
@@ -150,7 +150,6 @@
 }
 
 .dayName {
-    width: 14.28%;
     text-align: center;
     color: var(--textTertiary);
     font-size: 12px;
@@ -160,17 +159,17 @@
     letter-spacing: -0.24px;
 }
 
+/* Сетка без промежутков между днями: полоса периода идёт сплошной лентой. */
 .weekRow {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
     height: 48px;
     align-items: center;
     gap: 0;
 }
 
 .cell {
-    width: 14.28%;
-    max-width: 48px;
+    width: 100%;
     height: 48px;
     min-height: 44px;
     display: flex;
@@ -183,6 +182,8 @@
 }
 
 .cellInner {
+    position: relative;
+    z-index: 1;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -226,17 +227,74 @@
     color: var(--textTertiary);
 }
 
-.cellInRange {
-    background-color: var(--bgSecondary);
-    border-radius: 0;
+/* Дни соседнего месяца не рисуются — пустая клетка того же размера. */
+.cellEmpty {
+    visibility: hidden;
+    pointer-events: none;
+}
+
+/* Период: сплошная светло-оранжевая полоса от вылета до возврата.
+   У вылета полоса начинается с середины круга, у возврата — заканчивается на середине;
+   на краях недели и месяца она скруглена. Цвет одинаково читается в светлой и тёмной теме. */
+.cellInRange,
+.cellRangeStart,
+.cellRangeEnd {
+    position: relative;
+}
+
+.cellInRange::before,
+.cellRangeStart::before,
+.cellRangeEnd::before {
+    content: "";
+    position: absolute;
+    top: 4px;
+    bottom: 4px;
+    left: 0;
+    right: 0;
+    background-color: rgba(254, 115, 46, 0.16);
+    pointer-events: none;
+}
+
+.cellRangeStart::before {
+    left: 50%;
+}
+
+.cellRangeEnd::before {
+    right: 50%;
+}
+
+.cellInRange.cellRowStart::before {
+    left: 4px;
+    border-top-left-radius: 20px;
+    border-bottom-left-radius: 20px;
+}
+
+.cellInRange.cellRowEnd::before {
+    right: 4px;
+    border-top-right-radius: 20px;
+    border-bottom-right-radius: 20px;
+}
+
+.cellRangeStart.cellRowEnd::before,
+.cellRangeEnd.cellRowStart::before {
+    display: none;
 }
 
 .cellInRange .cellInner {
     background-color: transparent;
-    border-radius: 0;
-    width: 100%;
-    height: 100%;
-    max-width: none;
+    color: var(--textPrimary);
+    font-weight: 600;
+}
+
+/* Предпросмотр при выборе даты возврата (наведение): полоса светлее, возврат — пунктирный круг. */
+.cellPreview::before {
+    background-color: rgba(254, 115, 46, 0.09);
+}
+
+.cellRangeEnd.cellPreviewEnd .cellInner {
+    background-color: transparent;
+    color: var(--textPrimary);
+    box-shadow: inset 0 0 0 2px var(--core_Orange);
 }
 
 .cellPlusBand .cellInner {
@@ -283,6 +341,13 @@
     padding-top: 18px;
 }
 
+@media (prefers-reduced-motion: reduce) {
+    .cell,
+    .cellInner {
+        transition: none;
+    }
+}
+
 @media (max-width: 768px) {
     .monthsGridTwo {
         grid-template-columns: 1fr;
@@ -290,12 +355,6 @@
     }
 
     .cell {
-        max-width: none;
-        flex: 1;
         min-width: 0;
-    }
-
-    .weekRow {
-        gap: 2px;
     }
 }
