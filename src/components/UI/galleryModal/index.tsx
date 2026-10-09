@@ -37,9 +37,11 @@ interface GalleryModalProps {
     onClose: () => void;
     images: ImageItem[];
     initialIndex?: number;
+    /** Shown on the right of the header: hotel name (hotel gallery) or room name (room gallery). */
+    title?: string;
 }
 
-const GalleryModal: React.FC<GalleryModalProps> = ({ isOpen, onClose, images, initialIndex = 0 }) => {
+const GalleryModal: React.FC<GalleryModalProps> = ({ isOpen, onClose, images, initialIndex = 0, title }) => {
     const [currentIndex, setCurrentIndex] = useState(initialIndex);
     const [thumbnailSliderDesktop, setThumbnailSliderDesktop] = useState<Slider | null>(null);
     const [thumbnailSliderMobile, setThumbnailSliderMobile] = useState<Slider | null>(null);
@@ -124,6 +126,8 @@ const GalleryModal: React.FC<GalleryModalProps> = ({ isOpen, onClose, images, in
 
     if (!images || images.length === 0) return null;
 
+    const headerTitle = typeof title === 'string' ? title.trim() : '';
+
     const resolveImageUrl = (value?: string) => {
         if (!value) return '';
         if (value.startsWith('http://') || value.startsWith('https://')) return value;
@@ -205,9 +209,14 @@ const GalleryModal: React.FC<GalleryModalProps> = ({ isOpen, onClose, images, in
                     }
                 }}
             >
-                {/* Header with Close Button */}
+                {/* Header: hotel/room name on the right, next to the close button */}
                 <div className={styles.modalHeader}>
                     <div className={styles.modalHeaderLine}></div>
+                    {headerTitle ? (
+                        <p className={styles.modalTitle} title={headerTitle}>
+                            {headerTitle}
+                        </p>
+                    ) : null}
                     <button className={styles.closeButton} onClick={onClose} aria-label="Close gallery">
                         <Icon name="closeLine" size={24} color="var(--textPrimary)" />
                     </button>

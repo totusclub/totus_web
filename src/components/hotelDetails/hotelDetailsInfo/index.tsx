@@ -173,6 +173,9 @@ const HotelDetailsInfo = ({
         });
     }, [listRoomPick, listMatched]);
 
+    // Название отеля — в шапке окна «Все фото».
+    const hotelName = typeof hotel?.name === "string" ? hotel.name : "";
+
     const handleChooseRoomClick = () => {
         scrollToChooseRoomSection();
     };
@@ -201,7 +204,7 @@ const HotelDetailsInfo = ({
             {!panding ? (
                 <div className={"content"}>
                     <div className={styles.HotelDetailsInfoRow}>
-                        <VerticalSlider loading={panding} images={images} />
+                        <VerticalSlider loading={panding} images={images} title={hotelName} />
                         <div className={styles.HotelDetailsInfo}>
                             <div className={styles.HotelDetailsInfoPrice}>
                                 <div className={styles.HotelDetailsInfoPriceTop}>
@@ -274,7 +277,7 @@ const HotelDetailsInfo = ({
                     <div className={styles.HotelDetailsInfoRow}>
                         {/* Фото отеля уже есть (/references/hotels) — не ждём поиск номеров.
                             Пока images пустые, VerticalSlider сам показывает тот же плейсхолдер. */}
-                        <VerticalSlider loading={false} images={images} />
+                        <VerticalSlider loading={false} images={images} title={hotelName} />
                         <div className={styles.HotelDetailsInfo}>
                             <div className={styles.HotelDetailsInfoPrice}>
                                 <div className={styles.animationTextlazy1}></div>

@@ -33,7 +33,7 @@ const PrevArrow = ({ onClick }: ArrowProps) => {
     );
 };
 
-const SmallSlider = ({ images }) => {
+const SmallSlider = ({ images, title }: { images: any[]; title?: string }) => {
     const [selectedIndex, setSelectedIndex] = useState<string>('');
     const [currentSlide, setCurrentSlide] = useState(0);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -172,6 +172,7 @@ const SmallSlider = ({ images }) => {
                 onClose={() => setIsModalOpen(false)}
                 images={images}
                 initialIndex={selectedImageIndex}
+                title={title}
             />
         </div>
     );
