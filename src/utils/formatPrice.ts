@@ -1,3 +1,16 @@
+/**
+ * Единая запись цены на сайте (утверждено 09.10.2026, «Отель на телефоне»):
+ * тысячи — узкий неразрывный пробел (U+202F), перед ₽ — неразрывный пробел (U+00A0),
+ * чтобы «270 802 ₽» не разрывалось на две строки. Знак ₽ рисует шрифт «Totus Symbols» (globals.css).
+ */
+export const THOUSANDS_SEP = ' ';
+export const RUB_SUFFIX = ' ₽';
+
+/** 270802 → «270 802» (узкий пробел). Только цифры, без знака валюты. */
+export function groupThousands(value: string | number): string {
+  return String(value).replace(/\B(?=(\d{3})+(?!\d))/g, THOUSANDS_SEP);
+}
+
 export function formatPrice(amount: string | number | null | undefined): string {
   if (amount == null || amount === '') return '—';
 
@@ -8,17 +21,15 @@ export function formatPrice(amount: string | number | null | undefined): string 
 
   if (!Number.isFinite(normalized)) return String(amount);
 
-  return Math.round(normalized)
-    .toString()
-    .replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+  return groupThousands(Math.round(normalized));
 }
 
 export function formatPriceRub(amount: string | number | null | undefined): string {
   const formatted = formatPrice(amount);
-  return formatted === '—' ? formatted : `${formatted} ₽`;
+  return formatted === '—' ? formatted : `${formatted}${RUB_SUFFIX}`;
 }
 
 export function formatPriceFromLabel(amount: string | number | null | undefined): string {
   const formatted = formatPrice(amount);
-  return formatted === '—' ? formatted : `от ${formatted} ₽`;
+  return formatted === '—' ? formatted : `от ${formatted}${RUB_SUFFIX}`;
 }
