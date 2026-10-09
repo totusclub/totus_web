@@ -724,7 +724,7 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
             {header && (
                 <div className={styles.selectdFormM}>
                     <p className={styles.mytextHeader}>{headerName || ''}</p>
-                    <p>{formatDateToRussian(params?.start_date)} , {params?.nights} ночей, {parseInt(params?.adults || '0', 10) + parseInt(params?.kids || '0', 10)} туриста</p>
+                    <p>{formatDateToRussian(params?.start_date)} · {params?.nights} ночей · {parseInt(params?.adults || '0', 10) + parseInt(params?.kids || '0', 10)} туриста</p>
                 </div>
             )}
         </>
