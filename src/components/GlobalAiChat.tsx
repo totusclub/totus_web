@@ -5,6 +5,25 @@ import '@tosmedia/ai-assistant/styles.css'
 import { getAiApiBase, getAiWsUrl } from '@/lib/aiConfig'
 import useAuth from '@/hooks/useAuth'
 import styles from './globalAiChat.module.css'
+import MobileMilaChat from './mila/MobileMilaChat'
+
+/** Телефон и планшет — та же граница, что у нижнего меню (mobileBottomBar). */
+const MOBILE_QUERY = '(max-width: 1024px)'
+
+/** true на ширине до 1024px; следит за поворотом экрана и изменением окна. */
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia(MOBILE_QUERY).matches,
+  )
+  useEffect(() => {
+    const mq = window.matchMedia(MOBILE_QUERY)
+    const update = () => setIsMobile(mq.matches)
+    update()
+    mq.addEventListener('change', update)
+    return () => mq.removeEventListener('change', update)
+  }, [])
+  return isMobile
+}
 
 /** Полноэкранный чат с поддержкой на телефоне: внизу поле ввода — там кнопку Милы не показываем. */
 const HIDE_ON_MOBILE_PATHS = ['/profile/support-chat']
@@ -13,6 +32,7 @@ const HIDE_ON_MOBILE_PATHS = ['/profile/support-chat']
 export default function GlobalAiChat() {
   const { user, token } = useAuth()
   const { pathname } = useRouter()
+  const isMobile = useIsMobile()
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
@@ -35,11 +55,16 @@ export default function GlobalAiChat() {
       getAccessToken={getAccessToken}
       historyMode="auto"
     >
-      {/* Обёртка для мобильной версии: поднимает кнопку над нижним меню (см. globalAiChat.module.css).
-          На компьютере не влияет — правила только для ширины до 1024px. */}
-      <div className={HIDE_ON_MOBILE_PATHS.includes(pathname) ? `${styles.root} ${styles.hideOnMobile}` : styles.root}>
-        <ChatWidget />
-      </div>
+      {isMobile ? (
+        // Телефон и планшет: чат на весь экран (макет «Мила на телефоне», утверждён 09.10.2026).
+        <MobileMilaChat hideFab={HIDE_ON_MOBILE_PATHS.includes(pathname)} />
+      ) : (
+        // Компьютер: плавающее окно пакета, как раньше. Обёртка — на случай ширины на границе 1024px
+        // (правила globalAiChat.module.css только для ширины до 1024px).
+        <div className={HIDE_ON_MOBILE_PATHS.includes(pathname) ? `${styles.root} ${styles.hideOnMobile}` : styles.root}>
+          <ChatWidget />
+        </div>
+      )}
     </AiAssistantProvider>
   )
 }
