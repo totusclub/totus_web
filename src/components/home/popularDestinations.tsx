@@ -1,6 +1,4 @@
 import React, { useMemo, useCallback } from "react";
-import Slider from "react-slick";
-import "slick-carousel/slick/slick.css";
 import styles from './home.module.css'
 import Icon from "@/components/icons/Icon";
 import { useRouter } from "next/router";
@@ -171,49 +169,6 @@ export default function PopularDestinations({
         },
         [router, date, dispatch]
     );
-    const settings = {
-        dots: true,
-        infinite: true,
-        speed: 500,
-        slidesToShow: 1,
-        slidesToScroll: 1,
-        initialSlide: 0,
-        responsive: [
-
-            {
-                breakpoint: 600,
-                settings: {
-                    slidesToShow: 2,
-                    slidesToScroll: 2,
-                    initialSlide: 2
-                }
-            },
-            {
-                breakpoint: 480,
-                settings: {
-                    slidesToShow: 1.2,
-                    slidesToScroll: 1,
-                    // Без бесконечной прокрутки: при дробном slidesToShow react-slick с infinite
-                    // сдвигает ленту на 0,2 карточки — первая карточка обрезалась слева на телефоне.
-                    // Теперь первая карточка у левого края, следующая выглядывает справа.
-                    infinite: false,
-                    dots: false,
-                    arrows: false
-                }
-            },
-            {
-                breakpoint: 1026,
-                settings: {
-                    slidesToShow: 2.3,
-                    slidesToScroll: 2,
-                    infinite: false,
-                    dots: false
-                }
-            },
-
-        ]
-    };
-
     return (
         <div className={styles.popularDestinationsWrapper}>
             <p className={styles.hotProductTitle}>{title}</p>
@@ -243,11 +198,12 @@ export default function PopularDestinations({
                 })}
             </div>
 
+            {/* Телефон и планшет: горизонтальная прокрутка браузера с привязкой к карточке (было react-slick) */}
             <div className={styles.recomendDeslistMob} ref={mobileListRef}>
-                <Slider {...settings}>
+                <div className={styles.mobScroller}>
                     {popularDestinations?.map((item, index) => {
                         return (
-                            <div   key={item?.id || index}>
+                            <div key={item?.id || index} className={styles.mobScrollerItem}>
                             <div  style={{
                                     backgroundImage: mobileListVisible && item?.image ? `url(${item.image})` : undefined,
                                     cursor: 'pointer'
@@ -267,7 +223,7 @@ export default function PopularDestinations({
                             </div>
                         );
                     })}
-                </Slider>
+                </div>
             </div>
         </div>
     );
