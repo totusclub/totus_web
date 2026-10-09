@@ -60,16 +60,24 @@ await check('about-us: крошки «Главная › О компании ›
     has(about, /'\/about\/friends\.webp'/);
 });
 
-await check('help-faq: 5 групп, 20 вопросов, ссылка в чат поддержки', async () => {
+await check('help-faq: 12 разделов, 41 вопрос, ссылка в чат поддержки', async () => {
     const { FAQ_GROUPS } = await load('src/config/faqContent.ts');
-    assert.equal(FAQ_GROUPS.length, 5);
-    assert.deepEqual(FAQ_GROUPS.map((g) => g.items.length), [6, 4, 3, 3, 4]);
+    assert.deepEqual(FAQ_GROUPS.map((g) => g.title), [
+        'Туры с перелётом', 'Отели без перелёта', 'Перелёты и багаж', 'Оплата', 'Заказы и документы',
+        'Изменение, отмена и возврат', 'Перед поездкой', 'Мила — ИИ-ассистент', 'Поддержка: чат и звонок',
+        'Аккаунт и вход', 'Приложения и уведомления', 'Безопасность и данные',
+    ]);
+    assert.deepEqual(FAQ_GROUPS.map((g) => g.items.length), [5, 3, 4, 4, 4, 3, 3, 3, 3, 4, 2, 3]);
     const qs = FAQ_GROUPS.flatMap((g) => g.items.map((i) => i.q));
-    assert.equal(new Set(qs).size, 20, 'вопросы не должны повторяться');
+    assert.equal(new Set(qs).size, 41, 'вопросы не должны повторяться');
     for (const g of FAQ_GROUPS) for (const i of g.items) assert.ok(i.a.length > 0, `пустой ответ: ${i.q}`);
     const page = read('src/pages/help-faq/index.tsx');
     has(page, /title="Частые вопросы"/);
-    has(read('src/components/infoPages/FaqContent.tsx'), /href="\/profile\/support-chat"/);
+    const faq = read('src/components/infoPages/FaqContent.tsx');
+    has(faq, /href="\/profile\/support-chat"/);
+    has(faq, /open=\{i === 0\}/, 'в разделе раскрыт только первый вопрос');
+    const css = read('src/components/infoPages/infoPages.module.css');
+    has(css, /\.faqItem\[open\] \.chevron \{\s*transform: rotate\(180deg\);/, 'раскрыт — стрелка вверх');
 });
 
 await check('airlines: 17 российских и 27 зарубежных, коды IATA уникальны', async () => {

@@ -182,11 +182,11 @@
   height: 20px;
   transition: transform 0.2s ease;
   color: var(--textPrimary);
-  transform: rotate(180deg);
 }
 
+/* Свёрнут — стрелка вниз, раскрыт — вверх */
 .faqItem[open] .chevron {
-  transform: rotate(0deg);
+  transform: rotate(180deg);
 }
 
 .faqAnswer {
