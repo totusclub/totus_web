@@ -1,4 +1,4 @@
-// Окно «Все фото» на странице отеля: справа в шапке — название отеля;
+// Окно «Все фото» на странице отеля: слева в шапке — название отеля;
 // окно фото номера — название номера. Запуск: node scripts/check-gallery-titles.mjs
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -34,14 +34,16 @@ check('GalleryModal: проп title, заголовок в шапке перед
   assert.match(modal, /title\?: string;/);
   const header = modal.slice(modal.indexOf('className={styles.modalHeader}'), modal.indexOf('className={styles.galleryContainer}'));
   assert.ok(header.indexOf('styles.modalTitle') > 0, 'заголовок в шапке');
-  assert.ok(header.indexOf('styles.modalTitle') < header.indexOf('styles.closeButton'), 'заголовок слева от кнопки закрытия (справа в шапке)');
+  assert.ok(header.indexOf('styles.modalTitle') < header.indexOf('styles.closeButton'), 'заголовок в шапке перед кнопкой закрытия (слева)');
   assert.match(header, /\{headerTitle \? \(/, 'без названия шапка как раньше');
   assert.match(modal, /contentLabel="Фотографии"/, 'имя окна для a11y не меняется');
 });
 
-check('стили: прижат вправо, одна строка на компьютере, две на телефоне, крестик не сжимается', () => {
+check('стили: слева в шапке, крестик справа, одна строка на компьютере, две на телефоне, крестик не сжимается', () => {
   const t = css.match(/\.modalTitle \{([^}]*)\}/)[1];
-  assert.match(t, /margin: 0 0 0 auto;/);
+  assert.match(t, /margin: 0 auto 0 0;/, 'название слева, крестик прижат вправо');
+  assert.match(t, /text-align: left;/);
+  assert.match(css.match(/\.modalHeader \{([^}]*)\}/)[1], /justify-content: flex-end;/, 'без названия крестик справа, как раньше');
   assert.match(t, /min-width: 0;/);
   assert.match(t, /text-overflow: ellipsis;/);
   assert.match(t, /white-space: nowrap;/);

@@ -48,13 +48,12 @@
   border-bottom: 1px solid var(--borderTertiary, #e0e0e0);
 }
 
-/* Название отеля / номера: справа, рядом с кнопкой закрытия; длинное — с многоточием.
-   Блок прижат вправо (margin-left: auto) и ужимается по тексту — так многоточие видно
-   (при text-align: right Chromium его обрезает). */
+/* Название отеля / номера: в левой части шапки, кнопка закрытия остаётся справа
+   (margin-right: auto отодвигает её к правому краю); длинное — с многоточием. */
 .modalTitle {
   flex: 0 1 auto;
   min-width: 0;
-  margin: 0 0 0 auto;
+  margin: 0 auto 0 0;
   text-align: left;
   color: var(--textPrimary);
   font-size: 18px;

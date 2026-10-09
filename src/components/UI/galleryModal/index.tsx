@@ -37,7 +37,7 @@ interface GalleryModalProps {
     onClose: () => void;
     images: ImageItem[];
     initialIndex?: number;
-    /** Shown on the right of the header: hotel name (hotel gallery) or room name (room gallery). */
+    /** Shown on the left of the header: hotel name (hotel gallery) or room name (room gallery). */
     title?: string;
 }
 
@@ -209,7 +209,7 @@ const GalleryModal: React.FC<GalleryModalProps> = ({ isOpen, onClose, images, in
                     }
                 }}
             >
-                {/* Header: hotel/room name on the right, next to the close button */}
+                {/* Header: hotel/room name on the left, close button on the right */}
                 <div className={styles.modalHeader}>
                     <div className={styles.modalHeaderLine}></div>
                     {headerTitle ? (
