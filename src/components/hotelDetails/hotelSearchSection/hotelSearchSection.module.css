@@ -156,3 +156,21 @@
     display: none;
   }
 }
+
+/* Страница отеля до 1024 px — вариант C «Без карточек» (09.10.2026): поиск — раздел во всю ширину
+   с полосой 8 px сверху, поля в рамке со скруглением 16. Компьютер не меняется. */
+@media (max-width: 1024px) {
+  .hotelSearchSection {
+    width: calc(100% + 32px);
+    margin: 0 -16px;
+    padding: 16px;
+    border-top: 8px solid var(--bgSecondary);
+    background: var(--bgPrimary);
+  }
+
+  .searchFields {
+    border: 1px solid var(--borderTertiary);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+}
