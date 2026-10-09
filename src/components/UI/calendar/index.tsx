@@ -36,6 +36,10 @@ interface CalendarProps {
     onPlusMinusChange?: (enabled: boolean) => void;
     /** When set with rangeStart/rangeEnd, enables hover preview for the return-date step */
     rangeSelectionPhase?: RangeSelectionPhase | null;
+    /** Days after this date are disabled (e.g. the max nights limit while picking the return date). */
+    maxSelectableDate?: Date | null;
+    /** Hover/focus preview of the return date (null when the pointer leaves the grid). */
+    onPreviewDateChange?: (date: Date | null) => void;
 }
 
 const Calendar = ({
@@ -49,6 +53,8 @@ const Calendar = ({
     plusMinusEnabled,
     onPlusMinusChange,
     rangeSelectionPhase = null,
+    maxSelectableDate = null,
+    onPreviewDateChange,
 }: CalendarProps) => {
     const initialMonthSeed = rangeStart ?? selectedDate ?? new Date();
     const [currentMonth, setCurrentMonth] = useState(() => startOfMonth(initialMonthSeed));
@@ -85,6 +91,19 @@ const Calendar = ({
         }
     }, [rangeSelectionPhase]);
 
+    const onPreviewDateChangeRef = useRef(onPreviewDateChange);
+    onPreviewDateChangeRef.current = onPreviewDateChange;
+    useEffect(() => {
+        onPreviewDateChangeRef.current?.(hoverDate);
+    }, [hoverDate]);
+
+    /** Range mode: the departure/return pair draws the selection, not `selectedDate`. */
+    const isRangeMode = Boolean(rangeStart);
+    const maxSelectableDay = maxSelectableDate ? startOfDay(maxSelectableDate) : null;
+    const isPreviewing =
+        rangeSelectionPhase === 'end' &&
+        Boolean(hoverDate && rangeStart && !isBefore(startOfDay(hoverDate), startOfDay(rangeStart)));
+
     const isPlusMinusTwo = useCallback(
         (date: Date) => {
             if (!selectedDate || isSameDay(date, selectedDate)) return false;
@@ -99,9 +118,9 @@ const Calendar = ({
         const rs = startOfDay(rangeStart);
 
         if (!rangeEnd) {
-            if (rangeSelectionPhase === 'end' && hoverDate) {
-                const h = startOfDay(hoverDate);
-                return { lo: minDate([rs, h]), hi: maxDate([rs, h]) };
+            // Return-date preview only forward: a day before departure starts a new range instead.
+            if (rangeSelectionPhase === 'end' && hoverDate && !isBefore(startOfDay(hoverDate), rs)) {
+                return { lo: rs, hi: startOfDay(hoverDate) };
             }
             return { lo: rs, hi: rs };
         }
@@ -122,7 +141,9 @@ const Calendar = ({
         (currentDay: Date, month: Date) => {
             const day = startOfDay(currentDay);
             const isCurrentMonth = isSameMonth(currentDay, month);
-            const isDisabled = !allowPastDates && isBefore(day, today);
+            const isDisabled =
+                (!allowPastDates && isBefore(day, today)) ||
+                Boolean(maxSelectableDay && isAfter(day, maxSelectableDay));
 
             const matchesSelected = Boolean(selectedDate && isSameDay(day, startOfDay(selectedDate)));
             /** While choosing return date, keep departure visible as selected even if `selectedDate` is the end. */
@@ -133,7 +154,7 @@ const Calendar = ({
                 rangeEnd &&
                 isSameDay(day, startOfDay(rangeStart)) &&
                 !isSameDay(startOfDay(rangeStart), startOfDay(selectedDate));
-            const isSelected = matchesSelected || isDepartureAnchorInEndPhase;
+            const isSelected = !isRangeMode && (matchesSelected || isDepartureAnchorInEndPhase);
 
             let isRangeStart = false;
             let isRangeEnd = false;
@@ -171,11 +192,16 @@ const Calendar = ({
             isPlusMinusTwo,
             rangeSelectionPhase,
             rangeStart,
+            isRangeMode,
+            maxSelectableDay,
         ]
     );
 
     const handleDayPointerEnter = (day: Date, disabled: boolean) => {
-        if (disabled) return;
+        if (disabled) {
+            if (rangeSelectionPhase === 'end') setHoverDate(null);
+            return;
+        }
         if (rangeSelectionPhase === 'end' && rangeStart) {
             setHoverDate(startOfDay(day));
         }
@@ -323,6 +349,18 @@ const Calendar = ({
                 const key = format(currentDay, 'yyyy-MM-dd');
                 const props = getDayCellProps(currentDay, month);
 
+                // Days of the neighbouring month are not drawn: with two months side by side
+                // 1 November must not appear in the October grid (and get highlighted twice).
+                if (!props.isCurrentMonth) {
+                    days.push(<span key={key} className={`${styles.cell} ${styles.cellEmpty}`} aria-hidden="true" />);
+                    cursor = addDays(cursor, 1);
+                    continue;
+                }
+
+                // Edges of the visual row: the range band gets rounded corners there.
+                const isRowStart = i === 0 || currentDay.getDate() === 1;
+                const isRowEnd = i === 6 || isSameDay(currentDay, endOfMonth(month));
+
                 const isSingleDayRange = props.isRangeStart && props.isRangeEnd;
                 const classNames = [
                     styles.cell,
@@ -333,6 +371,12 @@ const Calendar = ({
                     !isSingleDayRange && props.isRangeStart ? styles.cellRangeStart : '',
                     !isSingleDayRange && props.isRangeEnd ? styles.cellRangeEnd : '',
                     props.isInSelectedRange ? styles.cellInRange : '',
+                    isRowStart ? styles.cellRowStart : '',
+                    isRowEnd ? styles.cellRowEnd : '',
+                    isPreviewing && (props.isInSelectedRange || props.isRangeStart || props.isRangeEnd)
+                        ? styles.cellPreview
+                        : '',
+                    isPreviewing && props.isRangeEnd && !isSingleDayRange ? styles.cellPreviewEnd : '',
                     props.isSelected ? styles.cellSelected : '',
                     props.isInPlusBand &&
                     !props.isRangeStart &&
@@ -353,6 +397,7 @@ const Calendar = ({
                         className={classNames}
                         disabled={props.isDisabled}
                         aria-label={label}
+                        aria-pressed={props.isRangeStart || props.isRangeEnd || props.isSelected || undefined}
                         tabIndex={props.isDisabled ? -1 : 0}
                         onClick={() => {
                             if (!props.isDisabled) {

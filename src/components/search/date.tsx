@@ -5,6 +5,7 @@ import Calendar from "@/components/UI/calendar";
 import { addDays, differenceInCalendarDays, format, parseISO, startOfDay } from "date-fns";
 import { ru } from "date-fns/locale";
 import Button from "@/components/UI/button";
+import { formatNightsCount } from "@/utils/formatRussianPlural";
 
 // ±2 departure date toggle (calendar ±2 days) disabled — fixed date only.
 
@@ -23,6 +24,9 @@ const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 
 /** Used when parent has no end yet, or same-day range → minimal +1 day */
 const DEFAULT_RANGE_DAYS = 1;
+
+/** Upper limit of the «Количество ночей» field (nights.tsx MAX) — return date cannot go further. */
+export const MAX_RANGE_NIGHTS = 30;
 
 function rangeFromProps(value: unknown, endValue?: string): { start: Date; end: Date } | null {
     const raw = String(value ?? '');
@@ -71,6 +75,8 @@ const SelectDate = ({
     const [isOpen, setIsOpen] = useState<boolean>(false);
     /** false → next tap chooses departure only (local); true → next tap chooses return and commits range */
     const [nextPickIsEnd, setNextPickIsEnd] = useState(false);
+    /** Return date under the pointer while choosing it — live nights preview. */
+    const [previewEndDate, setPreviewEndDate] = useState<Date | null>(null);
     const wrapperRef = useRef<HTMLDivElement>(null);
     const modalRef = useRef<HTMLDivElement>(null);
     const handleChangeRef = useRef(handleChange);
@@ -159,7 +165,7 @@ const SelectDate = ({
             return start;
         }
         const end = format(selectedEndDate, 'd MMM', { locale: ru }).toLowerCase();
-        return `${start} - ${end}`;
+        return `${start} – ${end}`;
     }, [selectedDate, selectedEndDate, departureOnlyLabel]);
 
     const syncRangeToParent = (start: Date, end: Date) => {
@@ -178,6 +184,9 @@ const SelectDate = ({
             },
             'date_range'
         );
+        // Nights follow the chosen range right away (not only after the calendar closes).
+        const nights = Math.max(1, differenceInCalendarDays(normalizedEnd, normalizedStart));
+        handleChange(String(nights), 'sync_nights_from_dates');
     };
 
     const handleSelectDate = (pickedDate: Date) => {
@@ -190,21 +199,40 @@ const SelectDate = ({
         }
 
         const start = selectedDate ? startOfDay(selectedDate) : day;
-        if (day < start) {
-            syncRangeToParent(day, start);
-        } else {
-            syncRangeToParent(start, day);
+        // A day on/before departure while choosing the return date starts a new range.
+        if (day <= start) {
+            setSelectedDate(day);
+            setSelectedEndDate(null);
+            setPreviewEndDate(null);
+            return;
         }
+        syncRangeToParent(start, day);
+        setPreviewEndDate(null);
         setNextPickIsEnd(false);
     };
 
+    /** Departure / return switch above the calendar. */
+    const pickDeparture = () => {
+        setNextPickIsEnd(false);
+        setPreviewEndDate(null);
+    };
+    const pickReturn = () => {
+        if (!selectedDate) return;
+        setSelectedEndDate(null);
+        setNextPickIsEnd(true);
+    };
+
     const modalTitle = nextPickIsEnd ? 'Выберите дату возврата' : 'Выберите дату вылета';
-    const startLabel = selectedDate ? format(selectedDate, 'dd.MM.yy') : '--.--.--';
-    const endLabel = selectedEndDate
-        ? format(selectedEndDate, 'dd.MM.yy')
-        : nextPickIsEnd
-          ? '…'
-          : '--.--.--';
+    const chipDate = (d: Date) => format(d, 'EEEEEE, d MMM', { locale: ru }).replace('.', '');
+    const startLabel = selectedDate ? chipDate(selectedDate) : '—';
+    const endLabel = selectedEndDate ? chipDate(selectedEndDate) : '—';
+    const nightsEnd = selectedEndDate ?? previewEndDate;
+    const shownNights =
+        selectedDate && nightsEnd && nightsEnd > selectedDate
+            ? differenceInCalendarDays(startOfDay(nightsEnd), startOfDay(selectedDate))
+            : null;
+    const maxReturnDate =
+        nextPickIsEnd && selectedDate ? addDays(startOfDay(selectedDate), MAX_RANGE_NIGHTS) : null;
 
     return (
         <div className={`${styles.searchField} ${className || ''}`} ref={wrapperRef} onClick={handleToggle}>
@@ -226,10 +254,33 @@ const SelectDate = ({
                             <Icon name={'closeLine'} size={24} color="var(--textPrimary)" />
                         </div>
                     </div>
-                    <div className={styles.dateRangeSwitch}>
-                        <p className={styles.dateRangeSummary}>
-                            Вылет: {startLabel} · Возврат: {endLabel}
-                        </p>
+                    <div className={styles.dateRangeChips}>
+                        <button
+                            type="button"
+                            className={`${styles.dateRangeChip} ${!nextPickIsEnd ? styles.dateRangeChipActive : ''}`}
+                            aria-pressed={!nextPickIsEnd}
+                            onClick={pickDeparture}
+                        >
+                            <span>Вылет</span>
+                            <b>{startLabel}</b>
+                        </button>
+                        <button
+                            type="button"
+                            className={`${styles.dateRangeChip} ${nextPickIsEnd ? styles.dateRangeChipActive : ''}`}
+                            aria-pressed={nextPickIsEnd}
+                            onClick={pickReturn}
+                        >
+                            <span>{nextPickIsEnd ? 'Возврат — выберите' : 'Возврат'}</span>
+                            <b>{endLabel}</b>
+                        </button>
+                        {/* Always in the layout (hidden while unknown) so the calendar does not jump on hover. */}
+                        <span
+                            className={styles.dateRangeNights}
+                            aria-live="polite"
+                            style={shownNights == null ? { visibility: 'hidden' } : undefined}
+                        >
+                            {shownNights != null ? formatNightsCount(shownNights) : formatNightsCount(MAX_RANGE_NIGHTS)}
+                        </span>
                     </div>
                     <Calendar
                         setSelectedDate={handleSelectDate}
@@ -239,8 +290,10 @@ const SelectDate = ({
                         rangeStart={selectedDate}
                         rangeEnd={selectedEndDate}
                         rangeSelectionPhase={nextPickIsEnd ? 'end' : 'start'}
+                        maxSelectableDate={maxReturnDate}
+                        onPreviewDateChange={setPreviewEndDate}
                         monthsToShow={2}
-                        allowPastDates={true}
+                        allowPastDates={false}
                         hideToggle={true}
                         // ±2 dates UI disabled
                         // plusMinusEnabled={Number(flexDates) === 2}
@@ -248,7 +301,11 @@ const SelectDate = ({
                         // plusMinusEnabled={false}
                     />
                     <div className={styles.dateFooter}>
-                        <Button onClick={closeModal} full={true} title={'Готово'} />
+                        <Button
+                            onClick={closeModal}
+                            full={true}
+                            title={shownNights != null && !nextPickIsEnd ? `Готово · ${formatNightsCount(shownNights)}` : 'Готово'}
+                        />
                     </div>
                 </div>
             )}
