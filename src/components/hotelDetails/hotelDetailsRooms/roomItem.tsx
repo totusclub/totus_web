@@ -100,12 +100,13 @@ const HotelDetailsRoomItem = ({
         setImageError(false);
     }, [roomImages]);
 
+    const roomName: string = item?.room?.name_ru || item?.room?.name || '';
     const singleImageUrl = roomImages[0]?.x900;
     const hasGallery = roomImages.length > 0 && !imageError;
 
     const renderRoomImage = () => {
         if (roomImages.length > 1) {
-            return <SmallSlider images={roomImages} />;
+            return <SmallSlider images={roomImages} title={roomName} />;
         }
 
         if (!singleImageUrl || imageError) {
@@ -171,6 +172,7 @@ const HotelDetailsRoomItem = ({
                     onClose={() => setIsRoomGalleryOpen(false)}
                     images={roomImages}
                     initialIndex={0}
+                    title={roomName}
                 />
             )}
         </div>
