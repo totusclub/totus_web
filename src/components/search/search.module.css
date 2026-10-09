@@ -12,13 +12,14 @@
   background-repeat: no-repeat;
 }
 .searchTitle {
+  font-family: var(--font-heading);
   color: var(--textPrimaryB);
   /*font-family: "Golos Text";*/
   font-size: 48px;
   font-style: normal;
-  font-weight: 500;
+  font-weight: 400;
   line-height: 56px;
-  letter-spacing: -0.96px;
+  letter-spacing: 0;
   text-align: center;
 }
 .searchFormBlock {
@@ -85,7 +86,7 @@
   border-radius: 14px;
   background: transparent;
   color: rgba(255, 255, 255, 0.92);
-  font-family: "Golos Text", sans-serif;
+  font-family: var(--font-text);
   cursor: pointer;
   transition: color 0.25s ease, transform 0.2s ease;
 }
@@ -212,7 +213,7 @@
 }
 .searchFieldsLabel {
   color: var(--textTertiary);
-  font-family: "Golos Text";
+  font-family: var(--font-text);
   font-size: 12px;
   font-style: normal;
   font-weight: 400;
@@ -225,7 +226,7 @@
 }
 .searchFieldsValue {
   color: var(--textPrimary);
-  font-family: "Golos Text";
+  font-family: var(--font-text);
   font-size: 16px;
   font-style: normal;
   font-weight: 400;
@@ -457,13 +458,14 @@
   padding: 0 24px;
 }
 .nightsModalHead > p {
+  font-family: var(--font-heading);
   color: var(--textPrimary);
   /*font-family: "Golos Text";*/
   font-size: 20px;
   font-style: normal;
-  font-weight: 500;
+  font-weight: 400;
   line-height: 24px;
-  letter-spacing: -0.4px;
+  letter-spacing: 0;
 }
 .nightsModalFooter {
   border-top: 1px solid var(--borderTertiary);
@@ -1070,7 +1072,7 @@
   .selectdFormM > p:nth-child(2) {
     color: var(--textTertiary);
     text-align: center;
-    font-family: "Golos Text";
+    font-family: var(--font-text);
     font-size: 12px;
     font-style: normal;
     font-weight: 400;

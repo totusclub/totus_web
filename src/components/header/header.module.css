@@ -46,7 +46,7 @@
 }
 .profileButton > p {
   color: var(--textPrimary);
-  font-family: "Golos Text";
+  font-family: var(--font-text);
   font-size: 16px;
   font-style: normal;
   font-weight: 500;
@@ -256,6 +256,7 @@
    длинный текст обрезается многоточием симметрично, центр остаётся на месте.
    Цвета из темы: читается и в светлой, и в тёмной теме (фон Header — --bgPrimary). */
 .heroTitle {
+  font-family: var(--font-heading);
   position: absolute;
   top: 50%;
   left: 50%;
@@ -268,9 +269,9 @@
   color: var(--textPrimary);
   font-size: 24px;
   font-style: normal;
-  font-weight: 500;
+  font-weight: 400;
   line-height: 32px;
-  letter-spacing: -0.48px;
+  letter-spacing: 0;
   text-align: center;
   white-space: nowrap;
   overflow: hidden;

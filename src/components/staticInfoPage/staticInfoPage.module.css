@@ -71,11 +71,12 @@
 }
 
 .title {
+  font-family: var(--font-heading);
   margin: 0 0 20px;
   font-size: 28px;
-  font-weight: 600;
+  font-weight: 400;
   line-height: 34px;
-  letter-spacing: -0.04em;
+  letter-spacing: 0;
   color: var(--textPrimary);
 }
 
@@ -95,16 +96,18 @@
 }
 
 .cmsHtml h1 {
+  font-family: var(--font-heading);
   margin: 24px 0 14px;
   font-size: 28px;
-  font-weight: 600;
+  font-weight: 400;
   line-height: 34px;
 }
 
 .cmsHtml h2 {
+  font-family: var(--font-heading);
   margin: 24px 0 12px;
   font-size: 22px;
-  font-weight: 600;
+  font-weight: 400;
   line-height: 28px;
 }
 

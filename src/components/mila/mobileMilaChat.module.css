@@ -55,7 +55,7 @@
     overflow: hidden;
     background: var(--bgPrimary, #ffffff);
     color: var(--textPrimary, #1f1f1f);
-    font-family: "Golos Text", ui-sans-serif, system-ui, -apple-system, sans-serif;
+    font-family: var(--font-text);
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
     animation: milaIn 0.18s ease-out;

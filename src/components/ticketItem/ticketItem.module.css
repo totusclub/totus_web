@@ -203,7 +203,7 @@
 }
 .ticketItemPrice > p:nth-child(2) {
   color: var(--textSecondary, #3d3d3d);
-  font-family: "Golos Text";
+  font-family: var(--font-text);
   font-size: 14px;
   font-style: normal;
   font-weight: 500;
@@ -215,7 +215,7 @@
 }
 .ticketItemPrice > p:nth-child(3) {
   color: var(--textTertiary);
-  font-family: "Golos Text";
+  font-family: var(--font-text);
   font-size: 12px;
   font-style: normal;
   font-weight: 400;

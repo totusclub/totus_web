@@ -106,13 +106,14 @@
   border: 1px solid var(--secondary_yellow);
 }
 .selectedTourName {
+  font-family: var(--font-heading);
   color: var(--textPrimary);
   /*font-family: "Golos Text";*/
   font-size: 20px;
   font-style: normal;
-  font-weight: 500;
+  font-weight: 400;
   line-height: 24px;
-  letter-spacing: -0.4px;
+  letter-spacing: 0;
 }
 .selectedTourList {
   display: flex;
@@ -132,7 +133,7 @@
   color: var(--textPrimary);
   text-align: right;
   /* Body - Caption/Regular */
-  font-family: "Golos Text";
+  font-family: var(--font-text);
   font-size: 14px;
   font-style: normal;
   font-weight: 400;
@@ -147,7 +148,7 @@
   color: var(--textPrimary);
   text-align: right;
   /* Headline/Medium */
-  font-family: "Golos Text";
+  font-family: var(--font-text);
   font-size: 20px;
   font-style: normal;
   font-weight: 500;
@@ -167,7 +168,7 @@
 }
 .timeDown > p {
   color: var(--textSecondary);
-  font-family: "Golos Text";
+  font-family: var(--font-text);
   font-size: 12px;
   font-style: normal;
   font-weight: 400;
@@ -180,7 +181,7 @@
 }
 .feesText {
   color: var(--textSecondary);
-  font-family: "Golos Text";
+  font-family: var(--font-text);
   font-size: 14px;
   font-style: normal;
   font-weight: 400;

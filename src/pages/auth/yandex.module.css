@@ -43,10 +43,11 @@
     font-weight: 700;
 }
 .title{
+    font-family: var(--font-heading);
     margin: 0;
     color: var(--textPrimary);
     font-size: 24px;
-    font-weight: 700;
+    font-weight: 400;
     line-height: 30px;
 }
 .text{

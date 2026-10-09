@@ -55,12 +55,12 @@
 }
 .modalHeaderInfoAuth>p:nth-child(1){
     color: var(--textPrimary);
-    font-family: "Golos Text";
+    font-family: var(--font-heading);
     font-size: 20px;
     font-style: normal;
-    font-weight: 500;
+    font-weight: 400;
     line-height: 24px; /* 120% */
-    letter-spacing: -0.4px;
+    letter-spacing: 0;
 }
 .modalHeaderInfo>p:nth-child(2){
     color: var(--textTertiary);

@@ -15,7 +15,7 @@
   background: var(--bgPrimary);
   border: 1px solid var(--borderTertiary);
   overflow: hidden;
-  font-family: "Golos Text";
+  font-family: var(--font-text);
   color: var(--textPrimary);
   align-self: flex-start;
   width: 100%;
@@ -377,12 +377,13 @@
   margin-bottom: 8px;
 }
 .emptyTitle {
+  font-family: var(--font-heading);
   margin: 0;
   color: var(--textPrimary);
   font-size: 20px;
-  font-weight: 500;
+  font-weight: 400;
   line-height: 24px;
-  letter-spacing: -0.4px;
+  letter-spacing: 0;
 }
 .emptyText {
   margin: 0;
@@ -626,7 +627,7 @@
   border-radius: 9px;
   background: var(--core_Orange);
   color: #ffffff;
-  font-family: "Golos Text";
+  font-family: var(--font-text);
   font-size: 11px;
   font-weight: 600;
   line-height: 18px;
@@ -645,7 +646,7 @@
   background: var(--bgPrimary);
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12);
   animation: notifPopIn 0.18s ease-out;
-  font-family: "Golos Text";
+  font-family: var(--font-text);
 }
 @keyframes notifPopIn {
   from {
@@ -751,7 +752,7 @@
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.16);
   cursor: pointer;
   pointer-events: auto;
-  font-family: "Golos Text";
+  font-family: var(--font-text);
   animation: notifToastIn 0.22s ease-out;
   text-align: left;
 }

@@ -104,12 +104,13 @@
 }
 
 .checkoutItemsHead > p {
+  font-family: var(--font-heading);
   color: var(--textPrimary);
   font-size: 20px;
   font-style: normal;
-  font-weight: 500;
+  font-weight: 400;
   line-height: 24px;
-  letter-spacing: -0.4px;
+  letter-spacing: 0;
   margin: 0;
 }
 
@@ -217,12 +218,13 @@
 }
 
 .checkoutCardHead > p {
+  font-family: var(--font-heading);
   color: var(--textPrimary);
   font-size: 20px;
   font-style: normal;
-  font-weight: 500;
+  font-weight: 400;
   line-height: 24px;
-  letter-spacing: -0.4px;
+  letter-spacing: 0;
   margin: 0;
 }
 

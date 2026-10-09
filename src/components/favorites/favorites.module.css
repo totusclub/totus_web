@@ -8,8 +8,9 @@
   margin-bottom: 20px;
 }
 .head h1 {
+  font-family: var(--font-heading);
   font-size: 22px;
-  font-weight: 600;
+  font-weight: 400;
   color: var(--textPrimary);
   margin: 0 0 8px;
 }
@@ -63,8 +64,9 @@
   padding-right: 40px;
 }
 .title {
+  font-family: var(--font-heading);
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 400;
   color: var(--textPrimary);
   margin: 0;
 }

@@ -1,8 +1,9 @@
-// PageSpeed C3–C4: шрифт только с нашего сервера (08.10: Google Fonts убраны по решению владельца), тема слайдеров без шрифта slick,
+// PageSpeed C3–C4: шрифты только из репозитория (08.10: Google Fonts убраны; 09.10: Museo Sans Cyrl + Forum вместо Golos Text), тема слайдеров без шрифта slick,
 // картинки ниже первого экрана грузятся по мере приближения. Запуск: node scripts/check-pagespeed-c3.mjs
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
+import zlib from 'node:zlib';
 import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -31,14 +32,149 @@ const theme = read('src/styles/slick-theme.css');
 
 console.log('PageSpeed: шрифт, слайдеры, картинки ниже экрана');
 
-check('шрифт: только с нашего сервера (файл из src/assets/fonts), без Google Fonts; запасные шрифты без засечек', () => {
-  const faces = globals.match(/@font-face\s*\{[^}]*\}/g) || [];
-  assert.equal(faces.length, 1);
-  assert.match(faces[0], /font-family: "Golos Text";/);
-  assert.match(faces[0], /src: url\("\.\/\.\.\/assets\/fonts\/GolosText-VariableFont_wght\.ttf"\) format\("truetype"\),\s*local\("Arial"\)/);
-  assert.match(faces[0], /font-display: swap;/);
-  for (const f of [globals, doc]) assert.ok(!/fonts\.gstatic\.com|fonts\.googleapis\.com/.test(f), 'нет Google Fonts');
-  assert.match(globals, /body \{[\s\S]*?font-family: "Golos Text", [^;]*sans-serif;/);
+// ---- Шрифты (09.10: Museo Sans Cyrl + Forum вместо Golos Text, файлы в репозитории) ----
+const FONT_DIR = 'src/assets/fonts';
+// Чтение cmap из WOFF2 без зависимостей: заголовок, каталог таблиц, brotli (zlib), cmap формата 4 / 12.
+const TAGS = ['cmap', 'head', 'hhea', 'hmtx', 'maxp', 'name', 'OS/2', 'post', 'cvt ', 'fpgm', 'glyf', 'loca', 'prep', 'CFF ', 'VORG', 'EBDT', 'EBLC', 'gasp', 'hdmx', 'kern', 'LTSH', 'PCLT', 'VDMX', 'vhea', 'vmtx', 'BASE', 'GDEF', 'GPOS', 'GSUB', 'EBSC', 'JSTF', 'MATH', 'CBDT', 'CBLC', 'COLR', 'CPAL', 'SVG ', 'sbix', 'acnt', 'avar', 'bdat', 'bloc', 'bsln', 'cvar', 'fdsc', 'feat', 'fmtx', 'fvar', 'gvar', 'hsty', 'just', 'lcar', 'mort', 'morx', 'opbd', 'prop', 'trak', 'Zapf', 'Silf', 'Glat', 'Gloc', 'Feat', 'Sill'];
+function woff2Cmap(buf) {
+  assert.equal(buf.toString('latin1', 0, 4), 'wOF2', 'не WOFF2');
+  const numTables = buf.readUInt16BE(12);
+  const compLen = buf.readUInt32BE(20);
+  let p = 48;
+  const b128 = () => { let v = 0; for (let i = 0; i < 5; i++) { const x = buf[p++]; v = v * 128 + (x & 0x7f); if (!(x & 0x80)) return v; } throw new Error('UIntBase128'); };
+  const dir = [];
+  for (let i = 0; i < numTables; i++) {
+    const flags = buf[p++];
+    let tag = TAGS[flags & 0x3f];
+    if ((flags & 0x3f) === 63) { tag = buf.toString('latin1', p, p + 4); p += 4; }
+    const ver = flags >> 6;
+    const orig = b128();
+    const transformed = (tag === 'glyf' || tag === 'loca') ? ver === 0 : ver !== 0;
+    const len = transformed ? b128() : orig;
+    dir.push({ tag, len });
+  }
+  const data = zlib.brotliDecompressSync(buf.subarray(p, p + compLen));
+  let off = 0;
+  const t = {};
+  for (const d of dir) { t[d.tag] = data.subarray(off, off + d.len); off += d.len; }
+  const c = t.cmap;
+  const cps = new Set();
+  const n = c.readUInt16BE(2);
+  for (let i = 0; i < n; i++) {
+    const pid = c.readUInt16BE(4 + i * 8), eid = c.readUInt16BE(6 + i * 8), o = c.readUInt32BE(8 + i * 8);
+    const fmt = c.readUInt16BE(o);
+    if (fmt === 4 && pid === 3 && eid === 1) {
+      const segX2 = c.readUInt16BE(o + 6);
+      const ends = o + 14, starts = ends + segX2 + 2, deltas = starts + segX2, ranges = deltas + segX2;
+      for (let s = 0; s < segX2 / 2; s++) {
+        const end = c.readUInt16BE(ends + s * 2), start = c.readUInt16BE(starts + s * 2);
+        const delta = c.readInt16BE(deltas + s * 2), ro = c.readUInt16BE(ranges + s * 2);
+        for (let ch = start; ch <= end && ch !== 0xffff; ch++) {
+          let g;
+          if (ro === 0) g = (ch + delta) & 0xffff;
+          else { g = c.readUInt16BE(ranges + s * 2 + ro + (ch - start) * 2); if (g) g = (g + delta) & 0xffff; }
+          if (g) cps.add(ch);
+        }
+      }
+    } else if (fmt === 12) {
+      const groups = c.readUInt32BE(o + 12);
+      for (let g = 0; g < groups; g++) {
+        const st = c.readUInt32BE(o + 16 + g * 12), en = c.readUInt32BE(o + 20 + g * 12);
+        for (let ch = st; ch <= en; ch++) cps.add(ch);
+      }
+    }
+  }
+  return cps;
+}
+const fontFile = (name) => fs.readFileSync(path.join(root, FONT_DIR, name));
+const faces = globals.match(/@font-face\s*\{[^}]*\}/g) || [];
+const faceOf = (fam) => faces.filter((f) => f.includes(`font-family: "${fam}";`));
+
+check('шрифты: только файлы из src/assets/fonts (WOFF2), без Google Fonts / CDN, font-display: swap', () => {
+  assert.ok(faces.length >= 10, `@font-face: ${faces.length}`);
+  for (const f of faces) {
+    const m = f.match(/src: url\("\.\/\.\.\/assets\/fonts\/([\w.-]+\.woff2)"\) format\("woff2"\);/);
+    assert.ok(m, `src не из assets/fonts: ${f.slice(0, 80)}`);
+    assert.equal(fontFile(m[1]).toString('latin1', 0, 4), 'wOF2', m[1]);
+    assert.match(f, /font-display: swap;/);
+    assert.ok(!/https?:|\/\//.test(f.replace(/\/\*[\s\S]*?\*\//g, '').replace(/url\("\.\/\.\.\/assets/g, '')), 'внешний адрес в @font-face');
+  }
+  const css = walk('src').filter((f) => f.endsWith('.css')).map(read).join('\n');
+  for (const f of [globals, doc, app, css]) assert.ok(!/fonts\.gstatic\.com|fonts\.googleapis\.com|@import\s+url\(\s*['"]?https?:/.test(f), 'нет Google Fonts / внешних CSS');
+  assert.ok(!fs.existsSync(path.join(root, FONT_DIR, 'GolosText-VariableFont_wght.ttf')), 'старый файл Golos удалён');
+});
+
+check('шрифты: Museo Sans Cyrl 300/500/700/900, Forum, знаки (₽, стрелки) — с нужными символами', () => {
+  const weights = faceOf('Museo Sans Cyrl').map((f) => f.match(/font-weight: ([\d ]+);/)[1]);
+  assert.deepEqual(weights, ['100 399', '400 599', '600 799', '800 1000']);
+  assert.equal(faceOf('Forum').length, 1);
+  const need = (s) => [...s].map((ch) => ch.codePointAt(0));
+  const RU = 'АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюя';
+  const LAT = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const PUNCT = '«»—–…№©%&@#*+=?!.,:;()[]/"\'öü';
+  for (const name of ['MuseoSansCyrl-300.woff2', 'MuseoSansCyrl-500.woff2', 'MuseoSansCyrl-700.woff2', 'MuseoSansCyrl-900.woff2', 'Forum-Regular.woff2']) {
+    const cps = woff2Cmap(fontFile(name));
+    const miss = need(RU + LAT + PUNCT).filter((c) => !cps.has(c)).map((c) => String.fromCodePoint(c));
+    assert.deepEqual(miss, [], `${name}: нет ${miss.join('')}`);
+  }
+  for (const name of ['GolosSymbols-500.woff2', 'GolosSymbols-700.woff2']) {
+    const cps = woff2Cmap(fontFile(name));
+    const miss = need('₽→←‑²').filter((c) => !cps.has(c)).map((c) => String.fromCodePoint(c));
+    assert.deepEqual(miss, [], `${name}: нет ${miss.join('')}`);
+  }
+  for (const f of [...faceOf('Totus Symbols'), ...faceOf('Golos Text').filter((x) => x.includes('GolosSymbols'))]) {
+    assert.match(f, /unicode-range: U\+00B2-00B3, U\+00B9, U\+2010-2011, U\+20BD, U\+2190-21FF;/);
+  }
+  // старое имя "Golos Text" (виджет Милы) — на файлах Museo и знаках
+  assert.deepEqual(faceOf('Golos Text').map((f) => f.match(/fonts\/([\w.-]+)"/)[1]),
+    ['MuseoSansCyrl-300.woff2', 'MuseoSansCyrl-500.woff2', 'MuseoSansCyrl-700.woff2', 'MuseoSansCyrl-900.woff2', 'GolosSymbols-500.woff2', 'GolosSymbols-700.woff2']);
+});
+
+check('шрифты: везде переменные --font-text / --font-heading, запасные шрифты без засечек; поля наследуют шрифт', () => {
+  assert.match(globals, /--font-text: "Museo Sans Cyrl", "Totus Symbols", [^;]*, sans-serif;/);
+  assert.match(globals, /--font-heading: "Forum", "Totus Symbols", [^;]*, serif;/);
+  assert.match(globals, /body \{[\s\S]*?font-family: var\(--font-text\);/);
+  assert.match(globals, /button,\s*input,\s*select,\s*textarea,\s*optgroup \{\s*font-family: inherit;/);
+  const bad = [];
+  for (const f of walk('src').filter((x) => x.endsWith('.css') && !x.endsWith('globals.css'))) {
+    const body = read(f).replace(/\/\*[\s\S]*?\*\//g, '');
+    for (const m of body.matchAll(/(?<![-\w])font-family\s*:\s*([^;}]*)/g)) {
+      if (!/^(var\(--font-text\)|var\(--font-heading\)|inherit)\s*$/.test(m[1])) bad.push(`${f}: ${m[1]}`);
+    }
+  }
+  assert.deepEqual(bad, []);
+});
+
+check('шрифты: Forum — заголовки и названия отелей (начертание 400, без отрицательной разрядки)', () => {
+  const rule = (file, sel) => {
+    const css = read(file).replace(/\/\*[\s\S]*?\*\//g, '');
+    const esc = sel.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\\>|>/g, '\\s*>\\s*').replace(/ /g, '\\s+');
+    const m = css.match(new RegExp(`(^|[}\\s])${esc}\\s*\\{([^}]*)\\}`));
+    assert.ok(m, `${file} ${sel}`);
+    return m[2];
+  };
+  const heads = [
+    ['src/components/hotelCard/hotelCard.module.css', '.hotelCardName > p'],
+    ['src/components/hotelBox/hotelBox.module.css', '.hotelBoxCardName>p'],
+    ['src/components/hotelDetails/hotelDetails.module.css', '.HotelDetailsHeaderName'],
+    ['src/components/favorites/favorites.module.css', '.title'],
+    ['src/components/selectedTour/selectedtour.module.css', '.selectedTourName'],
+    ['src/components/home/home.module.css', '.hotProductTitle'],
+    ['src/components/home/home.module.css', '.faqContainer > p'],
+    ['src/components/search/search.module.css', '.searchTitle'],
+    ['src/components/UI/collapse/collapse.module.css', '.collapseTitle'],
+    ['src/components/staticInfoPage/staticInfoPage.module.css', '.title'],
+  ];
+  for (const [f, s] of heads) {
+    const b = rule(f, s);
+    assert.match(b, /font-family: var\(--font-heading\);/, `${f} ${s}`);
+    assert.match(b, /font-weight: 400;/, `${f} ${s}`);
+    assert.ok(!/letter-spacing:\s*-/.test(b), `${f} ${s}: отрицательная разрядка`);
+  }
+  // цены и обычный текст — не Forum
+  for (const [f, s] of [['src/components/hotelBox/hotelBox.module.css', '.hotelBoxCardPrice'], ['src/components/hotelCard/hotelCard.module.css', '.hotelCardCheckout > p']]) {
+    assert.ok(!/--font-heading/.test(rule(f, s)), `${f} ${s}`);
+  }
 });
 
 check('тема слайдеров: своя, без шрифта slick и gif; подключена в _app; в компонентах не импортируется', () => {
