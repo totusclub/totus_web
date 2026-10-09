@@ -280,10 +280,18 @@
     background-position: 100% 0;
   }
 }
-@media (max-width: 768px) {
+/* Телефон и планшет (до 1024 px — там уже мобильные шапка и нижнее меню): карточка в столбик.
+   Раньше было до 768 px, и на 769–1024 колонка цены вылезала за край карточки. */
+@media (max-width: 1024px) {
   .hotelCard {
     height: auto;
     flex-direction: column;
+    padding: 12px;
+    border-radius: 16px;
+    gap: 12px;
+  }
+  .hotelCardInfo {
+    width: 100%;
   }
   /* Как в приложении (totus_APP, список отелей): фото на всю ширину карточки, высота 200, радиус 8, cover */
   .hotelCardImage {
@@ -295,6 +303,9 @@
   }
   .hotelCardName > p {
     width: 100%;
+    font-size: 18px;
+    line-height: 24px;
+    letter-spacing: -0.36px;
   }
   .hotelCardHead {
     width: 100%;
@@ -348,13 +359,18 @@
     gap: 10px;
     border-radius: 2px;
     background: var(--primary_green);
+    /* оценка на зелёном — белая в обеих темах (--textPrimaryB в тёмной теме тёмно-серый) */
+    color: #ffffff;
   }
   .hotelCardPriceM {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 4px;
     align-items: flex-start;
     width: 100%;
+  }
+  .hotelCardPriceM > :last-child {
+    margin-top: 8px;
   }
   .hotelCardPriceM > p:nth-child(1) {
     color: var(--textPrimary);

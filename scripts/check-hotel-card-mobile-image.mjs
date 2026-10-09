@@ -7,7 +7,8 @@ import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const css = fs.readFileSync(path.join(root, 'src/components/hotelCard/hotelCard.module.css'), 'utf8');
-const mobile = css.slice(css.indexOf('@media (max-width: 768px)'));
+// Мобильный блок карточки — до 1024 px (раньше до 768 px; на 769–1024 карточка была компьютерной и вылезала за край).
+const mobile = css.slice(css.indexOf('@media (max-width: 1024px)'));
 const rule = (src, sel) => (src.match(new RegExp(`\\${sel} \\{([^}]*)\\}`)) || [])[1] || '';
 
 let passed = 0;

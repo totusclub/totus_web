@@ -144,7 +144,8 @@ const Header = ({ heroTitle: ssrHeroTitle = null }: { heroTitle?: string | null 
                         <Button onClick={() => setAuthModalOpen(true)} title={'Войти'} />
                     )}
                 </div>
-                <div className={styles.headerRowM}>
+                {/* На поиске и билетах справа ещё кнопка фильтров (searchPage.buttonFilterMob) — колокольчик ставим левее неё */}
+                <div className={`${styles.headerRowM} ${showSearch === 'search' || showSearch === 'tickets' ? styles.headerRowMWithFilter : ''}`}>
                     {token && showSearch !== 'hotel-details' ? <NotificationsBell variant="link" /> : null}
                 </div>
             </header>

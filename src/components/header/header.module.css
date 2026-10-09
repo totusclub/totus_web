@@ -306,11 +306,20 @@
   .hide {
     display: none !important;
   }
+  /* «Назад» — зона нажатия 40×40 с отступом 8 px, иконка на прежнем месте (16 px от края) */
   .backM {
     display: flex;
     position: absolute;
-    top: 16px;
-    left: 16px;
+    top: 8px;
+    left: 8px;
+  }
+  .backM > div {
+    display: flex;
+    width: 40px;
+    height: 40px;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
   }
   .logo {
     display: block;
@@ -339,6 +348,25 @@
     display: block;
     width: 48px;
     /*flex: 1 0 0;*/
+  }
+  /* Поиск и билеты: справа кнопка фильтров 40×40 (right: 8px), колокольчик — рядом с ней, шаг 4 px */
+  .headerRowM.headerRowMWithFilter {
+    position: absolute;
+    top: 8px;
+    right: 52px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .headerRowMWithFilter > a {
+    width: 40px;
+    height: 40px;
+  }
+  .headerRowMWithFilter > a > span:last-child {
+    top: 0;
+    right: 0;
   }
   .profileButton {
     display: none;

@@ -13,6 +13,7 @@ import Button from "@/components/UI/button";
 import { pickAppliedFiltersFromHotels, replaceSearchListFilters } from '@/utils/searchListState';
 import SelectedFilters from './selectedFilters';
 import { buildRemoveChipParams, type FilterChip } from '@/utils/filterChips';
+import { MobileHotelCardSkeleton, MobileSearchLoading } from './mobileSkeleton';
 
 interface ResultListProps {
     tickets?: boolean;
@@ -348,11 +349,19 @@ const ResultList = ({ tickets, loading, data, setFiltersRequest }: ResultListPro
 
     return (
         <div className={styles.resultList}>
-            <Progress title={'Ищем подходящие туры'} loading={isSearching} />
+            {/* Компьютер — прежние Progress и полоска; телефон и планшет — блок той же высоты, что теги и сортировка */}
+            <div className={styles.desktopOnly}>
+                <Progress title={'Ищем подходящие туры'} loading={isSearching} />
 
+                {isSearching && (
+                    <div className={styles.resultListSorting}>
+                        <div className={styles.animationTextlazy} style={{ width: '30%', height: '16px' }}></div>
+                    </div>
+                )}
+            </div>
             {isSearching && (
-                <div className={styles.resultListSorting}>
-                    <div className={styles.animationTextlazy} style={{ width: '30%', height: '16px' }}></div>
+                <div className={styles.mobileOnly}>
+                    <MobileSearchLoading title={'Ищем подходящие туры'} />
                 </div>
             )}
 
@@ -386,9 +395,16 @@ const ResultList = ({ tickets, loading, data, setFiltersRequest }: ResultListPro
             <div className={styles.resultListItems}>
                 {showSkeleton && (
                     <>
-                        <HotelCard lazy request_id={data?.request_id} item={null} />
-                        <HotelCard lazy request_id={data?.request_id} item={null} />
-                        <HotelCard lazy request_id={data?.request_id} item={null} />
+                        <div className={styles.desktopOnly}>
+                            <HotelCard lazy request_id={data?.request_id} item={null} />
+                            <HotelCard lazy request_id={data?.request_id} item={null} />
+                            <HotelCard lazy request_id={data?.request_id} item={null} />
+                        </div>
+                        <div className={styles.mobileOnly}>
+                            <MobileHotelCardSkeleton />
+                            <MobileHotelCardSkeleton />
+                            <MobileHotelCardSkeleton />
+                        </div>
                     </>
                 )}
 
