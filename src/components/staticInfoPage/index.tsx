@@ -18,6 +18,8 @@ export type StaticInfoPageProps = {
     currentLabel: string;
     /** Overrides middle breadcrumb label (default is from section). */
     breadcrumbMid?: string;
+    /** Без общей белой карточки и заголовка: страница сама рисует блоки и свой h1 (центр помощи /help-faq). */
+    plain?: boolean;
     children: ReactNode;
 };
 
@@ -26,6 +28,7 @@ export function StaticInfoPage({
     section,
     currentLabel,
     breadcrumbMid,
+    plain = false,
     children,
 }: StaticInfoPageProps) {
     const mid = breadcrumbMid ?? SECTION_DEFAULT_MID[section];
@@ -50,10 +53,14 @@ export function StaticInfoPage({
                         </span>
                     </nav>
 
-                    <article className={styles.card}>
-                        <h1 className={styles.title}>{title}</h1>
-                        {children}
-                    </article>
+                    {plain ? (
+                        children
+                    ) : (
+                        <article className={styles.card}>
+                            <h1 className={styles.title}>{title}</h1>
+                            {children}
+                        </article>
+                    )}
                 </div>
             </div>
         </main>

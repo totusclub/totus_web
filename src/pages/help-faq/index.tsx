@@ -17,6 +17,7 @@ export default function HelpFaqPage() {
                 section={def.section}
                 currentLabel="Частые вопросы"
                 breadcrumbMid="Помощь"
+                plain
             >
                 <FaqContent />
             </StaticInfoPage>

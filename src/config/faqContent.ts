@@ -5,17 +5,42 @@ export type FaqItem = {
     steps?: string[];
 };
 
+/** Иконка раздела — см. HelpIcon в components/infoPages/helpIcons.tsx */
+export type FaqIcon =
+    | 'sun' | 'hotel' | 'plane' | 'card' | 'file' | 'refresh'
+    | 'luggage' | 'sparkle' | 'phone' | 'user' | 'smartphone' | 'shield';
+
 export type FaqGroup = {
+    /** Якорь раздела: /help-faq#<id> */
+    id: string;
     title: string;
+    icon: FaqIcon;
     items: FaqItem[];
 };
+
+export const HELP_HERO = {
+    title: 'Чем мы можем помочь?',
+    text: 'Ответы на вопросы о турах, отелях, перелётах, оплате и поездке. Если ответа нет — напишите в поддержку, мы ответим в чате.',
+};
+
+/** «Часто ищут»: подпись чипа и текст, который подставляется в поиск. */
+export const HELP_POPULAR: { label: string; query: string }[] = [
+    { label: 'Возврат денег', query: 'возврат' },
+    { label: 'Документы на поездку', query: 'документы' },
+    { label: 'Оплата через СБП', query: 'быстрых платежей' },
+    { label: 'Данные туристов', query: 'данные туристов' },
+    { label: 'Багаж', query: 'багаж' },
+    { label: 'Звонок в поддержку', query: 'позвонить' },
+];
 
 export const FAQ_INTRO =
     'Собрали ответы на вопросы, которые нам задают чаще всего. Если ответа нет, напишите в поддержку — чат есть в Аккаунте на сайте и в приложении.';
 
 export const FAQ_GROUPS: FaqGroup[] = [
     {
+        id: 'tours',
         title: 'Туры с перелётом',
+        icon: 'sun',
         items: [
             {
                 q: 'Как купить тур на Totus Club?',
@@ -56,7 +81,9 @@ export const FAQ_GROUPS: FaqGroup[] = [
         ],
     },
     {
+        id: 'hotels',
         title: 'Отели без перелёта',
+        icon: 'hotel',
         items: [
             {
                 q: 'Можно ли забронировать только отель, без перелёта?',
@@ -79,7 +106,9 @@ export const FAQ_GROUPS: FaqGroup[] = [
         ],
     },
     {
+        id: 'flights',
         title: 'Перелёты и багаж',
+        icon: 'plane',
         items: [
             {
                 q: 'Какой авиакомпанией я полечу?',
@@ -108,7 +137,9 @@ export const FAQ_GROUPS: FaqGroup[] = [
         ],
     },
     {
+        id: 'payment',
         title: 'Оплата',
+        icon: 'card',
         items: [
             {
                 q: 'Как можно оплатить заказ?',
@@ -137,7 +168,9 @@ export const FAQ_GROUPS: FaqGroup[] = [
         ],
     },
     {
+        id: 'orders',
         title: 'Заказы и документы',
+        icon: 'file',
         items: [
             {
                 q: 'Где и как получить документы?',
@@ -166,7 +199,9 @@ export const FAQ_GROUPS: FaqGroup[] = [
         ],
     },
     {
+        id: 'refund',
         title: 'Изменение, отмена и возврат',
+        icon: 'refresh',
         items: [
             {
                 q: 'Как изменить или отменить заказ?',
@@ -190,7 +225,9 @@ export const FAQ_GROUPS: FaqGroup[] = [
         ],
     },
     {
+        id: 'trip',
         title: 'Перед поездкой',
+        icon: 'luggage',
         items: [
             {
                 q: 'Нужна ли виза?',
@@ -213,7 +250,9 @@ export const FAQ_GROUPS: FaqGroup[] = [
         ],
     },
     {
+        id: 'mila',
         title: 'Мила — ИИ-ассистент',
+        icon: 'sparkle',
         items: [
             {
                 q: 'Кто такая Мила?',
@@ -236,7 +275,9 @@ export const FAQ_GROUPS: FaqGroup[] = [
         ],
     },
     {
+        id: 'support',
         title: 'Поддержка: чат и звонок',
+        icon: 'phone',
         items: [
             {
                 q: 'Как написать в поддержку?',
@@ -259,7 +300,9 @@ export const FAQ_GROUPS: FaqGroup[] = [
         ],
     },
     {
+        id: 'account',
         title: 'Аккаунт и вход',
+        icon: 'user',
         items: [
             {
                 q: 'Как войти в Аккаунт?',
@@ -288,7 +331,9 @@ export const FAQ_GROUPS: FaqGroup[] = [
         ],
     },
     {
+        id: 'apps',
         title: 'Приложения и уведомления',
+        icon: 'smartphone',
         items: [
             {
                 q: 'Есть ли у вас мобильное приложение?',
@@ -305,7 +350,9 @@ export const FAQ_GROUPS: FaqGroup[] = [
         ],
     },
     {
+        id: 'security',
         title: 'Безопасность и данные',
+        icon: 'shield',
         items: [
             {
                 q: 'Как вы защищаете мои данные?',
