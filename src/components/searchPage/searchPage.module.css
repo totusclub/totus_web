@@ -243,7 +243,22 @@
 .buttonFilterMob {
   display: none;
 }
+/* Загрузка: на компьютере прежние Progress и карточки-заглушки HotelCard lazy,
+   на телефоне и планшете — своя заглушка по форме настоящей карточки (mobileSkeleton.tsx).
+   display: contents — обёртка не меняет раскладку списка. */
+.desktopOnly {
+  display: contents;
+}
+.mobileOnly {
+  display: none;
+}
 @media (max-width: 1024px) {
+  .desktopOnly {
+    display: none;
+  }
+  .mobileOnly {
+    display: contents;
+  }
   .stepsWrapper {
     display: none;
   }
@@ -255,7 +270,7 @@
   }
   .resultListSelectedFilter {
     display: flex;
-    margin-top: 10px;
+    margin-top: 0;
     position: relative;
     padding: 12px;
     gap: 12px;
@@ -280,22 +295,45 @@
     border-radius: 14px;
     flex-shrink: 0;
   }
+  /* Шаг 12 px между блоками; внизу — место под нижнее меню (60 px) + 16 px + безопасная зона iPhone
+     (20 px снизу уже даёт .searchContainer). */
   .resultList {
     width: 100%;
-    margin-bottom: 60px;
+    margin-bottom: 0;
+    gap: 12px;
+    padding-bottom: calc(56px + env(safe-area-inset-bottom, 0px));
   }
+  .resultListItems {
+    gap: 12px;
+  }
+  /* Кнопка фильтров в шапке: 40×40 с отступом 8 px, как «назад»; колокольчик — левее (header.headerRowMWithFilter) */
   .buttonFilterMob {
     display: flex;
-    justify-content: flex-end;
+    justify-content: center;
     align-items: center;
-    width: 36px;
-    height: 56px;
+    width: 40px;
+    height: 40px;
     position: fixed;
-    top: 0;
-    right: 15px;
-    text-align: right;
-    /*padding-top: 16px;*/
+    top: 8px;
+    right: 8px;
     z-index: 900000;
+    cursor: pointer;
+  }
+  /* Счётчик фильтров — как значок колокольчика (notifications.bellBadge): оранжевый, с обводкой цвета фона */
+  .buttonFilterMob .filterBadge {
+    top: 0;
+    right: 0;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 9px;
+    background: var(--core_Orange);
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 18px;
+    border: 2px solid var(--bgPrimary);
+    box-sizing: content-box;
   }
   .resultListSorting {
     /*display: none;*/
@@ -400,9 +438,12 @@
     overscroll-behavior-y: contain;
     touch-action: pan-y;
   }
+  /* Первый блок — через 12 px после шапки (56 px). На 769–1024 у main нет отступа сверху: 56 + 12. */
   .searchResultWrapper {
     width: 100%;
     flex-direction: column;
+    gap: 12px;
+    margin-top: 68px;
   }
   .animationTextlazy {
     height: 8px;
@@ -462,7 +503,18 @@
     line-height: 20px;
   }
 }
+/* Планшет: мобильные карточки в две колонки */
+@media (min-width: 600px) and (max-width: 1024px) {
+  .resultListItems {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
 @media (max-width: 768px) {
+  /* До 768 px у .searchContainer уже есть margin-top 35 px + padding-top 1 px (globals.css): 36 + 32 = 68 */
+  .searchResultWrapper {
+    margin-top: 32px;
+  }
   /* Селект здесь без рамки и фона — боковые поля 16 px только сдвигали текст и съедали место. */
   .resultListSorting > p + :last-child [role='combobox'] {
     padding-left: 0;
@@ -475,5 +527,105 @@
   }
   100% {
     background-position: 100% 0;
+  }
+}
+
+/* ---------- Загрузка на телефоне и планшете (mobileSkeleton.tsx) ----------
+   Те же размеры, что у настоящих блоков, чтобы после загрузки ничего не сдвигалось:
+   блок «Ищем подходящие туры» = блок тегов и сортировки (120 px),
+   карточка = HotelCard на телефоне (фото 200, звёзды, название, отзывы, теги, цена, дата, кнопка 48). */
+.skeleton {
+  background: linear-gradient(90deg, var(--bgSecondary) 25%, var(--bgTertiary) 37%, var(--bgSecondary) 63%);
+  background-size: 400% 100%;
+  animation: placeholderShimmer 1.5s ease-in-out infinite;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+.mobileLoading {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 12px;
+  height: 120px;
+  padding: 12px 16px;
+  border-radius: 16px;
+  background: var(--bgPrimary);
+}
+.mobileLoadingTitle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 0;
+  color: var(--textPrimary);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 20px;
+  letter-spacing: -0.32px;
+}
+.mobileLoadingSpin {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--core_Orange);
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: mobileLoadingSpin 1s linear infinite;
+}
+@keyframes mobileLoadingSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.mobileLoadingBar {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--bgSecondary);
+  overflow: hidden;
+}
+.mobileLoadingBar > span {
+  display: block;
+  height: 100%;
+  width: 0;
+  border-radius: 2px;
+  background: var(--core_Orange);
+  animation: mobileLoadingFill 30s ease-in-out forwards;
+}
+@keyframes mobileLoadingFill {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+.mobileLoadingChips {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+.skeletonCard {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 16px;
+  border: 1px solid var(--borderTertiary);
+  background: var(--bgPrimary);
+}
+.skeletonCardInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.skeletonRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .skeleton,
+  .mobileLoadingSpin {
+    animation: none;
   }
 }
