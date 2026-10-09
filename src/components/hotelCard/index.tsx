@@ -12,6 +12,7 @@ import {
     listRoomPickToQueryParams,
     resolveActiveSearchMealCodes,
 } from "@/utils/listRoomPick";
+import { groupThousands, RUB_SUFFIX } from "@/utils/formatPrice";
 import { markSearchListForRestore, pickAppliedFiltersFromHotels, readSearchListState, replaceSearchListFilters } from "@/utils/searchListState";
 
 interface HotelCardState {
@@ -390,7 +391,7 @@ const HotelCard = ({ item, lazy }: HotelCardState) => {
                         ))}
                     </div>
                     <div className={styles.hotelCardPriceM}>
-                        <p>от {analytics_min_price?.toString()?.replace(/\B(?=(\d{3})+(?!\d))/g, '\u202F')}₽</p>
+                        <p>от {analytics_min_price != null ? groupThousands(analytics_min_price) : ''}{RUB_SUFFIX}</p>
                         <p>от {formattedDate}, на {min_price_nights} ночей</p>
                         <Button onClick={handleClick} full={true} title={'Выбрать'} />
                     </div>
@@ -404,7 +405,7 @@ const HotelCard = ({ item, lazy }: HotelCardState) => {
                         )}
                     </div>
                     <div className={styles.hotelCardCheckout}>
-                        <p>от {analytics_min_price?.toString()?.replace(/\B(?=(\d{3})+(?!\d))/g, '\u202F')}₽</p>
+                        <p>от {analytics_min_price != null ? groupThousands(analytics_min_price) : ''}{RUB_SUFFIX}</p>
                         <Button onClick={handleClick} full={true} title={'Выбрать'} />
                         <div className={styles.hotelCardDate}>
                             <p>c {formattedDate}, на {min_price_nights} ночей</p>
