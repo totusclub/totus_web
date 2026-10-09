@@ -84,18 +84,123 @@ body {
   --hoverPrimary: #4c4c4c;
 }
 /*
- * Golos Text — только с нашего сервера (totus.club), без Google Fonts.
- * Переменный шрифт (все начертания в одном файле): src/assets/fonts → Next кладёт его в
- * /_next/static/media/… с хешем в имени (кеш на год). Если файл не загрузился, тот же
- * "Golos Text" берётся из системных шрифтов без засечек (local), а не Times New Roman.
+ * Шрифты сайта — только из репозитория (src/assets/fonts), без Google Fonts и CDN.
+ * Next кладёт файлы в /_next/static/media/… с хешем в имени (кеш на год).
+ *   --font-text    — Museo Sans Cyrl: весь текст интерфейса. Начертания: 100–399 → 300, 400–599 → 500,
+ *                    600–799 → 700, 800+ → 900 (как на утверждённой доске: Regular/Medium → 500, SemiBold/Bold → 700).
+ *   --font-heading — Forum: заголовки разделов и названия отелей (одно начертание, поэтому font-weight: 400).
+ * В Museo и Forum нет ₽, стрелок и неразрывного дефиса — эти знаки берутся из «Totus Symbols»
+ * (подмножество Golos Text, OFL), только когда они есть на странице (unicode-range).
+ * Старое имя "Golos Text" (виджет Милы и прежние стили) указывает на те же файлы Museo.
  */
 @font-face {
-  font-family: "Golos Text";
-  src: url("./../assets/fonts/GolosText-VariableFont_wght.ttf") format("truetype"),
-    local("Arial"), local("Helvetica"), local("Roboto");
-  font-weight: 100 900; /* variable font weight range */
+  font-family: "Museo Sans Cyrl";
+  src: url("./../assets/fonts/MuseoSansCyrl-300.woff2") format("woff2");
+  font-weight: 100 399;
   font-style: normal;
   font-display: swap;
+}
+@font-face {
+  font-family: "Museo Sans Cyrl";
+  src: url("./../assets/fonts/MuseoSansCyrl-500.woff2") format("woff2");
+  font-weight: 400 599;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Museo Sans Cyrl";
+  src: url("./../assets/fonts/MuseoSansCyrl-700.woff2") format("woff2");
+  font-weight: 600 799;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Museo Sans Cyrl";
+  src: url("./../assets/fonts/MuseoSansCyrl-900.woff2") format("woff2");
+  font-weight: 800 1000;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Golos Text";
+  src: url("./../assets/fonts/MuseoSansCyrl-300.woff2") format("woff2");
+  font-weight: 100 399;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Golos Text";
+  src: url("./../assets/fonts/MuseoSansCyrl-500.woff2") format("woff2");
+  font-weight: 400 599;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Golos Text";
+  src: url("./../assets/fonts/MuseoSansCyrl-700.woff2") format("woff2");
+  font-weight: 600 799;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Golos Text";
+  src: url("./../assets/fonts/MuseoSansCyrl-900.woff2") format("woff2");
+  font-weight: 800 1000;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Golos Text";
+  src: url("./../assets/fonts/GolosSymbols-500.woff2") format("woff2");
+  font-weight: 100 599;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+00B2-00B3, U+00B9, U+2010-2011, U+20BD, U+2190-21FF;
+}
+@font-face {
+  font-family: "Golos Text";
+  src: url("./../assets/fonts/GolosSymbols-700.woff2") format("woff2");
+  font-weight: 600 1000;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+00B2-00B3, U+00B9, U+2010-2011, U+20BD, U+2190-21FF;
+}
+@font-face {
+  font-family: "Forum";
+  src: url("./../assets/fonts/Forum-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Totus Symbols";
+  src: url("./../assets/fonts/GolosSymbols-500.woff2") format("woff2");
+  font-weight: 100 599;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+00B2-00B3, U+00B9, U+2010-2011, U+20BD, U+2190-21FF;
+}
+@font-face {
+  font-family: "Totus Symbols";
+  src: url("./../assets/fonts/GolosSymbols-700.woff2") format("woff2");
+  font-weight: 600 1000;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+00B2-00B3, U+00B9, U+2010-2011, U+20BD, U+2190-21FF;
+}
+
+:root {
+  --font-text: "Museo Sans Cyrl", "Totus Symbols", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  --font-heading: "Forum", "Totus Symbols", Georgia, "Times New Roman", serif;
+}
+
+/* Поля ввода и кнопки по умолчанию не наследуют шрифт страницы */
+button,
+input,
+select,
+textarea,
+optgroup {
+  font-family: inherit;
 }
 
 .content {
@@ -124,7 +229,7 @@ body {
 body {
   margin: 0;
   padding: 0;
-  font-family: "Golos Text", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  font-family: var(--font-text);
   transition: background-color 0.3s, color 0.3s;
   background: var(--bgPrimary);
   color: var(--textPrimary);

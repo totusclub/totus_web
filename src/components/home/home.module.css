@@ -7,13 +7,14 @@
 }
 
 .hotProductTitle {
+  font-family: var(--font-heading);
   color: var(--textPrimary);
   /*font-family: "Golos Text";*/
   font-size: 32px;
   font-style: normal;
   font-weight: 400;
   line-height: 40px; /* 125% */
-  letter-spacing: -0.64px;
+  letter-spacing: 0;
   margin-top: 16px;
   margin-bottom: 24px;
 }
@@ -114,6 +115,7 @@
   border-radius: 8px;
 }
 .serviceItemTitle {
+  font-family: var(--font-heading);
   color: var(--textPrimary);
   /* Headline/Regular */
   /*font-family: "Golos Text";*/
@@ -121,7 +123,7 @@
   font-style: normal;
   font-weight: 400;
   line-height: 24px; /* 120% */
-  letter-spacing: -0.4px;
+  letter-spacing: 0;
 }
 .serviceItemText {
   color: var(--textTertiary);
@@ -184,6 +186,7 @@
   letter-spacing: -0.24px;
 }
 .tourItemTitle {
+  font-family: var(--font-heading);
   color: var(--textPrimary);
   /* Body - Caption/Regular */
   /*font-family: "Golos Text";*/
@@ -191,7 +194,7 @@
   font-style: normal;
   font-weight: 400;
   line-height: 18px; /* 128.571% */
-  letter-spacing: -0.28px;
+  letter-spacing: 0;
 }
 .tourItemText {
   color: var(--textTertiary, #7a7a7a);
@@ -317,7 +320,7 @@
   transform: translateX(0);
   text-align: center;
   color: var(--textPrimary);
-  font-family: "Nocturne Serif";
+  font-family: var(--font-heading);
   font-size: 38px;
   font-style: normal;
   font-weight: 400;
@@ -394,7 +397,7 @@
   align-items: center;
   height: 823px;
   position: relative;
-  font-family: "Georgia", serif;
+  font-family: var(--font-heading);
   width: 100%;
   max-width: 1280px;
   margin: 0 auto;
@@ -421,7 +424,7 @@
 }
 .categoryItem > p {
   color: var(--textPrimary);
-  font-family: "Nocturne Serif";
+  font-family: var(--font-heading);
   font-size: 38px;
   font-style: normal;
   font-weight: 400;
@@ -580,12 +583,12 @@
 .recomendDeslistItemInfo > a {
   color: var(--primary_b);
   /* Title S/Semibold */
-  font-family: "Golos Text";
+  font-family: var(--font-heading);
   font-size: 24px;
   font-style: normal;
-  font-weight: 600;
+  font-weight: 400;
   line-height: 32px; /* 133.333% */
-  letter-spacing: -0.48px;
+  letter-spacing: 0;
   display: flex;
   gap: 8px;
   align-items: center;
@@ -593,6 +596,8 @@
 }
 
 .recomendDeslistItemInfoText {
+  font-family: var(--font-heading);
+  font-weight: 400;
   display: flex;
   align-items: center;
   color: var(--primary_b);
@@ -655,12 +660,12 @@
   color: var(--textPrimaryB);
   text-align: center;
   /* Title S/Semibold */
-  font-family: "Golos Text";
+  font-family: var(--font-heading);
   font-size: 24px;
   font-style: normal;
-  font-weight: 600;
+  font-weight: 400;
   line-height: 32px; /* 133.333% */
-  letter-spacing: -0.48px;
+  letter-spacing: 0;
 }
 .formRequestCallBtn {
   display: flex;
@@ -694,7 +699,7 @@
 }
 .formRequestCallBtn > p {
   color: var(--textPrimary);
-  font-family: "Golos Text";
+  font-family: var(--font-text);
   font-size: 16px;
   font-style: normal;
   font-weight: 500;
@@ -704,7 +709,7 @@
 }
 .formRequestCallBtnDisable > p {
   color: var(--textPrimaryB);
-  font-family: "Golos Text";
+  font-family: var(--font-text);
   font-size: 16px;
   font-style: normal;
   font-weight: 500;
@@ -726,7 +731,7 @@
   border: 1px solid var(--borderTertiary);
   background: var(--bgPrimary);
   color: var(--textPrimary);
-  font-family: "Golos Text";
+  font-family: var(--font-text);
   font-size: 16px;
   outline: none;
   box-sizing: border-box;
@@ -739,14 +744,14 @@
   margin: 0 0 14px;
   color: #86efac;
   text-align: center;
-  font-family: "Golos Text";
+  font-family: var(--font-text);
   font-size: 14px;
   line-height: 20px;
 }
 .formRequestCallText > p {
   color: #fff;
   text-align: center;
-  font-family: "Golos Text";
+  font-family: var(--font-text);
   font-size: 10px;
   font-style: normal;
   font-weight: 400;
@@ -775,12 +780,12 @@
   color: var(--textPrimary);
   text-align: center;
   /* Title M/Regular */
-  font-family: "Golos Text";
+  font-family: var(--font-heading);
   font-size: 32px;
   font-style: normal;
   font-weight: 400;
   line-height: 40px; /* 125% */
-  letter-spacing: -0.64px;
+  letter-spacing: 0;
 }
 .recomendlistMob {
   display: none;
@@ -905,7 +910,7 @@
   .hotProductTitle {
     font-size: 20px;
     line-height: 24px;
-    font-weight: 500;
+    font-weight: 400;
     margin: 0 16px 12px;
     padding-right: 0;
   }
@@ -996,6 +1001,7 @@
   }
 
   .tabButton {
+    font-family: var(--font-heading);
     flex: 0 0 auto;
     padding: 10px 10px;
     /*font-size: 14px;*/
@@ -1052,7 +1058,7 @@
     margin: 0;
     color: #ffffff;
     font-size: 18px;
-    font-weight: 600;
+    font-weight: 400;
     line-height: 24px;
   }
 }

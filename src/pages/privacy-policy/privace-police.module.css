@@ -2,15 +2,15 @@
 .h1 {
   font-size: 1.6rem;
   margin-bottom: 6px;
-  font-family: "Golos Text", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: var(--font-heading);
   color: var(--textPrimary);
-  font-weight: 800; /* very bold */
+  font-weight: 400;
 }
 
 .h2 {
   font-size: 1.15rem;
   margin-top: 20px;
-  font-family: "Golos Text", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: var(--font-text);
   color: var(--textPrimary);
   font-weight: 700; /* bold */
 }
@@ -18,14 +18,14 @@
 .h3 {
   font-size: 1rem;
   margin-top: 12px;
-  font-family: "Golos Text", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: var(--font-text);
   color: var(--textPrimary);
   font-weight: 600; /* semi-bold */
 }
 
 .p {
   margin: 8px 0;
-  font-family: "Golos Text", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: var(--font-text);
   color: var(--textPrimary);
   font-weight: 500; /* small bold */
 }
@@ -33,7 +33,7 @@
 .ol,
 .ul {
   margin: 8px 0 8px 20px;
-  font-family: "Golos Text", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: var(--font-text);
   color: var(--textPrimary);
   font-weight: 500; /* small bold */
 }
@@ -42,7 +42,7 @@
   border-collapse: collapse;
   width: 100%;
   margin: 8px 0;
-  font-family: "Golos Text", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: var(--font-text);
   color: var(--textPrimary);
   font-weight: 500; /* small bold */
 }
@@ -52,14 +52,14 @@
   border: 1px solid #ddd;
   padding: 8px;
   text-align: left;
-  font-family: "Golos Text", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: var(--font-text);
   color: var(--textPrimary);
   font-weight: 500; /* small bold */
 }
 
 .note {
   font-size: 0.95rem;
-  font-family: "Golos Text", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: var(--font-text);
   color: var(--textSecondary);
   font-weight: 500; /* small bold */
 }

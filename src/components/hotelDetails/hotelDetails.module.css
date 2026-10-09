@@ -51,13 +51,14 @@
   letter-spacing: -0.24px;
 }
 .HotelDetailsHeaderName {
+  font-family: var(--font-heading);
   color: var(--textPrimary);
   /*font-family: "Golos Text";*/
   font-size: 32px;
   font-style: normal;
-  font-weight: 500;
+  font-weight: 400;
   line-height: 40px;
-  letter-spacing: -0.64px;
+  letter-spacing: 0;
 }
 .HotelDetailsHeaderAddress {
   color: var(--textTertiary);
@@ -137,11 +138,12 @@
   margin-left: 16px;
 }
 .HotelDetailsInfoPriceEmptyTitle {
+  font-family: var(--font-heading);
   color: var(--textPrimary);
   font-size: 22px;
-  font-weight: 600;
+  font-weight: 400;
   line-height: 28px;
-  letter-spacing: -0.44px;
+  letter-spacing: 0;
   margin: 0 0 0 16px;
 }
 .HotelDetailsInfoDate {
@@ -342,13 +344,14 @@
   scroll-margin-top: 24px;
 }
 .HotelDetailsRoomsHead > p {
+  font-family: var(--font-heading);
   color: var(--textPrimary);
   /*font-family: "Golos Text";*/
   font-size: 20px;
   font-style: normal;
-  font-weight: 500;
+  font-weight: 400;
   line-height: 24px; /* 120% */
-  letter-spacing: -0.4px;
+  letter-spacing: 0;
 }
 .HotelDetailsRoomsHead .HotelDetailsRoomFiltersLoading {
   margin: 0;
@@ -564,12 +567,13 @@
   display: block;
 }
 .HotelDetailsRoomsNotFoundTitle {
+  font-family: var(--font-heading);
   margin: 0;
   color: var(--textPrimary);
   font-size: 22px;
-  font-weight: 600;
+  font-weight: 400;
   line-height: 28px;
-  letter-spacing: -0.04em;
+  letter-spacing: 0;
 }
 .HotelDetailsRoomsNotFoundText {
   margin: 0;
@@ -726,13 +730,14 @@
   align-self: stretch;
 }
 .HotelDetailsRoomInforamation > p {
+  font-family: var(--font-heading);
   color: var(--textPrimary, #1f1f1f);
   /*font-family: "Golos Text";*/
   font-size: 20px;
   font-style: normal;
-  font-weight: 500;
+  font-weight: 400;
   line-height: 24px; /* 120% */
-  letter-spacing: -0.4px;
+  letter-spacing: 0;
 }
 .HotelDetailsRoomOptions {
   display: flex;
@@ -1021,13 +1026,14 @@
   border-bottom: 1px solid var(--borderTertiary);
 }
 .HotelDetailsServicesHead > p {
+  font-family: var(--font-heading);
   color: var(--textPrimary, #1f1f1f);
   /*font-family: "Golos Text";*/
   font-size: 20px;
   font-style: normal;
-  font-weight: 500;
+  font-weight: 400;
   line-height: 24px; /* 120% */
-  letter-spacing: -0.4px;
+  letter-spacing: 0;
 }
 .HotelDetailsServicesBody {
   padding: 16px;
@@ -1042,7 +1048,7 @@
   text-align: right;
   leading-trim: both;
   text-edge: cap;
-  font-family: "Golos Text";
+  font-family: var(--font-text);
   font-size: 12px;
   font-style: normal;
   font-weight: 400;
@@ -1062,7 +1068,7 @@
   text-align: center;
   leading-trim: both;
   text-edge: cap;
-  font-family: "Golos Text";
+  font-family: var(--font-text);
   font-size: 16px;
   font-style: normal;
   font-weight: 500;

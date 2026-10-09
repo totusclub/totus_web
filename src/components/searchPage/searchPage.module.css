@@ -163,18 +163,18 @@
 .emptyStateTitle {
   margin: 0;
   color: var(--textPrimary);
-  font-family: "Golos Text", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: var(--font-heading);
   font-size: 28px;
   line-height: 34px;
-  letter-spacing: -0.04em;
-  font-weight: 600;
+  letter-spacing: 0;
+  font-weight: 400;
 }
 
 .emptyStateText {
   margin: 0;
   max-width: 640px;
   color: var(--textSecondary);
-  font-family: "Golos Text", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: var(--font-text);
   font-size: 16px;
   line-height: 24px;
   letter-spacing: -0.02em;
@@ -182,7 +182,7 @@
 }
 
 .emptyState :global(button) {
-  font-family: "Golos Text", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: var(--font-text);
   font-size: 18px;
   line-height: 24px;
   font-weight: 600;
@@ -382,7 +382,7 @@
   }
   .mobileFilterHeader > p:nth-child(1) {
     color: var(--textPrimary);
-    font-family: "Golos Text";
+    font-family: var(--font-text);
     font-size: 16px;
     font-style: normal;
     font-weight: 500;
@@ -392,7 +392,7 @@
   .mobileFilterHeader > p:nth-child(2) {
     color: var(--core_Orange);
     text-align: right;
-    font-family: "Golos Text";
+    font-family: var(--font-text);
     font-size: 16px;
     font-style: normal;
     font-weight: 500;

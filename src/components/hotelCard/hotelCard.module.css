@@ -47,7 +47,7 @@
   text-align: right;
   leading-trim: both;
   text-edge: cap;
-  font-family: "Golos Text";
+  font-family: var(--font-text);
   font-size: 12px;
   font-style: normal;
   font-weight: 400;
@@ -67,7 +67,7 @@
   text-align: center;
   leading-trim: both;
   text-edge: cap;
-  font-family: "Golos Text";
+  font-family: var(--font-text);
   font-size: 16px;
   font-style: normal;
   font-weight: 500;
@@ -158,13 +158,14 @@
   /*max-width: 100%;*/
 }
 .hotelCardName > p {
+  font-family: var(--font-heading);
   color: var(--textPrimary, #1f1f1f);
   /*font-family: "Golos Text";*/
   font-size: 20px;
   font-style: normal;
-  font-weight: 500;
+  font-weight: 400;
   line-height: 24px;
-  letter-spacing: -0.4px;
+  letter-spacing: 0;
   white-space: nowrap; /* Prevent line breaks */
   overflow: hidden; /* Hide overflowed content */
   text-overflow: ellipsis;
@@ -305,7 +306,7 @@
     width: 100%;
     font-size: 18px;
     line-height: 24px;
-    letter-spacing: -0.36px;
+    letter-spacing: 0;
   }
   .hotelCardHead {
     width: 100%;
@@ -330,7 +331,7 @@
     text-align: right;
     leading-trim: both;
     text-edge: cap;
-    font-family: "Golos Text";
+    font-family: var(--font-text);
     font-size: 12px;
     font-style: normal;
     font-weight: 400;
@@ -346,7 +347,7 @@
     text-align: center;
     leading-trim: both;
     text-edge: cap;
-    font-family: "Golos Text";
+    font-family: var(--font-text);
     font-size: 12px;
     font-style: normal;
     font-weight: 400;
@@ -374,7 +375,7 @@
   }
   .hotelCardPriceM > p:nth-child(1) {
     color: var(--textPrimary);
-    font-family: "Golos Text";
+    font-family: var(--font-text);
     font-size: 20px;
     font-style: normal;
     font-weight: 500;
@@ -389,7 +390,7 @@
   }
   .hotelCardPriceM > p:last-of-type {
     color: var(--textTertiary);
-    font-family: "Golos Text";
+    font-family: var(--font-text);
     font-size: 14px;
     font-style: normal;
     font-weight: 400;

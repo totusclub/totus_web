@@ -18,7 +18,7 @@
   border-radius: 14px;
   background: #1d1346;
   color: #ffffff;
-  font-family: "Golos Text", system-ui, sans-serif;
+  font-family: var(--font-text);
   font-size: 16px;
   font-weight: 600;
   line-height: 20px;

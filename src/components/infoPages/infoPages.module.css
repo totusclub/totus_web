@@ -40,22 +40,24 @@
 }
 
 .sectionTitle {
+  font-family: var(--font-heading);
   margin: 0 0 24px;
   font-size: 20px;
   line-height: 24px;
-  font-weight: 500;
+  font-weight: 400;
   color: var(--textPrimary);
 }
 
 /* Заголовок с оранжевым номером: «1 Туры и отели», «1 Поиск и бронирование» */
 .numHeading {
+  font-family: var(--font-heading);
   display: flex;
   align-items: center;
   gap: 12px;
   margin: 32px 0 16px;
   font-size: 24px;
   line-height: 32px;
-  font-weight: 500;
+  font-weight: 400;
   color: var(--textPrimary);
 }
 
@@ -388,11 +390,12 @@
 }
 
 .helpTitle {
+  font-family: var(--font-heading);
   margin: 0 0 8px;
   font-size: 32px;
   line-height: 40px;
-  font-weight: 600;
-  letter-spacing: -0.04em;
+  font-weight: 400;
+  letter-spacing: 0;
 }
 
 .helpMuted {
@@ -525,10 +528,11 @@
 }
 
 .tilesTitle {
+  font-family: var(--font-heading);
   margin: 8px 0 -4px;
   font-size: 22px;
   line-height: 28px;
-  font-weight: 600;
+  font-weight: 400;
 }
 
 .tiles {
@@ -653,10 +657,11 @@
 }
 
 .helpCardTitle {
+  font-family: var(--font-heading);
   margin: 0 0 8px;
   font-size: 24px;
   line-height: 32px;
-  font-weight: 600;
+  font-weight: 400;
 }
 
 .resultsHead {
