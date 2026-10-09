@@ -168,7 +168,7 @@ export function buildFilterChips(hotels: AnyRecord | null | undefined): FilterCh
             chips.push({
                 key: 'price',
                 value: null,
-                label: `от ${formatPrice(min)} ₽ – до ${formatPrice(max)} ₽`,
+                label: `от ${formatPrice(min)} ₽ – до ${formatPrice(max)} ₽`,
             });
         }
     }

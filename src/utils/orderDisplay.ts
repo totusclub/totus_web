@@ -303,7 +303,7 @@ export function formatOrderPrice(order: any): string {
   const lt = getLtOrderPackage(order);
   const amount = lt?.price ?? lt?.full_price ?? 0;
   if (amount == null) return '—';
-  return `${Number(amount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '\u202F')} ₽`;
+  return `${Number(amount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ')} ₽`;
 }
 
 export function getNestedPackage(order: any) {

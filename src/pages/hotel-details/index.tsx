@@ -340,7 +340,7 @@ export default function HotelDetails() {
             <HotelDetailsRooms
                 rooms={rooms}
                 roomFilters={roomFilters}
-                loading={roomsLoading}
+                loading={roomsSectionLoading}
                 searchAttempted={roomsSearchAttempted}
                 selectedDate={selectedRoomDate}
                 onSelectedDateChange={setSelectedRoomDate}
