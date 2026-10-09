@@ -1,14 +1,10 @@
-import React, { CSSProperties } from "react";
-import Slider from "react-slick";
-import "slick-carousel/slick/slick.css";
+import React from "react";
 import styles from './home.module.css'
 import HotelBoxCard from "@/components/hotelBox/hotelBoxCard";
-import Icon from "@/components/icons/Icon";
 import { useRouter } from "next/router";
 import { buildHotelDetailsDeepLinkQuery } from "@/utils/hotelDetailsUtils";
 import { useNearViewport } from "@/hooks/useNearViewport";
 import { useAfterPageLoad } from "@/hooks/useAfterPageLoad";
-import { useIconColor } from "@/hooks/useTheme";
 
 interface HotelItem {
     id: number | string;
@@ -20,31 +16,8 @@ interface HotelItem {
     image?: string;
     url?: string;
 }
-interface ArrowProps {
-    onClick?: () => void;
-    className?: string;
-    style?: CSSProperties;
-}
-
-const NextArrow = ({ onClick }: ArrowProps) => {
-    const iconColor = useIconColor();
-    return (
-        <div className={styles.nextArrowHot} onClick={onClick}>
-            <Icon name="rightArrow" size={24} color={iconColor} />
-        </div>
-    );
-};
-
-const PrevArrow = ({ onClick }: ArrowProps) => {
-    const iconColor = useIconColor();
-    return (
-        <div className={styles.prevArrowHot} onClick={onClick}>
-            <Icon name="leftArrow" size={24} color={iconColor} />
-        </div>
-    );
-};
-
-export default function HotDealsSlide({ slidesToShow, title, recomendHotels }: { slidesToShow: number, title: string, recomendHotels?: HotelItem[] | null }) {
+// slidesToShow — прежний проп карусели; больше не используется, оставлен, чтобы не менять вызов на главной.
+export default function HotDealsSlide({ title, recomendHotels }: { slidesToShow: number, title: string, recomendHotels?: HotelItem[] | null }) {
     const router = useRouter();
     // Фото отелей грузим, когда блок рядом с экраном (PageSpeed: не мешать главной картинке).
     // На телефоне блок виден уже на первом экране — поэтому ещё и только после загрузки страницы:
@@ -67,57 +40,6 @@ export default function HotDealsSlide({ slidesToShow, title, recomendHotels }: {
         [router]
     );
 
-    const settings = {
-        dots: true,
-        infinite: true,
-        speed: 500,
-        slidesToShow: slidesToShow,
-        slidesToScroll: slidesToShow,
-        initialSlide: 0,
-        nextArrow: <NextArrow />,
-        prevArrow: <PrevArrow />,
-        appendDots: (dots: number) => (
-            <div className={styles.customDotsWrapper}>
-                <ul> {dots} </ul>
-            </div>
-        ),
-        customPaging: () => (
-            <div className={styles.customDot} />
-        ),
-        responsive: [
-            {
-                breakpoint: 1024,
-                settings: {
-                    slidesToShow: 3,
-                    slidesToScroll: 3,
-                    infinite: true,
-                    dots: true
-                }
-            },
-            {
-                breakpoint: 600,
-                settings: {
-                    slidesToShow: 2,
-                    slidesToScroll: 2,
-                    initialSlide: 2
-                }
-            },
-            {
-                breakpoint: 480,
-                settings: {
-                    slidesToShow: 1.2,
-                    slidesToScroll: 1,
-                    // Без бесконечной прокрутки: при дробном slidesToShow react-slick с infinite
-                    // сдвигает ленту на 0,2 карточки — первая карточка обрезалась слева на телефоне.
-                    // Теперь первая карточка у левого края, следующая выглядывает справа.
-                    infinite: false,
-                    dots: false,
-                    arrows: false
-                }
-            }
-
-        ]
-    };
     return (
         <div className={`${styles.contentFull} ${styles.contentFullHide}`}>
             <p className={styles.hotProductTitle}>{title}</p>
@@ -138,10 +60,12 @@ export default function HotDealsSlide({ slidesToShow, title, recomendHotels }: {
                     />
                 ))}
             </div>
+            {/* Телефон и планшет (до 1024 px): обычная горизонтальная прокрутка браузера с привязкой
+                к карточке — плавно и с инерцией (react-slick листал рывками). Стили — .mobScroller. */}
             <div className={styles.recomendlistMob} ref={mobileListRef}>
-                <Slider {...settings}>
+                <div className={styles.mobScroller}>
                     {recomendHotels?.map((item: HotelItem, index: number) => (
-                        <div key={item.id ?? index} className={styles.hotDealSlide}>
+                        <div key={item.id ?? index} className={styles.mobScrollerItem}>
                             <HotelBoxCard
                                 id={typeof item.id === 'number' ? item.id : Number(item.id) || 0}
                                 name={item.name || ''}
@@ -156,7 +80,7 @@ export default function HotDealsSlide({ slidesToShow, title, recomendHotels }: {
                             />
                         </div>
                     ))}
-                </Slider>
+                </div>
             </div>
         </div>
     );
