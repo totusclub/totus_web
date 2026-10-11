@@ -228,13 +228,14 @@ check('фото отелей в «Начните планирование»: т�
   assert.match(card, /style=\{showImage && image \? \{backgroundImage: `url\(\$\{image\}\)`\} : undefined\}/);
 });
 
-check('блок «Оставьте номер»: layer.png и girl.png только когда блок рядом с экраном', () => {
+check('блок «Оставьте номер»: girl.png только когда блок рядом с экраном, слой — градиент CSS без картинки', () => {
   const css = read('src/components/home/home.module.css');
   const c = code(read('src/components/home/callRequest.tsx'));
-  assert.equal((css.match(/url\("\/images\/layer\.png"\)/g) || []).length, 1);
-  assert.match(css, /\.callRequestLeyerLoaded \{\s*(background-color: lightgray;\s*)?background-image: url\("\/images\/layer\.png"\);/);
+  assert.ok(!/url\("\/images\/layer\.png"\)/.test(css));
+  assert.ok(!/callRequestLeyerLoaded/.test(css + c));
+  assert.match(css, /\.callRequestLeyer \{[^}]*background-image:\s*radial-gradient\([^}]*linear-gradient\(/);
   assert.match(css, /\.callRequestGirlLoaded \{\s*background-image: url\("\/images\/girl\.png"\);/);
-  assert.match(c, /blockVisible \? styles\.callRequestLeyerLoaded : ''/);
+  assert.match(c, /className=\{styles\.callRequestLeyer\}/);
   assert.match(c, /blockVisible \? styles\.callRequestGirlLoaded : ''/);
 });
 
