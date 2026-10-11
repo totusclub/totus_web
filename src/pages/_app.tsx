@@ -65,19 +65,32 @@ function MyApp({ Component, pageProps }: AppProps) {
     return (
         <>
             <SiteSeo pageProps={pageProps} />
+            {/* Яндекс Метрика. Очередь ym() и init — сразу, как раньше (вызовы ym до загрузки tag.js
+                копятся в очереди), а сам tag.js (~64 КБ, вебвизор) — только после события load и паузы
+                браузера (requestIdleCallback, не позже 3 с; без него — через 1,5 с). Так он не делит канал
+                с картинкой первого экрана и шрифтами и не попадает в LCP на телефоне. Визит, закрытый
+                раньше загрузки tag.js, в Метрику не попадёт. */}
             <Script
                 id="yandex-metrika"
                 strategy="afterInteractive"
                 dangerouslySetInnerHTML={{
                     __html: `
-                        (function(m,e,t,r,i,k,a){
+                        (function(m,e,t,r,i){
                             m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
                             m[i].l=1*new Date();
-                            for (var j = 0; j < document.scripts.length; j++) {
-                                if (document.scripts[j].src === r) { return; }
+                            function loadTag(){
+                                for (var j = 0; j < e.scripts.length; j++) {
+                                    if (e.scripts[j].src === r) { return; }
+                                }
+                                var k=e.createElement(t),a=e.getElementsByTagName(t)[0];
+                                k.async=1;k.src=r;a.parentNode.insertBefore(k,a);
                             }
-                            k=e.createElement(t),a=e.getElementsByTagName(t)[0],
-                            k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
+                            function whenIdle(){
+                                if (m.requestIdleCallback) { m.requestIdleCallback(loadTag, { timeout: 3000 }); }
+                                else { setTimeout(loadTag, 1500); }
+                            }
+                            if (e.readyState === 'complete') { whenIdle(); }
+                            else { m.addEventListener('load', whenIdle, { once: true }); }
                         })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=106173650', 'ym');
 
                         ym(106173650, 'init', {
