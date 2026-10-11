@@ -614,18 +614,23 @@
   margin-bottom: 60px;
   position: relative;
 }
+/* Слой блока «Оставьте номер»: градиент только средствами CSS (раньше — картинка /images/layer.png
+   1282×400, 188 КБ). Градиент повторяет картинку (отклонение < 1 уровня из 255) и лежит так же,
+   как лежала картинка с background-size: cover: на компьютере слой 479:100, картинка 1282:400
+   по ширине слоя → высота 479/100 × 400/1282 = 149.45%, по центру. */
 .callRequestLeyer {
   height: 100%;
   flex-shrink: 0;
   aspect-ratio: 479/100;
-  background: 50% / cover no-repeat;
+  background-image:
+    radial-gradient(75.9% 40.3% at 56.1% 56.7%, rgb(239 255 254 / 0.153), rgb(239 255 254 / 0)),
+    radial-gradient(129.8% 188.8% at -16.5% -97.3%, rgb(158 61 255 / 0.74), rgb(158 61 255 / 0)),
+    radial-gradient(121.7% 123.4% at -11.4% 146.6%, rgb(0 83 250 / 1), rgb(0 83 250 / 0)),
+    linear-gradient(54.4deg, rgb(162 179 254) 0%, rgb(165 186 255) 20%, rgb(167 187 254) 40%, rgb(163 186 254) 60%, rgb(154 179 254) 80%, rgb(97 178 254) 100%);
+  background-size: 100% 149.45%;
+  background-position: 50% 50%;
+  background-repeat: no-repeat;
   mix-blend-mode: overlay;
-}
-/* картинка подключается, когда блок рядом с экраном (callRequest.tsx, useNearViewport);
-   серая подложка — вместе с ней (до загрузки блок просто оранжевый, без серой «плашки») */
-.callRequestLeyerLoaded {
-  background-color: lightgray;
-  background-image: url("/images/layer.png");
 }
 .callRequestGirl {
   width: 477px;
@@ -854,12 +859,17 @@
     margin-bottom: 0;
     border-radius: 24px;
   }
+  /* Слой — во всю высоту блока, пропорции прежней картинки (1282:400), по центру: как cover */
   .callRequestLeyer {
     position: absolute;
-    inset: 0;
-    width: 100%;
+    top: 0;
+    left: 50%;
+    width: auto;
     height: 100%;
-    aspect-ratio: auto;
+    min-width: 100%;
+    aspect-ratio: 1282 / 400;
+    transform: translateX(-50%);
+    background-size: 100% 100%;
   }
   .formRequestCall {
     width: 100%;

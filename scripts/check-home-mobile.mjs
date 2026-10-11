@@ -88,7 +88,7 @@ check('блок «Оставьте номер»: высота по содерж�
   assert.match(c, /height: auto;/);
   assert.match(c, /border-radius: 24px;/);
   assert.match(rule(homeM, '.callRequestInfo'), /position: relative;\s*height: auto;\s*padding: 24px 16px;/);
-  assert.match(rule(homeM, '.callRequestLeyer'), /position: absolute;\s*inset: 0;/);
+  assert.match(rule(homeM, '.callRequestLeyer'), /position: absolute;\s*top: 0;\s*left: 50%;[^}]*height: 100%;[^}]*aspect-ratio: 1282 \/ 400;\s*transform: translateX\(-50%\);/);
 });
 
 check('тёмная тема: текст на фото и оранжевом — белый; серый текст светлее (#999)', () => {

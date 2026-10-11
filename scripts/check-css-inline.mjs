@@ -30,11 +30,13 @@ check('next.config: optimizeCss только если пакет critters уст
   assert.match(cfg, /\} catch \{\s*return false;\s*\}/);
 });
 
-check('блок «Оставьте номер»: серая подложка только вместе с картинкой', () => {
+check('блок «Оставьте номер»: слой — градиент CSS, без картинки и серой подложки', () => {
   const css = read('src/components/home/home.module.css');
-  const base = css.slice(css.indexOf('.callRequestLeyer {'), css.indexOf('.callRequestLeyerLoaded {'));
+  const base = css.slice(css.indexOf('.callRequestLeyer {'), css.indexOf('.callRequestGirl {'));
   assert.ok(!/lightgray/.test(base));
-  assert.match(css, /\.callRequestLeyerLoaded \{\s*background-color: lightgray;\s*background-image: url\("\/images\/layer\.png"\);/);
+  assert.ok(!/url\(/.test(base));
+  assert.ok(!/layer\.png/.test(css.replace(/\/\*[\s\S]*?\*\//g, '')));
+  assert.ok(!/\.callRequestLeyerLoaded/.test(css));
 });
 
 console.log(`\n${passed} passed, ${failed} failed`);
