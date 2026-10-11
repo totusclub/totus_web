@@ -38,6 +38,12 @@ const nextConfig: NextConfig = {
                 source: '/countries/:file*',
                 headers: [{ key: 'Cache-Control', value: 'public, max-age=2592000, stale-while-revalidate=86400' }],
             },
+            // Картинки hero главной (public/hero, src/config/homeHero.ts): кеш браузера на год без проверки.
+            // Файл с тем же именем не меняется — новая картинка = новое имя (public/hero/README.md).
+            {
+                source: '/hero/:file*',
+                headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
+            },
         ];
     },
 };

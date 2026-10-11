@@ -9,6 +9,9 @@ export interface HomeHero {
      * в фоне, lib/heroMobile.js). '' — версии пока нет: телефон показывает image, как раньше.
      */
     imageMobile?: string;
+    /** AVIF-версии тех же картинок (статические hero, src/config/homeHero.ts); нет — только WebP. */
+    imageAvif?: string;
+    imageMobileAvif?: string;
 }
 
 /** Ширина экрана, до которой hero показывает мобильную версию (CSS search.module.css и preload в pages/index.tsx). */

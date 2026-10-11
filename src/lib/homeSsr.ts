@@ -7,12 +7,16 @@
  *
  * Любая ошибка или таймаут → null для этого блока: компонент запросит данные в браузере,
  * как раньше (страница не ломается и не ждёт API дольше HOME_SSR_TIMEOUT_MS).
+ *
+ * Hero (11.10.2026) — без API: три картинки лежат в сайте (public/hero), сервер выбирает
+ * одну случайно (src/config/homeHero.ts).
  */
 import { API_BASE_URL } from '@/config/api';
 import type { HomeHero } from '@/api/homeHeroApi';
 import type { HomeBanner } from '@/api/homeBannersApi';
 import type { HomePartner } from '@/api/homePartnersApi';
 import type { HomeDataPayload } from '@/hooks/loadHomeData';
+import { pickHomeHero } from '@/config/homeHero';
 
 export const HOME_SSR_TIMEOUT_MS = 1200;
 const DEFAULT_HERO_TITLE = 'Путешествия начинаются здесь';
@@ -77,15 +81,14 @@ export function toHomeData(body: any): HomeDataPayload | null {
 }
 
 export async function loadHomeSsrData(): Promise<HomeSsrData> {
-    // home-hero: бэкенд выбирает случайную картинку на каждый запрос — как и раньше, на каждый заход.
-    const [hero, data, banners, partners] = await Promise.all([
-        fetchJson('/api/home-hero'),
+    // Hero — случайная из трёх картинок сайта на каждый заход (раньше выбирал бэкенд, /api/home-hero).
+    const [data, banners, partners] = await Promise.all([
         fetchJson('/home/data'),
         fetchJson('/api/home-banners'),
         fetchJson('/api/home-partners'),
     ]);
     return {
-        homeHero: plain(toHomeHero(hero)),
+        homeHero: plain(pickHomeHero()),
         homeData: plain(toHomeData(data)),
         homeBanners: plain(toList<HomeBanner>(banners)),
         homePartners: plain(toList<HomePartner>(partners)),

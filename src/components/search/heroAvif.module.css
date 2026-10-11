@@ -1,0 +1,15 @@
+/* Hero главной в AVIF (статические картинки, src/config/homeHero.ts; переменные задаёт search/index.tsx).
+   Только для браузеров, которые понимают image-set(… type()): остальные остаются на WebP
+   из search.module.css (.searchHeroMobile). Внутри image-set тоже запасной WebP.
+   Граница 600 px — та же, что в search.module.css и preload (HERO_MOBILE_MAX_WIDTH).
+   Класс удвоен, чтобы правило было сильнее .searchHeroMobile независимо от порядка CSS-файлов. */
+@supports (background-image: image-set("a.avif" type("image/avif"))) {
+  .heroAvif.heroAvif {
+    background-image: var(--hero-desktop-avif);
+  }
+  @media (max-width: 600px) {
+    .heroAvif.heroAvif {
+      background-image: var(--hero-mobile-avif);
+    }
+  }
+}

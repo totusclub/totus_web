@@ -1,5 +1,6 @@
 import styles from './search.module.css';
 import heroTitleStyles from './heroTitle.module.css';
+import heroAvifStyles from './heroAvif.module.css';
 import SearchForm from "@/components/search/searchForm";
 import Icon from "@/components/icons/Icon";
 import { useDispatch } from 'react-redux';
@@ -25,6 +26,18 @@ function heroBackground(image: string, imageMobile: string): CSSProperties | und
 }
 
 /**
+ * AVIF-версии (статические hero, src/config/homeHero.ts): image-set с запасным WebP. Показывает
+ * heroAvif.module.css, только если браузер понимает image-set(… type()); иначе — WebP, как выше.
+ */
+function heroAvifBackground(hero: HomeHero | null): CSSProperties {
+    if (!hero?.image || !hero.imageMobile || !hero.imageAvif || !hero.imageMobileAvif) return {};
+    return {
+        ['--hero-desktop-avif' as string]: `image-set(url(${hero.imageAvif}) type("image/avif"), url(${hero.image}) type("image/webp"))`,
+        ['--hero-mobile-avif' as string]: `image-set(url(${hero.imageMobileAvif}) type("image/avif"), url(${hero.imageMobile}) type("image/webp"))`,
+    } as CSSProperties;
+}
+
+/**
  * initialHero — hero с сервера (getServerSideProps главной): заголовок и картинка сразу в HTML,
  * картинка предзагружается из <head> (LCP). null — запросить в браузере, как раньше.
  */
@@ -36,6 +49,8 @@ const Search = ({ initialHero = null }: { initialHero?: HomeHero | null }) => {
     // и только после полной загрузки — без локальной заглушки
     const [heroImage, setHeroImage] = useState(initialHero?.image || '');
     const [heroImageMobile, setHeroImageMobile] = useState(initialHero?.image ? initialHero.imageMobile || '' : '');
+    const avifStyle = heroAvifBackground(initialHero);
+    const hasAvif = Object.keys(avifStyle).length > 0;
 
     useEffect(() => {
         dispatch(clearSearch());
@@ -72,8 +87,8 @@ const Search = ({ initialHero = null }: { initialHero?: HomeHero | null }) => {
 
     return (
         <div
-            className={`${styles.search} ${heroTitleStyles.desktopHeight}${heroImage && heroImageMobile ? ` ${styles.searchHeroMobile}` : ''}`}
-            style={heroBackground(heroImage, heroImageMobile)}
+            className={`${styles.search} ${heroTitleStyles.desktopHeight}${heroImage && heroImageMobile ? ` ${styles.searchHeroMobile}` : ''}${hasAvif ? ` ${heroAvifStyles.heroAvif}` : ''}`}
+            style={{ ...heroBackground(heroImage, heroImageMobile), ...avifStyle }}
         >
             <div className={`content ${styles.searchContent} ${heroTitleStyles.desktopContent}`}>
                 <div className={styles.logoHomeM}>

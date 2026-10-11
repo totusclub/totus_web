@@ -27,12 +27,21 @@ export default function Home({ homeHero = null, homeData: initialHomeData = null
                     <link rel="preload" as="image" href={homeHero.image} fetchPriority="high" key="home-hero-image" />
                 </Head>
             ) : null}
-            {homeHero?.image && homeHero.imageMobile ? (
+            {homeHero?.image && homeHero.imageMobile && !(homeHero.imageAvif && homeHero.imageMobileAvif) ? (
                 <Head>
                     {/* Есть мобильная версия: телефон (до 600 px) грузит только её (~50 КБ),
                         остальные экраны — полную картинку. Те же условия — в search.module.css. */}
                     <link rel="preload" as="image" href={homeHero.imageMobile} media={HERO_MOBILE_MEDIA} fetchPriority="high" key="home-hero-image-mobile" />
                     <link rel="preload" as="image" href={homeHero.image} media={HERO_DESKTOP_MEDIA} fetchPriority="high" key="home-hero-image" />
+                </Head>
+            ) : null}
+            {homeHero?.image && homeHero.imageMobile && homeHero.imageAvif && homeHero.imageMobileAvif ? (
+                <Head>
+                    {/* Статические hero (src/config/homeHero.ts): предзагружается AVIF — его и покажет
+                        CSS (search/heroAvif.module.css). type="image/avif": браузер без AVIF пропускает
+                        preload и берёт WebP из CSS. */}
+                    <link rel="preload" as="image" type="image/avif" href={homeHero.imageMobileAvif} media={HERO_MOBILE_MEDIA} fetchPriority="high" key="home-hero-image-mobile" />
+                    <link rel="preload" as="image" type="image/avif" href={homeHero.imageAvif} media={HERO_DESKTOP_MEDIA} fetchPriority="high" key="home-hero-image" />
                 </Head>
             ) : null}
             <Search initialHero={homeHero} />

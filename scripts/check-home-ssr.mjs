@@ -34,9 +34,10 @@ const doc = code(read('src/pages/_document.tsx'));
 
 console.log('Главная: данные первого экрана в HTML');
 
-check('сервер: 4 запроса параллельно, таймаут, ошибка → null (без падения страницы)', () => {
+check('сервер: 3 запроса параллельно (hero — статикой, без API), таймаут, ошибка → null (без падения страницы)', () => {
   assert.match(ssr, /export const HOME_SSR_TIMEOUT_MS = 1200;/);
-  assert.match(ssr, /await Promise\.all\(\[\s*fetchJson\('\/api\/home-hero'\),\s*fetchJson\('\/home\/data'\),\s*fetchJson\('\/api\/home-banners'\),\s*fetchJson\('\/api\/home-partners'\),\s*\]\)/);
+  assert.match(ssr, /await Promise\.all\(\[\s*fetchJson\('\/home\/data'\),\s*fetchJson\('\/api\/home-banners'\),\s*fetchJson\('\/api\/home-partners'\),\s*\]\)/);
+  assert.match(ssr, /homeHero: plain\(pickHomeHero\(\)\),/);
   assert.match(ssr, /setTimeout\(\(\) => controller\.abort\(\), timeoutMs\)/);
   assert.match(ssr, /if \(!response\.ok\) return null;/);
   assert.match(ssr, /\} catch \{\s*return null;\s*\}/);
@@ -59,7 +60,7 @@ check('hero: заголовок и картинка из HTML; без данны
   assert.match(search, /useState<string \| null>\(initialHero \? initialHero\.title \|\| DEFAULT_TITLE : null\)/);
   assert.match(search, /useState\(initialHero\?\.image \|\| ''\)/);
   assert.match(search, /if \(initialHero\) \{\s*publishHomeHeroTitle\(initialHero\.title \|\| DEFAULT_TITLE\);\s*return;\s*\}\s*let cancelled = false;\s*getHomeHero\(\)/);
-  assert.match(search, /style=\{heroBackground\(heroImage, heroImageMobile\)\}/);
+  assert.match(search, /style=\{\{ \.\.\.heroBackground\(heroImage, heroImageMobile\), \.\.\.avifStyle \}\}/);
   assert.match(search, /if \(!imageMobile\) return \{ backgroundImage: `url\(\$\{image\}\)` \};/);
 });
 
