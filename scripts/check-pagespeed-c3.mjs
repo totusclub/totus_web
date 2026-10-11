@@ -1,4 +1,4 @@
-// PageSpeed C3–C4: шрифты только из репозитория (08.10: Google Fonts убраны; 09.10: Museo Sans Cyrl + Forum вместо Golos Text), тема слайдеров без шрифта slick,
+// PageSpeed C3–C4: шрифты только из репозитория (08.10: Google Fonts убраны; 09.10: Museo Sans Cyrl + Forum вместо Golos Text, свой знак ₽), тема слайдеров без шрифта slick,
 // картинки ниже первого экрана грузятся по мере приближения. Запуск: node scripts/check-pagespeed-c3.mjs
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -93,6 +93,12 @@ const faceOf = (fam) => faces.filter((f) => f.includes(`font-family: "${fam}";`)
 check('шрифты: только файлы из src/assets/fonts (WOFF2), без Google Fonts / CDN, font-display: swap', () => {
   assert.ok(faces.length >= 10, `@font-face: ${faces.length}`);
   for (const f of faces) {
+    // ₽ (09.10, «Отель на телефоне»): шрифт из одного знака встроен в CSS — проверяется ниже отдельно
+    if (f.includes('url(data:font/woff;base64,')) {
+      assert.match(f, /unicode-range: U\+20BD;/, 'встроенный шрифт — только для ₽');
+      assert.match(f, /font-display: swap;/);
+      continue;
+    }
     const m = f.match(/src: url\("\.\/\.\.\/assets\/fonts\/([\w.-]+\.woff2)"\) format\("woff2"\);/);
     assert.ok(m, `src не из assets/fonts: ${f.slice(0, 80)}`);
     assert.equal(fontFile(m[1]).toString('latin1', 0, 4), 'wOF2', m[1]);
@@ -122,12 +128,32 @@ check('шрифты: Museo Sans Cyrl 300/500/700/900, Forum, знаки (₽, с
     const miss = need('₽→←‑²').filter((c) => !cps.has(c)).map((c) => String.fromCodePoint(c));
     assert.deepEqual(miss, [], `${name}: нет ${miss.join('')}`);
   }
-  for (const f of [...faceOf('Totus Symbols'), ...faceOf('Golos Text').filter((x) => x.includes('GolosSymbols'))]) {
-    assert.match(f, /unicode-range: U\+00B2-00B3, U\+00B9, U\+2010-2011, U\+20BD, U\+2190-21FF;/);
+  // стрелки, дефис, ²³¹ — из подмножества Golos; ₽ — свой знак (см. проверку «знак рубля»)
+  for (const f of [...faceOf('Totus Symbols'), ...faceOf('Golos Text')].filter((x) => x.includes('GolosSymbols'))) {
+    assert.match(f, /unicode-range: U\+00B2-00B3, U\+00B9, U\+2010-2011, U\+2190-21FF;/);
   }
   // старое имя "Golos Text" (виджет Милы) — на файлах Museo и знаках
-  assert.deepEqual(faceOf('Golos Text').map((f) => f.match(/fonts\/([\w.-]+)"/)[1]),
+  assert.deepEqual(faceOf('Golos Text').filter((f) => !f.includes('url(data:')).map((f) => f.match(/fonts\/([\w.-]+)"/)[1]),
     ['MuseoSansCyrl-300.woff2', 'MuseoSansCyrl-500.woff2', 'MuseoSansCyrl-700.woff2', 'MuseoSansCyrl-900.woff2', 'GolosSymbols-500.woff2', 'GolosSymbols-700.woff2']);
+});
+
+check('знак рубля: свой ₽ под Museo (300/500/700) в «Totus Symbols» и «Golos Text», < 1 КБ, из scripts/ruble-glyph.json', () => {
+  const glyph = JSON.parse(read('scripts/ruble-glyph.json'));
+  for (const fam of ['Totus Symbols', 'Golos Text']) {
+    const rub = faceOf(fam).filter((f) => f.includes('url(data:'));
+    assert.deepEqual(rub.map((f) => f.match(/font-weight: ([\d ]+);/)[1]), ['100 399', '400 599', '600 1000'], fam);
+    for (const f of rub) {
+      const w = f.match(/font-weight: ([\d ]+);/)[1];
+      const entry = Object.values(glyph.weights).find((x) => x.cssWeight === w);
+      const b64 = f.match(/url\(data:font\/woff;base64,([A-Za-z0-9+/=]+)\) format\("woff"\);/)[1];
+      assert.equal(b64, entry.woff, `${fam} ${w}: шрифт в CSS не совпадает с ruble-glyph.json`);
+      const buf = Buffer.from(b64, 'base64');
+      assert.equal(buf.toString('latin1', 0, 4), 'wOFF');
+      assert.ok(buf.length < 1024, `${fam} ${w}: ${buf.length} байт`);
+    }
+  }
+  // GolosSymbols больше не отвечает за ₽ ни в одном семействе
+  for (const f of faces.filter((x) => x.includes('GolosSymbols'))) assert.ok(!/U\+20BD/.test(f));
 });
 
 check('шрифты: везде переменные --font-text / --font-heading, запасные шрифты без засечек; поля наследуют шрифт', () => {

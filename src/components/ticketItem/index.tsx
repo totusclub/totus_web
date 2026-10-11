@@ -155,8 +155,8 @@ const TicketItem: FC<TicketItemProps> = ({ green, item, price, lazy }) => {
 
                         <div className={styles.ticketItemPriceInfo}>
                             <div className={styles.ticketItemPrice}>
-                                <p>{formatMoneyRub(totalPrice).replace(' ₽', '₽')}</p>
-                                <p>Доплаты и сборы: +{formatMoneyRub(fuelCharge).replace(' ₽', '₽')}</p>
+                                <p>{formatMoneyRub(totalPrice)}</p>
+                                <p>Доплаты и сборы: +{formatMoneyRub(fuelCharge)}</p>
                                 <p>За тур с перелётом</p>
                             </div>
                             <Button

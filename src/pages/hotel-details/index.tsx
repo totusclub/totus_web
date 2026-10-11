@@ -7,6 +7,7 @@ import HotelDetailsRooms from "@/components/hotelDetails/hotelDetailsRooms";
 import HotelDetailsSkeleton from "@/components/hotelDetails/hotelDetailsSkeleton";
 import HotelSearchSection, { type SearchParamsSnapshot } from "@/components/hotelDetails/hotelSearchSection";
 import HotelReviewsModal from "@/components/hotelDetails/HotelReviewsModal";
+import hotelStyles from "@/components/hotelDetails/hotelDetails.module.css";
 import { useRouter } from "next/router";
 import { useHotelDetails } from "@/hooks/useHotelDetails";
 import { useHotelReviews } from "@/hooks/useHotelReviews";
@@ -253,7 +254,7 @@ export default function HotelDetails() {
     // Wait for router to be ready before checking hotelId
     if (!router.isReady) {
         return (
-            <main className={'searchContainer'}>
+            <main className={`searchContainer ${hotelStyles.HotelDetailsPage}`}>
                 <Steps activeStep="hotel" />
                 <HotelDetailsSkeleton />
             </main>
@@ -263,7 +264,7 @@ export default function HotelDetails() {
     // Show loading if hotelId is missing (shouldn't happen if navigation is correct)
     if (!hotelId) {
         return (
-            <main className={'searchContainer'}>
+            <main className={`searchContainer ${hotelStyles.HotelDetailsPage}`}>
                 <Steps activeStep="hotel" />
                 <HotelDetailsSkeleton />
             </main>
@@ -272,7 +273,7 @@ export default function HotelDetails() {
 
     if (hotelLoading || !hotel) {
         return (
-            <main className={'searchContainer'}>
+            <main className={`searchContainer ${hotelStyles.HotelDetailsPage}`}>
                 <Steps activeStep="hotel" />
                 <HotelDetailsSkeleton />
             </main>
@@ -287,7 +288,7 @@ export default function HotelDetails() {
         `Отель «${hotel.name as string}»: номера, удобства и бронирование на ${SITE_NAME}.`;
 
     return (
-        <main className={'searchContainer'}>
+        <main className={`searchContainer ${hotelStyles.HotelDetailsPage}`}>
             {hotelTitle ? (
                 <Head>
                     <title>{hotelTitle}</title>

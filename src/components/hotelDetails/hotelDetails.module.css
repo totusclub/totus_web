@@ -1388,3 +1388,102 @@
     background-position: 100% 0;
   }
 }
+
+/* Страница отеля на телефоне и планшете (до 1024 px) — вариант C «Без карточек», утверждён 09.10.2026.
+   Страница на основном фоне; разделы (описание, развлечения, территория, поиск, номера) — во всю ширину,
+   между ними полоса 8 px цвета второго фона. Поля 16, шаг 8/12/16. Скругления: блок цены, плашки
+   фильтров и предложения 16, фото 12, теги 12 (при одной строке — таблетка), кнопки — таблетки.
+   Номера — списком через линию, без вложенной карточки. Компьютер (> 1024 px) не меняется.
+   Проверка: node scripts/check-hotel-mobile.mjs */
+@media (max-width: 1024px) {
+  .HotelDetailsPage {
+    background: var(--bgPrimary);
+  }
+  /* тёмная тема: линия #1f1f1f совпадала с фоном тегов и полос — делаем заметнее */
+  :global([data-theme="dark"]) .HotelDetailsPage {
+    --borderTertiary: #2c2c2c;
+  }
+  .HotelDetailsHeader {
+    margin-bottom: 8px;
+  }
+  .HotelDetailsInfoRow {
+    gap: 12px;
+  }
+  .HotelDetailsInfo {
+    margin-bottom: 16px;
+  }
+  .HotelDetailsInfoPrice {
+    margin-top: 0;
+    padding: 16px;
+    border-radius: 16px;
+    background: var(--bgSecondary);
+  }
+  /* оценка на зелёном — всегда белая (в тёмной теме --textPrimaryB тёмный) */
+  .hotelCardImageInfo > p:nth-child(1) {
+    color: #ffffff;
+  }
+
+  /* разделы во всю ширину экрана: .content даёт поля 16 px — выходим за них */
+  .HotelDetailsDesc,
+  .HotelDetailsRooms {
+    flex: none;
+    width: calc(100% + 32px);
+    max-width: none;
+    margin: 0 -16px;
+    border-radius: 0;
+    border-top: 8px solid var(--bgSecondary);
+    background: var(--bgPrimary);
+  }
+  .HotelDetailsDesc {
+    padding-bottom: 16px;
+  }
+  .HotelDetailsDescHead,
+  .HotelDetailsRoomsHead {
+    height: auto;
+    padding: 20px 16px 4px;
+    border-bottom: none;
+  }
+  .HotelDetailsDescItems {
+    padding: 12px 16px 0;
+  }
+  /* теги: при высоте 24 px скругление 12 — таблетка; длинный тег в две строки остаётся аккуратным */
+  .HotelDetailsDescItem,
+  .HotelDetailsRoomfacilitiesItem {
+    padding: 4px 10px;
+    border-radius: 12px;
+  }
+
+  /* фильтры номеров: плашки на втором фоне, скругление 16 */
+  .HotelDetailsRoomFilters {
+    padding: 12px 16px;
+    border-bottom: none;
+  }
+  .HotelDetailsRoomFilterTrigger {
+    border-color: transparent;
+    border-radius: 16px;
+    background: var(--bgSecondary);
+  }
+  .HotelDetailsRoomFilterTriggerOpen {
+    border-color: var(--core_Orange);
+  }
+
+  /* номер — строкой списка через линию, без своей рамки и полей карточки */
+  .HotelDetailsRoomItem,
+  .HotelDetailsRoomFilters ~ .HotelDetailsRoomItem,
+  .HotelDetailsRoomFilters ~ .HotelDetailsRoomItem ~ .HotelDetailsRoomItem {
+    margin: 0;
+    padding: 16px;
+    border: none;
+    border-top: 1px solid var(--borderTertiary);
+    border-radius: 0;
+    background: transparent;
+  }
+  .HotelDetailsRoomImage,
+  .HotelDetailsRoomImagePlaceholder,
+  .image_placeholder {
+    border-radius: 12px;
+  }
+  .HotelDetailsPriceListItems {
+    border-radius: 16px;
+  }
+}

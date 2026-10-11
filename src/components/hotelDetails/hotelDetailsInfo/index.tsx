@@ -22,6 +22,7 @@ import {
     formatListRoomOfferLabel,
     resolveExactMealIdsFromPick,
 } from "@/utils/listRoomPick";
+import { groupThousands, RUB_SUFFIX } from "@/utils/formatPrice";
 
 const CHOOSE_ROOM_SECTION_ID = "choose-room";
 
@@ -161,7 +162,7 @@ const HotelDetailsInfo = ({
 
     const priceFormatted =
         offerPrice != null
-            ? String(Math.round(Number(offerPrice))).replace(/\B(?=(\d{3})+(?!\d))/g, "\u{202F}")
+            ? groupThousands(Math.round(Number(offerPrice)))
             : "—";
 
     const roomOfferLabel = useMemo(() => {
@@ -225,7 +226,7 @@ const HotelDetailsInfo = ({
                                             </>
                                         ) : (
                                             <>
-                                                <p className={styles.HotelDetailsInfoPriceText}>от {priceFormatted}₽</p>
+                                                <p className={styles.HotelDetailsInfoPriceText}>от {priceFormatted}{RUB_SUFFIX}</p>
                                                 <div className={styles.HotelDetailsInfoDate}>
                                                     <p className={styles.HotelDetailsInfoDateTitle}>{getOfferPriceTitle(searchType)}</p>
                                                     {roomOfferLabel ? (

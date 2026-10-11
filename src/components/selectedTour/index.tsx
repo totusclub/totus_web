@@ -10,7 +10,7 @@ import {
 } from '@/utils/packagePrice';
 import { formatAdultsCountWithDates } from '@/utils/formatRussianPlural';
 
-const formatTourPrice = (amount: number) => formatMoneyRub(amount).replace(' ₽', '₽');
+const formatTourPrice = (amount: number) => formatMoneyRub(amount);
 
 const SelectedTour = ({ packages, flights }: any) => {
     const [open, setOpen] = useState(false);

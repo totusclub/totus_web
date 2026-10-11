@@ -5,15 +5,15 @@
  * No URL/query overrides.
  */
 
+import { groupThousands, RUB_SUFFIX } from '@/utils/formatPrice';
+
 export function toMoney(value: unknown): number {
     const n = typeof value === 'number' ? value : Number(String(value ?? '').replace(/[^\d.-]/g, ''));
     return Number.isFinite(n) ? n : 0;
 }
 
 export function formatMoneyRub(value: unknown): string {
-    return `${Math.round(toMoney(value))
-        .toString()
-        .replace(/\B(?=(\d{3})+(?!\d))/g, '\u202F')} ₽`;
+    return `${groupThousands(Math.round(toMoney(value)))}${RUB_SUFFIX}`;
 }
 
 /** Tour base from LT package (actualize / search). */

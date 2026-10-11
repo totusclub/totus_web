@@ -3,6 +3,7 @@ import styles from './checkboxGroup.module.css';
 import Checkbox from '@/components/UI/checkboxGroup/checkBox';
 import { pluralizeRu } from '@/utils/formatRussianPlural';
 import { NARROW_NBSP, formatFilterOptionName } from '@/utils/filterChips';
+import { RUB_SUFFIX } from '@/utils/formatPrice';
 
 interface Option {
     id?: number | string;
@@ -165,7 +166,7 @@ export default function CheckboxGroup({
                                     {option?.min_price
                                         ?.toString()
                                         ?.replace(/\B(?=(\d{3})+(?!\d))/g, NARROW_NBSP)}
-                                    ₽
+                                    {RUB_SUFFIX}
                                 </span>
                             )}
                             {pk && option?.suitable_flights != null && (
@@ -181,7 +182,7 @@ export default function CheckboxGroup({
                                     {(netPrice + option?.min_fuel_charge)
                                         ?.toString()
                                         ?.replace(/\B(?=(\d{3})+(?!\d))/g, NARROW_NBSP)}
-                                    ₽
+                                    {RUB_SUFFIX}
                                 </span>
                             )}
                         </div>
