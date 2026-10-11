@@ -56,7 +56,8 @@ check('граница 600 px одна для CSS и preload', () => {
 
 check('preload: есть мобильная — две ссылки по media (телефон качает только свою); нет — одна, как раньше', () => {
   assert.match(page, /\{homeHero\?\.image && !homeHero\.imageMobile \? \(\s*<Head>[\s\S]{0,120}?<link rel="preload" as="image" href=\{homeHero\.image\} fetchPriority="high" key="home-hero-image" \/>/);
-  assert.match(page, /\{homeHero\?\.image && homeHero\.imageMobile \? \(\s*<Head>[\s\S]{0,120}?<link rel="preload" as="image" href=\{homeHero\.imageMobile\} media=\{HERO_MOBILE_MEDIA\} fetchPriority="high" key="home-hero-image-mobile" \/>\s*<link rel="preload" as="image" href=\{homeHero\.image\} media=\{HERO_DESKTOP_MEDIA\} fetchPriority="high" key="home-hero-image" \/>/);
+  // без AVIF (картинки с API) — WebP по media; со статическими hero (AVIF) — scripts/check-home-hero-static.mjs
+  assert.match(page, /\{homeHero\?\.image && homeHero\.imageMobile && !\(homeHero\.imageAvif && homeHero\.imageMobileAvif\) \? \(\s*<Head>[\s\S]{0,120}?<link rel="preload" as="image" href=\{homeHero\.imageMobile\} media=\{HERO_MOBILE_MEDIA\} fetchPriority="high" key="home-hero-image-mobile" \/>\s*<link rel="preload" as="image" href=\{homeHero\.image\} media=\{HERO_DESKTOP_MEDIA\} fetchPriority="high" key="home-hero-image" \/>/);
   assert.match(page, /import \{ HERO_DESKTOP_MEDIA, HERO_MOBILE_MEDIA \} from "@\/api\/homeHeroApi";/);
 });
 
@@ -66,7 +67,7 @@ check('фон hero: нет мобильной — как раньше; есть 
   assert.match(search, /return \{\s*\['--hero-desktop' as string\]: `url\(\$\{image\}\)`,\s*\['--hero-mobile' as string\]: `url\(\$\{imageMobile\}\)`,\s*\} as CSSProperties;/);
   assert.match(search, /useState\(initialHero\?\.image \? initialHero\.imageMobile \|\| '' : ''\)/);
   assert.match(search, /\$\{heroImage && heroImageMobile \? ` \$\{styles\.searchHeroMobile\}` : ''\}/);
-  assert.match(search, /style=\{heroBackground\(heroImage, heroImageMobile\)\}/);
+  assert.match(search, /style=\{\{ \.\.\.heroBackground\(heroImage, heroImageMobile\), \.\.\.avifStyle \}\}/);
 });
 
 check('без SSR (запрос в браузере): заранее грузится версия для этого экрана', () => {
