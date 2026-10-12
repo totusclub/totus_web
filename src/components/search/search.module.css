@@ -1147,3 +1147,42 @@
     background-image: var(--hero-mobile);
   }
 }
+
+/* Главная на компьютере — вариант B «Строгий» (12.10.2026). Только hero главной (.search — корень
+   components/search/index.tsx) и только шире 1024 px; форма в шапке других страниц не меняется.
+   - Вкладки и форма стоят в той же колонке, что секции ниже (.content: 1280 px, поля 20 px):
+     раньше поля hero 80 px + поля .content давали 100–1266 px вместо 63–1303 на экране 1366.
+   - Скругления: форма 16, вкладки 14 (внутри — 10).
+   - Подсказки под вкладками светлее на фото; у активной вкладки в светлой теме — прежний серый. */
+@media (min-width: 1025px) {
+  .search {
+    padding-left: 0;
+    padding-right: 0;
+    align-items: stretch;
+  }
+  .search .searchContent {
+    width: 100%;
+    max-width: 1280px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .search .searchForm {
+    border-radius: 16px;
+  }
+  .search .searchTypeTabs {
+    border-radius: 14px;
+  }
+  .search .searchTypeTabIndicator,
+  .search .searchTypeTab {
+    border-radius: 10px;
+  }
+  .search .searchTypeTabHint {
+    color: rgba(255, 255, 255, 0.72);
+  }
+  .search .searchTypeTabActive .searchTypeTabHint {
+    color: rgba(255, 255, 255, 0.72);
+  }
+  :global([data-theme="light"]) .search .searchTypeTabActive .searchTypeTabHint {
+    color: var(--textTertiary);
+  }
+}

@@ -1072,3 +1072,100 @@
     line-height: 24px;
   }
 }
+
+/* Главная на компьютере — вариант B «Строгий» (выбран владельцем 12.10.2026, артефакт «Главная на компьютере»).
+   Только шире 1024 px: телефон и планшет не меняются. Скругление 12 (блок звонка 16), шаг между секциями 56,
+   заголовки секций 28/36, сетки с промежутком 16, направления — 3 колонки 3:2.
+   Тёмная тема: на оранжевом и на фото текст всегда белый (--textPrimaryB в тёмной — #1f1f1f),
+   рамки карточек #2c2c2c (было --bgSecondary #1f1f1f на фоне #141414 — не видно). */
+@media (min-width: 1025px) {
+  .hotProductTitle {
+    margin-top: 0;
+    margin-bottom: 16px;
+    font-size: 28px;
+    line-height: 36px;
+  }
+
+  .banners {
+    gap: 16px;
+    margin-top: 40px;
+    margin-bottom: 56px;
+  }
+  .bannerItem {
+    border-radius: 12px;
+  }
+
+  .popularDestinationsWrapper {
+    padding-top: 56px;
+    padding-bottom: 56px;
+  }
+  .recomendDeslist {
+    gap: 16px;
+  }
+  .recomendDeslistItem {
+    flex: 0 0 calc((100% - 32px) / 3);
+    min-width: 0;
+    height: auto;
+    aspect-ratio: 3 / 2;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .recomendDeslistItemInfo {
+    height: 60%;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.6) 100%);
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+  }
+  .recomendDeslistItemInfoText {
+    color: #ffffff;
+    font-size: 20px;
+    line-height: 28px;
+  }
+
+  .partnerList {
+    gap: 12px;
+    margin-bottom: 0;
+  }
+  .partnerItem {
+    padding: 16px;
+    border-radius: 12px;
+  }
+  :global([data-theme="dark"]) .recomendDeslistItem,
+  :global([data-theme="dark"]) .partnerItem {
+    border-color: #2c2c2c;
+  }
+
+  .callRequest {
+    border-radius: 16px;
+    margin-top: 56px;
+    margin-bottom: 56px;
+  }
+  .formRequestCallHead > p,
+  .formRequestCallBtnDisable > p {
+    color: #ffffff;
+  }
+  /* Поле номера на оранжевом — светлое в обеих темах */
+  .formRequestCallInput input {
+    background: #ffffff;
+    color: #141414;
+    border-color: transparent;
+  }
+
+  .faqContainer {
+    padding-top: 56px;
+    padding-bottom: 56px;
+  }
+  .faqContainer > p {
+    font-size: 28px;
+    line-height: 36px;
+  }
+  .faqRow {
+    margin-top: 24px;
+    gap: 16px;
+  }
+  /* Вопросы FAQ (компонент UI/collapse — общий с фильтрами поиска, поэтому только здесь) */
+  .faqCal > div {
+    border-radius: 12px;
+    overflow: hidden;
+  }
+}

@@ -156,3 +156,16 @@
         margin-top: 8px;
     }
 }
+/* Главная на компьютере — вариант B «Строгий» (12.10.2026): фото 16:10 вместо 304 px по высоте,
+   скругление 12, кадр от верха; плашка «Самый популярный» — белый текст в обеих темах. */
+@media (min-width: 1025px) {
+    .hotelBoxCardImage{
+        height: auto;
+        aspect-ratio: 16 / 10;
+        border-radius: 12px;
+        background-position: center top;
+    }
+    .hotelBoxCardStatus>p{
+        color: #ffffff;
+    }
+}
