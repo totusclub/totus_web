@@ -367,3 +367,221 @@
     margin-top: 12px;
   }
 }
+
+/* Билеты на телефоне и планшете (до 1024 px) — вариант B «Билет», утверждён 12.10.2026
+   (артефакт «Билеты на телефоне», claude/TICKETS_MOBILE_RU.md). Компьютер (> 1024 px) не меняется:
+   там прежняя карточка (.ticketDesktop), здесь — своя разметка (.mob).
+   Карточка: скругление 20, рамка 1 px (#e6e6e6 / в тёмной #2c2c2c — #1f1f1f не видно на фоне), поля 16.
+   Сверху внутри — полоса «Самый выгодный рейс к туру» с тёмным текстом (белый на зелёном не читался).
+   Низ — «корешок» билета на втором фоне под пунктиром: цена слева, «Выбрать» 44 px справа. */
+.mob {
+  display: none;
+}
+@media (max-width: 1024px) {
+  .ticketDesktop {
+    display: none;
+  }
+  .mob {
+    --tkLine: #e6e6e6;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--tkLine);
+    border-radius: 20px;
+    overflow: hidden;
+    background: var(--bgPrimary);
+    color: var(--textPrimary);
+  }
+  :global([data-theme="dark"]) .mob {
+    --tkLine: #2c2c2c;
+  }
+  .mobBadge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 28px;
+    padding: 4px 16px;
+    background: var(--secondary_green);
+    color: #0b3b2e;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 18px;
+  }
+  .mobBody {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+  }
+  .mobSeg {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .mobSeg + .mobSeg {
+    padding-top: 12px;
+    border-top: 1px solid var(--tkLine);
+  }
+  .mobSegHead {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    color: var(--textTertiary);
+    font-size: 13px;
+    line-height: 18px;
+  }
+  .mobSegHead > b {
+    color: var(--textPrimary);
+    font-weight: 500;
+  }
+  .mobSegLogo {
+    flex: none;
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    background: #ffffff;
+    object-fit: contain;
+  }
+  /* нет логотипа — пустая плашка второго фона, а не белый квадрат */
+  span.mobSegLogo {
+    background: var(--bgSecondary);
+  }
+  .mobSegAirline {
+    margin-left: auto;
+    min-width: 0;
+    max-width: 45%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: right;
+  }
+  .mobSegTimes {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 10px;
+  }
+  .mobSegTimes > b {
+    font-size: 20px;
+    line-height: 24px;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }
+  .mobSegMid {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    min-width: 0;
+    color: var(--textTertiary);
+    font-size: 12px;
+    line-height: 16px;
+    text-align: center;
+  }
+  .mobSegMid > i {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 1px;
+    background: var(--tkLine);
+  }
+  .mobSegMid > i::before,
+  .mobSegMid > i::after {
+    content: "";
+    position: absolute;
+    top: -3px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--tkLine);
+  }
+  .mobSegMid > i::before {
+    left: 0;
+  }
+  .mobSegMid > i::after {
+    right: 0;
+  }
+  .mobSegDirect {
+    color: #0aa37f;
+  }
+  .mobSegPlaces {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    color: var(--textTertiary);
+    font-size: 12px;
+    line-height: 16px;
+  }
+  .mobSegPlaces > span:last-child {
+    text-align: right;
+  }
+  .mobTags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .mobTags > li {
+    padding: 4px 8px;
+    border-radius: 8px;
+    background: var(--bgSecondary);
+    color: var(--textPrimary);
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 16px;
+  }
+  .mobStub {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 14px 16px 8px;
+    background: var(--bgSecondary);
+    border-top: 1px dashed var(--tkLine);
+  }
+  .mobFoot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .mobPrice {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+  .mobPrice > b {
+    font-size: 20px;
+    line-height: 24px;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .mobPrice > span {
+    color: var(--textTertiary);
+    font-size: 12px;
+    line-height: 16px;
+  }
+  .mobChoose {
+    flex: none;
+    width: 132px;
+  }
+  .mobDetails {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: 36px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--textTertiary);
+    font-size: 13px;
+    line-height: 18px;
+    cursor: pointer;
+  }
+  .mobDetails > span {
+    border-bottom: 1px solid currentColor;
+  }
+}

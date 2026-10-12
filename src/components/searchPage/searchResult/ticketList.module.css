@@ -1,0 +1,26 @@
+/* Список перелётов к туру (/tickets) на телефоне и планшете — вариант B «Билет» (12.10.2026).
+   Компьютер (> 1024 px) не меняется. Класс удвоен — сильнее правил searchPage.module.css и
+   selectedtour.module.css при любом порядке CSS. */
+@media (max-width: 1024px) {
+  /* выбранный тур: 16 px от шапки (было 35) */
+  .tour.tour > * {
+    margin-top: 16px;
+  }
+  /* «Показано 20 из 278 вариантов» — строка серым над списком, без плашки */
+  .countRow.countRow {
+    height: auto;
+    padding: 0 4px;
+    border-radius: 0;
+    background: none;
+  }
+  .countRow.countRow p {
+    color: var(--textTertiary);
+    font-size: 13px;
+    line-height: 18px;
+    text-align: left;
+  }
+  /* между карточками 16 */
+  .items.items {
+    gap: 16px;
+  }
+}

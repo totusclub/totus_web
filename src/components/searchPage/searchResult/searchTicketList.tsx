@@ -1,4 +1,5 @@
 import styles from '../searchPage.module.css';
+import tl from './ticketList.module.css';
 import TicketItem from "@/components/ticketItem";
 import SelectedTour from "@/components/selectedTour";
 import Progress from '@/components/UI/progress';
@@ -51,8 +52,10 @@ const ResultTicketList = ({ flights, packages, loading }: any) => {
         <div className={styles.resultList}>
             <Progress title={'Ищем подходящие туры'} loading={loading} />
 
-            <SelectedTour packages={packages} flights={flights} />
-            <div className={styles.resultListSelectedFilter}>
+            <div className={tl.tour}>
+                <SelectedTour packages={packages} flights={flights} />
+            </div>
+            <div className={`${styles.resultListSelectedFilter} ${tl.countRow}`}>
                 {/*<div className={styles.selectedFiltersList}>*/}
                 {/*    {filters.map((item) => (*/}
                 {/*        <Tag*/}
@@ -85,7 +88,7 @@ const ResultTicketList = ({ flights, packages, loading }: any) => {
                 )}
 
             </div>
-            <div className={styles.resultListItems}>
+            <div className={`${styles.resultListItems} ${tl.items}`}>
                 {loading && (
                     <>
                         <TicketItem lazy={true} price={0} item={null} green={true} />
