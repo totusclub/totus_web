@@ -68,10 +68,67 @@ const TicketItem: FC<TicketItemProps> = ({ green, item, price, lazy }) => {
         econom: 'Эконом',
         business: 'Бизнес'
     }
+
+    // У рейса с пересадкой `item.direction` от API может не прийти — тогда строка была пустой.
+    const transferLabel = (flight: any, lower = false) =>
+        flight?.direct ? 'Прямой' : (item?.direction || (lower ? 'с пересадкой' : 'С пересадкой'));
+
+    // Багаж «обратно» — из обратного рейса (раньше брался вес и наличие багажа «туда»).
+    const luggageTags = item ? (
+        <>
+            <li>{classFlight[item?.to?.class]}</li>
+            {item?.to?.luggage?.hand?.count > 0 && (
+                <li>Ручная кладь {item?.to?.luggage?.hand?.weight} кг туда</li>
+            )}
+            {item?.back?.luggage?.hand?.count > 0 && (
+                <li>Ручная кладь {item?.back?.luggage?.hand?.weight} кг обратно</li>
+            )}
+            {item?.to?.luggage?.hold?.count > 0 && (
+                <li>Багаж {item?.to?.luggage?.hold?.weight} кг туда</li>
+            )}
+            {item?.back?.luggage?.hold?.count > 0 && (
+                <li>Багаж {item?.back?.luggage?.hold?.weight} кг обратно</li>
+            )}
+        </>
+    ) : null;
+
+    /**
+     * Телефон и планшет (до 1024 px) — вариант B «Билет» (утверждён 12.10.2026, артефакт «Билеты на телефоне»):
+     * сегмент рейса как в билете — логотип, «Туда · дата», авиакомпания; крупно время вылета и прилёта,
+     * между ними длительность и «Прямой / с пересадкой»; ниже аэропорты и города.
+     */
+    const renderMobileSegment = (flight: any, label: string) => (
+        <div className={styles.mobSeg}>
+            <div className={styles.mobSegHead}>
+                {flight?.airline?.logo?.src ? (
+                    <img className={styles.mobSegLogo} src={flight.airline.logo.src} alt="" loading="lazy" decoding="async" />
+                ) : (
+                    <span className={styles.mobSegLogo} aria-hidden="true" />
+                )}
+                <b>{label}</b>
+                <span>{formatRussianDate(flight?.departure)}</span>
+                <span className={styles.mobSegAirline}>{flight?.airline?.name}</span>
+            </div>
+            <div className={styles.mobSegTimes}>
+                <b>{formatRussianDateTime(flight?.departure)}</b>
+                <div className={styles.mobSegMid}>
+                    <span>{secondsToRussianTime(flight?.time)}</span>
+                    <i aria-hidden="true" />
+                    <span className={flight?.direct ? styles.mobSegDirect : undefined}>{transferLabel(flight, true)}</span>
+                </div>
+                <b>{formatRussianDateTime(flight?.arrival)}</b>
+            </div>
+            <div className={styles.mobSegPlaces}>
+                <span>{[flight?.origin?.code, getPlaceName(flight?.origin)].filter(Boolean).join(' · ')}</span>
+                <span>{[getPlaceName(flight?.destination), flight?.destination?.code].filter(Boolean).join(' · ')}</span>
+            </div>
+        </div>
+    );
+
     if (!lazy) {
         return (
             <>
-                <div className={green ? styles.ticketItemWrapper : ''}>
+                <div className={`${green ? styles.ticketItemWrapper : ''} ${styles.ticketDesktop}`}>
                     <div
                         className={styles.ticketItem}
                         style={{ border: green ? 'none' : '1px solid var(--borderTertiary)' }}
@@ -93,7 +150,7 @@ const TicketItem: FC<TicketItemProps> = ({ green, item, price, lazy }) => {
                                     </div>
                                     <div className={styles.ticketItemLineItem}>
                                         <div className={styles.ticketItemDate}>
-                                            <p>{item?.to?.direct ? 'Прямой' : item?.direction}</p>
+                                            <p>{transferLabel(item?.to)}</p>
                                             <p>{item?.to?.airline?.name}</p>
                                         </div>
                                     </div>
@@ -122,7 +179,7 @@ const TicketItem: FC<TicketItemProps> = ({ green, item, price, lazy }) => {
                                     </div>
                                     <div className={styles.ticketItemLineItem}>
                                         <div className={styles.ticketItemDate}>
-                                            <p>{item?.back?.direct ? 'Прямой' : item?.direction}</p>
+                                            <p>{transferLabel(item?.back)}</p>
                                             <p>{item?.back?.airline?.name}</p>
                                         </div>
                                     </div>
@@ -135,22 +192,7 @@ const TicketItem: FC<TicketItemProps> = ({ green, item, price, lazy }) => {
                                     </div>
                                 </div>
                             </div>
-                            <ul>
-                                <li>{classFlight[item.to.class]}</li>
-                                {item?.to?.luggage?.hand?.count > 0 && (
-                                    <li>Ручная кладь {item?.to?.luggage?.hand?.weight} кг туда</li>
-                                )}
-                                {item?.back?.luggage?.hand?.count > 0 && (
-                                    <li>Ручная кладь {item?.back?.luggage?.hand?.weight} кг обратно</li>
-                                )}
-                                {item?.to?.luggage?.hold?.count > 0 && (
-                                    <li>Багаж {item?.to?.luggage?.hold?.weight} кг туда</li>
-                                )}
-                                {item?.to?.luggage?.hold?.count > 0 && (
-                                    <li>Багаж {item?.to?.luggage?.hold?.weight} кг обратно</li>
-                                )}
-
-                            </ul>
+                            <ul>{luggageTags}</ul>
                         </div>
 
                         <div className={styles.ticketItemPriceInfo}>
@@ -178,6 +220,41 @@ const TicketItem: FC<TicketItemProps> = ({ green, item, price, lazy }) => {
                             <p>Самый выгодный рейс к туру</p>
                         </div>
                     )}
+                </div>
+
+                <div className={styles.mob}>
+                    {green && (
+                        <div className={styles.mobBadge}>
+                            <Icon name="light" size={16} color="#0b3b2e" />
+                            <span>Самый выгодный рейс к туру</span>
+                        </div>
+                    )}
+                    <div className={styles.mobBody}>
+                        {renderMobileSegment(item?.to, 'Туда')}
+                        {renderMobileSegment(item?.back, 'Обратно')}
+                        <ul className={styles.mobTags}>{luggageTags}</ul>
+                    </div>
+                    <div className={styles.mobStub}>
+                        <div className={styles.mobFoot}>
+                            <div className={styles.mobPrice}>
+                                <b>{formatMoneyRub(totalPrice)}</b>
+                                <span>Доплаты и сборы +{formatMoneyRub(fuelCharge)} · за тур с перелётом</span>
+                            </div>
+                            <div className={styles.mobChoose}>
+                                <Button
+                                    onClick={() => handleClick(item?.flight_pair_id)}
+                                    title="Выбрать"
+                                    height="44px"
+                                    width="100%"
+                                    br={22}
+                                />
+                            </div>
+                        </div>
+                        <button type="button" onClick={() => setOpen(true)} className={styles.mobDetails}>
+                            <Icon name="info" size={16} />
+                            <span>Детали перелёта</span>
+                        </button>
+                    </div>
                 </div>
 
                 {/* Окно деталей монтируется только при открытии — не по экземпляру react-modal на каждый рейс */}
@@ -281,11 +358,46 @@ const TicketItem: FC<TicketItemProps> = ({ green, item, price, lazy }) => {
             </div>
         );
 
-        return green ? (
-            <div className={styles.ticketItemWrapper}>
-                {skeletonContent}
+        // Телефон и планшет: заглушка той же формы, что и карточка варианта B (список не прыгает)
+        const mobileSkeleton = (
+            <div className={styles.mob} aria-hidden="true">
+                <div className={styles.mobBody}>
+                    {[0, 1].map((i) => (
+                        <div key={i} className={styles.mobSeg}>
+                            <div className={styles.animationTextlazy} style={{ width: '70%', height: '18px', marginTop: 0 }}></div>
+                            <div className={styles.animationTextlazy} style={{ width: '100%', height: '24px', marginTop: 0 }}></div>
+                            <div className={styles.animationTextlazy} style={{ width: '85%', height: '16px', marginTop: 0 }}></div>
+                        </div>
+                    ))}
+                    <div className={styles.mobTags}>
+                        <div className={styles.animationTextlazy} style={{ width: '64px', height: '24px', marginTop: 0 }}></div>
+                        <div className={styles.animationTextlazy} style={{ width: '140px', height: '24px', marginTop: 0 }}></div>
+                    </div>
+                </div>
+                <div className={styles.mobStub}>
+                    <div className={styles.mobFoot}>
+                        <div className={styles.mobPrice}>
+                            <div className={styles.animationTextlazy} style={{ width: '120px', height: '24px', marginTop: 0 }}></div>
+                            <div className={styles.animationTextlazy} style={{ width: '180px', height: '16px', marginTop: 4 }}></div>
+                        </div>
+                        <div className={styles.leazyButton} style={{ width: '132px', height: '44px', borderRadius: '22px', marginTop: 0 }}></div>
+                    </div>
+                </div>
             </div>
-        ) : skeletonContent;
+        );
+
+        return (
+            <>
+                {green ? (
+                    <div className={`${styles.ticketItemWrapper} ${styles.ticketDesktop}`}>
+                        {skeletonContent}
+                    </div>
+                ) : (
+                    <div className={styles.ticketDesktop}>{skeletonContent}</div>
+                )}
+                {mobileSkeleton}
+            </>
+        );
     }
 
 };
