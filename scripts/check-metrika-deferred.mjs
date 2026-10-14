@@ -1,6 +1,6 @@
 // Яндекс Метрика грузится после загрузки страницы (мобильный PageSpeed: tag.js ~64 КБ был в окне LCP).
 // Проверяет настоящий код из src/pages/_app.tsx: очередь ym() и init — сразу, tag.js — только после
-// load и паузы браузера, один раз; параметры счётчика не изменились.
+// load и паузы браузера, один раз; параметры счётчика не изменились; всё это — только после согласия на аналитику.
 // Запуск: node scripts/check-metrika-deferred.mjs (без npm install).
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -114,7 +114,16 @@ check('параметры счётчика прежние (вебвизор, к�
   for (const p of ['ssr:true', 'webvisor:true', 'clickmap:true', 'ecommerce:"dataLayer"', 'accurateTrackBounce:true', 'trackLinks:true']) {
     assert.ok(snippet.includes(p), p);
   }
-  assert.match(app, /src="https:\/\/mc\.yandex\.ru\/watch\/106173650"/, 'noscript-пиксель на месте');
+});
+
+check('счётчик — только после согласия на аналитику в cookie-баннере; пикселя <noscript> нет', () => {
+  // 14.10.2026, «Согласия в формах»: без согласия ни скрипта, ни пикселя (Политика cookie, п. 4.2).
+  assert.match(app, /\{analyticsAllowed && \(\s*<Script\s+id="yandex-metrika"/);
+  assert.match(app, /const \[analyticsAllowed, setAnalyticsAllowed\] = useState\(false\);/);
+  assert.match(app, /hasAnalyticsConsent\(\)/);
+  assert.match(app, /window\.addEventListener\(COOKIE_CONSENT_EVENT, onChoice\)/);
+  assert.ok(!/mc\.yandex\.ru\/watch/.test(app), 'пиксель без согласия не выводится');
+  assert.ok(!/<noscript>/.test(app));
 });
 
 console.log(`\n${passed} passed, ${failed} failed`);
