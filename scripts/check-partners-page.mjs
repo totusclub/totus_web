@@ -53,8 +53,14 @@ check('форма: поля и типы как в API, проверка до о�
     assert.match(content, /role="radiogroup" aria-label="Кто вы"/);
     assert.match(content, /const found = validatePartnerForm\(fields\);/);
     assert.match(content, /name="website"[\s\S]*?tabIndex=\{-1\}[\s\S]*?className=\{styles\.honeypot\}/);
-    assert.match(content, /href="\/privacy-policy"/);
-    assert.ok(content.includes('Политикой обработки персональных данных'));
+    // 14.10.2026: согласие — отдельный чекбокс (ConsentPdText: /consent и /privacy-policy), без него кнопка неактивна.
+    assert.match(content, /<ConsentCheckbox id="partner-consent-pd" checked=\{pdConsent\} onChange=\{setPdConsent\} required>\s*<ConsentPdText \/>/);
+    assert.match(content, /disabled=\{sending \|\| !pdConsent\}/);
+    assert.match(content, /consents: \{ pd: true \}/);
+    assert.ok(!content.includes('Нажимая кнопку'), 'согласие «нажимая кнопку» убрано');
+    const consentUi = read('src/components/UI/consentCheckbox/index.tsx');
+    assert.ok(consentUi.includes('Политикой обработки персональных данных'));
+    assert.match(read('src/config/legalLinks.ts'), /privacy: '\/privacy-policy'/);
     assert.match(content, /role="alert"/, 'ошибка сервера показывается в форме, не alert()');
     assert.ok(!/\balert\(/.test(content));
     assert.ok(content.includes('Заявка отправлена'));
