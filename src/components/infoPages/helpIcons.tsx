@@ -1,7 +1,7 @@
 import type { FaqIcon } from '@/config/faqContent';
 
 /** Контурные иконки центра помощи (макет Figma «Частые вопросы · Центр помощи»). Цвет — currentColor. */
-const PATHS: Record<FaqIcon | 'search' | 'chat' | 'chevron', string[]> = {
+const PATHS: Record<FaqIcon | 'search' | 'chat' | 'chevron' | 'megaphone' | 'check', string[]> = {
     sun: [
         'M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z',
         'M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41',
@@ -30,6 +30,8 @@ const PATHS: Record<FaqIcon | 'search' | 'chat' | 'chevron', string[]> = {
     search: ['M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z', 'm21 21-4.3-4.3'],
     chat: ['M21 12a8 8 0 0 1-11.6 7.1L4 20.5l1.4-5.1A8 8 0 1 1 21 12Z', 'M8.5 12h.01M12 12h.01M15.5 12h.01'],
     chevron: ['M6 9l6 6 6-6'],
+    check: ['M5 12.5l4.5 4.5L19 7.5'],
+    megaphone: ['M3 11v2a1 1 0 0 0 1 1h2l5 4V6L6 10H4a1 1 0 0 0-1 1Z', 'M16 8.5a5 5 0 0 1 0 7', 'M19 5.5a9 9 0 0 1 0 13'],
 };
 
 export type HelpIconName = keyof typeof PATHS;
