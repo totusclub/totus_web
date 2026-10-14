@@ -5,6 +5,10 @@
  * не попадают: страница меняет ticket через POST /api/auth/yandex/exchange,
  * кладёт токены в localStorage (как после кода из письма) и возвращает туда,
  * откуда начинали. Макеты — claude/YANDEX_AUTH_DESIGN_RU.md.
+ *
+ * Новый пользователь (isNew) на шаге «Почти готово» даёт согласие на обработку персональных данных
+ * (обязательно) и на рекламу (по желанию) — макет «Согласия в формах», 14.10.2026. Телефон можно
+ * пропустить, согласие — нет: «Отказаться и выйти» завершает сеанс.
  */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
@@ -13,14 +17,16 @@ import Head from 'next/head';
 import styles from './yandex.module.css';
 import Button from '@/components/UI/button';
 import Input from '@/components/UI/input';
-import { setAuth } from '@/store/slices/authSlice';
-import { decodeToken, saveToken, saveRefreshToken } from '@/utils/auth';
+import { setAuth, logout } from '@/store/slices/authSlice';
+import { decodeToken, deleteToken, saveToken, saveRefreshToken } from '@/utils/auth';
 import { getMe } from '@/api/AuthApi';
 import { yandexExchange, updateProfilePhone, yandexStartUrl } from '@/api/YandexAuthApi';
 import { formatRuPhoneInput, normalizeRuPhone, RU_PHONE_HINT } from '@/utils/phone';
 import { yandexAuthErrorText, yandexExchangeErrorCode } from '@/utils/yandexAuthErrors';
+import { saveConsents } from '@/api/consentsApi';
+import ConsentCheckbox, { ConsentAdsText, ConsentPdText, TermsNote } from '@/components/UI/consentCheckbox';
 
-type Stage = 'loading' | 'phone' | 'error';
+type Stage = 'loading' | 'phone' | 'consent' | 'error';
 
 function safePath(value: unknown): string {
     const raw = typeof value === 'string' ? value : '';
@@ -39,6 +45,9 @@ const YandexAuthPage: React.FC = () => {
     const [phone, setPhone] = useState('');
     const [saving, setSaving] = useState(false);
     const [phoneError, setPhoneError] = useState('');
+    const [pdConsent, setPdConsent] = useState(false);
+    const [adsConsent, setAdsConsent] = useState(false);
+    const [consentError, setConsentError] = useState('');
 
     const finish = useCallback(
         (path: string) => {
@@ -89,6 +98,11 @@ const YandexAuthPage: React.FC = () => {
                     if (profile) dispatch(setAuth({ token, user: { ...(user as any), ...profile } }));
                 });
 
+                // Новый аккаунт создан по данным Яндекса — согласие собираем здесь же (вместе с телефоном).
+                if (data.isNew) {
+                    setStage('consent');
+                    return;
+                }
                 if (data.needsPhone) {
                     setStage('phone');
                     return;
@@ -135,6 +149,60 @@ const YandexAuthPage: React.FC = () => {
         }
     };
 
+    /** «Продолжить» на шаге согласия: телефон — если введён, согласия — в журнал (POST /api/consents). */
+    const handleConsentContinue = async () => {
+        if (!pdConsent || saving) return;
+        let normalized = '';
+        if (phone.trim()) {
+            normalized = normalizeRuPhone(phone) || '';
+            if (!normalized) {
+                setPhoneError(RU_PHONE_HINT);
+                return;
+            }
+        }
+        setPhoneError('');
+        setConsentError('');
+        setSaving(true);
+        try {
+            await saveConsents('signup_yandex', { pd: true, ads: adsConsent });
+        } catch {
+            setConsentError('Не удалось сохранить согласие. Проверьте интернет и попробуйте ещё раз.');
+            setSaving(false);
+            return;
+        }
+        if (normalized) {
+            try {
+                const data = await updateProfilePhone(normalized);
+                const token = data?.accessToken || data?.authToken;
+                if (token) {
+                    saveToken(token);
+                    if (data.refreshToken) saveRefreshToken(data.refreshToken);
+                    dispatch(setAuth({ token, user: decodeToken(token) }));
+                }
+            } catch (error: any) {
+                setPhoneError(
+                    error?.response?.data?.error === 'phone_invalid'
+                        ? error?.response?.data?.message || RU_PHONE_HINT
+                        : 'Не удалось сохранить номер',
+                );
+                setSaving(false);
+                return;
+            }
+        }
+        setSaving(false);
+        finish(returnPath);
+    };
+
+    /** «Отказаться и выйти»: без согласия аккаунтом не пользуемся — выходим. */
+    const handleDecline = () => {
+        deleteToken();
+        dispatch(logout());
+        if (typeof window !== 'undefined' && (window as any).ReactNativeWebView?.postMessage) {
+            (window as any).ReactNativeWebView.postMessage('logout');
+        }
+        router.replace('/');
+    };
+
     const error = yandexAuthErrorText(errorCode);
 
     return (
@@ -174,6 +242,44 @@ const YandexAuthPage: React.FC = () => {
                             <Button title="Сохранить" full loading={saving} onClick={handleSavePhone} />
                             <button type="button" className={styles.link} onClick={() => finish(returnPath)}>
                                 Пропустить
+                            </button>
+                        </>
+                    ) : null}
+
+                    {stage === 'consent' ? (
+                        <>
+                            <h1 className={styles.title}>Почти готово</h1>
+                            <p className={styles.text}>
+                                Добавьте телефон — он нужен для оформления заказа и связи по бронированию. Телефон можно
+                                добавить позже.
+                            </p>
+                            <Input
+                                value={phone}
+                                onChange={onPhoneChange}
+                                placeholder="+7 999 123-45-67"
+                                type="tel"
+                                inputMode="tel"
+                                maxLength={18}
+                                error={phoneError}
+                            />
+                            <p className={styles.hint}>Только российские номера: +7 или 8</p>
+                            <ConsentCheckbox id="yandex-consent-pd" checked={pdConsent} onChange={setPdConsent} required>
+                                <ConsentPdText />
+                            </ConsentCheckbox>
+                            <ConsentCheckbox id="yandex-consent-ads" checked={adsConsent} onChange={setAdsConsent}>
+                                <ConsentAdsText />
+                            </ConsentCheckbox>
+                            {consentError ? <p className={styles.consentError} role="alert">{consentError}</p> : null}
+                            <Button
+                                title="Продолжить"
+                                full
+                                loading={saving}
+                                disabled={!pdConsent || saving}
+                                onClick={handleConsentContinue}
+                            />
+                            <TermsNote verb="Продолжая" />
+                            <button type="button" className={styles.link} onClick={handleDecline}>
+                                Отказаться и выйти
                             </button>
                         </>
                     ) : null}

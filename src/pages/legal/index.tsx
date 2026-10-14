@@ -50,10 +50,12 @@ export default function LegalPage() {
                             <dt>Адрес</dt>
                             <dd>{LEGAL_COMPANY.address}</dd>
                         </div>
-                        <div>
-                            <dt>Реестр турагентов</dt>
-                            <dd>{LEGAL_COMPANY.touragentRegistry}</dd>
-                        </div>
+                        {LEGAL_COMPANY.touragentRegistry ? (
+                            <div>
+                                <dt>Реестр турагентов</dt>
+                                <dd>{LEGAL_COMPANY.touragentRegistry}</dd>
+                            </div>
+                        ) : null}
                     </dl>
                     <Link href={LEGAL_REQUISITES.href} className={styles.companyLink}>
                         Все реквизиты и контакты →

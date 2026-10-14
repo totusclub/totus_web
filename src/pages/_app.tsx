@@ -1,5 +1,5 @@
 import type { AppProps } from 'next/app';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import Script from 'next/script'; // ✅ ADD
 import { useRouter } from 'next/router';
@@ -19,6 +19,7 @@ import { useDispatch } from "react-redux";
 import MobileBottomBar from "@/components/mobileBottomBar";
 import SiteSeo from "@/components/seo/SiteSeo";
 import CookieConsent from "@/components/cookieConsent";
+import { COOKIE_CONSENT_EVENT, clearMetrikaCookies, hasAnalyticsConsent, type CookieChoice } from '@/utils/cookieConsent';
 import SupportCallProvider from '@/components/support/SupportCallProvider';
 import AuthOnly from '@/components/AuthOnly';
 import { useStopSearchPollOnLeave } from '@/hooks/useStopSearchPollOnLeave';
@@ -35,6 +36,26 @@ function MyApp({ Component, pageProps }: AppProps) {
     // Только /ai и /ai/* (переадресации Милы). Проверка по префиксу «/ai» без слэша задевала /airlines и /airline-fees.
     const isAiRoute = router.pathname === '/ai' || router.pathname.startsWith('/ai/');
     useStopSearchPollOnLeave();
+    // Яндекс Метрика — только после согласия на аналитику в cookie-баннере (Политика cookie, п. 4.2).
+    const [analyticsAllowed, setAnalyticsAllowed] = useState(false);
+
+    useEffect(() => {
+        let allowedNow = hasAnalyticsConsent();
+        setAnalyticsAllowed(allowedNow);
+        const onChoice = (event: Event) => {
+            const allowed = (event as CustomEvent<CookieChoice>).detail?.analytics === true;
+            // Отозвали согласие после запуска счётчика: удалить его cookie и перезагрузить страницу без него.
+            if (allowedNow && !allowed) {
+                clearMetrikaCookies();
+                window.location.reload();
+                return;
+            }
+            allowedNow = allowed;
+            setAnalyticsAllowed(allowed);
+        };
+        window.addEventListener(COOKIE_CONSENT_EVENT, onChoice);
+        return () => window.removeEventListener(COOKIE_CONSENT_EVENT, onChoice);
+    }, []);
 
     useEffect(() => {
         const token = loadToken();
@@ -65,56 +86,46 @@ function MyApp({ Component, pageProps }: AppProps) {
     return (
         <>
             <SiteSeo pageProps={pageProps} />
-            {/* Яндекс Метрика. Очередь ym() и init — сразу, как раньше (вызовы ym до загрузки tag.js
-                копятся в очереди), а сам tag.js (~64 КБ, вебвизор) — только после события load и паузы
-                браузера (requestIdleCallback, не позже 3 с; без него — через 1,5 с). Так он не делит канал
-                с картинкой первого экрана и шрифтами и не попадает в LCP на телефоне. Визит, закрытый
-                раньше загрузки tag.js, в Метрику не попадёт. */}
-            <Script
-                id="yandex-metrika"
-                strategy="afterInteractive"
-                dangerouslySetInnerHTML={{
-                    __html: `
-                        (function(m,e,t,r,i){
-                            m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
-                            m[i].l=1*new Date();
-                            function loadTag(){
-                                for (var j = 0; j < e.scripts.length; j++) {
-                                    if (e.scripts[j].src === r) { return; }
+            {/* Яндекс Метрика — только после согласия на аналитику (cookie-баннер); без согласия скрипт и пиксель
+                не выводятся вовсе. Очередь ym() и init — сразу после согласия, сам tag.js (~64 КБ, вебвизор) — после
+                события load и паузы браузера (requestIdleCallback, не позже 3 с; без него — через 1,5 с), чтобы не
+                попадать в LCP на телефоне. Пиксель для браузеров без JavaScript убран: без JavaScript согласие не дать. */}
+            {analyticsAllowed && (
+                <Script
+                    id="yandex-metrika"
+                    strategy="afterInteractive"
+                    dangerouslySetInnerHTML={{
+                        __html: `
+                            (function(m,e,t,r,i){
+                                m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+                                m[i].l=1*new Date();
+                                function loadTag(){
+                                    for (var j = 0; j < e.scripts.length; j++) {
+                                        if (e.scripts[j].src === r) { return; }
+                                    }
+                                    var k=e.createElement(t),a=e.getElementsByTagName(t)[0];
+                                    k.async=1;k.src=r;a.parentNode.insertBefore(k,a);
                                 }
-                                var k=e.createElement(t),a=e.getElementsByTagName(t)[0];
-                                k.async=1;k.src=r;a.parentNode.insertBefore(k,a);
-                            }
-                            function whenIdle(){
-                                if (m.requestIdleCallback) { m.requestIdleCallback(loadTag, { timeout: 3000 }); }
-                                else { setTimeout(loadTag, 1500); }
-                            }
-                            if (e.readyState === 'complete') { whenIdle(); }
-                            else { m.addEventListener('load', whenIdle, { once: true }); }
-                        })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=106173650', 'ym');
+                                function whenIdle(){
+                                    if (m.requestIdleCallback) { m.requestIdleCallback(loadTag, { timeout: 3000 }); }
+                                    else { setTimeout(loadTag, 1500); }
+                                }
+                                if (e.readyState === 'complete') { whenIdle(); }
+                                else { m.addEventListener('load', whenIdle, { once: true }); }
+                            })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=106173650', 'ym');
 
-                        ym(106173650, 'init', {
-                            ssr:true,
-                            webvisor:true,
-                            clickmap:true,
-                            ecommerce:"dataLayer",
-                            accurateTrackBounce:true,
-                            trackLinks:true
-                        });
-                    `,
-                }}
-            />
-
-            {/* ✅ Noscript fallback */}
-            <noscript>
-                <div>
-                    <img
-                        src="https://mc.yandex.ru/watch/106173650"
-                        style={{ position: 'absolute', left: '-9999px' }}
-                        alt=""
-                    />
-                </div>
-            </noscript>
+                            ym(106173650, 'init', {
+                                ssr:true,
+                                webvisor:true,
+                                clickmap:true,
+                                ecommerce:"dataLayer",
+                                accurateTrackBounce:true,
+                                trackLinks:true
+                            });
+                        `,
+                    }}
+                />
+            )}
 
             <div id="root">
                 {/* <ScrollRestoration /> */}
