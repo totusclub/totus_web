@@ -175,9 +175,11 @@ check('футер: колонка «Приложение Totus Club» со ст�
     has(footer, /<SocialLinks items=\{socialLinks\} \/>/);
 });
 
-check('футер: колонки «Компания» и «Помощь» — по 4 ссылки', () => {
+// 14.10.2026: «Советы по низким тарифам» и «Безопасность» убраны из футера по решению владельца
+// (страницы /low-fare-tips и /security остаются доступны по адресу).
+check('футер: «Компания» — 4 ссылки, «Помощь» — 2 ссылки', () => {
     const company = [['/about-us', 'О нас'], ['/partners', 'Партнёры'], ['/advertise', 'Рекламируйтесь у нас'], ['/requisites', 'Реквизиты и контакты']];
-    const help = [['/help-faq', 'Помощь и FAQ'], ['/low-fare-tips', 'Советы по низким тарифам'], ['/airlines', 'Авиакомпании'], ['/security', 'Безопасность']];
+    const help = [['/help-faq', 'Помощь и FAQ'], ['/airlines', 'Авиакомпании']];
     const block = (name) => {
         const m = footer.match(new RegExp(`const ${name} = \\[([\\s\\S]*?)\\];`));
         assert.ok(m, `нет ${name}`);
@@ -187,6 +189,9 @@ check('футер: колонки «Компания» и «Помощь» — �
         const b = block(name);
         const found = [...b.matchAll(/href: '([^']+)', label: '([^']+)'/g)].map((x) => [x[1], x[2]]);
         assert.deepEqual(found, links, name);
+    }
+    for (const gone of ['/low-fare-tips', '/security', 'Советы по низким тарифам', 'Безопасность']) {
+        assert.ok(!footer.includes(gone), `в футере осталось «${gone}»`);
     }
     has(footer, /<LinkColumn title="Компания" links=\{COMPANY_LINKS\}/);
     has(footer, /<LinkColumn title="Помощь" links=\{HELP_LINKS\}/);
