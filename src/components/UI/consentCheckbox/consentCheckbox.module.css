@@ -1,0 +1,93 @@
+/* Чекбоксы согласий (макет «Согласия в формах», 14.10.2026). Светлая и тёмная тема — через переменные. */
+.group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+}
+.consent {
+    display: grid;
+    grid-template-columns: 20px minmax(0, 1fr);
+    gap: 10px;
+    align-items: start;
+    text-align: left;
+    cursor: pointer;
+}
+.box {
+    appearance: none;
+    -webkit-appearance: none;
+    display: grid;
+    place-items: center;
+    width: 20px;
+    height: 20px;
+    margin: 0;
+    border: 1.5px solid var(--textTertiary);
+    border-radius: 6px;
+    background: transparent;
+    cursor: pointer;
+}
+.box:checked {
+    border-color: var(--core_Orange);
+    background: var(--core_Orange);
+}
+.box:checked::after {
+    content: "";
+    width: 6px;
+    height: 11px;
+    border: solid #fff;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg) translate(-1px, -1px);
+}
+.box:focus-visible {
+    outline: 2px solid var(--core_Orange);
+    outline-offset: 2px;
+}
+.text {
+    color: var(--textSecondary);
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 18px;
+    letter-spacing: -0.2px;
+}
+.link {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+.link:hover {
+    color: var(--core_Orange);
+}
+.note {
+    margin: 0;
+    color: var(--textTertiary);
+    font-size: 12px;
+    line-height: 16px;
+    text-align: center;
+}
+.hint {
+    margin: 0;
+    color: var(--textTertiary);
+    font-size: 12px;
+    line-height: 16px;
+}
+
+/* На оранжевом фоне (блок «Оставьте номер»): белый текст, отмеченный — тёмный квадрат. */
+.onAccent .text {
+    color: rgba(255, 255, 255, 0.92);
+}
+.onAccent .link:hover {
+    color: #fff;
+}
+.onAccent .box {
+    border-color: rgba(255, 255, 255, 0.9);
+}
+.onAccent .box:checked {
+    border-color: #141414;
+    background: #141414;
+}
+.onAccent .box:focus-visible {
+    outline-color: #fff;
+}
+.hintOnAccent {
+    color: rgba(255, 255, 255, 0.85);
+}
