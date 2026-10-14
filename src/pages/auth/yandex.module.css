@@ -121,3 +121,13 @@
 [data-theme="dark"] .errorText{
     color: #E2B9B3;
 }
+.consentError{
+    margin: 0;
+    color: #C42618;
+    font-size: 13px;
+    line-height: 18px;
+    text-align: left;
+}
+[data-theme="dark"] .consentError{
+    color: #FF7A6B;
+}

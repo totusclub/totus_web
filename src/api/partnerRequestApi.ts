@@ -1,4 +1,5 @@
 import { API_BASE_URL } from '@/config/api';
+import type { Consents } from '@/config/legalLinks';
 
 export type PartnerKind = 'operator' | 'hotel' | 'ads' | 'other';
 
@@ -11,6 +12,8 @@ export interface PartnerRequestInput {
     message: string;
     /** Скрытое поле-ловушка для ботов, у людей всегда пустое. */
     website: string;
+    /** Галочки формы — сервер пишет их в журнал согласий после успешной заявки. */
+    consents: Consents;
 }
 
 /** Заявка «Стать партнёром» → totus_API → админка («Заявки партнёров»). */

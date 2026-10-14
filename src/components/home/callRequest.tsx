@@ -3,25 +3,30 @@ import styles from "./home.module.css";
 import PhoneInputField from "@/components/UI/phoneInputField";
 import { submitCallbackRequest } from "@/api/callbackRequestApi";
 import { useNearViewport } from "@/hooks/useNearViewport";
+import ConsentCheckbox, { ConsentHint, ConsentPdText } from "@/components/UI/consentCheckbox";
 
 
 export default function CallRequest(): JSX.Element {
     const [phone, setPhone] = useState('');
     const [submitting, setSubmitting] = useState(false);
     const [submitted, setSubmitted] = useState(false);
+    // Согласие на обработку персональных данных — отдельный чекбокс, не отмечен по умолчанию (152-ФЗ, ст. 9).
+    const [pdConsent, setPdConsent] = useState(false);
     // Фоновая картинка girl.png (~190 КБ) — только когда блок рядом с экраном; градиент слоя — CSS
     const [blockRef, blockVisible] = useNearViewport<HTMLDivElement>();
 
-    const isValid = /^7\d{10}$/.test(phone);
+    const phoneValid = /^7\d{10}$/.test(phone);
+    const isValid = phoneValid && pdConsent;
 
     const handleSubmit = async () => {
         if (!isValid || submitting) return;
 
         try {
             setSubmitting(true);
-            await submitCallbackRequest(phone);
+            await submitCallbackRequest(phone, { pd: true });
             setSubmitted(true);
             setPhone('');
+            setPdConsent(false);
         } catch (error) {
             const message = error instanceof Error ? error.message : 'Не удалось отправить запрос';
             alert(message);
@@ -54,11 +59,17 @@ export default function CallRequest(): JSX.Element {
                                 Спасибо! Мы свяжемся с вами в ближайшее время.
                             </p>
                         )}
+                        <div className={styles.formRequestCallText}>
+                            <ConsentCheckbox id="callback-consent-pd" checked={pdConsent} onChange={setPdConsent} variant="onAccent" required>
+                                <ConsentPdText />
+                            </ConsentCheckbox>
+                        </div>
                         <div
                             className={isValid && !submitting ? styles.formRequestCallBtn : styles.formRequestCallBtnDisable}
                             onClick={handleSubmit}
                             role="button"
                             tabIndex={0}
+                            aria-disabled={!isValid || submitting}
                             onKeyDown={(e) => {
                                 if (e.key === 'Enter' || e.key === ' ') {
                                     e.preventDefault();
@@ -68,10 +79,9 @@ export default function CallRequest(): JSX.Element {
                         >
                             <p>{submitting ? 'Отправка...' : 'Перезвоните мне'}</p>
                         </div>
-                        <div className={styles.formRequestCallText}>
-                            <p>Нажимая кнопку, я соглашаюсь на обработку своих персональных данных согласно</p>
-                            <p>политике защиты и обработки персональных данных и с условиями оферты</p>
-                        </div>
+                        {phoneValid && !pdConsent ? (
+                            <ConsentHint variant="onAccent">Отметьте согласие, чтобы отправить номер</ConsentHint>
+                        ) : null}
                     </div>
                     <div className={`${styles.callRequestGirl} ${blockVisible ? styles.callRequestGirlLoaded : ''}`}></div>
                 </div>

@@ -172,8 +172,20 @@
     color: inherit;
     text-decoration: underline;
 }
-.copyright a:hover{
+.copyright a:hover,
+.cookieSettings:hover{
     color: var(--textPrimary);
+}
+/* «Настройки cookie» — открывает cookie-баннер с выбором; выглядит как ссылки рядом. */
+.cookieSettings{
+    padding: 0;
+    border: none;
+    background: none;
+    color: inherit;
+    font: inherit;
+    letter-spacing: inherit;
+    text-decoration: underline;
+    cursor: pointer;
 }
 @media (max-width: 1024px) {
     /* Footer в мобильной версии: снизу место под фиксированную нижнюю панель (60px) */

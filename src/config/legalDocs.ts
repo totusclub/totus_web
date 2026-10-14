@@ -97,6 +97,9 @@ export const LEGAL_COMPANY = {
     ogrn: '1267700310382',
     address:
         '119361, г. Москва, вн.тер.г. муниципальный округ Очаково-Матвеевское, пер. 2-й Очаковский, д. 4, помещ. 1/2',
-    /** Реестровый номер турагента — заполнить после внесения в реестр. */
-    touragentRegistry: '[РТА …]',
+    /**
+     * Реестровый номер турагента — из настройки сайта NEXT_PUBLIC_TOURAGENT_REGISTRY_NUMBER.
+     * Пока номера нет, строка на /legal и в подвале не показывается (без заглушек на боевом сайте).
+     */
+    touragentRegistry: (process.env.NEXT_PUBLIC_TOURAGENT_REGISTRY_NUMBER || '').trim(),
 };

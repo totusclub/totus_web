@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react';
 import styles from './footer.module.css';
 import Icon from '@/components/icons/Icon';
 import { getFooterSocialLinks, type FooterSocialLink } from '@/api/footerSocialApi';
+import { LEGAL_COMPANY } from '@/config/legalDocs';
+import { openCookieSettings } from '@/utils/cookieConsent';
 
 const FALLBACK_SOCIAL: FooterSocialLink[] = [
     { id: 1, title: 'VK', icon: 'vk', url: '', sort_order: 1, is_active: true },
@@ -104,7 +106,8 @@ const Footer = () => {
                     <div className={styles.legalBlock}>
                         <p className={styles.legalText}>
                             <span>
-                                Турагент: ООО «ТОТУСКЛАБ», ИНН 9729424935, ОГРН 1267700310382, 119361, г. Москва, вн.тер.г. муниципальный округ Очаково-Матвеевское, пер. 2-й Очаковский, д. 4, помещ. 1/2. Реестровый номер турагента: [РТА …]
+                                Турагент: ООО «ТОТУСКЛАБ», ИНН 9729424935, ОГРН 1267700310382, 119361, г. Москва, вн.тер.г. муниципальный округ Очаково-Матвеевское, пер. 2-й Очаковский, д. 4, помещ. 1/2.
+                                {LEGAL_COMPANY.touragentRegistry ? ` Реестровый номер турагента: ${LEGAL_COMPANY.touragentRegistry}` : null}
                             </span>
                             <span>Приём платежей: Банк ВТБ (ПАО)</span>
                         </p>
@@ -124,8 +127,12 @@ const Footer = () => {
                 <div className={styles.footerBottom}>
                     <p className={styles.copyright}>
                         © 2026 ООО «ТОТУСКЛАБ». Все права защищены. Используя сайт, вы принимаете условия{' '}
-                        <Link href="/terms">пользовательского соглашения</Link>. Информация на сайте не является публичной офертой.{' '}
-                        <Link href="/privacy-policy">Политика обработки персональных данных</Link>.
+                        <Link href="/terms">пользовательского соглашения</Link>. Информация на сайте не является публичной офертой,
+                        кроме документов в разделе <Link href="/legal">«Правовая информация»</Link>.{' '}
+                        <Link href="/privacy-policy">Политика обработки персональных данных</Link>.{' '}
+                        <button type="button" className={styles.cookieSettings} onClick={openCookieSettings}>
+                            Настройки cookie
+                        </button>
                     </p>
                 </div>
             </div>

@@ -7,6 +7,7 @@ import YandexSmartCaptcha, {
     YANDEX_SMARTCAPTCHA_SITEKEY,
 } from '@/components/auth/YandexSmartCaptcha';
 import YandexIdButton from '@/components/auth/YandexIdButton';
+import { TermsNote } from '@/components/UI/consentCheckbox';
 
 /**
  * Вход по email. Капча показывается ПОСЛЕ нажатия «Войти» и, как только
@@ -81,7 +82,7 @@ const SignInForm: React.FC = ({setScreen,setEmail}:any) => {
      <div className={styles.authCard}>
          <Input value={login} onChange={(e)=>handleEmail(e)} placeholder={'Электронная почта'} />
          <div className={styles.authCardText}>
-             <p>Мы позвоним или отправим сообщение, чтобы подтвердить ваш номер. Применяются стандартные тарифы на сообщения и данные.</p>
+             <p>Пришлём код на почту.</p>
          </div>
          {captchaVisible ? (
              <>
@@ -92,6 +93,7 @@ const SignInForm: React.FC = ({setScreen,setEmail}:any) => {
          {error ? <p className={styles.captchaError}>{error}</p> : null}
          <Button disabled={disabled} loading={loading} onClick={()=>handelLogin()} title={'Войти'}/>
          <YandexIdButton />
+         <TermsNote verb="Продолжая" withPrivacy />
      </div>
     );
 };
