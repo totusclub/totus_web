@@ -22,9 +22,7 @@ const COMPANY_LINKS = [
 
 const HELP_LINKS = [
     { href: '/help-faq', label: 'Помощь и FAQ' },
-    { href: '/low-fare-tips', label: 'Советы по низким тарифам' },
     { href: '/airlines', label: 'Авиакомпании' },
-    { href: '/security', label: 'Безопасность' },
 ];
 
 function SocialLinks({ items }: { items: FooterSocialLink[] }) {
