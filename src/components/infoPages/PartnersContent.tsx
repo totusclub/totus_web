@@ -1,10 +1,10 @@
 'use client';
 
-import Link from 'next/link';
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react';
 import { getHomePartners, type HomePartner } from '@/api/homePartnersApi';
 import { submitPartnerRequest, type PartnerKind } from '@/api/partnerRequestApi';
 import { HelpIcon, type HelpIconName } from './helpIcons';
+import ConsentCheckbox, { ConsentPdText } from '@/components/UI/consentCheckbox';
 import styles from './infoPages.module.css';
 
 // Страница /partners — макет Figma «Партнёры» (секция 2422:109219, 14.10.2026).
@@ -110,6 +110,8 @@ function PartnerForm() {
     const [sending, setSending] = useState(false);
     const [serverError, setServerError] = useState<string | null>(null);
     const [sentTo, setSentTo] = useState<string | null>(null);
+    // Согласие на обработку персональных данных — отдельный чекбокс, не отмечен по умолчанию (152-ФЗ, ст. 9).
+    const [pdConsent, setPdConsent] = useState(false);
     const doneRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -124,7 +126,7 @@ function PartnerForm() {
 
     const onSubmit = async (e: FormEvent) => {
         e.preventDefault();
-        if (sending) return;
+        if (sending || !pdConsent) return;
         const found = validatePartnerForm(fields);
         setErrors(found);
         setServerError(null);
@@ -143,9 +145,11 @@ function PartnerForm() {
                 kind,
                 message: fields.message.trim(),
                 website,
+                consents: { pd: true },
             });
             setSentTo(fields.email.trim());
             setFields(EMPTY);
+            setPdConsent(false);
         } catch (err) {
             setServerError(err instanceof Error ? err.message : 'Не удалось отправить заявку, попробуйте позже');
         } finally {
@@ -247,16 +251,14 @@ function PartnerForm() {
                 </p>
             ) : null}
 
-            <button type="submit" className={`${styles.btnPrimary} ${styles.formSubmit}`} disabled={sending}>
+            <ConsentCheckbox id="partner-consent-pd" checked={pdConsent} onChange={setPdConsent} required>
+                <ConsentPdText />
+            </ConsentCheckbox>
+
+            <button type="submit" className={`${styles.btnPrimary} ${styles.formSubmit}`} disabled={sending || !pdConsent}>
                 {sending ? 'Отправляем…' : 'Отправить заявку'}
             </button>
-            <p className={styles.formNote}>
-                Нажимая кнопку, вы соглашаетесь с{' '}
-                <Link href="/privacy-policy" className={styles.link}>
-                    Политикой обработки персональных данных
-                </Link>
-                .
-            </p>
+            {!pdConsent ? <p className={styles.formNote}>Отметьте согласие, чтобы отправить заявку</p> : null}
         </form>
     );
 }
