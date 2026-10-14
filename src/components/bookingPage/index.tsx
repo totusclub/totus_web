@@ -8,6 +8,8 @@ import useAuth from "@/hooks/useAuth";
 import { validateBookingForm, flattenBookingErrors, mapLevelTravelTouristValidateErrors, type Tourist, type TouristErrors, type BookingValidationErrors } from "@/utils/bookingValidation";
 import { getSearchTypeFromQuery, isHotelOnlySearch } from "@/utils/bookingFlowUtils";
 import { toMoney } from "@/utils/packagePrice";
+import { requiredBookingConsents } from "@/components/bookingPage/orderCard";
+import { hasRequiredConsents, type Consents } from "@/config/legalLinks";
 
 type Params = {
     email: string;
@@ -146,6 +148,10 @@ const BookingCard = () => {
     });
     const [errors, setErrors] = useState<ValidationErrors>({});
     const [showErrors, setShowErrors] = useState(false);
+    // Согласия под кнопкой (оферта / условия отеля, персональные данные, реклама) — не отмечены по умолчанию.
+    const [consents, setConsents] = useState<Consents>({});
+    const isHotelOnly = isHotelOnlySearch(getSearchTypeFromQuery(router.query));
+    const consentsOk = hasRequiredConsents(consents, requiredBookingConsents(isHotelOnly));
 
     useEffect(() => {
         const packageId = router?.query?.package;
@@ -473,6 +479,11 @@ const BookingCard = () => {
             return;
         }
 
+        // Без обязательных согласий заказ не отправляется (кнопка и так неактивна).
+        if (!consentsOk) {
+            return;
+        }
+
         // Clear errors before submission
         setErrors({});
 
@@ -738,6 +749,10 @@ const BookingCard = () => {
                 phone: client.phone,
                 user_id: user?.id,
                 payment_option: 'sbp',
+                // Журнал согласий в totus_API; в Level.Travel поле не уходит (create-package собирает запрос сам).
+                consents: isHotelOnly
+                    ? { hotel_terms: true, pd: true, ads: consents.ads === true }
+                    : { tour_offer: true, pd: true, ads: consents.ads === true },
             };
             if (flightPairId) {
                 dataOrderCreate.flight_pair_id = flightPairId;
@@ -826,6 +841,9 @@ const BookingCard = () => {
                         dataLoading={dataLoading}
                         isFormValid={isFormValid}
                         errorMessages={bottomErrorMessages}
+                        isHotelOnly={isHotelOnly}
+                        consents={consents}
+                        onConsentsChange={setConsents}
                     />
                 </div>
             </div>
