@@ -134,17 +134,40 @@ check('шрифты: Museo Sans Cyrl 300/500/700/900, Forum, знаки (₽, с
   }
   // старое имя "Golos Text" (виджет Милы) — на файлах Museo и знаках
   assert.deepEqual(faceOf('Golos Text').filter((f) => !f.includes('url(data:')).map((f) => f.match(/fonts\/([\w.-]+)"/)[1]),
-    ['MuseoSansCyrl-300.woff2', 'MuseoSansCyrl-500.woff2', 'MuseoSansCyrl-700.woff2', 'MuseoSansCyrl-900.woff2', 'GolosSymbols-500.woff2', 'GolosSymbols-700.woff2']);
+    ['MuseoSansCyrl-300.woff2', 'MuseoSansCyrl-500.woff2', 'MuseoSansCyrl-700.woff2', 'MuseoSansCyrl-900.woff2',
+      'GolosSymbols-500.woff2', 'GolosSymbols-500.woff2', 'GolosSymbols-700.woff2', 'GolosSymbols-700.woff2']);
+});
+
+check('шрифты: у граней одного семейства одинаковые диапазоны font-weight (иначе Chrome не объединяет ₽ и стрелки)', () => {
+  const ranges = (fam, pick) => [...new Set(faceOf(fam).filter(pick).map((f) => f.match(/font-weight: ([\d ]+);/)[1]))].join(' | ');
+  const isRub = (f) => f.includes('url(data:');
+  const isSym = (f) => f.includes('GolosSymbols');
+  const isMuseo = (f) => f.includes('MuseoSansCyrl');
+  assert.equal(ranges('Totus Symbols', isSym), '100 399 | 400 599 | 600 1000');
+  assert.equal(ranges('Totus Symbols', isRub), '100 399 | 400 599 | 600 1000');
+  assert.equal(ranges('Golos Text', isMuseo), '100 399 | 400 599 | 600 799 | 800 1000');
+  assert.equal(ranges('Golos Text', isSym), '100 399 | 400 599 | 600 799 | 800 1000');
+  assert.equal(ranges('Golos Text', isRub), '100 399 | 400 599 | 600 799 | 800 1000');
+  // стрелки: Golos 500 до 599, Golos 700 с 600 — как раньше
+  for (const fam of ['Totus Symbols', 'Golos Text']) {
+    for (const f of faceOf(fam).filter(isSym)) {
+      const lo = +f.match(/font-weight: (\d+)/)[1];
+      assert.ok(f.includes(lo < 600 ? 'GolosSymbols-500' : 'GolosSymbols-700'), `${fam} ${lo}`);
+    }
+  }
 });
 
 check('знак рубля: свой ₽ под Museo (300/500/700) в «Totus Symbols» и «Golos Text», < 1 КБ, из scripts/ruble-glyph.json', () => {
   const glyph = JSON.parse(read('scripts/ruble-glyph.json'));
   for (const fam of ['Totus Symbols', 'Golos Text']) {
     const rub = faceOf(fam).filter((f) => f.includes('url(data:'));
-    assert.deepEqual(rub.map((f) => f.match(/font-weight: ([\d ]+);/)[1]), ['100 399', '400 599', '600 1000'], fam);
+    assert.deepEqual(rub.map((f) => f.match(/font-weight: ([\d ]+);/)[1]),
+      fam === 'Totus Symbols' ? ['100 399', '400 599', '600 1000'] : ['100 399', '400 599', '600 799', '800 1000'], fam);
     for (const f of rub) {
       const w = f.match(/font-weight: ([\d ]+);/)[1];
-      const entry = Object.values(glyph.weights).find((x) => x.cssWeight === w);
+      const lo = +w.split(' ')[0];
+      // знак для диапазона: 300 — до 399, 500 — 400–599, 700 — с 600
+      const entry = Object.values(glyph.weights).find((x) => { const [a, b] = x.cssWeight.split(' ').map(Number); return lo >= a && lo <= b; });
       const b64 = f.match(/url\(data:font\/woff;base64,([A-Za-z0-9+/=]+)\) format\("woff"\);/)[1];
       assert.equal(b64, entry.woff, `${fam} ${w}: шрифт в CSS не совпадает с ruble-glyph.json`);
       const buf = Buffer.from(b64, 'base64');
