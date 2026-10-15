@@ -44,7 +44,7 @@ const HotelDetailsHeader = ({ info, loading, onReviewsClick }: any) => {
                                     : undefined
                             }
                         >
-                            <Icon name={'message'} size={14} color={iconColor} />
+                            <Icon name={'reviews'} size={14} color={iconColor} />
                             {' '}
                             {hasReviews ? `${reviewsCount} отзывов` : 'Отзывы'}
                         </p>

@@ -152,7 +152,7 @@ const HotelDetailsPriceList: React.FC<HotelDetailsPriceListProps> = ({ item, typ
                                 {hasBestPrice ? (
                                     <span className={styles.HotelDetailsOfferBestPriceBadge}>
                                         <span className={styles.HotelDetailsOfferBestPriceIcon}>
-                                            <Icon name="star" size={10} color="#FFFFFF" />
+                                            <Icon name="bestOffer" size={10} color="#FFFFFF" accent={false} />
                                         </span>
                                         <span className={styles.HotelDetailsOfferBestPriceText}>
                                             {OFFER_TAG_BEST_PRICE}

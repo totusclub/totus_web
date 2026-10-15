@@ -20,6 +20,8 @@ import {
     toggleMute,
 } from '@/lib/supportCall';
 import { SUPPORT_DISPLAY_NAME, SUPPORT_PHONE_NUMBER, formatSupportPhone } from '@/config/support';
+import TotusIcon from '@/components/icons/totus/TotusIcon';
+import { iconChevronDown, iconChevronUp } from '@/components/icons/totus/icons.generated';
 
 interface Props {
     onWriteToChat: () => void;
@@ -60,17 +62,9 @@ const HangUpIcon = () => (
     </svg>
 );
 
-const ChevronDownIcon = () => (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-);
+const ChevronDownIcon = () => <TotusIcon icon={iconChevronDown} size={16} />;
 
-const ChevronUpIcon = () => (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <path d="M6 15l6-6 6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-);
+const ChevronUpIcon = () => <TotusIcon icon={iconChevronUp} size={18} />;
 
 const SupportCallModal = ({ onWriteToChat, onRetry }: Props) => {
     const [state, setState] = useState<CallState>('idle');

@@ -2,6 +2,8 @@ import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useSta
 import { SUPPORT_MESSAGE_MAX_LENGTH } from '@/api/supportChatApi';
 import QuickTopics from './QuickTopics';
 import styles from './supportChat.module.css';
+import TotusIcon from '@/components/icons/totus/TotusIcon';
+import { iconSend } from '@/components/icons/totus/icons.generated';
 
 export type ComposerHandle = {
     setText: (text: string) => void;
@@ -135,12 +137,7 @@ const Composer = forwardRef<ComposerHandle, ComposerProps>(function Composer(
                     onClick={() => void submit()}
                     aria-label="Отправить"
                 >
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
-                        <path
-                            d="M3.4 2.6C2.6 2.2 1.8 3 2.1 3.8L4.2 9.3C4.3 9.6 4.6 9.8 4.9 9.8L11 10L4.9 10.2C4.6 10.2 4.3 10.4 4.2 10.7L2.1 16.2C1.8 17 2.6 17.8 3.4 17.4L17.4 10.9C18.2 10.5 18.2 9.5 17.4 9.1L3.4 2.6Z"
-                            fill="currentColor"
-                        />
-                    </svg>
+                    <TotusIcon icon={iconSend} size={20} accent={false} />
                 </button>
             </div>
             {tooLong ? (

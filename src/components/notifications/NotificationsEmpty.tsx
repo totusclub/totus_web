@@ -1,5 +1,7 @@
 import PushEnableCard from './PushEnableCard';
 import styles from './notifications.module.css';
+import TotusIcon from '@/components/icons/totus/TotusIcon';
+import { iconBell } from '@/components/icons/totus/icons.generated';
 
 interface NotificationsEmptyProps {
     /** Пусто из-за фильтра (карточку push не показываем) */
@@ -10,10 +12,7 @@ export default function NotificationsEmpty({ filtered = false }: NotificationsEm
     return (
         <div className={styles.empty}>
             <span className={styles.emptyIcon}>
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#FE732E" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                    <path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15L6 16Z" />
-                    <path d="M10 20a2 2 0 0 0 4 0" />
-                </svg>
+                <TotusIcon icon={iconBell} size={32} color="#FE732E" accent={false} />
             </span>
             <p className={styles.emptyTitle}>{filtered ? 'В этой категории пока пусто' : 'Уведомлений пока нет'}</p>
             <p className={styles.emptyText}>
