@@ -88,7 +88,7 @@ await check('help-faq: центр помощи — поиск, «Часто ищ
     assert.equal(new Set(ids).size, 12, 'якоря разделов уникальны');
     for (const id of ids) assert.match(id, /^[a-z]+$/);
     const icons = read('src/components/infoPages/helpIcons.tsx');
-    for (const g of FAQ_GROUPS) assert.ok(new RegExp(`\\n    ${g.icon}: \\[`).test(icons), `нет иконки ${g.icon}`);
+    for (const g of FAQ_GROUPS) assert.ok(new RegExp(`\\n    ${g.icon}: T\\.icon[A-Z]\\w+,`).test(icons), `нет иконки ${g.icon}`);
     assert.equal(new Set(FAQ_GROUPS.map((g) => g.icon)).size, 12, 'у разделов разные иконки');
     // Та же логика, что matchItem в FaqContent.tsx: все слова запроса есть в вопросе или ответе.
     const norm = (t) => t.toLowerCase().replace(/ё/g, 'е');

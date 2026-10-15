@@ -80,7 +80,7 @@ const SelectedTour = ({ packages, flights }: any) => {
                 <div className={styles.selectedTour}>
                     <div className={styles.selectedTourHead}>
                         <div className={styles.selectedTourCheck}>
-                            <Icon name={'check'} size={24} color={'var(--secondary_green)'} />
+                            <Icon name={'check'} size={24} color={'var(--secondary_green)'} accent={false} />
                             <p>Выбранный тур</p>
                         </div>
                         <div onClick={() => setOpen(true)} className={styles.selectedTourMore}>
@@ -115,7 +115,7 @@ const SelectedTour = ({ packages, flights }: any) => {
                             <p className={styles.selectedTourName}>{packages?.hotel?.name}</p>
 
                             <div className={styles.selectedTourList}>
-                                <Icon name={'user'} size={16} />
+                                <Icon name={'tourists'} size={16} />
                                 <p>{formatAdultsCountWithDates(packages)}</p>
                             </div>
 
@@ -125,7 +125,7 @@ const SelectedTour = ({ packages, flights }: any) => {
                             </div>
 
                             <div className={styles.selectedTourList}>
-                                <Icon name={'hotel'} size={16} />
+                                <Icon name={'orderRoom'} size={16} />
                                 <p>
                                     {packages?.room_info?.name_ru}, «{packages?.pansion_description}»
                                 </p>

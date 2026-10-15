@@ -236,7 +236,7 @@ const SelectDate = ({
 
     return (
         <div className={`${styles.searchField} ${className || ''}`} ref={wrapperRef} onClick={handleToggle}>
-            <Icon name={'calendar'} size={24} color="var(--textPrimary)" />
+            <Icon name={'dates'} size={24} color="var(--textPrimary)" />
             <div className={styles.searchFieldInfo}>
                 <p className={styles.searchFieldsLabel}>Даты и ночи</p>
                 <p className={styles.searchFieldsValue}>{dateLabel}</p>

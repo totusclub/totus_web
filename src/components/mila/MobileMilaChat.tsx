@@ -17,6 +17,8 @@ import type { PointerEvent as ReactPointerEvent } from 'react'
 import { useRouter } from 'next/router'
 import { ChatMessage, useAssistant, useAssistantStore } from '@tosmedia/ai-assistant'
 import styles from './mobileMilaChat.module.css'
+import TotusIcon from '@/components/icons/totus/TotusIcon'
+import { iconChevronLeft, iconClose, iconMila, iconPlus, iconSend } from '@/components/icons/totus/icons.generated'
 
 /** Готовые вопросы на первом экране — те же, что в пакете (QuickActions). */
 export const MILA_STARTS = [
@@ -41,36 +43,16 @@ const FIELD_MAX_HEIGHT = 5 * 20 + 24 + 2
 
 const isWelcome = (id: string) => id === 'welcome' || id.startsWith('welcome')
 
-const CloseIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
-    <path d="M6 6l12 12M18 6L6 18" />
-  </svg>
-)
+const CloseIcon = () => <TotusIcon icon={iconClose} />
 const ListIcon = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
     <path d="M4 7h16M4 12h16M4 17h10" />
   </svg>
 )
-const BackIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    <path d="M15 5l-7 7 7 7" />
-  </svg>
-)
-const SendIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    <path d="M12 19V5M5 12l7-7 7 7" />
-  </svg>
-)
-const PlusIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" aria-hidden="true">
-    <path d="M12 5v14M5 12h14" />
-  </svg>
-)
-const ChatIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" />
-  </svg>
-)
+const BackIcon = () => <TotusIcon icon={iconChevronLeft} />
+const SendIcon = () => <TotusIcon icon={iconSend} accent={false} />
+const PlusIcon = () => <TotusIcon icon={iconPlus} accent={false} />
+const ChatIcon = () => <TotusIcon icon={iconMila} accent={false} />
 
 /** Строка «Мои чаты»: смахивание влево открывает «Удалить». */
 function ChatRow({

@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 import useAuth from "@/hooks/useAuth";
 import { addFavorite, isFavorite as checkFavorite, removeFavorite } from "@/api/favoritesApi";
-import HeartIcon from "@/components/icons/heart";
+import TotusIcon from "@/components/icons/totus/TotusIcon";
+import { iconFavorite, iconFavoriteFilled } from "@/components/icons/totus/icons.generated";
 import { buildSlimFavoriteHotelPayload } from "@/utils/favoriteHotelDisplay";
 
 /** Small body for voip `/api/favorites` — full `references/hotels` JSON hits 413 Payload Too Large. */
@@ -109,7 +110,12 @@ export default function HotelFavoriteButton({
                 opacity: loading ? 0.6 : 1,
             }}
         >
-            <HeartIcon width={iconSize} height={iconSize} color={color} filled={favorited && !inactive} />
+            <TotusIcon
+                icon={favorited && !inactive ? iconFavoriteFilled : iconFavorite}
+                size={iconSize}
+                color={color}
+                accentColor={color}
+            />
         </button>
     );
 }

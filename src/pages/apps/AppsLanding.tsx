@@ -236,7 +236,7 @@ export default function AppsLanding() {
                             transition={{ type: "spring", stiffness: 400, damping: 28 }}
                         >
                             <div className={styles.bentoIcon}>
-                                <Icon name="hotel" size={26} color="var(--core_Orange)" />
+                                <Icon name="typeHotel" size={26} color="var(--core_Orange)" />
                             </div>
                             <div>
                                 <h2 className={styles.bentoTitle}>Карточка отеля</h2>

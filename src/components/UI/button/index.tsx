@@ -45,7 +45,7 @@ const Button = ({
             ) : (
                 <>
                     {title && <span className={styles.buttonTitle}>{title}</span>}
-                    {icon && <Icon name={icon} size={20} color="#fff" />}
+                    {icon && <Icon name={icon} size={20} color="#fff" accent={false} />}
                 </>
             )}
         </div>

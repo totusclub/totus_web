@@ -21,6 +21,8 @@ export interface TotusIconProps {
     accentColor?: string;
     /** false — иконка одним цветом, без оранжевой детали (например, на оранжевой кнопке). */
     accent?: boolean;
+    /** true — залить контуры их же цветом (например, звёзды отеля). */
+    filled?: boolean;
     /** Текст для скринридера. Без него иконка считается декоративной. */
     title?: string;
     className?: string;
@@ -37,6 +39,7 @@ export default function TotusIcon({
     color,
     accentColor,
     accent = true,
+    filled = false,
     title,
     className,
     style,
@@ -63,7 +66,7 @@ export default function TotusIcon({
         >
             {icon.p.map((d, i) => {
                 const c = icon.f ? acc : icon.a.includes(i) ? acc : ink;
-                return <path key={i} d={d} stroke={c} fill={icon.f ? c : undefined} />;
+                return <path key={i} d={d} stroke={c} fill={icon.f || filled ? c : undefined} />;
             })}
         </svg>
     );

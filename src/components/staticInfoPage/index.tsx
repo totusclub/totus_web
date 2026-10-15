@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import styles from "./staticInfoPage.module.css";
-import RightIcon from "@/components/icons/right";
+import Icon from "@/components/icons/Icon";
 
 export type StaticInfoSection = "company" | "contact" | "more" | "legal";
 
@@ -42,11 +42,11 @@ export function StaticInfoPage({
                             Главная
                         </Link>
                         <span className={styles.sep} aria-hidden="true">
-                            <RightIcon />
+                            <Icon name="rightArrow" />
                         </span>
                         <span className={styles.crumbInactive}>{mid}</span>
                         <span className={styles.sep} aria-hidden="true">
-                            <RightIcon />
+                            <Icon name="rightArrow" />
                         </span>
                         <span className={styles.crumbCurrent} aria-current="page">
                             {currentLabel}

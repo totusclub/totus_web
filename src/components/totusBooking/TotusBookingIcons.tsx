@@ -1,100 +1,44 @@
 import React from 'react';
 import type { TotusBookingTone } from '@/utils/totusBooking';
+import TotusIcon from '@/components/icons/totus/TotusIcon';
+import {
+  iconCheck,
+  iconDocVoucher,
+  iconStConfirmed,
+  iconStProcessing,
+  iconStRejected,
+} from '@/components/icons/totus/icons.generated';
 
 type IconProps = { size?: number; className?: string };
 
+/*
+ * Иконки брони — из набора Totus (стиль C). Статусы — одним цветом тона (currentColor),
+ * без оранжевой детали: цвет уже несёт смысл (жёлтый / зелёный / красный).
+ */
+
 /** Часы — «Проверяем бронирование». */
 export const ClockIcon = ({ size = 24, className }: IconProps) => (
-  <svg
-    className={className}
-    width={size}
-    height={size}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth={1.8}
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    aria-hidden
-  >
-    <circle cx="12" cy="12" r="9" />
-    <path d="M12 7v5l3 2" />
-  </svg>
+  <TotusIcon icon={iconStProcessing} size={size} className={className} accent={false} />
 );
 
 /** Галочка в круге — «Подтверждено» / «Оплата прошла». */
 export const CheckCircleIcon = ({ size = 24, className }: IconProps) => (
-  <svg
-    className={className}
-    width={size}
-    height={size}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth={1.8}
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    aria-hidden
-  >
-    <circle cx="12" cy="12" r="9" />
-    <path d="M8.5 12.5l2.5 2.5 4.5-5" />
-  </svg>
+  <TotusIcon icon={iconStConfirmed} size={size} className={className} accent={false} />
 );
 
 /** Крестик в круге — «Отклонено» / «Отменено». */
 export const CloseCircleIcon = ({ size = 24, className }: IconProps) => (
-  <svg
-    className={className}
-    width={size}
-    height={size}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth={1.8}
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    aria-hidden
-  >
-    <circle cx="12" cy="12" r="9" />
-    <path d="M9 9l6 6M15 9l-6 6" />
-  </svg>
+  <TotusIcon icon={iconStRejected} size={size} className={className} accent={false} />
 );
 
 /** Простая галочка — крупная иконка успеха. */
 export const CheckIcon = ({ size = 32, className }: IconProps) => (
-  <svg
-    className={className}
-    width={size}
-    height={size}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth={2.2}
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    aria-hidden
-  >
-    <path d="M5 12.5l4.5 4.5L19 7.5" />
-  </svg>
+  <TotusIcon icon={iconCheck} size={size} className={className} accent={false} />
 );
 
 /** Документ — ваучер. */
 export const DocumentIcon = ({ size = 20, className }: IconProps) => (
-  <svg
-    className={className}
-    width={size}
-    height={size}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth={1.8}
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    aria-hidden
-  >
-    <path d="M7 3h7l5 5v13H7z" />
-    <path d="M14 3v5h5M10 13h6M10 17h6" />
-  </svg>
+  <TotusIcon icon={iconDocVoucher} size={size} className={className} />
 );
 
 export const ToneIcon = ({ tone, size = 24 }: { tone: TotusBookingTone; size?: number }) => {
