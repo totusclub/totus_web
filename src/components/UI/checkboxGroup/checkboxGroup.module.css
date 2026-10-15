@@ -10,7 +10,8 @@
     align-items: center;
     height: 48px;
     /*font-size: 16px;*/
-    /*cursor: pointer;*/
+    cursor: pointer; /* вся строка варианта кликабельна */
+    user-select: none;
     /*padding: 4px 0;*/
     /*border: 1px solid;*/
     gap:10px
@@ -53,4 +54,10 @@
 /* Иконка варианта (набор Totus, 20px) между чекбоксом и подписью */
 .optionIcon {
     flex: none;
+}
+
+.checkboxItem:focus-visible {
+    outline: 2px solid var(--core_Orange);
+    outline-offset: 2px;
+    border-radius: 8px;
 }
