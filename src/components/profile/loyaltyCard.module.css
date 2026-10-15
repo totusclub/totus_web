@@ -1,0 +1,217 @@
+/*
+ * Карта лояльности (макет 15.10.2026): светлая тема — вариант C «Светлая», тёмная — B «Графит».
+ * Пропорции банковской карты 1,586 : 1; размеры текста идут от ширины карты (cqi),
+ * поэтому номер из 16 цифр помещается и на 320 px, и в колонке профиля 413 px.
+ */
+.card {
+  --lc-bg: #F7F3EE;
+  --lc-border: #E6DFD6;
+  --lc-ink: #1F1F1F;
+  --lc-sub: #5E5B56;
+  --lc-brand: #C24A0E;
+  --lc-bird: #FE732E;
+  --lc-ring-a: rgba(254, 115, 46, 0.16);
+  --lc-ring-b: rgba(254, 115, 46, 0.07);
+  --lc-line: #E6DFD6;
+  --lc-copy-bg: #FFFFFF;
+  --lc-copy-border: #E6DFD6;
+  --lc-copy-accent: #FE732E;
+
+  position: relative;
+  container-type: inline-size;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  aspect-ratio: 1.586;
+  margin-top: 40px;
+  padding: 20px 20px 16px;
+  border-radius: 20px;
+  border: 1px solid var(--lc-border);
+  background: var(--lc-bg);
+  color: var(--lc-ink);
+  /* без overflow: hidden — на самых узких экранах карта может чуть вытянуться по высоте, а не обрезать текст */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  font-family: var(--font-text);
+}
+
+:global([data-theme="dark"]) .card {
+  --lc-bg: #1C1B1A;
+  --lc-border: #2C2C2C;
+  --lc-ink: #FFFFFF;
+  --lc-sub: #BDB6AE;
+  --lc-brand: #FE732E;
+  --lc-bird: #FE732E;
+  --lc-ring-a: rgba(254, 115, 46, 0.22);
+  --lc-ring-b: rgba(255, 255, 255, 0.05);
+  --lc-line: rgba(255, 255, 255, 0.12);
+  --lc-copy-bg: rgba(255, 255, 255, 0.08);
+  --lc-copy-border: transparent;
+  --lc-copy-accent: #FFFFFF;
+}
+
+.card p {
+  margin: 0;
+}
+
+.rings {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  overflow: hidden;
+  pointer-events: none;
+}
+.rings svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.ringA {
+  fill: var(--lc-ring-a);
+}
+.ringB {
+  fill: var(--lc-ring-b);
+}
+
+.header,
+.numberBlock,
+.footer {
+  position: relative;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+.titleCol {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.title {
+  font-family: var(--font-heading);
+  font-weight: 400;
+  font-size: clamp(20px, 7.2cqi, 30px);
+  line-height: 1.15;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+.club {
+  font-size: 11px;
+  line-height: 14px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--lc-brand);
+}
+.bird {
+  flex: 0 0 auto;
+  width: 52px;
+  height: 28px;
+}
+.bird path {
+  fill: var(--lc-bird);
+}
+
+.numberBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.numberRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.number {
+  min-width: 0;
+  font-size: clamp(15px, 5.6cqi, 24px);
+  line-height: 1.25;
+  font-weight: 500;
+  letter-spacing: 0.07em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.copy {
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid var(--lc-copy-border);
+  background: var(--lc-copy-bg);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+.copy:hover {
+  opacity: 0.85;
+}
+.copy:active {
+  transform: scale(0.96);
+}
+.copy:focus-visible {
+  outline: 2px solid var(--lc-bird);
+  outline-offset: 2px;
+}
+.copyIcon {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.copyInk {
+  stroke: var(--lc-ink);
+}
+.copyAccent {
+  stroke: var(--lc-copy-accent);
+}
+.caption {
+  font-size: 13px;
+  line-height: 16px;
+  color: var(--lc-sub);
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-top: 1px solid var(--lc-line);
+  padding-top: 12px;
+}
+.name {
+  min-width: 0;
+  font-size: 16px;
+  line-height: 20px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.monogram {
+  flex: 0 0 auto;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #FE732E;
+  color: #1F1F1F;
+  font-size: 12px;
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}

@@ -13,6 +13,7 @@ import { unregisterDevice } from "@/api/notificationsApi";
 import { getDeviceId } from "@/lib/webPush";
 import { useSupportCall } from "@/components/support/SupportCallProvider";
 import TotusIcon from "@/components/icons/totus/TotusIcon";
+import LoyaltyCard, { loyaltyHolderName } from "./LoyaltyCard";
 import { iconThemeDark, iconThemeLight, iconThemeSystem, type TotusIconDef } from "@/components/icons/totus/icons.generated";
 
 // Тема оформления: по умолчанию «Системная» — как в настройках устройства
@@ -58,23 +59,8 @@ const MenuProfile = () => {
 
     return (
         <div className={styles.profileMenuCol}>
-            <div className={styles.profileCard}>
-                <div className={styles.profileCardHeader}>
-                    <p>Карта лояльности</p>
-                    <Icon name={'bird'} size={64} />
-                </div>
-                <div className={styles.profileCardInfo}>
-                    <p className={styles.profileCardNumber}>{user?.loyalty_id}</p>
-                    <p className={styles.smallInfoCard}><Icon name={'info'} color={'#fff'} size={18} accent={false} />Ваш персональный номер</p>
-                </div>
-                <div className={styles.profileName}>
-                    <p>{`${user?.name} ${user?.l_name}`}</p>
-                    <div className={styles.userCardIcon}>
-                        <Icon name={'user'} size={16} />
-                    </div>
-
-                </div>
-            </div>
+            {/* Карта лояльности: светлая тема — вариант C, тёмная — B (макет 15.10.2026) */}
+            <LoyaltyCard number={user?.loyalty_id} name={loyaltyHolderName(user?.name, user?.l_name)} />
             {/*<div className={styles.profileMenu}>*/}
             {/*    <div className={styles.profileMenuHead}>*/}
             {/*        <p>Личная информация</p>*/}
