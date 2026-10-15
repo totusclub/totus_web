@@ -93,6 +93,11 @@ body {
  * стрелки и дефис — подмножество Golos Text (OFL), ₽ — свой знак под Museo (ниже, встроен в CSS);
  * всё только когда знак есть на странице (unicode-range).
  * Старое имя "Golos Text" (виджет Милы и прежние стили) указывает на те же файлы Museo.
+ *
+ * Важно: у всех граней одного семейства — одинаковые диапазоны font-weight (тот же файл повторяется
+ * для соседнего диапазона). Chrome объединяет по unicode-range только грани с одинаковым диапазоном;
+ * при разных (100–599 у стрелок и 400–599 у ₽) он выбирает одну грань, и ₽ или стрелки рисует
+ * системный шрифт.
  */
 @font-face {
   font-family: "Museo Sans Cyrl";
@@ -153,7 +158,15 @@ body {
 @font-face {
   font-family: "Golos Text";
   src: url("./../assets/fonts/GolosSymbols-500.woff2") format("woff2");
-  font-weight: 100 599;
+  font-weight: 100 399;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+00B2-00B3, U+00B9, U+2010-2011, U+2190-21FF;
+}
+@font-face {
+  font-family: "Golos Text";
+  src: url("./../assets/fonts/GolosSymbols-500.woff2") format("woff2");
+  font-weight: 400 599;
   font-style: normal;
   font-display: swap;
   unicode-range: U+00B2-00B3, U+00B9, U+2010-2011, U+2190-21FF;
@@ -161,7 +174,15 @@ body {
 @font-face {
   font-family: "Golos Text";
   src: url("./../assets/fonts/GolosSymbols-700.woff2") format("woff2");
-  font-weight: 600 1000;
+  font-weight: 600 799;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+00B2-00B3, U+00B9, U+2010-2011, U+2190-21FF;
+}
+@font-face {
+  font-family: "Golos Text";
+  src: url("./../assets/fonts/GolosSymbols-700.woff2") format("woff2");
+  font-weight: 800 1000;
   font-style: normal;
   font-display: swap;
   unicode-range: U+00B2-00B3, U+00B9, U+2010-2011, U+2190-21FF;
@@ -176,7 +197,15 @@ body {
 @font-face {
   font-family: "Totus Symbols";
   src: url("./../assets/fonts/GolosSymbols-500.woff2") format("woff2");
-  font-weight: 100 599;
+  font-weight: 100 399;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+00B2-00B3, U+00B9, U+2010-2011, U+2190-21FF;
+}
+@font-face {
+  font-family: "Totus Symbols";
+  src: url("./../assets/fonts/GolosSymbols-500.woff2") format("woff2");
+  font-weight: 400 599;
   font-style: normal;
   font-display: swap;
   unicode-range: U+00B2-00B3, U+00B9, U+2010-2011, U+2190-21FF;
@@ -238,7 +267,15 @@ body {
 @font-face {
   font-family: "Golos Text";
   src: url(data:font/woff;base64,d09GRgABAAAAAAKoAAoAAAAAAsQAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAABPUy8yAAABZAAAADAAAABgZ5JlBmNtYXAAAAGcAAAAKgAAADQADCEQZ2x5ZgAAAdAAAABqAAAAamnfUcJoZWFkAAAA9AAAADYAAAA2L4oq8mhoZWEAAAEsAAAAIAAAACQGFAHpaG10eAAAAZQAAAAIAAAACASSAABsb2NhAAAByAAAAAYAAAAGADUAAG1heHAAAAFMAAAAFwAAACAACAAibmFtZQAAAjwAAABTAAAAYC8hZL9wb3N0AAACkAAAABYAAAAsdmhx1wABAAAAAQAAQq7lC18PPPUAAQPoAAAAAObu86gAAAAA5u7zqAAeAAACegLCAAAAAwACAAAAAAAAeJxjYGRgYN72n42BgWkeAwODE1MMA1AEBTABAFFcAwN4nGNgZGBgYGJQYGBlYACz0AAABCoAKwB4nGNgZvJk2sPAysDCQBxggjHsgYCBQWGvwl7mbf/ZGBiYtzH8QlOrwMAAAAvqB18B9AAAAp4AAHicY2BgYGJgYGAGYhEgyQimWRgUgDQLEAL5Cnv//4eQ913A8gwAX4MHOQAAAAAAAAA1AAAABQAeAAACegLCAAMABwALAA8AHwAAMzMRIxUhNSEDITUhESE1IQEVMhYVFAYjFTI2NjU0JiaWgYEBF/7peAGP/nEBSv62AY8gLS0gOV03N10CwnBw/mpw/txwAdpwNSYmNXA3XDg4XDcAAAB4nC2IOwrAIBQExw+BEEiZ2iIHeFW8h3gCwU6wUO8fDZlid3YBy4NioTi+XGjMXAZl9/lcnL9rNu5Y+2gujFSyFyFS6QwajjA7Uch4BHkBLJAKbAB4nGNgYsAPgPKMTKxFpUk5qQAHPQInAAA=) format("woff");
-  font-weight: 600 1000;
+  font-weight: 600 799;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+20BD;
+}
+@font-face {
+  font-family: "Golos Text";
+  src: url(data:font/woff;base64,d09GRgABAAAAAAKoAAoAAAAAAsQAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAABPUy8yAAABZAAAADAAAABgZ5JlBmNtYXAAAAGcAAAAKgAAADQADCEQZ2x5ZgAAAdAAAABqAAAAamnfUcJoZWFkAAAA9AAAADYAAAA2L4oq8mhoZWEAAAEsAAAAIAAAACQGFAHpaG10eAAAAZQAAAAIAAAACASSAABsb2NhAAAByAAAAAYAAAAGADUAAG1heHAAAAFMAAAAFwAAACAACAAibmFtZQAAAjwAAABTAAAAYC8hZL9wb3N0AAACkAAAABYAAAAsdmhx1wABAAAAAQAAQq7lC18PPPUAAQPoAAAAAObu86gAAAAA5u7zqAAeAAACegLCAAAAAwACAAAAAAAAeJxjYGRgYN72n42BgWkeAwODE1MMA1AEBTABAFFcAwN4nGNgZGBgYGJQYGBlYACz0AAABCoAKwB4nGNgZvJk2sPAysDCQBxggjHsgYCBQWGvwl7mbf/ZGBiYtzH8QlOrwMAAAAvqB18B9AAAAp4AAHicY2BgYGJgYGAGYhEgyQimWRgUgDQLEAL5Cnv//4eQ913A8gwAX4MHOQAAAAAAAAA1AAAABQAeAAACegLCAAMABwALAA8AHwAAMzMRIxUhNSEDITUhESE1IQEVMhYVFAYjFTI2NjU0JiaWgYEBF/7peAGP/nEBSv62AY8gLS0gOV03N10CwnBw/mpw/txwAdpwNSYmNXA3XDg4XDcAAAB4nC2IOwrAIBQExw+BEEiZ2iIHeFW8h3gCwU6wUO8fDZlid3YBy4NioTi+XGjMXAZl9/lcnL9rNu5Y+2gujFSyFyFS6QwajjA7Uch4BHkBLJAKbAB4nGNgYsAPgPKMTKxFpUk5qQAHPQInAAA=) format("woff");
+  font-weight: 800 1000;
   font-style: normal;
   font-display: swap;
   unicode-range: U+20BD;
