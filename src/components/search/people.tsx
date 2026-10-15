@@ -137,7 +137,7 @@ const People = ({ handleChange, value, className }: { handleChange: any; value: 
 
     return (
         <div className={`${styles.searchField} ${styles.people} ${className || ''}`} ref={wrapperRef} onClick={handleToggle}>
-            <Icon name={'user'} size={24} color="var(--textPrimary)" />
+            <Icon name={'tourists'} size={24} color="var(--textPrimary)" />
             <div className={styles.searchFieldInfo}>
                 <p className={styles.searchFieldsLabel}>Туристы</p>
                 <p className={styles.searchFieldsValue}>

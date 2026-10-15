@@ -57,7 +57,7 @@ const DocumentsModal: React.FC<DocumentsModalProps> = ({
                                             handleDownload(doc.url);
                                         }}
                                     >
-                                        <Icon name="share" size={24} color="var(--textPrimary)" />
+                                        <Icon name="download" size={24} color="var(--textPrimary)" />
                                     </div>
                                 </div>
                                 {index < documents.length - 1 && (

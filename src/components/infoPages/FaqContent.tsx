@@ -171,7 +171,7 @@ function HelpActions() {
                 {cards.map((c) => (
                     <div key={c.title} className={styles.contactCard}>
                         <span className={styles.contactIcon}>
-                            <HelpIcon name={c.icon} />
+                            <HelpIcon name={c.icon} place="contact" />
                         </span>
                         <div className={styles.contactBody}>
                             <h3 className={styles.contactTitle}>{c.title}</h3>

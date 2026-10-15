@@ -5,6 +5,8 @@ import { fetchSettings, setPushStatus } from '@/store/slices/notificationsSlice'
 import { getDeviceName, getWebPushStatus, subscribeWebPush, unsubscribeWebPush, WebPushError } from '@/lib/webPush';
 import type { AppDispatch } from '@/store';
 import styles from './notifications.module.css';
+import TotusIcon from '@/components/icons/totus/TotusIcon';
+import { iconCheck } from '@/components/icons/totus/icons.generated';
 
 export const IOS_PWA_HINT = 'Добавьте сайт на экран «Домой», чтобы получать уведомления';
 
@@ -68,9 +70,7 @@ function BellOffGlyph() {
 
 function CheckGlyph() {
     return (
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-            <path d="M5 12.5l4.5 4.5L19 7.5" />
-        </svg>
+        <TotusIcon icon={iconCheck} size={22} accent={false} />
     );
 }
 

@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { StaticInfoPage } from '@/components/staticInfoPage';
-import RightIcon from '@/components/icons/right';
+import Icon from '@/components/icons/Icon';
 import {
     LEGAL_COMPANY,
     LEGAL_DOCS,
@@ -27,7 +27,7 @@ export default function LegalPage() {
                                         <span className={styles.rowDesc}>{doc.description}</span>
                                     </span>
                                     <span className={styles.chevron} aria-hidden="true">
-                                        <RightIcon />
+                                        <Icon name="rightArrow" />
                                     </span>
                                 </Link>
                             </li>

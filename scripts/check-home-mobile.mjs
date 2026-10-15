@@ -101,11 +101,9 @@ check('тёмная тема: текст на фото и оранжевом —
   assert.match(globals, /\[data-theme="dark"\] \{[^}]*--textTertiary: #7a7a7a;/, 'на компьютере прежний цвет');
 });
 
-check('нижнее меню: иконки приложения (поиск, заказы, аккаунт) с подписями; высота 60px', () => {
-  for (const name of ['SearchTabIcon', 'OrdersTabIcon', 'AccountTabIcon']) assert.match(bar, new RegExp(`const ${name} = \\(\\) => \\(`));
-  assert.match(bar, /<circle cx="10" cy="10" r="6" \/>/, 'лупа из search.tsx');
-  assert.match(bar, /viewBox="0 0 459\.923 459\.923"/, 'путешественник из orders.tsx');
-  assert.match(bar, /M11\.9989 17C15\.6613 17/, 'силуэт из accont.tsx');
+check('нижнее меню: иконки набора Totus (поиск, заказы, аккаунт) с подписями; высота 60px', () => {
+  for (const [name, icon] of [['SearchTabIcon', 'iconTabSearch'], ['OrdersTabIcon', 'iconTabOrders'], ['AccountTabIcon', 'iconTabAccount']])
+    assert.match(bar, new RegExp(`const ${name} = \\(\\) => <TotusIcon icon=\\{${icon}\\} size=\\{24\\} />;`));
   for (const label of ['Поиск', 'Заказы', 'Аккаунт']) assert.match(bar, new RegExp(`<span className=\\{styles\\.tabLabel\\}>${label}</span>`));
   assert.ok(!/import Icon from/.test(bar), 'значки сайта больше не нужны');
   assert.match(rule(barM, '.mobileTab'), /height: 60px;/);

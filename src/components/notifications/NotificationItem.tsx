@@ -3,6 +3,8 @@ import type { NotificationItem as NotificationItemModel } from '@/api/notificati
 import CategoryIcon from './CategoryIcon';
 import { formatNotificationTime } from './dates';
 import styles from './notifications.module.css';
+import TotusIcon from '@/components/icons/totus/TotusIcon';
+import { iconClose } from '@/components/icons/totus/icons.generated';
 
 interface NotificationItemProps {
     item: NotificationItemModel;
@@ -48,9 +50,7 @@ export default function NotificationItem({ item, onOpen, onDelete, compact = fal
             <span className={styles.itemTime}>{formatNotificationTime(item.createdAt)}</span>
             {!compact && onDelete ? (
                 <button type="button" className={styles.itemDelete} onClick={handleDelete} aria-label="Удалить уведомление">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden>
-                        <path d="M6 6l12 12M18 6L6 18" />
-                    </svg>
+                    <TotusIcon icon={iconClose} size={16} />
                 </button>
             ) : null}
         </div>

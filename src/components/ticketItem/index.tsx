@@ -216,7 +216,7 @@ const TicketItem: FC<TicketItemProps> = ({ green, item, price, lazy }) => {
 
                     {green && (
                         <div className={styles.ticketItemAlert}>
-                            <Icon name="light" size={20} color="var(--bgPrimary)" />
+                            <Icon name="bestPrice" size={20} color="var(--bgPrimary)" accent={false} />
                             <p>Самый выгодный рейс к туру</p>
                         </div>
                     )}
@@ -225,7 +225,7 @@ const TicketItem: FC<TicketItemProps> = ({ green, item, price, lazy }) => {
                 <div className={styles.mob}>
                     {green && (
                         <div className={styles.mobBadge}>
-                            <Icon name="light" size={16} color="#0b3b2e" />
+                            <Icon name="bestPrice" size={16} color="#0b3b2e" accent={false} />
                             <span>Самый выгодный рейс к туру</span>
                         </div>
                     )}
