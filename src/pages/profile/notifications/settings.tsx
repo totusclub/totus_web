@@ -11,6 +11,8 @@ import type { NotificationCategory, NotificationPrefs, PushDevice } from '@/api/
 import { fetchSettings, saveSettings } from '@/store/slices/notificationsSlice';
 import PushEnableCard from '@/components/notifications/PushEnableCard';
 import styles from '@/components/notifications/notifications.module.css';
+import TotusIcon from '@/components/icons/totus/TotusIcon';
+import { iconChevronLeft } from '@/components/icons/totus/icons.generated';
 
 /** Строки «ЧТО ПРИСЫЛАТЬ» (DESIGN.md). Обязательные — всегда включены и недоступны. */
 const CATEGORY_ROWS: { key: NotificationCategory; title: string; subtitle: string; mandatory: boolean }[] = [
@@ -79,9 +81,7 @@ const NotificationSettingsPage = () => {
                     <section className={styles.card} aria-label="Настройки уведомлений">
                         <div className={styles.cardHeader}>
                             <Link href="/profile/notifications" className={styles.backLink} aria-label="Назад к уведомлениям">
-                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                                    <path d="M15 5l-7 7 7 7" />
-                                </svg>
+                                <TotusIcon icon={iconChevronLeft} size={22} />
                             </Link>
                             <div className={styles.cardHeaderText}>
                                 <h1 className={styles.cardTitle}>Настройки уведомлений</h1>

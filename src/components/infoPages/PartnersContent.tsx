@@ -161,7 +161,7 @@ function PartnerForm() {
         return (
             <div className={`${styles.partnerForm} ${styles.partnerDone}`} ref={doneRef} tabIndex={-1} role="status">
                 <span className={styles.partnerIcon}>
-                    <HelpIcon name="check" />
+                    <HelpIcon name="check" place="partner" />
                 </span>
                 <h3 className={styles.partnerDoneTitle}>Заявка отправлена</h3>
                 <p className={styles.helpMuted}>
@@ -303,7 +303,7 @@ export function PartnersContent() {
                 <h2 className={styles.helpCardTitle}>Приём платежей</h2>
                 <div className={styles.bankRow}>
                     <span className={styles.partnerIcon}>
-                        <HelpIcon name="card" />
+                        <HelpIcon name="card" place="partner" />
                     </span>
                     <div className={styles.bankText}>
                         <h3 className={styles.partnerItemTitle}>Банк ВТБ (ПАО)</h3>
@@ -327,7 +327,7 @@ export function PartnersContent() {
                         {AUDIENCE.map((a) => (
                             <li key={a.title} className={styles.audienceItem}>
                                 <span className={styles.partnerIcon}>
-                                    <HelpIcon name={a.icon} />
+                                    <HelpIcon name={a.icon} place="partner" />
                                 </span>
                                 <div>
                                     <h3 className={styles.partnerItemTitle}>{a.title}</h3>

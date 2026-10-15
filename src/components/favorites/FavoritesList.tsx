@@ -3,7 +3,8 @@ import Link from "next/link";
 import Image from "next/image";
 import useAuth from "@/hooks/useAuth";
 import { getUserFavorites, removeFavorite, type Favorite } from "@/api/favoritesApi";
-import HeartIcon from "@/components/icons/heart";
+import TotusIcon from "@/components/icons/totus/TotusIcon";
+import { iconFavoriteFilled } from "@/components/icons/totus/icons.generated";
 import { favoriteToDisplay } from "@/utils/favoriteHotelDisplay";
 import { buildHotelDetailsDeepLinkQuery } from "@/utils/hotelDetailsUtils";
 import styles from "./favorites.module.css";
@@ -114,7 +115,7 @@ export default function FavoritesList() {
                                 disabled={removingId === d.hotelId || d.hotelId <= 0}
                                 onClick={(e) => d.hotelId > 0 && handleRemove(e, d.hotelId)}
                             >
-                                <HeartIcon width={20} height={20} color="#FF3B30" filled />
+                                <TotusIcon icon={iconFavoriteFilled} size={20} color="#FF3B30" accentColor="#FF3B30" />
                             </button>
                         </div>
                     );

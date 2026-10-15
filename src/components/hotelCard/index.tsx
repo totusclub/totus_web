@@ -374,7 +374,7 @@ const HotelCard = ({ item, lazy }: HotelCardState) => {
                             <p>{hotel?.name}</p>
                         </div>
                         <div className={styles.hotelCardImageInfoM}>
-                            <p><Icon name={'message'} size={14}
+                            <p><Icon name={'reviews'} size={14}
                                 color={iconColor} /> {hotel?.reviews_count > 0 ? `${hotel?.reviews_count} отзывов` : 'нет отзывов'}
                             </p>
                             {hotel?.rating > 0 && (
@@ -399,7 +399,7 @@ const HotelCard = ({ item, lazy }: HotelCardState) => {
                 </div>
                 <div className={styles.hotelCardPrice}>
                     <div className={styles.hotelCardImageInfo}>
-                        <p><Icon name={'message'} size={14} color={iconColor} /> {hotel?.reviews_count > 0 ? `${hotel?.reviews_count} отзывов` : 'нет отзывов'}</p>
+                        <p><Icon name={'reviews'} size={14} color={iconColor} /> {hotel?.reviews_count > 0 ? `${hotel?.reviews_count} отзывов` : 'нет отзывов'}</p>
                         {hotel?.rating > 0 && (
                             <p>{hotel.rating}</p>
                         )}

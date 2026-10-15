@@ -8,16 +8,13 @@ import { markNotificationsRead, markReadLocal } from '@/store/slices/notificatio
 import NotificationItem from './NotificationItem';
 import { useOpenNotification } from './useOpenNotification';
 import styles from './notifications.module.css';
+import TotusIcon from '@/components/icons/totus/TotusIcon';
+import { iconBell } from '@/components/icons/totus/icons.generated';
 
 export const NOTIFICATIONS_PATH = '/profile/notifications';
 
 function BellGlyph({ size = 22 }: { size?: number }) {
-    return (
-        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-            <path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15L6 16Z" />
-            <path d="M10 20a2 2 0 0 0 4 0" />
-        </svg>
-    );
+    return <TotusIcon icon={iconBell} size={size} />;
 }
 
 function formatBadge(count: number): string {
