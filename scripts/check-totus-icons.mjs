@@ -57,7 +57,12 @@ try {
 let mapped = 0;
 if (lt) {
     for (const [name, value] of Object.entries(lt)) {
-        if (value && typeof value === 'object') {
+        if (Array.isArray(value)) {
+            for (const [to, re] of value) {
+                mapped++;
+                if (!keys.has(to)) fail(`${name}: ${re} → нет иконки «${to}»`);
+            }
+        } else if (value && typeof value === 'object') {
             for (const [from, to] of Object.entries(value)) {
                 mapped++;
                 if (!keys.has(to)) fail(`${name}.${from} → нет иконки «${to}»`);
@@ -68,9 +73,30 @@ if (lt) {
         lt.mealIcon('XX'), lt.hotelTypeIcon(999), lt.wifiIcon('X'), lt.beachSurfaceIcon('X'),
         lt.beachTypeIcon('X'), lt.categoryIcon('X'), lt.confirmabilityIcon('9'), lt.restTypeIcon('X'),
         lt.roomFacilityIcon('new-group', 'Весы'), lt.roomFacilityIcon(null, 'Халаты'), lt.notificationIcon('x'),
-        lt.amenityIcon('pool'),
+        lt.amenityIcon('pool'), lt.amenityTextIcon('что-то новое'), lt.hotelFeatureIcon('beach_surface', 'SAND'), lt.hotelFeatureIcon('kids_club', true),
     ];
     for (const k of fallbacks) if (!keys.has(k)) fail('запасная иконка не найдена: ' + k);
+    const SAMPLES = {
+        'анимация бесплатно': 'animation', 'дискотека': 'disco', 'теннисный корт': 'tennis', 'дайвинг-центр': 'diving',
+        'сад': 'garden', 'открытый бассейн': 'pool', 'крытый бассейн': 'indoor-pool', 'шезлонги и зонтики': 'sunbeds',
+        'ресторан': 'meal-dinner', 'бар у бассейна': 'bar', 'барбекю': 'meal-dinner', 'банан платно': 'water-sports',
+        'парковка платно': 'parking', 'банкетный зал': 'conference', 'турецкая баня (хаммам)': 'hammam', 'баня': 'sauna',
+    };
+    for (const [text, want] of Object.entries(SAMPLES)) {
+        const got = lt.amenityTextIcon(text);
+        if (got !== want) fail(`amenityTextIcon(«${text}») = ${got}, ожидалось ${want}`);
+    }
+}
+
+// 4. всё, что выдают соответствия Level.Travel (кроме уведомлений), есть в подмножестве для страниц отеля
+const hotelSubset = new Set([...readFileSync(join(root, 'src/components/icons/totus/hotelIcons.generated.ts'), 'utf8').matchAll(/^    "([a-z0-9-]+)": I\./gm)].map((m) => m[1]));
+if (lt) {
+    for (const [name, value] of Object.entries(lt)) {
+        if (name === 'NOTIFICATION_ICONS' || !value || typeof value !== 'object') continue;
+        const targets = Array.isArray(value) ? value.map((r) => r[0]) : Object.values(value);
+        for (const k of targets) if (!hotelSubset.has(k)) fail(`${name}: «${k}» нет в hotelIcons.generated.ts`);
+    }
+    if (!hotelSubset.has('facility-other')) fail('нет запасной facility-other в hotelIcons.generated.ts');
 }
 
 if (errors.length) {

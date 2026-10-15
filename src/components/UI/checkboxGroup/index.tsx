@@ -4,6 +4,8 @@ import Checkbox from '@/components/UI/checkboxGroup/checkBox';
 import { pluralizeRu } from '@/utils/formatRussianPlural';
 import { NARROW_NBSP, formatFilterOptionName } from '@/utils/filterChips';
 import { RUB_SUFFIX } from '@/utils/formatPrice';
+import HotelIcon from '@/components/icons/totus/HotelIcon';
+import type { TotusIconKey } from '@/components/icons/totus/registry.generated';
 
 interface Option {
     id?: number | string;
@@ -20,6 +22,8 @@ interface CheckboxGroupProps {
     name?: string;
     pk?: boolean;
     netPrice?: number;
+    /** Иконка варианта (набор Totus) — например, тип питания или покрытие пляжа. */
+    optionIcon?: (option: Option) => TotusIconKey | null | undefined;
 }
 
 function valuesEqual(a: unknown, b: unknown): boolean {
@@ -35,6 +39,7 @@ export default function CheckboxGroup({
     name,
     pk,
     netPrice,
+    optionIcon,
 }: CheckboxGroupProps) {
     const getOptionValue = (item: any) => {
         if (name === 'transitions_count') return item?.number;
@@ -157,6 +162,9 @@ export default function CheckboxGroup({
                             checked={checked}
                             handleToggle={handleToggle}
                         />
+                        {optionIcon ? (
+                            <HotelIcon name={optionIcon(option)} size={20} className={styles.optionIcon} />
+                        ) : null}
                         <div>
                             <p onClick={() => handleToggle(value)}>{renderName(option)}</p>
                             {!pk && (

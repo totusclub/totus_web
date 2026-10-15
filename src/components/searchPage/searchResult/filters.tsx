@@ -20,6 +20,18 @@ import {
     shouldRestoreSearchFilters,
 } from '@/utils/searchListState';
 import { countActiveFilters } from '@/utils/filterChips';
+import HotelIcon from '@/components/icons/totus/HotelIcon';
+import type { TotusIconKey } from '@/components/icons/totus/registry.generated';
+import {
+    AMENITY_ICONS,
+    beachSurfaceIcon,
+    beachTypeIcon,
+    categoryIcon,
+    confirmabilityIcon,
+    hotelTypeIcon,
+    mealIcon,
+    wifiIcon,
+} from '@/components/icons/totus/ltIcons';
 
 const DEFAULT_FILTERS = {
     filter_instant_confirm: false,
@@ -90,6 +102,19 @@ const LIST_FILTER_UI: Array<{
     { key: 'filter_category', apiKey: 'category', title: 'Категория' },
     { key: 'filter_confirmability', apiKey: 'confirmability', title: 'Подтверждение' },
 ];
+
+/** Иконки вариантов фильтров (набор Totus): группа → id варианта Level.Travel → ключ иконки. */
+type OptionIconFn = (option: { id?: unknown }) => TotusIconKey | null;
+const OPTION_ICONS: Record<string, OptionIconFn> = {
+    filter_hotel_type: (o) => hotelTypeIcon(o?.id as string | number),
+    filter_meals: (o) => mealIcon(o?.id as string),
+    filter_wifi: (o) => wifiIcon(o?.id as string),
+    filter_beach_surface: (o) => beachSurfaceIcon(o?.id as string),
+    filter_beach_type: (o) => beachTypeIcon(o?.id as string),
+    filter_category: (o) => categoryIcon(o?.id as string),
+    filter_confirmability: (o) => confirmabilityIcon(o?.id as string | number),
+};
+const switchIcon = (key: string) => <HotelIcon name={AMENITY_ICONS[key]} size={20} />;
 
 function buildFiltersFromHotels(hotels: any) {
     const saved = readSearchListState();
@@ -586,6 +611,7 @@ const Filters = ({ selectedFilters, allFilters, statistics }: any) => {
                 <ItemSwitch
                     name={'filter_instant_confirm'}
                     title={'Быстрое подтверждение'}
+                    icon={<HotelIcon name="instant" size={20} />}
                     setIsOn={onChangeFilters}
                     isOn={instantConfirm}
                 />
@@ -608,6 +634,7 @@ const Filters = ({ selectedFilters, allFilters, statistics }: any) => {
                     <Collapse title={'Тип размещения'} open={true}>
                         <CheckboxGroup
                             name={'filter_hotel_type'}
+                            optionIcon={OPTION_ICONS.filter_hotel_type}
                             options={getOptionsWithSelected(
                                 allFilters?.hotel_type || [],
                                 activeFilterValues?.filter_hotel_type
@@ -621,6 +648,7 @@ const Filters = ({ selectedFilters, allFilters, statistics }: any) => {
                     <Collapse title={'Питание'} open={true}>
                         <CheckboxGroup
                             name={'filter_meals'}
+                            optionIcon={OPTION_ICONS.filter_meals}
                             options={getOptionsWithSelected(
                                 allFilters?.meals || [],
                                 activeFilterValues?.filter_meals
@@ -694,6 +722,7 @@ const Filters = ({ selectedFilters, allFilters, statistics }: any) => {
                         <Collapse key={key} title={title} open={true}>
                             <CheckboxGroup
                                 name={key}
+                                optionIcon={OPTION_ICONS[key]}
                                 options={getOptionsWithSelected(
                                     options,
                                     activeFilterValues?.[key],
@@ -714,6 +743,7 @@ const Filters = ({ selectedFilters, allFilters, statistics }: any) => {
                                     key={key}
                                     name={key}
                                     title={title}
+                                    icon={switchIcon(key)}
                                     setIsOn={onChangeFilters}
                                     isOn={resolveBoolFilter(key)}
                                 />

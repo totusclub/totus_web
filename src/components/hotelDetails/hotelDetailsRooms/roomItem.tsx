@@ -11,6 +11,8 @@ import {
     HOTEL_DETAILS_DEFAULT_FLEX_DATES,
 } from "@/utils/hotelDetailsUtils";
 import { resolveExactMealIdsFromPick, type ListRoomPick } from "@/utils/listRoomPick";
+import HotelIcon from '@/components/icons/totus/HotelIcon';
+import { roomFacilityIcon } from '@/components/icons/totus/ltIcons';
 
 type RoomImage = {
     x900?: string;
@@ -147,8 +149,9 @@ const HotelDetailsRoomItem = ({
                             <p>{item?.room?.description}</p>
                         </div>
                         <div className={styles.HotelDetailsRoomfacilities}>
-                            {item?.room?.facilities?.map((f: { name: string }, i: number) => (
+                            {item?.room?.facilities?.map((f: { name: string; group_identifier?: string | null }, i: number) => (
                                 <div key={i} className={styles.HotelDetailsRoomfacilitiesItem}>
+                                    <HotelIcon name={roomFacilityIcon(f.group_identifier, f.name)} size={14} />
                                     <p>{f.name}</p>
                                 </div>
                             ))}

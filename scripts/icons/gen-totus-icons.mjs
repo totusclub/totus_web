@@ -8,6 +8,7 @@
  * Результат:
  *   src/components/icons/totus/icons.generated.ts     — по одной константе на иконку (tree-shaking)
  *   src/components/icons/totus/registry.generated.ts  — ключ → иконка, подписи, разделы
+ *   src/components/icons/totus/hotelIcons.generated.ts — подмножество для поиска, отеля и номеров
  *
  * Источник правды — Figma u6A5og35jw0BBJyOkKl8Ij, страница «ICONS · Набор C».
  * JSON собран из неё (scripts/icons/build.py + manifest.py, основа — Tabler Icons, MIT).
@@ -74,9 +75,29 @@ ${sections.map(([id, t, ks]) => `    { id: ${q(id)}, title: ${q(t)}, keys: [${ks
 ];
 `;
 
+// Подмножество для поиска, страницы отеля и номеров: иконки там выбираются по данным Level.Travel,
+// поэтому нужен словарь ключ → иконка, но не весь набор (меньше JS на этих страницах).
+const HOTEL_SECTIONS = ['filter', 'card', 'hotel', 'room', 'amenity'];
+const HOTEL_EXTRA = ['transfer', 'mail', 'baggage', 'pin', 'calendar', 'nights', 'operator', 'best-price', 'discount'];
+const hotelKeys = [...new Set([
+    ...data.sections.filter((s) => HOTEL_SECTIONS.includes(s.id)).flatMap((s) => s.icons.map((i) => i.key)),
+    ...HOTEL_EXTRA,
+])];
+const hotel = HEAD + `
+import * as I from './icons.generated';
+import type { TotusIconDef } from './icons.generated';
+import type { TotusIconKey } from './registry.generated';
+
+/** Иконки поиска, страницы отеля и номеров: разделы ${HOTEL_SECTIONS.join(', ')} и ${HOTEL_EXTRA.join(', ')}. */
+export const HOTEL_ICONS: Partial<Record<TotusIconKey, TotusIconDef>> = {
+${hotelKeys.map((k) => `    ${q(k)}: I.${camel(k)},`).join('\n')}
+};
+`;
+
 const files = [
     [join(outDir, 'icons.generated.ts'), icons],
     [join(outDir, 'registry.generated.ts'), registry],
+    [join(outDir, 'hotelIcons.generated.ts'), hotel],
 ];
 if (process.argv.includes('--check')) {
     let ok = true;
