@@ -71,12 +71,22 @@
 }
 
 .ratingBadge {
-    background: var(--textPrimary);
-    color: var(--textPrimaryB, #fff);
+    /* Оценка отзыва — фирменный оранжевый, число по центру плашки (в обеих темах белое на оранжевом) */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    min-width: 32px;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: 8px;
+    background: var(--core_Orange);
+    color: #fff;
     font-size: 12px;
     font-weight: 500;
-    padding: 2px 8px;
-    border-radius: 8px;
+    line-height: 1;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
 }
 
 .reviewTitle {
