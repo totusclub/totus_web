@@ -10,7 +10,7 @@ import {
 } from "@/utils/bookingFlowUtils";
 import { formatPriceRub } from '@/utils/formatPrice';
 import { formatNightsCount } from '@/utils/formatRussianPlural';
-import { getOfferConfirmabilityDisplayLabel } from '@/utils/roomFilters';
+import { CONFIRMABILITY_LABELS, getOfferConfirmabilityDisplayLabel } from '@/utils/roomFilters';
 import { getOfferDisplayInfo, OFFER_TAG_BEST_PRICE } from '@/utils/offerDisplay';
 import {
     getOfferPrice,
@@ -19,6 +19,9 @@ import {
     type OfferSource,
 } from '@/utils/roomOffers';
 import Icon from '@/components/icons/Icon';
+import HotelIcon from '@/components/icons/totus/HotelIcon';
+import { mealIcon } from '@/components/icons/totus/ltIcons';
+import type { TotusIconKey } from '@/components/icons/totus/registry.generated';
 
 interface HotelDetailsPriceListProps {
     item: any[];
@@ -43,6 +46,17 @@ const roomTypeName: Record<string, string> = {
 };
 
 type OfferGroup = { source: OfferSource; offers: any[] };
+
+/** Иконки строки предложения (набор Totus): вид подтверждения и теги. */
+const CONFIRMABILITY_ICON: Record<string, TotusIconKey> = {
+    [CONFIRMABILITY_LABELS[1]]: 'instant',
+    [CONFIRMABILITY_LABELS[2]]: 'confirm-fast',
+    'Подтверждение по запросу': 'confirm-any',
+};
+const OFFER_TAG_ICON: Record<string, TotusIconKey> = {
+    'Раннее бронирование': 'early-booking',
+    'Выгодное предложение': 'best-price',
+};
 
 const HotelDetailsPriceList: React.FC<HotelDetailsPriceListProps> = ({ item, type }) => {
     const router = useRouter();
@@ -159,18 +173,31 @@ const HotelDetailsPriceList: React.FC<HotelDetailsPriceListProps> = ({ item, typ
                                         </span>
                                     </span>
                                 ) : null}
-                                <span>{formatWhen(room)}</span>
+                                <span className={styles.HotelDetailsOfferIconLine}>
+                                    <HotelIcon name="nights" size={16} />
+                                    <span>{formatWhen(room)}</span>
+                                </span>
                             </p>
-                            <p>{room?.operator_name}</p>
+                            <p className={styles.HotelDetailsOfferIconLine}>
+                                {room?.operator_name ? <HotelIcon name="operator" size={14} /> : null}
+                                <span>{room?.operator_name}</span>
+                            </p>
                             {confirmabilityLabel ? (
-                                <p className={styles.HotelDetailsOfferConfirmability}>
-                                    {confirmabilityLabel}
+                                <p className={`${styles.HotelDetailsOfferConfirmability} ${styles.HotelDetailsOfferIconLine}`}>
+                                    <HotelIcon
+                                        name={CONFIRMABILITY_ICON[confirmabilityLabel]}
+                                        size={14}
+                                        color="var(--core_Orange)"
+                                        accent={false}
+                                    />
+                                    <span>{confirmabilityLabel}</span>
                                 </p>
                             ) : null}
                             {otherTags.length > 0 ? (
                                 <div className={styles.HotelDetailsOfferTags}>
                                     {otherTags.map((tag) => (
                                         <span key={tag} className={styles.HotelDetailsOfferTag}>
+                                            <HotelIcon name={OFFER_TAG_ICON[tag]} size={14} />
                                             {tag}
                                         </span>
                                     ))}
@@ -206,7 +233,10 @@ const HotelDetailsPriceList: React.FC<HotelDetailsPriceListProps> = ({ item, typ
     return (
         <div className={styles.HotelDetailsPriceList}>
             <div className={styles.HotelDetailsPriceListHead}>
-                <p>{roomTypeName?.[type]}</p>
+                <p className={styles.HotelDetailsPriceListHeadTitle}>
+                    {roomTypeName?.[type] ? <HotelIcon name={mealIcon(type)} size={20} /> : null}
+                    <span>{roomTypeName?.[type]}</span>
+                </p>
                 {item?.description?.length > 1 && <p>{item?.description}</p>}
             </div>
             <div className={styles.HotelDetailsPriceListItems}>

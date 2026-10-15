@@ -23,6 +23,8 @@ import {
     resolveExactMealIdsFromPick,
 } from "@/utils/listRoomPick";
 import { groupThousands, RUB_SUFFIX } from "@/utils/formatPrice";
+import HotelIcon from '@/components/icons/totus/HotelIcon';
+import { mealIcon } from '@/components/icons/totus/ltIcons';
 
 const CHOOSE_ROOM_SECTION_ID = "choose-room";
 
@@ -174,12 +176,30 @@ const HotelDetailsInfo = ({
         });
     }, [listRoomPick, listMatched]);
 
+    // Иконка питания у строки «номер · питание»: один код — своя иконка, несколько — общая.
+    const roomOfferMealIcon = useMemo(() => {
+        const codes = String(listRoomPick?.mealId || listMatched?.mealId || '')
+            .split(',')
+            .map((c) => c.trim())
+            .filter(Boolean);
+        if (codes.length === 1) return mealIcon(codes[0]);
+        return codes.length > 1 ? 'meal-other' : null;
+    }, [listRoomPick, listMatched]);
+
     // Название отеля — в шапке окна «Все фото».
     const hotelName = typeof hotel?.name === "string" ? hotel.name : "";
 
     const handleChooseRoomClick = () => {
         scrollToChooseRoomSection();
     };
+
+    // Число ночей у даты: из выбранного предложения, иначе из параметров поиска (как было в тексте).
+    const offerNights =
+        (highlightOffer as any)?.nights_count != null
+            ? (highlightOffer as any).nights_count
+            : nightsConstraint.searchNights != null
+              ? nightsConstraint.searchNights
+              : null;
 
     const formatDate = useMemo(() => {
         const startDate =
@@ -230,15 +250,20 @@ const HotelDetailsInfo = ({
                                                 <div className={styles.HotelDetailsInfoDate}>
                                                     <p className={styles.HotelDetailsInfoDateTitle}>{getOfferPriceTitle(searchType)}</p>
                                                     {roomOfferLabel ? (
-                                                        <p className={styles.HotelDetailsInfoDateText}>{roomOfferLabel}</p>
+                                                        <p className={`${styles.HotelDetailsInfoDateText} ${styles.HotelDetailsInfoIconLine}`}>
+                                                            <HotelIcon name={roomOfferMealIcon} size={16} />
+                                                            <span>{roomOfferLabel}</span>
+                                                        </p>
                                                     ) : null}
-                                                    <p className={styles.HotelDetailsInfoDateText}>
-                                                        {formatDate}
-                                                        {(highlightOffer as any)?.nights_count != null
-                                                            ? `, ${(highlightOffer as any).nights_count} ночей`
-                                                            : nightsConstraint.searchNights != null
-                                                              ? `, ${nightsConstraint.searchNights} ночей`
-                                                              : ""}
+                                                    <p className={`${styles.HotelDetailsInfoDateText} ${styles.HotelDetailsInfoIconLine}`}>
+                                                        {formatDate ? <HotelIcon name="calendar" size={16} /> : null}
+                                                        <span>{formatDate}</span>
+                                                        {offerNights != null ? (
+                                                            <>
+                                                                <HotelIcon name="nights" size={16} className={styles.HotelDetailsInfoIconGap} />
+                                                                <span>{offerNights} ночей</span>
+                                                            </>
+                                                        ) : null}
                                                     </p>
                                                 </div>
                                             </>

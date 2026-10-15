@@ -144,6 +144,27 @@ export const AMENITY_ICONS: Record<string, TotusIconKey> = {
 export const amenityIcon = (key: string): TotusIconKey | undefined =>
     AMENITY_ICONS[key] ?? AMENITY_ICONS['filter_' + key];
 
+/** Признаки отеля в карточке поиска (`hotel.features`: ключ и значение) → иконка тега. */
+export const FEATURE_ICONS: Record<string, TotusIconKey> = {
+    airport_distance: 'to-airport',
+    beach_distance: 'to-sea',
+    distance_to_city_center: 'to-center',
+    city_center_distance: 'to-center',
+    ski_lift_distance: 'ski-lift',
+    line: 'line',
+    min_age: 'adults-only',
+    construction_year: 'built',
+    renovation_year: 'renovation',
+    area: 'area',
+    beach_size: 'beach-length',
+};
+export function hotelFeatureIcon(key: string, value?: unknown): TotusIconKey | undefined {
+    if (key === 'beach_surface') return beachSurfaceIcon(value as Id);
+    if (key === 'beach_type') return beachTypeIcon(value as Id);
+    if (key === 'wi_fi' || key === 'wifi') return wifiIcon(value as Id);
+    return FEATURE_ICONS[key] ?? amenityIcon(key);
+}
+
 /** Удобства номера (`/hotels-rooms` → facilities[].group_identifier). */
 export const ROOM_FACILITY_ICONS: Record<string, TotusIconKey> = {
     balcony: 'balcony',
@@ -226,3 +247,76 @@ export const NOTIFICATION_ICONS: Record<string, TotusIconKey> = {
     bell: 'bell',
 };
 export const notificationIcon = (kind: string): TotusIconKey => NOTIFICATION_ICONS[kind] ?? 'bell';
+
+/**
+ * Пункты «Развлечения» и «Территория» страницы отеля (`info.attractions`, `info.territory`) —
+ * свободный текст Level.Travel («анимация бесплатно», «основной ресторан на 250 чел.»).
+ * Иконка подбирается по словам; проверено на 750 отелях (Турция, Египет, ОАЭ, Таиланд, 15.10.2026):
+ * своя иконка у ~99 % пунктов, остальным — «Другое» (facility-other).
+ */
+const W = '(?:^|[^а-яё])'; // граница слова для кириллицы (\b не работает с кириллицей)
+/** Правила по порядку: первое совпадение побеждает. */
+export const AMENITY_TEXT_RULES: ReadonlyArray<readonly [TotusIconKey, RegExp]> = [
+    ['bar', /^(\d+ )?бар(?!бек|бер)/],
+    ['kids-pool', /детск\S* бассейн/],
+    ['indoor-pool', new RegExp(W + 'крыт\\S* бассейн')],
+    ['heated-pool', /подогрев/],
+    ['pool', /бассейн|купальн|slide pool/],
+    ['aquapark', /аквапарк|аква ?центр|aqua ?park|водн\S* горк|горк|горок/],
+    ['kids-club', /мини-?клуб|детск\S* клуб|клуб для детей/],
+    ['playground', /детск\S* (игров|площад)|игров\S* площад|игров\S* комнат/],
+    ['nanny', /няня|присмотр за детьми/],
+    ['disco', /дискотек|ночн\S* клуб|диджей|\bdj\b|disco/],
+    ['animation', /анимац|развлекательн|шоу|вечерн\S* програм|тематическ|амфитеатр|кинотеатр|кино|восточн\S* ноч|танц/],
+    ['live-music', /живая музык|музык|караоке/],
+    ['tennis', /теннис|тенис|сквош|падел/],
+    ['sport-court', /волейбол|баскетбол|футбол|водное поло|корт|спортивн\S* площад|бочч|петанк|бадминтон|крокет/],
+    ['diving', /дайвинг|снорк|сноркел|подводн/],
+    ['water-sports', /водн\S* (вид|развлеч|лыж)|серфинг|виндсерф|кайт|каяк|каноэ|байдар|катамаран|яхт|парусн|лодк|рыбалк|сап-?борд|\bsup\b|банан|парасейл|гидроцикл|парашют/],
+    ['billiards', /бильярд/],
+    ['board-games', /шахмат|шашк|нард|настольн\S* (игр|футбол)|дартс|боулинг|игров\S* зал|видеоигр|игровые автоматы|электронн\S* игр|аэрохоккей/],
+    ['golf', /гольф/],
+    ['riding', /верблюд|лошад|конн|верхов|сафари/],
+    ['bike-rental', /велосипед|велопрокат|скутер|мопед/],
+    ['car-rental', /прокат авто|автомобил|аренда авто|прокат машин|лимузин/],
+    ['transfer', /трансфер|шаттл|такси|автобус/],
+    ['excursions', /экскурс|туристическ\S* (бюро|стойк)|продаж\S* билет|билет|музей/],
+    ['hammam', /хаммам|хамам|турецк\S* бан/],
+    ['sauna', new RegExp('саун|парн|паров|' + W + 'бан[яи]')],
+    ['spa', /спа|spa|оздоровит|велнес|wellness|джакузи|гидромассаж|талассо/],
+    ['massage', /массаж/],
+    ['fitness', /фитнес|тренаж|спортзал|спортивн\S* зал|йога|аэробик|пилатес|стретчинг/],
+    ['beauty', /салон красоты|центр красоты|парикмах|цирюльн|маникюр|тату|барбер/],
+    ['doctor', /врач|доктор|медицин|медпункт|аптек/],
+    ['meal-dinner', /ресторан|столов|шведск|завтрак|а-ля карт|гриль|барбекю|кулинарн|буфет|меню/],
+    ['meal-breakfast', /кафе|café|кофе|чайн|кондитер|снэк|снек|пиццер/],
+    ['bar', new RegExp(W + 'бар|bar\\b|паб|pub|кальян')],
+    ['garden', new RegExp('(?:' + W + 'сад|зелен|газон|' + W + 'парк(?!ов)|пикник)')],
+    ['sunbeds', /шезлонг|лежак|зонтик|терраса для загара|солярий/],
+    ['beach-own', /пляж/],
+    ['wifi-free', /wi-?fi|интернет|вай-фай/],
+    ['parking', /парковк|стоянк|гараж/],
+    ['conference', /конференц|банкетн|бизнес|переговор|собрани|секретар|факс|ксерокс|копи|принтер/],
+    ['exchange', /обмен валют|банкомат|банк/],
+    ['baggage', /багаж|камера хранения/],
+    ['washing', /прачечн|химчист|гладильн|глаж|стирк|стиральн/],
+    ['reception', /регистрац|ресепшн|ресепшен|ресепц|стойк/],
+    ['elevator', /лифт/],
+    ['shop', /магазин|маркет|бутик|сувенир|пресса|газет|kiosk|киоск|торгов\S* автомат|доставка продукт/],
+    ['mail', /почт/],
+    ['room-service', /консьерж|обслуживание номер|room service|побудк|дворецк/],
+    ['security', /охран|видеонаблюд|безопасн|сейф/],
+    ['lounge', /лаунж|лаундж|лобби|гостин|холл|библиотек|тв-|телевизор|тв |tv|зона отдыха|приставк/],
+    ['terrace', /террас|балкон|веранд|патио/],
+    ['accessible', /инвалид|ограниченн/],
+    ['pets', /животн|питом/],
+    ['aircon', /кондиционер/],
+    ['heating', /отоплен/],
+    ['kitchen', /кухн|микроволн/],
+];
+
+export function amenityTextIcon(text: string | null | undefined): TotusIconKey {
+    const t = String(text ?? '').toLowerCase();
+    const rule = AMENITY_TEXT_RULES.find(([, re]) => re.test(t));
+    return rule ? rule[0] : 'facility-other';
+}

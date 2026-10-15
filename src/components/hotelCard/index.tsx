@@ -14,6 +14,9 @@ import {
 } from "@/utils/listRoomPick";
 import { groupThousands, RUB_SUFFIX } from "@/utils/formatPrice";
 import { markSearchListForRestore, pickAppliedFiltersFromHotels, readSearchListState, replaceSearchListFilters } from "@/utils/searchListState";
+import HotelIcon from '@/components/icons/totus/HotelIcon';
+import { hotelFeatureIcon } from '@/components/icons/totus/ltIcons';
+import type { TotusIconKey } from '@/components/icons/totus/registry.generated';
 
 interface HotelCardState {
     item: any
@@ -247,9 +250,7 @@ const HotelCard = ({ item, lazy }: HotelCardState) => {
 
         const ignoredKeys = ['construction_year', 'renovation_year', 'area', 'beach_type', 'beach_size', 'no_single_men', 'thermal_fun'];
 
-        return Object.entries(data)
-            .filter(([key, value]) => value !== null && value !== false && !ignoredKeys.includes(key))
-            .map(([key, value]) => {
+        const toText = (key: string, value: any): string | null => {
                 const label = labels[key] || key;
 
                 // Handle distance fields: convert to km
@@ -316,8 +317,15 @@ const HotelCard = ({ item, lazy }: HotelCardState) => {
                 }
 
                 return `${value}${units[key] || ''} ${label}`;
+        };
+
+        return Object.entries(data)
+            .filter(([key, value]) => value !== null && value !== false && !ignoredKeys.includes(key))
+            .map(([key, value]) => {
+                const text = toText(key, value);
+                return text ? { text, icon: hotelFeatureIcon(key, value) } : null;
             })
-            .filter((tag): tag is string => Boolean(tag));
+            .filter((tag): tag is { text: string; icon: TotusIconKey | undefined } => Boolean(tag));
     };
 
 
@@ -385,8 +393,9 @@ const HotelCard = ({ item, lazy }: HotelCardState) => {
                     </div>
                     <div className={styles.hotelCardTags}>
                         {TAGS?.map(tag => (
-                            <div className={styles.hotelCardTagItem} key={tag}>
-                                <p>{tag}</p>
+                            <div className={styles.hotelCardTagItem} key={tag.text}>
+                                <HotelIcon name={tag.icon} size={14} />
+                                <p>{tag.text}</p>
                             </div>
                         ))}
                     </div>

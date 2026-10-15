@@ -20,3 +20,14 @@
     line-height: 20px;
     letter-spacing: -0.32px;
 }
+
+/* Иконка слева от подписи (набор Totus, 20px) */
+.itemSwitchLabel {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+.itemSwitchLabel > svg {
+    flex: none;
+}

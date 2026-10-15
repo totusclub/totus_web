@@ -11,6 +11,8 @@ import {
     toggleOperatorFilter,
 } from '@/utils/roomFilters';
 import { formatPriceRub } from '@/utils/formatPrice';
+import HotelIcon from '@/components/icons/totus/HotelIcon';
+import type { TotusIconKey } from '@/components/icons/totus/registry.generated';
 
 type RoomFiltersProps = {
     filters: HotelRoomFilters | null;
@@ -107,6 +109,7 @@ function FilterOptionRow({
 
 function RoomFilterDropdown({
     title,
+    icon,
     summary,
     isOpen,
     onToggle,
@@ -114,6 +117,8 @@ function RoomFilterDropdown({
     children,
 }: {
     title: string;
+    /** Иконка группы (набор Totus, 16px). */
+    icon?: TotusIconKey;
     summary: string;
     isOpen: boolean;
     onToggle: () => void;
@@ -143,6 +148,7 @@ function RoomFilterDropdown({
                 onClick={onToggle}
                 aria-expanded={isOpen}
             >
+                {icon ? <HotelIcon name={icon} size={16} className={styles.HotelDetailsRoomFilterTriggerIcon} /> : null}
                 <span className={styles.HotelDetailsRoomFilterTriggerText}>
                     <span className={styles.HotelDetailsRoomFilterTriggerTitle}>{title}</span>
                     <span className={styles.HotelDetailsRoomFilterTriggerValue}>{summary}</span>
@@ -188,6 +194,7 @@ const RoomFilters = ({ filters, hasActiveFilters = false, onChange, onClear }: R
                 {hasMeals ? (
                     <RoomFilterDropdown
                         title="Питание"
+                        icon="meal-ai"
                         summary={getSummary(meals, (meal) => meal.name || String(meal.id))}
                         isOpen={openFilter === 'meals'}
                         onToggle={() => toggleDropdown('meals')}
@@ -211,6 +218,7 @@ const RoomFilters = ({ filters, hasActiveFilters = false, onChange, onClear }: R
                 {hasFreeCancel ? (
                     <RoomFilterDropdown
                         title="Отмена"
+                        icon="free-cancel"
                         summary={getFreeCancelSummary(freeCancel)}
                         isOpen={openFilter === 'free_cancel'}
                         onToggle={() => toggleDropdown('free_cancel')}
@@ -234,6 +242,7 @@ const RoomFilters = ({ filters, hasActiveFilters = false, onChange, onClear }: R
                 {hasConfirmability ? (
                     <RoomFilterDropdown
                         title="Подтверждение"
+                        icon="instant"
                         summary={getSummary(confirmability, getConfirmabilityLabel)}
                         isOpen={openFilter === 'confirmability'}
                         onToggle={() => toggleDropdown('confirmability')}
@@ -260,6 +269,7 @@ const RoomFilters = ({ filters, hasActiveFilters = false, onChange, onClear }: R
                 {hasOperators ? (
                     <RoomFilterDropdown
                         title="Туроператор"
+                        icon="operator"
                         summary={getSummary(operators, (operator) => operator.name || String(operator.id))}
                         isOpen={openFilter === 'operators'}
                         onToggle={() => toggleDropdown('operators')}

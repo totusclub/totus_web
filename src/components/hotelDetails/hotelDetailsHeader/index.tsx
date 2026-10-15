@@ -2,6 +2,7 @@ import styles from '../hotelDetails.module.css';
 import reviewStyles from '../hotelReviewsModal.module.css';
 import Icon from "@/components/icons/Icon";
 import { useTheme } from "@/hooks/useTheme";
+import HotelIcon from '@/components/icons/totus/HotelIcon';
 
 const HotelDetailsHeader = ({ info, loading, onReviewsClick }: any) => {
     const { theme, mounted } = useTheme();
@@ -49,7 +50,10 @@ const HotelDetailsHeader = ({ info, loading, onReviewsClick }: any) => {
                             {hasReviews ? `${reviewsCount} отзывов` : 'Отзывы'}
                         </p>
                     </div>
-                    <p className={styles.HotelDetailsHeaderAddress}>{info?.address}</p>
+                    <p className={styles.HotelDetailsHeaderAddress}>
+                        {info?.address ? <HotelIcon name="pin" size={16} /> : null}
+                        <span>{info?.address}</span>
+                    </p>
                 </div>
             </div>
         );

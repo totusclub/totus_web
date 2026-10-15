@@ -184,6 +184,7 @@
   padding: 4px 8px;
   justify-content: center;
   align-items: center;
+  gap: 4px; /* иконка набора Totus 14px + подпись */
   border-radius: 12px;
   background: var(--bgSecondary);
 }

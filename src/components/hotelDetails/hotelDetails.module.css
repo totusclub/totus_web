@@ -61,6 +61,9 @@
   letter-spacing: 0;
 }
 .HotelDetailsHeaderAddress {
+  display: flex; /* метка (иконка Totus 16px) + адрес */
+  align-items: center;
+  gap: 6px;
   color: var(--textTertiary);
   /*font-family: "Golos Text";*/
   font-size: 16px;
@@ -211,6 +214,7 @@
 }
 .HotelDetailsDescHead {
   display: flex;
+  gap: 8px; /* иконка раздела (Totus 20px) + заголовок */
   height: 48px;
   padding: 0px 16px;
   align-items: center;
@@ -228,6 +232,7 @@
 }
 .HotelDetailsDescItem {
   display: flex;
+  gap: 4px; /* иконка пункта (Totus 14px) + текст */
   padding: 4px 8px;
   justify-content: center;
   align-items: center;
@@ -758,6 +763,9 @@
   gap: 8px;
 }
 .HotelDetailsRoomfacilitiesItem {
+  display: flex; /* иконка удобства (Totus 14px) + название */
+  align-items: center;
+  gap: 4px;
   padding: 4px 8px;
   background: var(--bgSecondary);
   font-size: 11px;
@@ -988,6 +996,7 @@
 .HotelDetailsOfferTag {
   display: inline-flex;
   align-items: center;
+  gap: 4px; /* иконка тега (Totus 14px) */
   padding: 4px 8px;
   border-radius: 999px;
   background: var(--bgPrimary);
@@ -1486,4 +1495,39 @@
   .HotelDetailsPriceListItems {
     border-radius: 16px;
   }
+}
+
+/* Карточка цены: строки с иконками Totus 16px (питание, дата, ночи) */
+.HotelDetailsInfoIconLine {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.HotelDetailsInfoIconLine > svg {
+  flex: none;
+}
+.HotelDetailsInfoIconGap {
+  margin-left: 6px;
+}
+
+/* Номера: иконки Totus в строке предложения, заголовке питания и фильтрах */
+.HotelDetailsOfferIconLine {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.HotelDetailsOfferIconLine > svg,
+.HotelDetailsPriceListHeadTitle > svg,
+.HotelDetailsRoomFilterTriggerIcon {
+  flex: none;
+}
+.HotelDetailsPriceListHeadTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.HotelDetailsRoomFilterTrigger > .HotelDetailsRoomFilterTriggerText {
+  flex: 1;
+  min-width: 0;
 }
