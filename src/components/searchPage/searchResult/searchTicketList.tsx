@@ -50,7 +50,7 @@ const ResultTicketList = ({ flights, packages, loading }: any) => {
 
     return (
         <div className={styles.resultList}>
-            <Progress title={'Ищем подходящие туры'} loading={loading} />
+            <Progress title={'Ищем подходящие варианты перелёта'} loading={loading} />
 
             <div className={tl.tour}>
                 <SelectedTour packages={packages} flights={flights} />
