@@ -155,7 +155,22 @@ export default function CheckboxGroup({
                 const checked = isSelected(value);
 
                 return (
-                    <div key={String(value)} className={styles.checkboxItem}>
+                    // Вся строка — один переключатель: клик по чекбоксу, иконке или подписи
+                    // отмечает вариант, курсор — указатель (раньше реагировали только чекбокс и подпись).
+                    <div
+                        key={String(value)}
+                        className={styles.checkboxItem}
+                        role="checkbox"
+                        aria-checked={checked}
+                        tabIndex={0}
+                        onClick={() => handleToggle(value)}
+                        onKeyDown={(e) => {
+                            if (e.key === ' ' || e.key === 'Enter') {
+                                e.preventDefault();
+                                handleToggle(value);
+                            }
+                        }}
+                    >
                         <Checkbox
                             option={option}
                             value={value}
@@ -166,7 +181,7 @@ export default function CheckboxGroup({
                             <HotelIcon name={optionIcon(option)} size={20} className={styles.optionIcon} />
                         ) : null}
                         <div>
-                            <p onClick={() => handleToggle(value)}>{renderName(option)}</p>
+                            <p>{renderName(option)}</p>
                             {!pk && (
                                 <span>
                                     {' '}

@@ -18,7 +18,22 @@ const ItemSwitch = ({isOn,setIsOn,title,isFull,name,icon}: ItemSwitchProps) => {
     }
 
     return (
-        <div className={styles.itemSwitch} style={{flex:isFull?1:'none'}}>
+        // Вся строка переключает фильтр (подпись и иконка тоже), курсор — указатель.
+        // Сам Switch останавливает всплытие клика, поэтому двойного переключения нет.
+        <div
+            className={styles.itemSwitch}
+            style={{flex:isFull?1:'none'}}
+            role="switch"
+            aria-checked={isOn}
+            tabIndex={0}
+            onClick={() => handleToggle(!isOn)}
+            onKeyDown={(e) => {
+                if (e.key === ' ' || e.key === 'Enter') {
+                    e.preventDefault();
+                    handleToggle(!isOn);
+                }
+            }}
+        >
             {icon ? (
                 <span className={styles.itemSwitchLabel}>
                     {icon}

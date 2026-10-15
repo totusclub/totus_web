@@ -8,12 +8,7 @@ interface CheckboxProps {
     value: number | string;
 }
 
-export default function Checkbox({ checked, handleToggle, value }: CheckboxProps) {
-    return (
-        <Icon
-            name={checked ? 'checkBoxActive' : 'checkBox'}
-            size={24}
-            onClick={() => handleToggle(value)}
-        />
-    );
+/** Только картинка чекбокса: клик обрабатывает строка CheckboxGroup (вся строка кликабельна). */
+export default function Checkbox({ checked }: CheckboxProps) {
+    return <Icon name={checked ? 'checkBoxActive' : 'checkBox'} size={24} />;
 }
