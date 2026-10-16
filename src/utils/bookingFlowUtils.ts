@@ -1,4 +1,5 @@
 import type { NextRouter } from 'next/router';
+import { saveBookingReturnUrl } from '@/utils/bookingOffer';
 
 export type SearchTypeValue = 'package' | 'hotel';
 
@@ -64,6 +65,8 @@ export function navigateAfterPackageCreate(
   searchType?: string | null
 ): void {
   const id = String(packageId);
+  // «Вернуться к номерам» на /booking, если тур продан или не загрузился.
+  if (typeof router.asPath === 'string') saveBookingReturnUrl(router.asPath);
   if (isHotelOnlySearch(searchType ?? undefined)) {
     router.push({
       pathname: '/booking',
