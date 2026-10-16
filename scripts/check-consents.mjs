@@ -120,7 +120,7 @@ await check('бронирование: тур — оферта, отель — �
     has(card, /<ConsentTourOfferText \/>/);
     has(card, /<ConsentPdText subjects=\{isHotelOnly \? 'guests' : 'tourists'\} \/>/);
     has(card, /<ConsentAdsText \/>/);
-    has(card, /disabled=\{!isFormValid \|\| !consentsOk \|\| loading\}/);
+    has(card, /disabled=\{!isFormValid \|\| !consentsOk \|\| loading( \|\| submitUnavailable)?\}/);
     has(card, /Отметьте обязательные пункты, чтобы продолжить/);
     has(card, /\{isHotelOnly \? 'Отель' : 'Тур'\} в \{packageData\?\.hotel\?\.city\}/);
     assert.ok(!/перс\. данным|Условиями продажи|потреб\./.test(card), 'старый текст убран (в обоих состояниях)');

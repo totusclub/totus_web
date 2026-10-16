@@ -138,8 +138,8 @@ const list = code(read('src/components/searchPage/searchResult/searchTicketList.
 await check('бронирование: топливный сбор — из одного выбранного перелёта, без полного списка', () => {
   assert.ok(!/Packagesflights/.test(booking), 'полный список перелётов на странице бронирования не запрашивается');
   assert.match(booking, /const selected = await getSelectedFlight\(pkg\.id \|\| pkg\.package_id, pairId, options\);/);
-  assert.match(booking, /fuel_charge: toMoney\(selected\?\.fuel_charge\)/);
-  assert.match(booking, /if \(packageFuel > 0\) \{\s*return \{ \.\.\.pkg, fuel_charge: packageFuel \};/, 'есть сбор в актуализации — второго запроса нет');
+  assert.match(booking, /const flightFuel = toMoney\(selected\?\.fuel_charge\);[\s\S]*?fuel_charge: flightFuel,/);
+  assert.match(booking, /if \(packageFuel > 0\) \{\s*return \{ \.\.\.pkg, fuel_charge: packageFuel, _fees_source: 'package' \};/, 'есть сбор в актуализации — второго запроса нет');
 });
 
 await check('бронирование: один запрос на адрес — смена перелёта или уход отменяют прежний, ответ не перетирает', () => {
@@ -147,7 +147,7 @@ await check('бронирование: один запрос на адрес —
   assert.match(booking, /PackagesActualizeFlight\(packageId as any, flightPairId as any, \{ signal \}\)/);
   assert.match(booking, /PackagesActualize\(packageId as any, \{ search_type: 'hotel', signal \}\)/);
   assert.match(booking, /resolvePackageWithFlightFees\(pkg, flightPairId, \{ signal \}\);\s*if \(signal\.aborted\) return;/);
-  assert.match(booking, /if \(signal\.aborted \|\| isRequestCancelled\(err\)\) return;\s*setDataLoading\(false\);/);
+  assert.match(booking, /if \(signal\.aborted \|\| isRequestCancelled\(err\)\) return;\s*const kind = classifyBookingLoadFailure\(err\);/);
   assert.match(booking, /return \(\) => controller\.abort\(\);\s*\}, \[/);
 });
 
