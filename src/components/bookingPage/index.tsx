@@ -10,6 +10,15 @@ import { validateBookingForm, flattenBookingErrors, mapLevelTravelTouristValidat
 import { getSearchTypeFromQuery, isHotelOnlySearch } from "@/utils/bookingFlowUtils";
 import { toMoney } from "@/utils/packagePrice";
 import { requiredBookingConsents } from "@/components/bookingPage/orderCard";
+import { BookingLoadError, BookingUnavailable } from "@/components/bookingPage/bookingStatus";
+import {
+    BOOKING_SLOW_HINT_MS,
+    classifyBookingLoadFailure,
+    getOfferSummary,
+    getOtherFlightHref,
+    isOfferUnavailablePayload,
+    readBookingReturnUrl,
+} from "@/utils/bookingOffer";
 import { hasRequiredConsents, type Consents } from "@/config/legalLinks";
 
 type Params = {
@@ -39,20 +48,23 @@ async function resolvePackageWithFlightFees(
         return {
             ...pkg,
             fuel_charge: packageFuel || toMoney(pkg.predicted_surcharge),
+            _fees_source: packageFuel > 0 ? 'package' : 'predicted',
         };
     }
 
     // Actualize already returned fuel_charge for this flight
     if (packageFuel > 0) {
-        return { ...pkg, fuel_charge: packageFuel };
+        return { ...pkg, fuel_charge: packageFuel, _fees_source: 'package' };
     }
 
     // Look up surcharge from LT packages/flights for the selected pair
     try {
         const selected = await getSelectedFlight(pkg.id || pkg.package_id, pairId, options);
+        const flightFuel = toMoney(selected?.fuel_charge);
         return {
             ...pkg,
-            fuel_charge: toMoney(selected?.fuel_charge),
+            fuel_charge: flightFuel,
+            _fees_source: flightFuel > 0 ? 'flight' : 'predicted',
         };
     } catch (err) {
         // Страницу закрыли / открыли другой перелёт — результат никому не нужен.
@@ -60,6 +72,7 @@ async function resolvePackageWithFlightFees(
         return {
             ...pkg,
             fuel_charge: toMoney(pkg.predicted_surcharge),
+            _fees_source: 'predicted',
         };
     }
 }
@@ -99,13 +112,7 @@ const PREBOOK_FAILED_MESSAGE =
  */
 const getOfferBlockReason = (payload: any): string | null => {
     if (!payload) return OFFER_UNAVAILABLE_MESSAGE;
-    if (
-        payload.success === false ||
-        payload.rotten === true ||
-        payload.package?.available === false
-    ) {
-        return OFFER_UNAVAILABLE_MESSAGE;
-    }
+    if (isOfferUnavailablePayload(payload)) return OFFER_UNAVAILABLE_MESSAGE;
     return null;
 };
 
@@ -135,6 +142,13 @@ const extractCreateErrorMessage = (payload: any): string => {
 };
 
 
+/**
+ * loading — идёт актуализация (скелетон); ready — тур загружен;
+ * unavailable — тур снят / продан (экран с «Выбрать другой перелёт»);
+ * error — сбой связи / туроператора (экран с «Повторить»).
+ */
+type LoadState = 'loading' | 'ready' | 'unavailable' | 'error';
+
 const BookingCard = () => {
     const router = useRouter();
     const [packageData, setPackageData] = useState<{
@@ -148,6 +162,15 @@ const BookingCard = () => {
     } | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const [dataLoading, setDataLoading] = useState<boolean>(true);
+    const [loadState, setLoadState] = useState<LoadState>('loading');
+    /** Пакет из отказа LT (rotten) — для строки «Белек, Турция · 22–29 октября». */
+    const [unavailablePackage, setUnavailablePackage] = useState<any>(null);
+    /** «Повторить» — новый запуск эффекта загрузки. */
+    const [loadAttempt, setLoadAttempt] = useState(0);
+    const [slowLoading, setSlowLoading] = useState(false);
+    /** Тур продали, пока заполняли форму: заказ не создавали. */
+    const [submitUnavailable, setSubmitUnavailable] = useState(false);
+    const [roomsHref, setRoomsHref] = useState<string | null>(null);
     const { user } = useAuth()
     const [params, setParams] = useState<Params>({
         email: "",
@@ -166,6 +189,7 @@ const BookingCard = () => {
         if (!router.isReady) return;
         if (!packageId) {
             setDataLoading(false);
+            setLoadState('unavailable');
             return;
         }
 
@@ -173,6 +197,8 @@ const BookingCard = () => {
         const flightPairId = router?.query?.flight_pair_id;
 
         setDataLoading(true);
+        setLoadState('loading');
+        setSubmitUnavailable(false);
 
         // Один запрос на текущий адрес: при смене тура / перелёта или уходе со страницы
         // прежний запрос отменяется, и его ответ не перетирает новый.
@@ -195,6 +221,8 @@ const BookingCard = () => {
                     setPackageData(null);
                     setParams((prev) => ({ ...prev, tourist: [] }));
                     setErrors({ general: blockReason || OFFER_UNAVAILABLE_MESSAGE });
+                    setUnavailablePackage(pkg);
+                    setLoadState('unavailable');
                     setDataLoading(false);
                     return;
                 }
@@ -209,10 +237,16 @@ const BookingCard = () => {
                 const resolved = await resolvePackageWithFlightFees(pkg, flightPairId, { signal });
                 if (signal.aborted) return;
                 setPackageData(resolved);
+                setLoadState('ready');
                 setDataLoading(false);
             })
             .catch((err) => {
                 if (signal.aborted || isRequestCancelled(err)) return;
+                const kind = classifyBookingLoadFailure(err);
+                const data = (err as any)?.response?.data;
+                setPackageData(null);
+                setUnavailablePackage(kind === 'unavailable' ? data?.package || null : null);
+                setLoadState(kind);
                 setDataLoading(false);
             });
 
@@ -222,7 +256,28 @@ const BookingCard = () => {
         router?.query?.package,
         router?.query?.flight_pair_id,
         router?.query?.search_type,
+        loadAttempt,
     ]);
+
+    // «Проверяем цену и места у туроператора» — если актуализация идёт дольше обычного.
+    useEffect(() => {
+        if (loadState !== 'loading') {
+            setSlowLoading(false);
+            return;
+        }
+        const timer = setTimeout(() => setSlowLoading(true), BOOKING_SLOW_HINT_MS);
+        return () => clearTimeout(timer);
+    }, [loadState, loadAttempt]);
+
+    // Страница отеля, с которой пришли (сохраняет navigateAfterPackageCreate).
+    useEffect(() => {
+        setRoomsHref(readBookingReturnUrl());
+    }, []);
+
+    const otherFlightHref = useMemo(() => {
+        if (isHotelOnly) return null;
+        return getOtherFlightHref(packageData?.id ?? unavailablePackage?.id ?? router.query.package);
+    }, [isHotelOnly, packageData?.id, unavailablePackage?.id, router.query.package]);
 
     useEffect(() => {
         if (!packageData) return;
@@ -525,7 +580,8 @@ const BookingCard = () => {
 
                 const blockReason = getOfferBlockReason(actualizeResult);
                 if (blockReason) {
-                    setErrors({ general: blockReason });
+                    // Заказ не создаём; в карточке — «Этот тур только что раскупили» и куда перейти.
+                    setSubmitUnavailable(true);
                     setLoading(false);
                     return;
                 }
@@ -538,8 +594,12 @@ const BookingCard = () => {
                     actualPackage = resolved;
                     setPackageData(resolved);
                 }
-            } catch {
-                setErrors({ general: 'Не удалось актуализировать предложение. Пожалуйста, попробуйте еще раз.' });
+            } catch (actualizeError) {
+                if (classifyBookingLoadFailure(actualizeError) === 'unavailable') {
+                    setSubmitUnavailable(true);
+                } else {
+                    setErrors({ general: 'Не удалось проверить тур у туроператора. Заказ не создан — нажмите «Отправить запрос» ещё раз.' });
+                }
                 setLoading(false);
                 return;
             }
@@ -841,6 +901,28 @@ const BookingCard = () => {
     }
 
 
+    if (loadState === 'unavailable' || loadState === 'error') {
+        return (
+            <div className={'content'}>
+                <div className={`${styles.bookingScreen} ${styles.bookingScreenCenter}`}>
+                    {loadState === 'unavailable' ? (
+                        <BookingUnavailable
+                            summary={getOfferSummary(unavailablePackage)}
+                            otherFlightHref={otherFlightHref}
+                            roomsHref={roomsHref}
+                        />
+                    ) : (
+                        <BookingLoadError
+                            onRetry={() => setLoadAttempt((n) => n + 1)}
+                            otherFlightHref={otherFlightHref}
+                            roomsHref={roomsHref}
+                        />
+                    )}
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className={'content'}>
             <div className={styles.bookingScreen}>
@@ -862,6 +944,10 @@ const BookingCard = () => {
                         isHotelOnly={isHotelOnly}
                         consents={consents}
                         onConsentsChange={setConsents}
+                        slowLoading={slowLoading}
+                        submitUnavailable={submitUnavailable}
+                        otherFlightHref={otherFlightHref}
+                        roomsHref={roomsHref}
                     />
                 </div>
             </div>

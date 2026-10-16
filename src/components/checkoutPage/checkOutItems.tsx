@@ -2,7 +2,25 @@ import React, { useMemo, useState, useEffect } from "react";
 import styles from './checkout.module.css';
 import Icon from "@/components/icons/Icon";
 import TicketModal from "@/components/modals/ticketModal";
-import { Packagesflights } from "@/api/levelTravelApi";
+import { getSelectedFlight } from "@/api/levelTravelApi";
+import { getOrderFlightData } from "@/utils/orderPayment";
+import { formatMoneyRub, toMoney } from "@/utils/packagePrice";
+import { getBookingInclusions, getConfirmationLabel, type InclusionItem } from "@/utils/bookingOffer";
+
+/** «А что ещё» — значение справа из строки «Что входит» (данные Level.Travel по заказу). */
+function inclusionValue(item: InclusionItem): string {
+    if (item.key === 'insurance' || item.key === 'transfer') {
+        return item.kind === 'yes' ? 'Входит в тур' : 'Не входит';
+    }
+    if (item.key === 'visa') return item.note === 'нужна' ? 'Нужна' : 'Не нужна';
+    return item.note || '';
+}
+
+const INCLUSION_LABEL: Record<string, string> = {
+    insurance: 'Медицинская страховка',
+    transfer: 'Трансфер',
+    visa: 'Виза',
+};
 
 function formatPhoneDisplay(phone: unknown): string {
     const digits = String(phone ?? '').replace(/\D/g, '');
@@ -101,34 +119,28 @@ const CheckoutItems = ({ order, dataLoading, buyerFromBooking }: any) => {
     useEffect(() => {
         if (!order) return;
 
-        const orderFlightData =
-            order?.package?.flight ||
-            order?.package?.flight_pair ||
-            order?.flight ||
-            order?.flight_pair;
-
+        // Перелёт из самого заказа; иначе — один выбранный перелёт (?view=pair), а не весь список
+        // пакета (до 12 МБ). Без flight_pair_id не подставляем «первый попавшийся» рейс.
+        const orderFlightData = getOrderFlightData(order);
         if (orderFlightData) {
             setFlightData(orderFlightData);
             return;
         }
 
         const packageId = order?.package?.id || order?.package_id;
-        if (!packageId) return;
+        const flightPairId = order?.package?.flight_pair_id || order?.flight_pair_id;
+        if (!packageId || !flightPairId) return;
 
-        Packagesflights({ package_id: packageId })
-            .then((response) => {
-                const selectedFlight =
-                    response?.flights?.find(
-                        (flight: any) =>
-                            String(flight.flight_pair_id) ===
-                            String(order?.package?.flight_pair_id || order?.flight_pair_id),
-                    ) || response?.flights?.[0];
-
+        const controller = new AbortController();
+        getSelectedFlight(packageId, flightPairId, { signal: controller.signal })
+            .then((selectedFlight) => {
                 if (selectedFlight) setFlightData(selectedFlight);
             })
             .catch((err) => {
+                if (controller.signal.aborted) return;
                 console.error('Failed to fetch flight data:', err);
             });
+        return () => controller.abort();
     }, [order]);
 
     const formatDate = useMemo(() => {
@@ -166,6 +178,13 @@ const CheckoutItems = ({ order, dataLoading, buyerFromBooking }: any) => {
     const operatorName = pkg?.operator?.name || order?.operator?.name || '';
     const hotelName = hotel?.name || '';
     const hotelStars = hotel?.stars ? `${hotel.stars}★` : '';
+    const confirmation = getConfirmationLabel(pkg);
+    const isHotelOnly = Boolean(pkg) && pkg?.search_type === 'hotel';
+    const extraRows = useMemo(
+        () => getBookingInclusions(pkg, { isHotelOnly }).filter((item) => item.key !== 'flight' && item.key !== 'stay'),
+        [pkg, isHotelOnly],
+    );
+    const fuelCharge = toMoney(pkg?.fuel_charge);
 
     return (
         <div className={styles.checkoutItemsWrap}>
@@ -197,7 +216,7 @@ const CheckoutItems = ({ order, dataLoading, buyerFromBooking }: any) => {
                             value={destination}
                             badge={hotel?.visa?.needed ? 'Требуется виза' : undefined}
                         />
-                        <InfoRow label="Скорость бронирования" value="Быстрое подтверждение" />
+                        <InfoRow label="Подтверждение" value={confirmation} />
                         <InfoRow label="Туроператор" value={operatorName} />
                     </div>
                 </div>
@@ -258,15 +277,29 @@ const CheckoutItems = ({ order, dataLoading, buyerFromBooking }: any) => {
                     </div>
                 </div>
 
-                <div className={styles.checkoutItem}>
-                    <div className={styles.checkoutItemHead}>
-                        <p>А что еще</p>
+                {extraRows.length > 0 || fuelCharge > 0 ? (
+                    <div className={styles.checkoutItem}>
+                        <div className={styles.checkoutItemHead}>
+                            <p>А что ещё</p>
+                        </div>
+                        <div className={styles.checkoutItemLayout}>
+                            {extraRows.map((item) =>
+                                INCLUSION_LABEL[item.key] ? (
+                                    <InfoRow key={item.key} label={INCLUSION_LABEL[item.key]} value={inclusionValue(item)} />
+                                ) : (
+                                    <InfoRow
+                                        key={item.key}
+                                        label={item.note ? item.title : 'Важно'}
+                                        value={item.note || item.title}
+                                    />
+                                ),
+                            )}
+                            {fuelCharge > 0 ? (
+                                <InfoRow label="Топливный сбор" value={`${formatMoneyRub(fuelCharge)}, уже в сумме`} />
+                            ) : null}
+                        </div>
                     </div>
-                    <div className={styles.checkoutItemLayout}>
-                        <InfoRow label="Страховка" value="Включена в стоимость" />
-                        <InfoRow label="Трансфер" value="Не включен в стоимость" />
-                    </div>
-                </div>
+                ) : null}
 
                 <div className={styles.checkoutItem}>
                     <div className={styles.checkoutItemHead}>

@@ -12,6 +12,8 @@ import ConsentCheckbox, {
     ConsentTourOfferText,
 } from "@/components/UI/consentCheckbox";
 import { hasRequiredConsents, type ConsentKey, type Consents } from "@/config/legalLinks";
+import { BookingInclusions, BookingSlowHint, BookingSubmitUnavailable } from "@/components/bookingPage/bookingStatus";
+import { formatNights, getBookingInclusions, getFeesLabel } from "@/utils/bookingOffer";
 
 /** Обязательные согласия: тур — оферта (п. 1.3: договор заключается отметкой и оплатой), отель — условия размещения. */
 export function requiredBookingConsents(isHotelOnly: boolean): ConsentKey[] {
@@ -29,6 +31,12 @@ type BookingOrderCardProps = {
     isHotelOnly?: boolean;
     consents: Consents;
     onConsentsChange: (next: Consents) => void;
+    /** Актуализация идёт дольше обычного — подсказка в скелетоне. */
+    slowLoading?: boolean;
+    /** Тур продали при оформлении — вместо списка ошибок блок с переходами. */
+    submitUnavailable?: boolean;
+    otherFlightHref?: string | null;
+    roomsHref?: string | null;
 };
 
 const BookingOrderCard = ({
@@ -41,6 +49,10 @@ const BookingOrderCard = ({
     isHotelOnly = false,
     consents,
     onConsentsChange,
+    slowLoading = false,
+    submitUnavailable = false,
+    otherFlightHref = null,
+    roomsHref = null,
 }: BookingOrderCardProps) => {
     const consentsOk = hasRequiredConsents(consents, requiredBookingConsents(isHotelOnly));
     const setConsent = (key: ConsentKey) => (checked: boolean) => onConsentsChange({ ...consents, [key]: checked });
@@ -73,6 +85,13 @@ const BookingOrderCard = ({
         [packageData],
     );
 
+    const inclusions = useMemo(
+        () => getBookingInclusions(packageData, { isHotelOnly }),
+        [packageData, isHotelOnly],
+    );
+    const operatorName = packageData?.operator?.name || 'туроператора';
+    const hasSeparatePayments = Array.isArray(packageData?.taxes) && packageData.taxes.length > 0;
+
     if (dataLoading || !packageData) {
         return (
             <div className={styles.bookingCardWrap}>
@@ -90,6 +109,7 @@ const BookingOrderCard = ({
                         </div>
                     </div>
                     <div className={styles.bookingLine} />
+                    {slowLoading ? <BookingSlowHint /> : null}
                     <div className={styles.bookingCardPrice}>
                         <p>Итого</p>
                         <div className={styles.animationTextLazy} style={{ width: '30%', height: '24px' }} />
@@ -126,12 +146,13 @@ const BookingOrderCard = ({
                     </div>
                     <div className={styles.bookingCardInfoItem}>
                         <p>
-                            {formatDate}, на {packageData?.nights_count} ночей
+                            {formatDate}
+                            {formatNights(packageData?.nights_count) ? `, на ${formatNights(packageData?.nights_count)}` : ''}
                         </p>
                     </div>
                     {fees > 0 && (
                         <div className={styles.bookingCardInfoItem}>
-                            <p>Доплаты и сборы</p>
+                            <p>{getFeesLabel(packageData)}</p>
                             <p>+{formatMoneyRub(fees)}</p>
                         </div>
                     )}
@@ -141,6 +162,10 @@ const BookingOrderCard = ({
                     <p>Итого</p>
                     <p>{formatMoneyRub(totalPrice)}</p>
                 </div>
+                <p className={styles.bookingPriceNote}>
+                    Цена {operatorName} на момент проверки{hasSeparatePayments ? '' : ', со всеми доплатами'}
+                </p>
+                <BookingInclusions items={inclusions} title={isHotelOnly ? 'Что входит' : 'Что входит в тур'} />
                 <div className={styles.bookingCardFooter}>
                     <ConsentGroup>
                         {isHotelOnly ? (
@@ -164,9 +189,12 @@ const BookingOrderCard = ({
                         onClick={() => handleSubmit()}
                         title={'Отправить запрос'}
                         full={true}
-                        disabled={!isFormValid || !consentsOk || loading}
+                        disabled={!isFormValid || !consentsOk || loading || submitUnavailable}
                     />
-                    {!consentsOk ? <ConsentHint>Отметьте обязательные пункты, чтобы продолжить</ConsentHint> : null}
+                    {submitUnavailable ? (
+                        <BookingSubmitUnavailable otherFlightHref={otherFlightHref} roomsHref={roomsHref} />
+                    ) : null}
+                    {!consentsOk && !submitUnavailable ? <ConsentHint>Отметьте обязательные пункты, чтобы продолжить</ConsentHint> : null}
                     {errorMessages.length > 0 && (
                         <div className={styles.formErrorsBottom} role="alert">
                             <p className={styles.formErrorsBottomTitle}>Проверьте форму:</p>
