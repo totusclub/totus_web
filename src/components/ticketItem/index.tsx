@@ -14,9 +14,11 @@ interface TicketItemProps {
     item: any
     price?: number
     lazy: boolean
+    /** id пакета после актуализации на /tickets: перелёты списка принадлежат ему, а не id из адреса. */
+    packageId?: number | string | null
 }
 
-const TicketItem: FC<TicketItemProps> = ({ green, item, price, lazy }) => {
+const TicketItem: FC<TicketItemProps> = ({ green, item, price, lazy, packageId }) => {
     const [open, setOpen] = useState<boolean>(false);
     const router = useRouter();
     const [authModal, setAuthModal] = useState(false)
@@ -55,7 +57,9 @@ const TicketItem: FC<TicketItemProps> = ({ green, item, price, lazy }) => {
             router.push({
                 pathname: '/booking',
                 query: {
-                    package: router.query.package,
+                    // LT при актуализации может выдать пакету новый id — flight_pair_id из этого
+                    // списка относится к нему; со старым id бронирование получает чужой перелёт.
+                    package: packageId ?? router.query.package,
                     flight_pair_id: id,
                 },
             });

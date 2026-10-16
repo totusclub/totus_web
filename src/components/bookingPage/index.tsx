@@ -2,7 +2,8 @@ import styles from './booking.module.css';
 import BookingOrderForm from "@/components/bookingPage/bookingForm";
 import BookingOrderCard from "@/components/bookingPage/orderCard";
 import { useEffect, useState, useMemo } from "react";
-import { createOrder, PackagesActualize, PackagesActualizeFlight, Packagesflights, prebookPackage, prebuildOrder, validateTourist } from "@/api/levelTravelApi";
+import { createOrder, getSelectedFlight, PackagesActualize, PackagesActualizeFlight, prebookPackage, prebuildOrder, validateTourist } from "@/api/levelTravelApi";
+import axios from "axios";
 import { useRouter } from "next/router";
 import useAuth from "@/hooks/useAuth";
 import { validateBookingForm, flattenBookingErrors, mapLevelTravelTouristValidateErrors, type Tourist, type TouristErrors, type BookingValidationErrors } from "@/utils/bookingValidation";
@@ -19,8 +20,15 @@ type Params = {
 
 type ValidationErrors = BookingValidationErrors;
 
-/** Enrich LT package with fuel_charge from selected flight when actualize omits it. */
-async function resolvePackageWithFlightFees(pkg: any, flightPairId?: string | string[]) {
+/**
+ * Enrich LT package with fuel_charge from selected flight when actualize omits it.
+ * Перелёт берётся один (getSelectedFlight → ?view=pair), а не весь список пакета (до 12 МБ).
+ */
+async function resolvePackageWithFlightFees(
+    pkg: any,
+    flightPairId?: string | string[],
+    options?: { signal?: AbortSignal },
+) {
     if (!pkg) return null;
 
     const pairId = Array.isArray(flightPairId) ? flightPairId[0] : flightPairId;
@@ -41,23 +49,23 @@ async function resolvePackageWithFlightFees(pkg: any, flightPairId?: string | st
 
     // Look up surcharge from LT packages/flights for the selected pair
     try {
-        const flightsRes = await Packagesflights({
-            package_id: pkg.id || pkg.package_id,
-        });
-        const flights = flightsRes?.flights || [];
-        const selected = flights.find(
-            (f: any) => String(f?.flight_pair_id) === String(pairId),
-        );
+        const selected = await getSelectedFlight(pkg.id || pkg.package_id, pairId, options);
         return {
             ...pkg,
             fuel_charge: toMoney(selected?.fuel_charge),
         };
-    } catch {
+    } catch (err) {
+        // Страницу закрыли / открыли другой перелёт — результат никому не нужен.
+        if (isRequestCancelled(err)) throw err;
         return {
             ...pkg,
             fuel_charge: toMoney(pkg.predicted_surcharge),
         };
     }
+}
+
+function isRequestCancelled(err: unknown): boolean {
+    return axios.isCancel(err) || (err as { name?: string } | null)?.name === 'CanceledError';
 }
 
 const extractOrderIdFromResponse = (payload: any): string | null => {
@@ -166,14 +174,20 @@ const BookingCard = () => {
 
         setDataLoading(true);
 
+        // Один запрос на текущий адрес: при смене тура / перелёта или уходе со страницы
+        // прежний запрос отменяется, и его ответ не перетирает новый.
+        const controller = new AbortController();
+        const signal = controller.signal;
+
         const loadPackage = flightPairId
-            ? PackagesActualizeFlight(packageId as any, flightPairId as any)
+            ? PackagesActualizeFlight(packageId as any, flightPairId as any, { signal })
             : isHotelOnlySearch(searchType)
-              ? PackagesActualize(packageId as any, { search_type: 'hotel' })
-              : PackagesActualize(packageId as any, { search_type: 'package' });
+              ? PackagesActualize(packageId as any, { search_type: 'hotel', signal })
+              : PackagesActualize(packageId as any, { search_type: 'package', signal });
 
         loadPackage
             .then(async (e) => {
+                if (signal.aborted) return;
                 const blockReason = getOfferBlockReason(e);
                 const pkg = e?.package || null;
                 if (blockReason || !pkg) {
@@ -192,13 +206,17 @@ const BookingCard = () => {
                 });
 
                 // Price only from Level Travel: actualize + selected flight fuel_charge
-                const resolved = await resolvePackageWithFlightFees(pkg, flightPairId);
+                const resolved = await resolvePackageWithFlightFees(pkg, flightPairId, { signal });
+                if (signal.aborted) return;
                 setPackageData(resolved);
                 setDataLoading(false);
             })
-            .catch(() => {
+            .catch((err) => {
+                if (signal.aborted || isRequestCancelled(err)) return;
                 setDataLoading(false);
             });
+
+        return () => controller.abort();
     }, [
         router.isReady,
         router?.query?.package,

@@ -100,7 +100,7 @@ const ResultTicketList = ({ flights, packages, loading }: any) => {
                 {!loading && flights && flights.length > 0 && (
                     <>
                         {flights.slice(0, shownCount).map((item, index) => (
-                            <TicketItem key={flightKey(item, index)} lazy={false} price={packages.price} item={item} green={index === 0} />
+                            <TicketItem key={flightKey(item, index)} lazy={false} price={packages.price} item={item} green={index === 0} packageId={packages?.id} />
                         ))}
                     </>
                 )}
