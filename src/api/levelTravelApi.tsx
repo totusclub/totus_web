@@ -297,6 +297,22 @@ export async function getHotelReviews(data: {
     return response.data;
 }
 
+/**
+ * Таймауты шагов бронирования в браузере. Сервер (totus_API, utils/ltPackageProxy.js) ждёт LT
+ * 30–45 с и отвечает понятной ошибкой; здесь — с запасом сверху, чтобы страница не висела,
+ * если ответ не пришёл вовсе (обрыв связи, прокси). createOrder / createPay без таймаута:
+ * заказ мог создаться, а браузер решил бы, что нет, — и человек оформил бы второй.
+ */
+export const LT_CLIENT_TIMEOUT_MS = {
+    packageDetails: 40000,
+    actualize: 55000,
+    flights: 75000,
+    selectedFlight: 75000,
+    prebuild: 55000,
+    prebook: 75000,
+    validateTourists: 40000,
+} as const;
+
 export async function createPackage(data: { request_id: never; tour_id: never; }) {
     if (!data.request_id || !data.tour_id) {
         throw new Error('Missing request_id or hotel_id');
@@ -308,13 +324,14 @@ export async function createPackage(data: { request_id: never; tour_id: never; }
     };
     const response = await axios.get(`${BASE_URL}/packages/package_details`, {
         params,
+        timeout: LT_CLIENT_TIMEOUT_MS.packageDetails,
     });
 
     return response.data;
 };
 export async function PackagesActualize(
     id: never,
-    options?: { search_type?: 'package' | 'hotel' }
+    options?: { search_type?: 'package' | 'hotel'; signal?: AbortSignal }
 ) {
     if (!id) {
         throw new Error('Missing package_id');
@@ -326,6 +343,8 @@ export async function PackagesActualize(
     };
     const response = await axios.get(`${BASE_URL}/packages/actualize`, {
         params,
+        timeout: LT_CLIENT_TIMEOUT_MS.actualize,
+        ...(options?.signal ? { signal: options.signal } : {}),
     });
 
     return response.data;
@@ -419,11 +438,41 @@ export async function Packagesflights(
     const response = await axios.post(`${BASE_URL}/packages/flights`, body, {
         ...(options?.view ? { params: { view: options.view } } : {}),
         ...(options?.signal ? { signal: options.signal } : {}),
+        timeout: LT_CLIENT_TIMEOUT_MS.flights,
     });
     return response.data;
 }
 
-export async function PackagesActualizeFlight(id: never, f_id: never) {
+/**
+ * Один выбранный перелёт пакета (страница бронирования: топливный сбор и состав рейса).
+ * totus_API ?view=pair отдаёт только его — вместо полного списка (у популярного тура ~2000
+ * рейсов, 12 МБ). API без view=pair вернёт полный список — рейс всё равно найдётся в нём.
+ * null — перелёта в списке нет (продан / сменился).
+ */
+export async function getSelectedFlight(
+    packageId: unknown,
+    flightPairId: unknown,
+    options?: { signal?: AbortSignal },
+): Promise<Record<string, any> | null> {
+    const id = toPackageIdNumber(packageId);
+    const pairId = String((Array.isArray(flightPairId) ? flightPairId[0] : flightPairId) ?? '').trim();
+    if (id == null) throw new Error('Missing or invalid package_id');
+    if (!pairId) return null;
+
+    const response = await axios.post(
+        `${BASE_URL}/packages/flights`,
+        { package_id: id },
+        {
+            params: { view: 'pair', flight_pair_id: pairId },
+            timeout: LT_CLIENT_TIMEOUT_MS.selectedFlight,
+            ...(options?.signal ? { signal: options.signal } : {}),
+        },
+    );
+    const flights: any[] = Array.isArray(response.data?.flights) ? response.data.flights : [];
+    return flights.find((f) => String(f?.flight_pair_id) === pairId) || null;
+}
+
+export async function PackagesActualizeFlight(id: never, f_id: never, options?: { signal?: AbortSignal }) {
     if (!id) {
         throw new Error('Missing package_id');
     }
@@ -435,6 +484,8 @@ export async function PackagesActualizeFlight(id: never, f_id: never) {
     };
     const response = await axios.get(`${BASE_URL}/packages/actualize`, {
         params,
+        timeout: LT_CLIENT_TIMEOUT_MS.actualize,
+        ...(options?.signal ? { signal: options.signal } : {}),
     });
 
     return response.data;
@@ -444,7 +495,9 @@ export async function prebuildOrder(params: Record<string, unknown>) {
     if (!params?.package_id) {
         throw new Error('Missing package_id');
     }
-    const response = await axios.post(`${BASE_URL}/orders/prebuild`, params);
+    const response = await axios.post(`${BASE_URL}/orders/prebuild`, params, {
+        timeout: LT_CLIENT_TIMEOUT_MS.prebuild,
+    });
     return response.data;
 }
 
@@ -453,7 +506,9 @@ export async function prebookPackage(params: Record<string, unknown>) {
         throw new Error('Missing package_id');
     }
     try {
-        const response = await axios.post(`${BASE_URL}/packages/prebook`, params);
+        const response = await axios.post(`${BASE_URL}/packages/prebook`, params, {
+            timeout: LT_CLIENT_TIMEOUT_MS.prebook,
+        });
         return response.data;
     } catch (err: any) {
         return {
@@ -472,7 +527,9 @@ export async function validateTourist(params: never) {
         if (!params) {
             throw new Error('Missing package_id');
         }
-        const response = await axios.post(`${BASE_URL}/validate-tourists`, params);
+        const response = await axios.post(`${BASE_URL}/validate-tourists`, params, {
+            timeout: LT_CLIENT_TIMEOUT_MS.validateTourists,
+        });
         return response.data;
     } catch (err) {
         return err
