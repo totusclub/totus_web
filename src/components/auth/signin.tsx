@@ -6,13 +6,11 @@ import {SignInRequest} from "@/api/AuthApi";
 import YandexSmartCaptcha, {
     YANDEX_SMARTCAPTCHA_SITEKEY,
 } from '@/components/auth/YandexSmartCaptcha';
-import YandexIdButton from '@/components/auth/YandexIdButton';
 import { TermsNote } from '@/components/UI/consentCheckbox';
 
 /**
  * Вход по email. Капча показывается ПОСЛЕ нажатия «Войти» и, как только
  * пройдена, сама отправляет форму — дальше экран подтверждения кода.
- * Вход через Яндекс ID капчу не требует: робот не пройдёт подтверждение у Яндекса.
  */
 const SignInForm: React.FC = ({setScreen,setEmail}:any) => {
     const [login, setLogin] = useState("");
@@ -92,7 +90,6 @@ const SignInForm: React.FC = ({setScreen,setEmail}:any) => {
          ) : null}
          {error ? <p className={styles.captchaError}>{error}</p> : null}
          <Button disabled={disabled} loading={loading} onClick={()=>handelLogin()} title={'Войти'}/>
-         <YandexIdButton />
          <TermsNote verb="Продолжая" withPrivacy />
      </div>
     );

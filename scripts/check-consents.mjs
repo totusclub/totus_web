@@ -33,7 +33,6 @@ const callback = read('src/components/home/callRequest.tsx');
 const callbackApi = read('src/api/callbackRequestApi.ts');
 const signup = read('src/components/auth/signup.tsx');
 const signin = read('src/components/auth/signin.tsx');
-const yandex = read('src/pages/auth/yandex.tsx');
 const card = read('src/components/bookingPage/orderCard.tsx');
 const booking = read('src/components/bookingPage/index.tsx');
 const partners = read('src/components/infoPages/PartnersContent.tsx');
@@ -99,19 +98,8 @@ await check('регистрация: согласие обязательно, р
 
 await check('вход: «Пришлём код на почту.», под кнопками соглашение и политика', () => {
     has(signin, /<p>Пришлём код на почту\.<\/p>/);
-    has(signin, /<YandexIdButton \/>\s*<TermsNote verb="Продолжая" withPrivacy \/>/);
-});
-
-await check('Яндекс ID, новый пользователь: шаг согласия, «Продолжить» с телефоном или без, «Отказаться и выйти»', () => {
-    has(yandex, /type Stage = 'loading' \| 'phone' \| 'consent' \| 'error';/);
-    has(yandex, /if \(data\.isNew\) \{\s*setStage\('consent'\);/);
-    has(yandex, /await saveConsents\('signup_yandex', \{ pd: true, ads: adsConsent \}\)/);
-    has(yandex, /disabled=\{!pdConsent \|\| saving\}/);
-    has(yandex, /if \(phone\.trim\(\)\) \{/, 'телефон необязателен');
-    has(yandex, /deleteToken\(\);\s*dispatch\(logout\(\)\);/);
-    has(yandex, />\s*Отказаться и выйти\s*</);
-    has(yandex, /Телефон можно\s+добавить позже\./);
-    has(read('src/api/consentsApi.ts'), /axios\.post\(`\$\{API_BASE_URL\}\/api\/consents`, \{ form, consents \}\)/);
+    has(signin, /<Button [^\n]*title=\{'Войти'\}\/>\s*<TermsNote verb="Продолжая" withPrivacy \/>/);
+    assert.ok(!/YandexIdButton|Яндекс ID/.test(signin), 'входа через Яндекс ID нет');
 });
 
 await check('бронирование: тур — оферта, отель — условия размещения; оба обязательны с согласием; «Отель в …»', async () => {
@@ -196,7 +184,7 @@ const FORBIDDEN = [new RegExp('ПД' + 'н'), new RegExp(['Арлеки' + 'но
 await check('нет сокращения вместо «персональных данных», стороннего юрлица и «Скоро»', () => {
     const hits = [];
     const files = {
-        ui, callback, signup, signin, yandex, card, booking, partners, banner, footer,
+        ui, callback, signup, signin, card, booking, partners, banner, footer,
         links: read('src/config/legalLinks.ts'), cookie: read('src/utils/cookieConsent.ts'),
     };
     for (const [name, text] of Object.entries(files)) {
