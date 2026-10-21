@@ -5,6 +5,9 @@
  * состояние опрашивается у сервиса каждые 500 мс, таймер считается от startedAt,
  * кнопки дергают те же функции сервиса. Разница — набор состояний под сценарий
  * «пользователь звонит в поддержку» и вид по макету сайта.
+ *
+ * Входящий звонок от оператора: звук и мигание вкладки, пока звонят
+ * (`src/lib/incomingRingtone.ts`) — до ответа, отклонения или отбоя.
  */
 import { useCallback, useEffect, useRef, useState } from 'react';
 import styles from './supportCall.module.css';
@@ -19,6 +22,7 @@ import {
     resetCallState,
     toggleMute,
 } from '@/lib/supportCall';
+import { installAudioUnlock, startIncomingRingtone, stopIncomingRingtone } from '@/lib/incomingRingtone';
 import { SUPPORT_DISPLAY_NAME, SUPPORT_PHONE_NUMBER, formatSupportPhone } from '@/config/support';
 import TotusIcon from '@/components/icons/totus/TotusIcon';
 import { iconChevronDown, iconChevronUp } from '@/components/icons/totus/icons.generated';
@@ -88,6 +92,18 @@ const SupportCallModal = ({ onWriteToChat, onRetry }: Props) => {
         }, 500);
         return () => clearInterval(id);
     }, []);
+
+    // Звук разблокируется первым нажатием на странице; карточка ушла (выход) — тишина.
+    useEffect(() => {
+        installAudioUnlock();
+        return () => stopIncomingRingtone();
+    }, []);
+
+    // Входящий звонок: звук и мигание вкладки, пока звонят. Свёрнутая карточка тоже звонит.
+    useEffect(() => {
+        if (state === 'ringing') startIncomingRingtone();
+        else stopIncomingRingtone();
+    }, [state]);
 
     // Новый звонок разворачивает карточку обратно.
     useEffect(() => {
