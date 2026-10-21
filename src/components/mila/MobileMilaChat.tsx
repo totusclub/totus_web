@@ -22,7 +22,7 @@ import { iconChevronLeft, iconClose, iconMila, iconPlus, iconSend } from '@/comp
 
 /** Готовые вопросы на первом экране — те же, что в пакете (QuickActions). */
 export const MILA_STARTS = [
-  { label: 'Совет, куда ехать', prompt: 'Не знаю куда поехать в сентябре с ребёнком 5 лет — что посоветуете?' },
+  { label: 'Совет, куда ехать', prompt: 'Посоветуйте, куда поехать в отпуск' },
   { label: 'Туры в Турцию', prompt: 'Найди туры в Турцию' },
   { label: 'Туры в Египет', prompt: 'Найди туры в Египет' },
   {
