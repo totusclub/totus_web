@@ -38,7 +38,6 @@ check('color-contrast: вторичный текст #737373 (4,74:1 на бел
 
 check('aria-dialog-name: у всех окон есть имя', () => {
   assert.match(code(read('src/components/UI/modal/index.tsx')), /contentLabel=\{contentLabel \|\| title \|\| 'Диалоговое окно'\}/);
-  assert.match(code(read('src/components/UI/modalPin/index.tsx')), /contentLabel="Код доступа к сайту"/);
   assert.match(code(read('src/components/UI/galleryModal/index.tsx')), /contentLabel="Фотографии"/);
 });
 

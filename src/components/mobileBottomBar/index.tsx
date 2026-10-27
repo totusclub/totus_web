@@ -1,11 +1,9 @@
 import styles from './mobileBottomBar.module.css';
-import {useEffect, useMemo, useState} from "react";
+import {useMemo, useState} from "react";
 import {usePathname} from "next/navigation";
 import AuthModal from "@/components/auth/LazyAuthModal";
 import useAuth from "@/hooks/useAuth";
 import {useRouter} from "next/router";
-import ModalPin from "@/components/UI/modalPin";
-import {getPin, PIN_ACCESS_VALUE} from "@/utils/auth";
 import {clearSearch} from '@/store/slices/searchSlice';
 import {useDispatch, useSelector} from 'react-redux';
 import type {RootState} from '@/store';
@@ -25,10 +23,7 @@ const AccountTabIcon = () => <TotusIcon icon={iconTabAccount} size={24} />;
 const MobileBottomBar = () => {
     const router = useRouter();
     const dispatch = useDispatch();
-    // Код доступа при первом открытии сайта (UI/modalPin; с 08.10.2026 — 1289, раньше 2103);
-    // после верного кода браузер помнит его — localStorage pin_code = PIN_ACCESS_VALUE.
-    // Открывается эффектом ниже, если кода нет: у вернувшихся окно больше не мигает на первом кадре.
-    const [pinModalOpen, setPinModalOpen] = useState(false);
+    // Кода доступа к сайту больше нет (решение владельца 27.10.2026): сайт открывается сразу.
     const [authModalOpen, setAuthModalOpen] = useState(false);
 
     const {user,token} = useAuth()
@@ -40,15 +35,6 @@ const MobileBottomBar = () => {
         return segments[segments.length - 1] || 'home';
     },[pathname])
 
-
-    useEffect(()=>{
-        const checkPin = getPin()
-        if(checkPin === PIN_ACCESS_VALUE){
-            setPinModalOpen(false);
-        }else{
-            setPinModalOpen(true);
-        }
-    },[])
 
     const handleHome = () => {
         router.push('/')
@@ -79,7 +65,6 @@ const MobileBottomBar = () => {
                 {/*</div>*/}
             </div>
             <AuthModal open={authModalOpen} setOpen={setAuthModalOpen}/>
-            <ModalPin open={pinModalOpen} setOpen={setPinModalOpen}/>
         </>
 
     );
