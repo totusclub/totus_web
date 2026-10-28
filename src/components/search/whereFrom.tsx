@@ -7,8 +7,17 @@ const WhereFrom = ({handleChange,value,name}) => {
     const wrapperRef = useRef<HTMLDivElement>(null);
     const [isOpen, setIsOpen] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
+    // searchValue — текст в поле (после выбора — название города),
+    // query — по чему фильтруется список. После выбора и при каждом открытии
+    // query пустой, поэтому список снова показывает все города, а не только выбранный.
     const [searchValue, setSearchValue] = useState("");
-    const { results, status, error } = useDepartureSearch(searchValue);
+    const [query, setQuery] = useState("");
+    const { results, status, error } = useDepartureSearch(query);
+
+    const handleInput = (text: string) => {
+        setSearchValue(text);
+        setQuery(text);
+    };
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -29,6 +38,7 @@ const WhereFrom = ({handleChange,value,name}) => {
 
     const handleSelect = (item: string) => {
         setSearchValue(item?.name);
+        setQuery("");
         if(item.iata){
             handleChange(item,name)
         }else{
@@ -39,7 +49,11 @@ const WhereFrom = ({handleChange,value,name}) => {
 
 
     useEffect(() => {
-        if (isOpen && inputRef.current) {
+        if (!isOpen) return;
+        // Открыли список — показываем все города; выбранное название выделено,
+        // первая же буква заменит его и начнёт поиск.
+        setQuery("");
+        if (inputRef.current) {
             inputRef.current.focus();
             inputRef.current.select();
         }
@@ -56,7 +70,7 @@ const WhereFrom = ({handleChange,value,name}) => {
                     type="text"
                     ref={inputRef}
                     value={searchValue}
-                    onChange={(e) => setSearchValue(e.target.value)}
+                    onChange={(e) => handleInput(e.target.value)}
                     onClick={(e) => {
                         e.stopPropagation();
                         setIsOpen(true);
@@ -79,7 +93,7 @@ const WhereFrom = ({handleChange,value,name}) => {
                             type="text"
                             ref={inputRef}
                             value={searchValue}
-                            onChange={(e) => setSearchValue(e.target.value)}
+                            onChange={(e) => handleInput(e.target.value)}
                             onClick={(e) => {
                                 e.stopPropagation();
                                 setIsOpen(true);
@@ -102,7 +116,7 @@ const WhereFrom = ({handleChange,value,name}) => {
                                 </div>
                             </div>
                         ))
-                    ) : searchValue.trim() === "" ? (
+                    ) : query.trim() === "" ? (
                         status === "loading" ? (
                             <p className={styles.noResults}>Загрузка...</p>
                         ) : (
