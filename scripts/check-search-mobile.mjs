@@ -134,10 +134,10 @@ check('загрузка: на телефоне своя заглушка, на �
   assert.equal(decl(page, '', '.mobileOnly', 'display'), 'none');
   assert.equal(decl(page, TAB, '.desktopOnly', 'display'), 'none');
   assert.equal(decl(page, TAB, '.mobileOnly', 'display'), 'contents');
-  assert.match(list, /<div className=\{styles\.desktopOnly\}>\s*<Progress title=\{'Ищем подходящие туры'\} loading=\{isSearching\} \/>/);
+  assert.match(list, /<div className=\{styles\.desktopOnly\}>\s*<Progress title=\{'Ищем подходящие отели'\} loading=\{isSearching\} \/>/);
   assert.match(list, /<div className=\{styles\.desktopOnly\}>\s*(<HotelCard lazy request_id=\{data\?\.request_id\} item=\{null\} \/>\s*){3}<\/div>/);
   assert.match(list, /<div className=\{styles\.mobileOnly\}>\s*(<MobileHotelCardSkeleton \/>\s*){3}<\/div>/);
-  assert.match(list, /\{isSearching && \(\s*<div className=\{styles\.mobileOnly\}>\s*<MobileSearchLoading title=\{'Ищем подходящие туры'\} \/>/);
+  assert.match(list, /\{isSearching && \(\s*<div className=\{styles\.mobileOnly\}>\s*<MobileSearchLoading title=\{'Ищем подходящие отели'\} \/>/);
   assert.match(list, /const showSkeleton = isSearching && !loadMore;/, 'когда показывать заглушку — не меняется');
 });
 

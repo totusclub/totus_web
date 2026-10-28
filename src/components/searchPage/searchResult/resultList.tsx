@@ -351,7 +351,7 @@ const ResultList = ({ tickets, loading, data, setFiltersRequest }: ResultListPro
         <div className={styles.resultList}>
             {/* Компьютер — прежние Progress и полоска; телефон и планшет — блок той же высоты, что теги и сортировка */}
             <div className={styles.desktopOnly}>
-                <Progress title={'Ищем подходящие туры'} loading={isSearching} />
+                <Progress title={'Ищем подходящие отели'} loading={isSearching} />
 
                 {isSearching && (
                     <div className={styles.resultListSorting}>
@@ -361,7 +361,7 @@ const ResultList = ({ tickets, loading, data, setFiltersRequest }: ResultListPro
             </div>
             {isSearching && (
                 <div className={styles.mobileOnly}>
-                    <MobileSearchLoading title={'Ищем подходящие туры'} />
+                    <MobileSearchLoading title={'Ищем подходящие отели'} />
                 </div>
             )}
 
