@@ -8,14 +8,17 @@ import { useRouter } from "next/router";
 import useAuth from "@/hooks/useAuth";
 import { validateBookingForm, flattenBookingErrors, mapLevelTravelTouristValidateErrors, type Tourist, type TouristErrors, type BookingValidationErrors } from "@/utils/bookingValidation";
 import { getSearchTypeFromQuery, isHotelOnlySearch } from "@/utils/bookingFlowUtils";
-import { toMoney } from "@/utils/packagePrice";
+import { formatMoneyRub, getBookingPriceBreakdown, toMoney } from "@/utils/packagePrice";
 import { requiredBookingConsents } from "@/components/bookingPage/orderCard";
-import { BookingLoadError, BookingUnavailable } from "@/components/bookingPage/bookingStatus";
+import { BookingLoadError, BookingNoFlights, BookingUnavailable } from "@/components/bookingPage/bookingStatus";
 import {
     BOOKING_SLOW_HINT_MS,
     classifyBookingLoadFailure,
+    getNoFlightBookingHref,
     getOfferSummary,
     getOtherFlightHref,
+    isNoFlightQuery,
+    isNoFlightsPayload,
     isOfferUnavailablePayload,
     readBookingReturnUrl,
 } from "@/utils/bookingOffer";
@@ -77,6 +80,15 @@ async function resolvePackageWithFlightFees(
     }
 }
 
+/**
+ * Тур без перелёта: прогнозный топливный сбор рейса (predicted_surcharge) не добавляем —
+ * только сбор, который Level.Travel вернул в самом пакете.
+ */
+function withoutFlightFees(pkg: any) {
+    if (!pkg) return null;
+    return { ...pkg, fuel_charge: toMoney(pkg.fuel_charge), predicted_surcharge: 0, _fees_source: 'package' };
+}
+
 function isRequestCancelled(err: unknown): boolean {
     return axios.isCancel(err) || (err as { name?: string } | null)?.name === 'CanceledError';
 }
@@ -110,8 +122,10 @@ const PREBOOK_FAILED_MESSAGE =
  * `package.available: false`, `exception`), поэтому наличие пакета ещё не значит, что предложение
  * можно забронировать. Возвращает текст ошибки или null, если предложение живое.
  */
-const getOfferBlockReason = (payload: any): string | null => {
+const getOfferBlockReason = (payload: any, options?: { noFlight?: boolean }): string | null => {
     if (!payload) return OFFER_UNAVAILABLE_MESSAGE;
+    // Бронирование без перелёта: «нет перелётов» от Level.Travel — не отказ, отель доступен.
+    if (options?.noFlight && isNoFlightsPayload(payload)) return null;
     if (isOfferUnavailablePayload(payload)) return OFFER_UNAVAILABLE_MESSAGE;
     return null;
 };
@@ -145,9 +159,10 @@ const extractCreateErrorMessage = (payload: any): string => {
 /**
  * loading — идёт актуализация (скелетон); ready — тур загружен;
  * unavailable — тур снят / продан (экран с «Выбрать другой перелёт»);
- * error — сбой связи / туроператора (экран с «Повторить»).
+ * error — сбой связи / туроператора (экран с «Повторить»);
+ * no-flights — перелётов к туру нет, отель доступен (экран с «Продолжить без перелёта»).
  */
-type LoadState = 'loading' | 'ready' | 'unavailable' | 'error';
+type LoadState = 'loading' | 'ready' | 'unavailable' | 'error' | 'no-flights';
 
 const BookingCard = () => {
     const router = useRouter();
@@ -182,6 +197,8 @@ const BookingCard = () => {
     // Согласия под кнопкой (оферта / условия отеля, персональные данные, реклама) — не отмечены по умолчанию.
     const [consents, setConsents] = useState<Consents>({});
     const isHotelOnly = isHotelOnlySearch(getSearchTypeFromQuery(router.query));
+    // Тур без перелёта: /booking?package=…&no_flight=1 (кнопка «Продолжить без перелёта»).
+    const noFlight = !isHotelOnly && !router.query.flight_pair_id && isNoFlightQuery(router.query);
     const consentsOk = hasRequiredConsents(consents, requiredBookingConsents(isHotelOnly));
 
     useEffect(() => {
@@ -195,6 +212,7 @@ const BookingCard = () => {
 
         const searchType = getSearchTypeFromQuery(router.query);
         const flightPairId = router?.query?.flight_pair_id;
+        const withoutFlight = !isHotelOnlySearch(searchType) && !flightPairId && isNoFlightQuery(router.query);
 
         setDataLoading(true);
         setLoadState('loading');
@@ -214,8 +232,16 @@ const BookingCard = () => {
         loadPackage
             .then(async (e) => {
                 if (signal.aborted) return;
-                const blockReason = getOfferBlockReason(e);
                 const pkg = e?.package || null;
+                // Перелётов нет, отель доступен — предлагаем продолжить без перелёта.
+                if (!flightPairId && !isHotelOnlySearch(searchType) && !withoutFlight && isNoFlightsPayload(e)) {
+                    setPackageData(null);
+                    setUnavailablePackage(pkg);
+                    setLoadState('no-flights');
+                    setDataLoading(false);
+                    return;
+                }
+                const blockReason = getOfferBlockReason(e, { noFlight: withoutFlight });
                 if (blockReason || !pkg) {
                     // Форму не показываем: бронировать протухшее предложение нельзя.
                     setPackageData(null);
@@ -236,7 +262,7 @@ const BookingCard = () => {
                 // Price only from Level Travel: actualize + selected flight fuel_charge
                 const resolved = await resolvePackageWithFlightFees(pkg, flightPairId, { signal });
                 if (signal.aborted) return;
-                setPackageData(resolved);
+                setPackageData(withoutFlight ? withoutFlightFees(pkg) : resolved);
                 setLoadState('ready');
                 setDataLoading(false);
             })
@@ -256,6 +282,7 @@ const BookingCard = () => {
         router?.query?.package,
         router?.query?.flight_pair_id,
         router?.query?.search_type,
+        router?.query?.no_flight,
         loadAttempt,
     ]);
 
@@ -578,7 +605,7 @@ const BookingCard = () => {
                         search_type: isHotelOnlySearch(searchType) ? 'hotel' : 'package',
                     });
 
-                const blockReason = getOfferBlockReason(actualizeResult);
+                const blockReason = getOfferBlockReason(actualizeResult, { noFlight });
                 if (blockReason) {
                     // Заказ не создаём; в карточке — «Этот тур только что раскупили» и куда перейти.
                     setSubmitUnavailable(true);
@@ -587,10 +614,12 @@ const BookingCard = () => {
                 }
 
                 if (actualizeResult?.package) {
-                    const resolved = await resolvePackageWithFlightFees(
-                        actualizeResult.package,
-                        flightPairId as string | string[] | undefined,
-                    );
+                    const resolved = noFlight
+                        ? withoutFlightFees(actualizeResult.package)
+                        : await resolvePackageWithFlightFees(
+                            actualizeResult.package,
+                            flightPairId as string | string[] | undefined,
+                        );
                     actualPackage = resolved;
                     setPackageData(resolved);
                 }
@@ -901,6 +930,27 @@ const BookingCard = () => {
     }
 
 
+    if (loadState === 'no-flights') {
+        const noFlightHref = getNoFlightBookingHref(unavailablePackage?.id ?? router.query.package);
+        const { totalPrice } = getBookingPriceBreakdown(
+            unavailablePackage ? { ...unavailablePackage, predicted_surcharge: 0 } : null,
+        );
+        return (
+            <div className={'content'}>
+                <div className={`${styles.bookingScreen} ${styles.bookingScreenCenter}`}>
+                    <BookingNoFlights
+                        summary={getOfferSummary(unavailablePackage)}
+                        priceText={totalPrice > 0 ? formatMoneyRub(totalPrice) : undefined}
+                        onContinue={() => {
+                            if (noFlightHref) router.push(noFlightHref);
+                        }}
+                        roomsHref={roomsHref}
+                    />
+                </div>
+            </div>
+        );
+    }
+
     if (loadState === 'unavailable' || loadState === 'error') {
         return (
             <div className={'content'}>
@@ -948,6 +998,7 @@ const BookingCard = () => {
                         submitUnavailable={submitUnavailable}
                         otherFlightHref={otherFlightHref}
                         roomsHref={roomsHref}
+                        noFlight={noFlight}
                     />
                 </div>
             </div>
