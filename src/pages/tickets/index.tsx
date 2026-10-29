@@ -4,6 +4,18 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { PackagesActualize, Packagesflights } from "@/api/levelTravelApi";
 import { useRouter } from "next/router";
 import axios from "axios";
+import useAuth from "@/hooks/useAuth";
+import AuthModal from "@/components/auth/LazyAuthModal";
+import bookingStyles from "@/components/bookingPage/booking.module.css";
+import { BookingNoFlights } from "@/components/bookingPage/bookingStatus";
+import {
+    getNoFlightBookingHref,
+    getOfferSummary,
+    isFlightsFailedError,
+    isNoFlightsPayload,
+    readBookingReturnUrl,
+} from "@/utils/bookingOffer";
+import { formatMoneyRub, getBookingPriceBreakdown } from "@/utils/packagePrice";
 
 function pickActiveFlightFilters(data: Record<string, unknown> | null | undefined) {
     if (!data || typeof data !== 'object') return {};
@@ -57,6 +69,14 @@ export default function Tickets() {
     const [packageId, setPackageId] = useState<number | string | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    /**
+     * Перелётов к туру нет (actualize: «No flights available…» или flights_failed без фильтров):
+     * вместо списка — «Продолжить без перелёта» (макет «Тур без перелёта», 29.10.2026).
+     */
+    const [noFlights, setNoFlights] = useState(false);
+    const [roomsHref, setRoomsHref] = useState<string | null>(null);
+    const [authModal, setAuthModal] = useState(false);
+    const { token } = useAuth();
 
     const packageQuery = Array.isArray(router.query.package)
         ? router.query.package[0]
@@ -85,6 +105,7 @@ export default function Tickets() {
         const isCurrent = () => seq === requestSeqRef.current;
         try {
             setError(null);
+            setNoFlights(false);
             // view: 'list' — лёгкий ответ API (только поля, которые показывает страница билетов)
             const f = await Packagesflights(paramsFlight, { view: 'list', signal: controller.signal });
             if (!isCurrent()) return f;
@@ -119,6 +140,12 @@ export default function Tickets() {
 
             setAllFlights([]);
             setFlightsFilter(null);
+            // Level.Travel не нашёл рейсов к пакету (запрос без фильтров) — тур можно взять без перелёта.
+            const withoutFilters = Object.keys(paramsFlight).every((key) => key === 'package_id');
+            if (withoutFilters && isFlightsFailedError(err)) {
+                setNoFlights(true);
+                return undefined;
+            }
             setError('Не удалось загрузить варианты перелёта. Попробуйте выбрать тур заново.');
             throw err;
         } finally {
@@ -132,6 +159,7 @@ export default function Tickets() {
         let cancelled = false;
         setLoading(true);
         setError(null);
+        setNoFlights(false);
 
         PackagesActualize(packageQuery as never)
             .then((e) => {
@@ -142,6 +170,11 @@ export default function Tickets() {
                 }
                 setPackages(e.package);
                 setPackageId(id);
+                if (isNoFlightsPayload(e)) {
+                    setNoFlights(true);
+                    setLoading(false);
+                    return;
+                }
                 return requestFlights({ package_id: id });
             })
             .catch((err) => {
@@ -156,6 +189,22 @@ export default function Tickets() {
             cancelled = true;
         };
     }, [router.isReady, packageQuery, requestFlights]);
+
+    // Страница отеля, с которой пришли («Вернуться к номерам»).
+    useEffect(() => {
+        setRoomsHref(readBookingReturnUrl());
+    }, []);
+
+    const continueWithoutFlight = () => {
+        const href = getNoFlightBookingHref(packageId ?? packageQuery);
+        if (!href) return;
+        // Как «Выбрать» у рейса: оформление — после входа.
+        if (!token) {
+            setAuthModal(true);
+            return;
+        }
+        router.push(href);
+    };
 
     const setFiltersRequest = (data: Record<string, unknown>) => {
         if (!packageId) return;
@@ -172,6 +221,28 @@ export default function Tickets() {
                 /* error state already set */
             });
         }, FLIGHTS_FILTERS_DEBOUNCE_MS);
+    }
+
+    if (noFlights && !loading) {
+        const { totalPrice } = getBookingPriceBreakdown(
+            packages ? { ...(packages as Record<string, unknown>), predicted_surcharge: 0 } : null,
+        );
+        return (
+            <main className={'searchContainer'}>
+                <Steps activeStep="flights" searchType="package" />
+                <div className={'content'}>
+                    <div className={`${bookingStyles.bookingScreen} ${bookingStyles.bookingScreenCenter}`}>
+                        <BookingNoFlights
+                            summary={getOfferSummary(packages)}
+                            priceText={totalPrice > 0 ? formatMoneyRub(totalPrice) : undefined}
+                            onContinue={continueWithoutFlight}
+                            roomsHref={roomsHref}
+                        />
+                    </div>
+                </div>
+                <AuthModal open={authModal} setOpen={setAuthModal} />
+            </main>
+        );
     }
 
     return (
