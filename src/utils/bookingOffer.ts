@@ -26,6 +26,42 @@ export function isOfferUnavailablePayload(payload: any): boolean {
 }
 
 /**
+ * Тур живой, но перелётов к нему нет: Level.Travel отвечает на actualize `success: false` и
+ * `exception: "No flights available for this package"`, а `rotten` и `package.available: false`
+ * не ставит. Такой тур можно оформить без перелёта (заказ с `flight_pair_id: null`),
+ * как кнопка «Продолжить без перелёта» на сайте Level.Travel.
+ */
+export function isNoFlightsPayload(payload: any): boolean {
+    if (!payload || typeof payload !== 'object' || !payload.package) return false;
+    if (payload.success !== false) return false;
+    if (payload.rotten === true || payload.package.available === false) return false;
+    const reason = String(payload.exception ?? payload.error ?? '').toLowerCase();
+    return reason.includes('no flights');
+}
+
+/** /packages/flights: Level.Travel не нашёл рейсов к пакету — 422 `{ error: "flights_failed" }`. */
+export function isFlightsFailedError(err: unknown): boolean {
+    if (!axios.isAxiosError(err)) return false;
+    const data: any = err.response?.data;
+    return String(data?.error ?? '').toLowerCase() === 'flights_failed';
+}
+
+/** Бронирование без перелёта: `/booking?package=…&no_flight=1`. */
+export const NO_FLIGHT_QUERY_KEY = 'no_flight';
+
+export function isNoFlightQuery(query: Record<string, unknown> | null | undefined): boolean {
+    const raw = query?.[NO_FLIGHT_QUERY_KEY];
+    const value = Array.isArray(raw) ? raw[0] : raw;
+    return value === '1' || value === 'true';
+}
+
+export function getNoFlightBookingHref(packageId: unknown): string | null {
+    const id = String(Array.isArray(packageId) ? packageId[0] : packageId ?? '').trim();
+    if (!/^\d+$/.test(id)) return null;
+    return `/booking?package=${id}&${NO_FLIGHT_QUERY_KEY}=1`;
+}
+
+/**
  * Ошибка запроса actualize → что показать.
  * Таймаут, обрыв связи, 5xx, totus_API `lt_timeout` / `lt_unreachable` / `internal` → «Не удалось
  * загрузить» с «Повторить». Тело с rotten / available:false и 4xx от Level.Travel (пакет не найден,
@@ -129,6 +165,17 @@ export function formatDateRangeShort(start: unknown, end: unknown): string {
     return `${a.getDate()} ${MONTHS_GEN[a.getMonth()]} – ${b.getDate()} ${MONTHS_GEN[b.getMonth()]}`;
 }
 
+/** «2 и 9 ноября» / «30 октября и 6 ноября» — даты, на которые клиент покупает билеты сам. */
+export function formatTripDatesPair(start: unknown, end: unknown): string {
+    const a = parseIsoDate(start);
+    const b = parseIsoDate(end);
+    if (!a || !b) return '';
+    if (a.getMonth() === b.getMonth() && a.getFullYear() === b.getFullYear()) {
+        return `${a.getDate()} и ${b.getDate()} ${MONTHS_GEN[b.getMonth()]}`;
+    }
+    return `${a.getDate()} ${MONTHS_GEN[a.getMonth()]} и ${b.getDate()} ${MONTHS_GEN[b.getMonth()]}`;
+}
+
 /** «Белек, Турция · 22–29 октября · 2 взрослых» — из пакета, который LT вернул и в отказе. */
 export function getOfferSummary(pkg: any): string {
     if (!pkg || typeof pkg !== 'object') return '';
@@ -200,13 +247,16 @@ function clip(text: string): string {
  */
 export function getBookingInclusions(
     pkg: any,
-    options?: { isHotelOnly?: boolean },
+    options?: { isHotelOnly?: boolean; noFlight?: boolean },
 ): InclusionItem[] {
     if (!pkg || typeof pkg !== 'object') return [];
     const isHotelOnly = options?.isHotelOnly === true;
+    const noFlight = !isHotelOnly && options?.noFlight === true;
     const items: InclusionItem[] = [];
 
-    if (!isHotelOnly) {
+    if (noFlight) {
+        items.push({ key: 'flight', kind: 'no', title: 'Перелёт', note: 'не входит' });
+    } else if (!isHotelOnly) {
         const from = textOf(pkg.departure?.name_ru_form2);
         items.push({
             key: 'flight',
@@ -231,7 +281,10 @@ export function getBookingInclusions(
         );
     }
 
-    if (!isHotelOnly && typeof pkg.transfer === 'boolean') {
+    if (noFlight) {
+        // Трансфер у тура привязан к рейсу — без перелёта не обещаем.
+        items.push({ key: 'transfer', kind: 'no', title: 'Трансфер аэропорт — отель', note: 'уточните у туроператора' });
+    } else if (!isHotelOnly && typeof pkg.transfer === 'boolean') {
         items.push(
             pkg.transfer
                 ? { key: 'transfer', kind: 'yes', title: 'Трансфер аэропорт — отель' }

@@ -5,7 +5,7 @@ import type { InclusionItem } from "@/utils/bookingOffer";
 /**
  * Состояния страницы бронирования (макет «Бронирование · ошибки и доп. услуги», утверждён 16.10.2026):
  * тур недоступен, не удалось загрузить, долгая проверка у туроператора, тур продан при оформлении,
- * «Что входит в тур».
+ * «Что входит в тур». Перелётов нет — BookingNoFlights (макет 29.10.2026).
  */
 
 type NavLinks = {
@@ -62,6 +62,65 @@ export function BookingUnavailable({ summary, otherFlightHref, roomsHref }: NavL
                 )}
             </div>
         </section>
+    );
+}
+
+/**
+ * Перелётов к туру нет, отель доступен (макет «Тур без перелёта», утверждён 29.10.2026):
+ * /tickets и /booking. «Продолжить без перелёта» — бронирование с no_flight=1.
+ */
+export function BookingNoFlights({
+    summary,
+    priceText,
+    onContinue,
+    roomsHref,
+}: {
+    summary?: string;
+    /** «10 ₽» — цена тура из ответа Level.Travel; нет — строки с ценой нет. */
+    priceText?: string;
+    onContinue: () => void;
+    roomsHref?: string | null;
+}) {
+    return (
+        <section className={styles.bookingStatus} role="alert" data-booking-state="no-flights">
+            <div className={`${styles.bookingStatusIcon} ${styles.bookingStatusIconAccent}`}>
+                <PlaneIcon size={28} />
+            </div>
+            <h1 className={styles.bookingStatusTitle}>Перелётов к этому туру нет</h1>
+            <p className={styles.bookingStatusText}>
+                Туроператор не нашёл мест на рейсах на эти даты. Отель при этом доступен — можно забронировать его без перелёта, а билеты купить самостоятельно.
+            </p>
+            {summary ? <p className={styles.bookingStatusMeta}>{summary}</p> : null}
+            {priceText ? (
+                <div className={styles.bookingNoFlightPrice}>
+                    <span>Без перелёта</span>
+                    <strong>{priceText}</strong>
+                </div>
+            ) : null}
+            <div className={styles.bookingStatusActions}>
+                <button type="button" className={styles.bookingBtnPrimary} onClick={onContinue}>
+                    Продолжить без перелёта
+                </button>
+                <RoomsLink href={roomsHref} className={styles.bookingBtnSecondary} />
+            </div>
+            <p className={styles.bookingStatusFootnote}>
+                Цену и условия ещё раз проверит туроператор при оформлении.
+            </p>
+        </section>
+    );
+}
+
+/** Карточка заказа без перелёта: билеты в заказ не входят. */
+export function BookingNoFlightNote({ datesText }: { datesText?: string }) {
+    return (
+        <div className={styles.bookingNoFlightNote} data-booking-state="no-flight">
+            <p className={styles.bookingNoFlightNoteTitle}>Тур без перелёта</p>
+            <p className={styles.bookingNoFlightNoteText}>
+                {datesText
+                    ? `Авиабилеты в заказ не входят — купите их сами на даты ${datesText}.`
+                    : 'Авиабилеты в заказ не входят — купите их сами на даты тура.'}
+            </p>
+        </div>
     );
 }
 

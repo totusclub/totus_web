@@ -12,8 +12,8 @@ import ConsentCheckbox, {
     ConsentTourOfferText,
 } from "@/components/UI/consentCheckbox";
 import { hasRequiredConsents, type ConsentKey, type Consents } from "@/config/legalLinks";
-import { BookingInclusions, BookingSlowHint, BookingSubmitUnavailable } from "@/components/bookingPage/bookingStatus";
-import { formatNights, getBookingInclusions, getFeesLabel } from "@/utils/bookingOffer";
+import { BookingInclusions, BookingNoFlightNote, BookingSlowHint, BookingSubmitUnavailable } from "@/components/bookingPage/bookingStatus";
+import { formatNights, formatTripDatesPair, getBookingInclusions, getFeesLabel } from "@/utils/bookingOffer";
 
 /** Обязательные согласия: тур — оферта (п. 1.3: договор заключается отметкой и оплатой), отель — условия размещения. */
 export function requiredBookingConsents(isHotelOnly: boolean): ConsentKey[] {
@@ -29,6 +29,8 @@ type BookingOrderCardProps = {
     errorMessages?: string[];
     /** Отель без перелёта — не тур: «Отель в …», условия бронирования размещения, «гостей». */
     isHotelOnly?: boolean;
+    /** Тур без перелёта (no_flight=1): плашка «Тур без перелёта», «Перелёт — не входит». */
+    noFlight?: boolean;
     consents: Consents;
     onConsentsChange: (next: Consents) => void;
     /** Актуализация идёт дольше обычного — подсказка в скелетоне. */
@@ -47,6 +49,7 @@ const BookingOrderCard = ({
     isFormValid,
     errorMessages = [],
     isHotelOnly = false,
+    noFlight = false,
     consents,
     onConsentsChange,
     slowLoading = false,
@@ -86,9 +89,12 @@ const BookingOrderCard = ({
     );
 
     const inclusions = useMemo(
-        () => getBookingInclusions(packageData, { isHotelOnly }),
-        [packageData, isHotelOnly],
+        () => getBookingInclusions(packageData, { isHotelOnly, noFlight }),
+        [packageData, isHotelOnly, noFlight],
     );
+    const noFlightDates = noFlight
+        ? formatTripDatesPair(packageData?.dates_info?.start_date, packageData?.dates_info?.end_date)
+        : '';
     const operatorName = packageData?.operator?.name || 'туроператора';
     const hasSeparatePayments = Array.isArray(packageData?.taxes) && packageData.taxes.length > 0;
 
@@ -150,6 +156,12 @@ const BookingOrderCard = ({
                             {formatNights(packageData?.nights_count) ? `, на ${formatNights(packageData?.nights_count)}` : ''}
                         </p>
                     </div>
+                    {noFlight && (
+                        <div className={styles.bookingCardInfoItem}>
+                            <p>Перелёт</p>
+                            <p>Без перелёта</p>
+                        </div>
+                    )}
                     {fees > 0 && (
                         <div className={styles.bookingCardInfoItem}>
                             <p>{getFeesLabel(packageData)}</p>
@@ -165,6 +177,7 @@ const BookingOrderCard = ({
                 <p className={styles.bookingPriceNote}>
                     Цена {operatorName} на момент проверки{hasSeparatePayments ? '' : ', со всеми доплатами'}
                 </p>
+                {noFlight ? <BookingNoFlightNote datesText={noFlightDates} /> : null}
                 <BookingInclusions items={inclusions} title={isHotelOnly ? 'Что входит' : 'Что входит в тур'} />
                 <div className={styles.bookingCardFooter}>
                     <ConsentGroup>
