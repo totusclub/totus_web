@@ -20,7 +20,7 @@ import MobileBottomBar from "@/components/mobileBottomBar";
 import SiteSeo from "@/components/seo/SiteSeo";
 import CookieConsent from "@/components/cookieConsent";
 import { COOKIE_CONSENT_EVENT, clearMetrikaCookies, hasAnalyticsConsent, type CookieChoice } from '@/utils/cookieConsent';
-import SupportCallProvider from '@/components/support/SupportCallProvider';
+import SupportCallProvider, { CallingOnly } from '@/components/support/SupportCallProvider';
 import AuthOnly from '@/components/AuthOnly';
 import { useStopSearchPollOnLeave } from '@/hooks/useStopSearchPollOnLeave';
 // import ScrollRestoration from '@/components/ScrollRestoration';
@@ -139,8 +139,10 @@ function MyApp({ Component, pageProps }: AppProps) {
                 <AuthOnly>
                 {/* Мила FAB on all site pages; /ai home redirects to / */}
                 {!isAiRoute && <GlobalAiChat />}
-                {/* Чат с поддержкой: сокет + счётчик непрочитанных (без UI) */}
+                {/* Чат с поддержкой: сокет + счётчик непрочитанных (без UI) — только при «Доступ» в Calling Admin */}
+                <CallingOnly>
                 <SupportChatGate />
+                </CallingOnly>
                 {/* Уведомления: непрочитанные, notify:* на сокете, service worker, тосты */}
                 <NotificationsBridge />
                 </AuthOnly>
