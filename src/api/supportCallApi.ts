@@ -170,15 +170,36 @@ export async function endCallRequest(callId: string, deviceId: string, options: 
     });
 }
 
+/** Профиль пользователя в calling_api_v2 — нужны только поля для доступа к Calling и Миле. */
+export interface VoipUserProfile {
+    id?: number;
+    loyaltyId?: string;
+    /**
+     * Доступ из Calling Admin. `GET /api/users/by-id` отдаёт boolean: `false` — «Доступ»
+     * (в базе `users.access = 0`), `true` — «Заблок.» (`1` или пусто). Число — на случай старого ответа.
+     */
+    access?: number | boolean | null;
+}
+
 /**
  * GET /api/users/by-id/:userId — профиль в calling_api_v2.
- * Нужен ради поля `access`: в приложении раздел звонка показывается только
- * при `access === 0`, и в пользовательский JWT это поле не входит.
+ * Нужен ради поля `access`: в пользовательский JWT оно не входит.
+ * Ответ сервера — `{ ok, user: { …, access } }`; раньше `access` читали с верхнего уровня,
+ * где его нет, и Calling показывался всем.
+ * null — профиль не получен (нет пользователя в calling_api_v2, сеть, ошибка сервера).
  */
-export async function getVoipUser(userId: number | string): Promise<{ access?: number; loyaltyId?: string } | null> {
+export async function getVoipUser(userId: number | string): Promise<VoipUserProfile | null> {
     try {
-        return await request(`/api/users/by-id/${encodeURIComponent(String(userId))}`);
+        const data = await request<{ user?: VoipUserProfile | null }>(
+            `/api/users/by-id/${encodeURIComponent(String(userId))}`,
+        );
+        return data?.user ?? null;
     } catch {
         return null;
     }
+}
+
+/** Как в приложении (totus_APP, authStack.tsx и Account.tsx): доступ есть при `access` 0 или false. */
+export function hasCallingAccess(access: unknown): boolean {
+    return access === 0 || access === false;
 }

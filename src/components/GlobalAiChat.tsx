@@ -4,6 +4,7 @@ import { AiAssistantProvider, ChatWidget } from '@tosmedia/ai-assistant'
 import '@tosmedia/ai-assistant/styles.css'
 import { getAiApiBase, getAiWsUrl } from '@/lib/aiConfig'
 import useAuth from '@/hooks/useAuth'
+import { useSupportCall } from '@/components/support/SupportCallProvider'
 import styles from './globalAiChat.module.css'
 import MobileMilaChat from './mila/MobileMilaChat'
 
@@ -28,12 +29,16 @@ function useIsMobile() {
 /** Полноэкранный чат с поддержкой на телефоне: внизу поле ввода — там кнопку Милы не показываем. */
 const HIDE_ON_MOBILE_PATHS = ['/profile/support-chat']
 
-/** Плавающая кнопка Милы — только для авторизованных, после hydrate (без SSR mismatch). */
+/**
+ * Плавающая кнопка Милы — только для авторизованных, после hydrate (без SSR mismatch),
+ * и только при доступе в Calling Admin (как вкладка Totus AI в приложении, см. SupportCallProvider).
+ */
 export default function GlobalAiChat() {
   const { user, token } = useAuth()
   const { pathname } = useRouter()
   const isMobile = useIsMobile()
   const [mounted, setMounted] = useState(false)
+  const { milaAllowed } = useSupportCall()
 
   useEffect(() => {
     setMounted(true)
@@ -44,6 +49,8 @@ export default function GlobalAiChat() {
 
   // Same on server + first client paint → no hydration mismatch.
   if (!mounted || !user || !token) return null
+  // «Заблок.» в Calling Admin или доступ ещё проверяется — Милы нет.
+  if (!milaAllowed) return null
 
   return (
     <AiAssistantProvider
