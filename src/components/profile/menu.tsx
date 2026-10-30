@@ -42,8 +42,8 @@ const MenuProfile = () => {
     const [deleteModal, setDeleteModal] = useState<boolean>(false)
     const { theme, mode, setMode } = useTheme();
     const supportUnread = useSelector((state: RootState) => state.supportChat?.unreadCount ?? 0);
-    // Звонок в поддержку: доступен, если calling_api_v2 отдал access === 0 (как в приложении)
-    const { available: canCallSupport, call: callSupport } = useSupportCall();
+    // Calling («Чат с поддержкой», «Звонок в поддержку») — только при «Доступ» в Calling Admin (как в приложении)
+    const { available: canCallSupport, call: callSupport, callingAllowed } = useSupportCall();
     const notificationsUnread = useSelector((state: RootState) => state.notifications?.unread ?? 0);
 
     const handleLogout = () => {
@@ -112,19 +112,21 @@ const MenuProfile = () => {
                         </span>
                     )}
                 </div>
-                <div
-                    onClick={() => router.push('/profile/support-chat')}
-                    className={`${styles.profileMenuItem} ${styles.profileMenuItemChat} ${router.pathname === '/profile/support-chat' ? styles.profileMenuItemActive : ''}`}
-                >
-                    <div className={styles.profileMenuChatIcon}>
-                        <Icon name={'message'} size={24} color={'var(--textPrimary)'} />
-                        {supportUnread > 0 && <span className={styles.profileMenuBadge} aria-label={`Непрочитанных: ${supportUnread}`} />}
+                {callingAllowed && (
+                    <div
+                        onClick={() => router.push('/profile/support-chat')}
+                        className={`${styles.profileMenuItem} ${styles.profileMenuItemChat} ${router.pathname === '/profile/support-chat' ? styles.profileMenuItemActive : ''}`}
+                    >
+                        <div className={styles.profileMenuChatIcon}>
+                            <Icon name={'message'} size={24} color={'var(--textPrimary)'} />
+                            {supportUnread > 0 && <span className={styles.profileMenuBadge} aria-label={`Непрочитанных: ${supportUnread}`} />}
+                        </div>
+                        <div className={styles.profileMenuItemText}>
+                            <p>Чат с поддержкой</p>
+                            <span className={styles.profileMenuItemSub}>Напишите нам — ответим в чате</span>
+                        </div>
                     </div>
-                    <div className={styles.profileMenuItemText}>
-                        <p>Чат с поддержкой</p>
-                        <span className={styles.profileMenuItemSub}>Напишите нам — ответим в чате</span>
-                    </div>
-                </div>
+                )}
                 {canCallSupport && (
                     <div
                         onClick={callSupport}

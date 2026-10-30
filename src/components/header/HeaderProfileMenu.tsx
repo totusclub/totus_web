@@ -8,6 +8,7 @@ import { deleteToken } from '@/utils/auth';
 import type { RootState } from '@/store';
 import { unregisterDevice } from '@/api/notificationsApi';
 import { getDeviceId } from '@/lib/webPush';
+import { useSupportCall } from '@/components/support/SupportCallProvider';
 import styles from './header.module.css';
 
 type MenuItem = {
@@ -26,6 +27,8 @@ const HeaderProfileMenu = () => {
   const { user } = useAuth();
   const supportUnread = useSelector((state: RootState) => state.supportChat?.unreadCount ?? 0);
   const notificationsUnread = useSelector((state: RootState) => state.notifications?.unread ?? 0);
+  // «Чат с поддержкой» — только при «Доступ» в Calling Admin (как в приложении)
+  const { callingAllowed } = useSupportCall();
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
 
@@ -53,7 +56,7 @@ const HeaderProfileMenu = () => {
     }
   };
 
-  const items: MenuItem[] = [
+  const allItems: MenuItem[] = [
     { id: 'profile', label: 'Профиль', icon: 'profile', href: '/profile' },
     { id: 'orders', label: 'Мои заказы', icon: 'order', href: '/profile/my-orders' },
     { id: 'favorites', label: 'Избранное', icon: 'favorite', href: '/profile/favorites' },
@@ -61,6 +64,7 @@ const HeaderProfileMenu = () => {
     { id: 'support', label: 'Чат с поддержкой', icon: 'message', href: '/profile/support-chat', badge: supportUnread > 0 },
     { id: 'logout', label: 'Выйти', icon: 'logout', danger: true, onSelect: handleLogout },
   ];
+  const items = allItems.filter((item) => item.id !== 'support' || callingAllowed);
 
   useEffect(() => {
     if (!open) return;
@@ -113,7 +117,7 @@ const HeaderProfileMenu = () => {
       >
         <span className={styles.profileAvatar} aria-hidden>
           {initials}
-          {supportUnread > 0 ? <span className={styles.profileAvatarBadge} /> : null}
+          {callingAllowed && supportUnread > 0 ? <span className={styles.profileAvatarBadge} /> : null}
         </span>
         <span className={styles.profileTriggerText}>
           <span className={styles.profileTriggerName}>{displayName}</span>
