@@ -22,6 +22,12 @@ import {
 import { RootState } from '@/store';
 import { stayRangeFromDeparture } from '@/utils/calendarDateRange';
 import { parseUiPageNumber } from '@/utils/searchResults';
+import { destinationLabel } from '@/utils/searchQuery';
+import { DEFAULT_BROWSE_COUNTRIES } from '@/utils/countryImages';
+import dynamic from 'next/dynamic';
+
+// «Тур / Отель» в шапке нужен только на /search — отдельный чанк, не в бандле главной.
+const SearchTypeSwitch = dynamic(() => import('@/components/searchPage/searchTypeSwitch'));
 
 // ±2 flex dates/nights UI disabled on main search form — fixed date only.
 
@@ -666,11 +672,26 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
     // }, [searchValue]);
     const showSearchForm = pageName === 'search' || pageName === 'home';
     const isHotelSearch = params.search_type === 'hotel';
+    // /search: «Куда» — из адреса (страна по to_country), а не прошлый выбор в форме и не подсказка «Египет».
+    const destinationValue = pageName === 'search'
+        ? destinationLabel({
+            toCity: params.to_city,
+            toCountry: params.to_country,
+            headerName,
+            countries: DEFAULT_BROWSE_COUNTRIES,
+        })
+        : (params.to_city || headerName || '');
 
     return (
         <>
             {showSearchForm && (
-                <div className={styles.searchFormBlock}>
+                <div
+                    className={styles.searchFormBlock}
+                    // Шапка /search: «Тур / Отель» слева от формы, в одну строку (вариант A макета)
+                    style={header && pageName === 'search' ? { flexDirection: 'row', alignItems: 'center' } : undefined}
+                >
+                    {/* Выдача: «Тур / Отель» в шапке (вариант A); на телефоне — строкой над выдачей (searchResult) */}
+                    {header && pageName === 'search' && <SearchTypeSwitch variant="header" />}
                     {!header && (
                         <SearchTypeTabs
                             value={(params.search_type === 'hotel' ? 'hotel' : 'package') as SearchTypeValue}
@@ -682,7 +703,7 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
                             <WhereTo
                                 handleChange={handleChange}
                                 name={'to_city'}
-                                value={params.to_city || headerName || ''}
+                                value={destinationValue}
                                 searchType={params.search_type as SearchTypeValue}
                                 fromCity={params.from_city}
                             />
@@ -723,7 +744,7 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
 
             {header && (
                 <div className={styles.selectdFormM}>
-                    <p className={styles.mytextHeader}>{headerName || ''}</p>
+                    <p className={styles.mytextHeader}>{pageName === 'search' ? destinationValue : (headerName || '')}</p>
                     <p>{formatDateToRussian(params?.start_date)} · {params?.nights} ночей · {parseInt(params?.adults || '0', 10) + parseInt(params?.kids || '0', 10)} туриста</p>
                 </div>
             )}
