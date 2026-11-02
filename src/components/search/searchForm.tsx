@@ -12,7 +12,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { runFullSearchFlow, setStartSearch } from '@/store/slices/searchSlice';
 import {
     pickAppliedFiltersFromHotels,
-    readSearchListState,
+    readSearchListStateFor,
     replaceSearchListFilters,
     writeSearchListState,
     peekSearchListRestoreFlag,
@@ -24,10 +24,6 @@ import { stayRangeFromDeparture } from '@/utils/calendarDateRange';
 import { parseUiPageNumber } from '@/utils/searchResults';
 import { destinationLabel } from '@/utils/searchQuery';
 import { DEFAULT_BROWSE_COUNTRIES } from '@/utils/countryImages';
-import dynamic from 'next/dynamic';
-
-// «Тур / Отель» в шапке нужен только на /search — отдельный чанк, не в бандле главной.
-const SearchTypeSwitch = dynamic(() => import('@/components/searchPage/searchTypeSwitch'));
 
 // ±2 flex dates/nights UI disabled on main search form — fixed date only.
 
@@ -260,7 +256,8 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
 
         const parsed = parseSearchParams(router.query);
         const autoSearchKey = getAutoSearchKey(router.query as Record<string, string | string[]>);
-        const saved = readSearchListState();
+        // Фильтры — только от поиска того же типа (тур / отель).
+        const saved = readSearchListStateFor(parsed.search_type);
         const restoreFlag = pageName === 'search' && peekSearchListRestoreFlag();
         const sameResultsInMemory =
             Boolean(hotels?.request_id) &&
@@ -357,7 +354,7 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
                 consumeSearchListRestoreFlag();
                 replaceSearchListFilters({
                     ...pickAppliedFiltersFromHotels(hotels),
-                    ...(readSearchListState()?.filters ?? {}),
+                    ...(readSearchListStateFor(parsed.search_type)?.filters ?? {}),
                 }, String(hotels.request_id));
                 writeSearchListState({ autoSearchKey });
             }
@@ -403,7 +400,7 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
         const savedFilters =
             preservedFilters === null
                 ? undefined
-                : preservedFilters ?? readSearchListState()?.filters;
+                : preservedFilters ?? readSearchListStateFor(data.search_type)?.filters;
 
         const autoSearchKey = JSON.stringify(
             (({ page_number: _p, page_limit: _l, sort_by: _s, ...core }) => core)(
@@ -608,7 +605,7 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
                       ...rest
                   } = {
                       ...pickAppliedFiltersFromHotels(hotels),
-                      ...(readSearchListState()?.filters ?? {}),
+                      ...(readSearchListStateFor(searchParams.search_type)?.filters ?? {}),
                   };
                   return rest;
               })()
@@ -685,13 +682,7 @@ const SearchForm = ({ header, pageName }: SearchFormProps) => {
     return (
         <>
             {showSearchForm && (
-                <div
-                    className={styles.searchFormBlock}
-                    // Шапка /search: «Тур / Отель» слева от формы, в одну строку (вариант A макета)
-                    style={header && pageName === 'search' ? { flexDirection: 'row', alignItems: 'center' } : undefined}
-                >
-                    {/* Выдача: «Тур / Отель» в шапке (вариант A); на телефоне — строкой над выдачей (searchResult) */}
-                    {header && pageName === 'search' && <SearchTypeSwitch variant="header" />}
+                <div className={styles.searchFormBlock}>
                     {!header && (
                         <SearchTypeTabs
                             value={(params.search_type === 'hotel' ? 'hotel' : 'package') as SearchTypeValue}
