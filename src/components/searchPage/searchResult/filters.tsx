@@ -116,7 +116,11 @@ const OPTION_ICONS: Record<string, OptionIconFn> = {
 };
 const switchIcon = (key: string) => <HotelIcon name={AMENITY_ICONS[key]} size={20} />;
 
-function buildFiltersFromHotels(hotels: any) {
+/** Фильтры только для тура — в режиме «Отель» не показываются и не отправляются (план поиска, этап 3). */
+const TOUR_ONLY_FILTER_KEYS = new Set<string>(['filter_direct_flight']);
+
+/** isHotelSearch — поиск отелей: звёзды 3–5 по умолчанию не отмечаются (у отеля их нет в запросе). */
+function buildFiltersFromHotels(hotels: any, isHotelSearch = false) {
     const saved = readSearchListState();
     const fromHotels = pickAppliedFiltersFromHotels(hotels);
     const fromSession = saved?.filters ?? {};
@@ -172,7 +176,9 @@ function buildFiltersFromHotels(hotels: any) {
             fromSession.filter_meals ??
             (DEFAULT_FILTERS as { filter_meals?: string }).filter_meals,
         filter_stars:
-            fromHotels.filter_stars ?? fromSession.filter_stars ?? DEFAULT_FILTERS.filter_stars,
+            fromHotels.filter_stars ??
+            fromSession.filter_stars ??
+            (isHotelSearch ? undefined : DEFAULT_FILTERS.filter_stars),
         filter_operators: fromHotels.filter_operators ?? fromSession.filter_operators,
         filter_hotel_type: fromHotels.filter_hotel_type ?? fromSession.filter_hotel_type,
         filter_regions: fromHotels.filter_regions ?? fromSession.filter_regions,
@@ -200,13 +206,14 @@ function buildFiltersFromHotels(hotels: any) {
 const Filters = ({ selectedFilters, allFilters, statistics }: any) => {
     const { hotels, loading, startSearchValid } = useSelector((state: RootState) => state.search);
     const router = useRouter();
+    const isHotelSearch = router.query.search_type === 'hotel';
     const dispatch = useDispatch();
     const [mobileModal, setMobileModal] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
     const [price, setPrice] = useState<number[]>([0, 0]);
     const [priceReady, setPriceReady] = useState(false);
-    const [filters, setFilters] = useState(() => buildFiltersFromHotels(hotels));
-    const [pendingFilters, setPendingFilters] = useState(() => buildFiltersFromHotels(hotels));
+    const [filters, setFilters] = useState(() => buildFiltersFromHotels(hotels, isHotelSearch));
+    const [pendingFilters, setPendingFilters] = useState(() => buildFiltersFromHotels(hotels, isHotelSearch));
     const priceInitializedRef = useRef(false);
     const lastRequestIdRef = useRef<string | null>(null);
     const lastFilterRequestKeyRef = useRef<string | null>(null);
@@ -265,6 +272,8 @@ const Filters = ({ selectedFilters, allFilters, statistics }: any) => {
         const extraBool = Object.fromEntries(
             EXTRA_BOOL_FILTER_KEYS.map((key) => {
                 const value = source[key];
+                // Поиск отелей: фильтры только для тура (прямой перелёт) не отправляем.
+                if (isHotelSearch && TOUR_ONLY_FILTER_KEYS.has(key)) return [key, undefined];
                 // Only send amenity filters when enabled (true).
                 if (value === true || value === 'true') return [key, true];
                 return [key, undefined];
@@ -373,7 +382,7 @@ const Filters = ({ selectedFilters, allFilters, statistics }: any) => {
         lastFilterRequestKeyRef.current = null;
         filtersSyncedRef.current = false;
 
-        const restored = buildFiltersFromHotels(hotels);
+        const restored = buildFiltersFromHotels(hotels, isHotelSearch);
         // Удобства, которых больше нет ни в hotels, ни в сессии (снятый тег над списком) — убираем,
         // иначе merge оставит старое true и переключатель в сайдбаре не погаснет.
         const mergeRestored = (prev: Record<string, unknown>) => {
@@ -597,7 +606,11 @@ const Filters = ({ selectedFilters, allFilters, statistics }: any) => {
     const usePendingState = isMobile && mobileModal;
     const activeFilterValues = usePendingState ? pendingFilters : filters;
 
-    const hasAmenityFilters = BOOL_AMENITY_UI.some(
+    // Поиск отелей: без «Прямого перелёта» (перелёта нет).
+    const amenityUi = isHotelSearch
+        ? BOOL_AMENITY_UI.filter(({ key }) => !TOUR_ONLY_FILTER_KEYS.has(key))
+        : BOOL_AMENITY_UI;
+    const hasAmenityFilters = amenityUi.some(
         ({ apiKey }) => Array.isArray(allFilters?.[apiKey]) && allFilters[apiKey].length > 0,
     );
 
@@ -735,7 +748,7 @@ const Filters = ({ selectedFilters, allFilters, statistics }: any) => {
                 })}
                 {hasAmenityFilters && (
                     <Collapse title={'Удобства'} open={true}>
-                        {BOOL_AMENITY_UI.map(({ key, apiKey, title }) => {
+                        {amenityUi.map(({ key, apiKey, title }) => {
                             const options = allFilters?.[apiKey];
                             if (!Array.isArray(options) || options.length === 0) return null;
                             return (
