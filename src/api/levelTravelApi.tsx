@@ -23,9 +23,14 @@ function prepareStartSearchParams(raw: Record<string, unknown>): Record<string, 
         'ui_page_number',
     ]);
 
+    // Поиск отелей (без перелёта): город вылета Level.Travel не нужен — не отправляем
+    // (план claude/HOTEL_SEARCH_PROGRESSIVE_PLAN_RU.md, этап 3).
+    const isHotelSearch = raw.search_type === 'hotel';
+
     for (const [key, value] of Object.entries(raw)) {
         if (skipKeys.has(key)) continue;
         if (key.startsWith('filter_')) continue;
+        if (isHotelSearch && (key === 'from_city' || key === 'from_country')) continue;
         if (value === undefined || value === null) continue;
         if (typeof value === 'string' && value.trim() === '') continue;
         if (Array.isArray(value)) {
