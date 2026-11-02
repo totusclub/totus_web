@@ -502,8 +502,8 @@ export const iconNPromo: TotusIconDef = { p: ["M6.5 7.5a1 1 0 1 0 2 0a1 1 0 1 0 
 /** Напоминание о поездке */
 export const iconNReminder: TotusIconDef = { p: ["M16 10h4a2 2 0 0 1 0 4h-4l-4 7h-3l2 -7h-4l-2 2h-3l2 -4l-2 -4h3l2 2h4l-2 -7h3l4 7", "M3 21h4"], a: [1] };
 
-// 10 · Мила
-/** Мила */
+// 10 · Маша
+/** Маша */
 export const iconMila: TotusIconDef = { p: ["M16 18a2 2 0 0 1 2 2a2 2 0 0 1 2 -2a2 2 0 0 1 -2 -2a2 2 0 0 1 -2 2", "M16 6a2 2 0 0 1 2 2a2 2 0 0 1 2 -2a2 2 0 0 1 -2 -2a2 2 0 0 1 -2 2", "M9 18a6 6 0 0 1 6 -6a6 6 0 0 1 -6 -6a6 6 0 0 1 -6 6a6 6 0 0 1 6 6"], a: [0] };
 
 // 11 · Информационные страницы
@@ -521,7 +521,7 @@ export const iconHelpOrders: TotusIconDef = { p: ["M14 3v4a1 1 0 0 0 1 1h4", "M1
 export const iconHelpRefund: TotusIconDef = { p: ["M5 21v-16a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v16l-3 -2l-2 2l-2 -2l-2 2l-2 -2l-3 2", "M15 14v-2a2 2 0 0 0 -2 -2h-4l2 -2m0 4l-2 -2"], a: [1] };
 /** Перед поездкой */
 export const iconHelpTrip: TotusIconDef = { p: ["M9.615 20h-2.615a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v8", "M14 19l2 2l4 -4", "M9 8h4", "M9 12h2"], a: [1] };
-/** Мила */
+/** Маша */
 export const iconHelpMila: TotusIconDef = { p: ["M16 18a2 2 0 0 1 2 2a2 2 0 0 1 2 -2a2 2 0 0 1 -2 -2a2 2 0 0 1 -2 2", "M16 6a2 2 0 0 1 2 2a2 2 0 0 1 2 -2a2 2 0 0 1 -2 -2a2 2 0 0 1 -2 2", "M9 18a6 6 0 0 1 6 -6a6 6 0 0 1 -6 -6a6 6 0 0 1 -6 6a6 6 0 0 1 6 6"], a: [0] };
 /** Поддержка */
 export const iconHelpSupport: TotusIconDef = { p: ["M4 14v-3a8 8 0 1 1 16 0v3", "M18 19c0 1.657 -2.686 3 -6 3", "M4 14a2 2 0 0 1 2 -2h1a2 2 0 0 1 2 2v3a2 2 0 0 1 -2 2h-1a2 2 0 0 1 -2 -2v-3", "M15 14a2 2 0 0 1 2 -2h1a2 2 0 0 1 2 2v3a2 2 0 0 1 -2 2h-1a2 2 0 0 1 -2 -2v-3"], a: [1] };

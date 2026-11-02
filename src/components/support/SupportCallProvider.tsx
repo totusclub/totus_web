@@ -5,12 +5,12 @@
  * сервис для вошедшего пользователя и держит карточку звонка поверх любой
  * страницы, чтобы разговор переживал переходы по сайту.
  *
- * Доступ к Calling и Миле — как в приложении (totus_APP): переключатель «Доступ» в Calling Admin
+ * Доступ к Calling и Маше — как в приложении (totus_APP): переключатель «Доступ» в Calling Admin
  * (`users.access`). Поле приходит из calling_api_v2 (в пользовательский JWT оно не входит),
  * поэтому запрашивается один раз после входа.
- *  - «Доступ»: в профиле «Чат с поддержкой» и «Звонок в поддержку», на сайте — Мила;
+ *  - «Доступ»: в профиле «Чат с поддержкой» и «Звонок в поддержку», на сайте — Маша;
  *  - «Заблок.»: ничего из этого не показывается;
- *  - профиль не получен (сеть, ошибка): Calling скрыт, Мила показывается — как в приложении
+ *  - профиль не получен (сеть, ошибка): Calling скрыт, Маша показывается — как в приложении
  *    (Account.tsx скрывает раздел, вкладка Totus AI в authStack.tsx остаётся).
  */
 import {
@@ -51,7 +51,7 @@ interface SupportCallContextValue {
     call: () => void;
     /** Calling в профиле: «Чат с поддержкой», «Звонок в поддержку». */
     callingAllowed: boolean;
-    /** Мила (кнопка и чат). */
+    /** Маша (кнопка и чат). */
     milaAllowed: boolean;
 }
 
@@ -66,7 +66,7 @@ export const useSupportCall = () => useContext(SupportCallContext);
 
 /** Calling виден при «Доступ». Загрузка и ошибка — скрыт. */
 export const isCallingVisible = (state: CallingAccessState) => state === 'allowed';
-/** Мила видна при «Доступ» и когда профиль не получен (как вкладка Totus AI в приложении). */
+/** Маша видна при «Доступ» и когда профиль не получен (как вкладка Totus AI в приложении). */
 export const isMilaVisible = (state: CallingAccessState) => state === 'allowed' || state === 'unknown';
 
 /** Рендерит детей только при доступе к Calling (сокет и счётчик чата поддержки). */
@@ -98,7 +98,7 @@ const SupportCallProvider = ({ children }: { children: ReactNode }) => {
         setAccessState('loading');
         void getVoipUser(userId).then((profile) => {
             if (cancelled) return;
-            // Как в приложении: Calling и Мила — только при «Доступ» в Calling Admin.
+            // Как в приложении: Calling и Маша — только при «Доступ» в Calling Admin.
             setAccessState(!profile ? 'unknown' : hasCallingAccess(profile.access) ? 'allowed' : 'denied');
         });
 

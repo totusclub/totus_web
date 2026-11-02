@@ -1,4 +1,4 @@
-/** Totus AI (Мила) connection — used by /ai pages. */
+/** Totus AI (Маша) connection — used by /ai pages. */
 
 const fallbackApi = 'https://apiv2.totus.club/api'
 const fallbackWs = 'wss://apiv2.totus.club/ws/assistant'

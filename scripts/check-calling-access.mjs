@@ -1,5 +1,5 @@
-// Calling и Мила на сайте — как в приложении: переключатель «Доступ» в Calling Admin (users.access).
-// «Доступ» — в профиле «Чат с поддержкой» и «Звонок в поддержку», Мила; «Заблок.» — ничего из этого.
+// Calling и Маша на сайте — как в приложении: переключатель «Доступ» в Calling Admin (users.access).
+// «Доступ» — в профиле «Чат с поддержкой» и «Звонок в поддержку», Маша; «Заблок.» — ничего из этого.
 // Запуск: node scripts/check-calling-access.mjs (без npm install).
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -41,7 +41,7 @@ function evalFn(src, re, name) {
   return new Function(`${js}; return ${name};`)();
 }
 
-console.log('Calling и Мила: доступ из Calling Admin');
+console.log('Calling и Маша: доступ из Calling Admin');
 
 check('ответ /api/users/by-id разбирается правильно: access лежит в user', () => {
   assert.match(api, /const data = await request<\{ user\?: VoipUserProfile \| null \}>\(\s*`\/api\/users\/by-id\/\$\{encodeURIComponent\(String\(userId\)\)\}`,?\s*\);\s*return data\?\.user \?\? null;/);
@@ -58,13 +58,13 @@ check('доступ — как в приложении: access 0 или false (�
   assert.equal(has(null), false);
 });
 
-check('Calling — только при «Доступ»; Мила — при «Доступ» и когда профиль не получен (как вкладка Totus AI)', () => {
+check('Calling — только при «Доступ»; Маша — при «Доступ» и когда профиль не получен (как вкладка Totus AI)', () => {
   const calling = evalFn(provider, /export const isCallingVisible = \(state: CallingAccessState\) => [^;]+;/, 'isCallingVisible');
   const milaVis = evalFn(provider, /export const isMilaVisible = \(state: CallingAccessState\) => [^;]+;/, 'isMilaVisible');
   const table = { none: [false, false], loading: [false, false], allowed: [true, true], denied: [false, false], unknown: [false, true] };
   for (const [state, [c, m]] of Object.entries(table)) {
     assert.equal(calling(state), c, `Calling при ${state}`);
-    assert.equal(milaVis(state), m, `Мила при ${state}`);
+    assert.equal(milaVis(state), m, `Маша при ${state}`);
   }
   assert.match(provider, /setAccessState\(!profile \? 'unknown' : hasCallingAccess\(profile\.access\) \? 'allowed' : 'denied'\);/);
   assert.match(provider, /\}, \[userId\]\);/, 'доступ запрашивается один раз на пользователя');
@@ -75,7 +75,7 @@ check('звонок запускается только при «Доступ»,
   assert.match(provider, /\}, \[accessState, loyaltyId\]\);/);
 });
 
-check('Мила скрыта без доступа', () => {
+check('Маша скрыта без доступа', () => {
   assert.match(mila, /const \{ milaAllowed \} = useSupportCall\(\)/);
   assert.match(mila, /if \(!milaAllowed\) return null/);
 });

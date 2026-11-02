@@ -64,7 +64,7 @@ await check('help-faq: 12 разделов, 41 вопрос, ссылка в ч�
     const { FAQ_GROUPS } = await load('src/config/faqContent.ts');
     assert.deepEqual(FAQ_GROUPS.map((g) => g.title), [
         'Туры с перелётом', 'Отели без перелёта', 'Перелёты и багаж', 'Оплата', 'Заказы и документы',
-        'Изменение, отмена и возврат', 'Перед поездкой', 'Мила — ИИ-ассистент', 'Поддержка: чат и звонок',
+        'Изменение, отмена и возврат', 'Перед поездкой', 'Маша — ИИ-ассистент', 'Поддержка: чат и звонок',
         'Аккаунт и вход', 'Приложения и уведомления', 'Безопасность и данные',
     ]);
     assert.deepEqual(FAQ_GROUPS.map((g) => g.items.length), [5, 3, 4, 4, 4, 3, 3, 3, 3, 4, 2, 3]);
@@ -105,11 +105,11 @@ await check('help-faq: центр помощи — поиск, «Часто ищ
     has(faq, /words\.every\(\(w\) => text\.includes\(w\)\)/);
     has(faq, /href=\{`#\$\{anchor\(g\)\}`\}/, 'плитки и оглавление ведут к разделам');
     has(faq, /new IntersectionObserver/, 'оглавление подсвечивает текущий раздел');
-    for (const s of ['Не нашли ответ?', 'Написать в чат', 'Позвонить', 'Открыть Милу', 'Разделы помощи', 'Часто ищут:']) {
+    for (const s of ['Не нашли ответ?', 'Написать в чат', 'Позвонить', 'Открыть Машу', 'Разделы помощи', 'Часто ищут:']) {
         assert.ok(faq.includes(s), `нет «${s}»`);
     }
     has(faq, /useSupportCall\(\)/, 'звонок — общий SupportCallProvider');
-    has(faq, /await import\('@tosmedia\/ai-assistant'\)/, 'Мила подгружается только по нажатию');
+    has(faq, /await import\('@tosmedia\/ai-assistant'\)/, 'Маша подгружается только по нажатию');
     has(faq, /<AuthModal open=\{authOpen\} setOpen=\{setAuthOpen\} \/>/, 'гостю — окно входа');
     const sip = read('src/components/staticInfoPage/index.tsx');
     has(sip, /plain \? \(\s*children/);

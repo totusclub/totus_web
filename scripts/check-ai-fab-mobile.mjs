@@ -1,4 +1,4 @@
-// Кнопка Милы (AI) в мобильной версии: над нижним меню, не перекрывает его и поле ввода чата поддержки.
+// Кнопка Маши (AI) в мобильной версии: над нижним меню, не перекрывает его и поле ввода чата поддержки.
 // На компьютере (> 1024px) — без изменений (как в пакете: 20px от низа и справа).
 // Запуск: node scripts/check-ai-fab-mobile.mjs (без npm install).
 import assert from 'node:assert/strict';
@@ -40,7 +40,7 @@ function media(src, query) {
   return null;
 }
 
-console.log('Мила: кнопка в мобильной версии');
+console.log('Маша: кнопка в мобильной версии');
 
 check('ChatWidget обёрнут в div со стилем модуля (корень пакета не меняется)', () => {
   assert.match(tsx, /import styles from '\.\/globalAiChat\.module\.css'/);
@@ -69,7 +69,7 @@ check('открытое окно чата помещается между шап
   assert.match(m, /\.root :global\(\.fixed\.bottom-5\.right-5\) > :not\(button\) \{[^}]*max-height: calc\(100dvh - 216px\);/);
 });
 
-check('в полноэкранном чате с поддержкой на телефоне кнопка Милы скрыта (не закрывает «Отправить»)', () => {
+check('в полноэкранном чате с поддержкой на телефоне кнопка Маши скрыта (не закрывает «Отправить»)', () => {
   assert.match(tsx, /const HIDE_ON_MOBILE_PATHS = \['\/profile\/support-chat'\]/);
   assert.match(tsx, /HIDE_ON_MOBILE_PATHS\.includes\(pathname\) \? `\$\{styles\.root\} \$\{styles\.hideOnMobile\}` : styles\.root/);
   assert.match(media(css, '(max-width: 1024px)'), /\.hideOnMobile \{\s*display: none;\s*\}/);

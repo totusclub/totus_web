@@ -14,7 +14,7 @@ Google Fonts и внешние CDN не используются.
 | `GolosSymbols-500.woff2`, `GolosSymbols-700.woff2` | подмножество Golos Text: стрелки, неразрывный дефис, ²³¹ (₽ в файле есть, но не используется) | «Totus Symbols» — знаки, которых нет в Museo и Forum (`unicode-range`, грузится только если знак есть на странице) | SIL OFL 1.1, `GolosText-OFL.txt` |
 | встроен в `globals.css` (data:, WOFF < 1 КБ) | свой знак ₽ под Museo Sans Cyrl, 300/500/700 | «Totus Symbols» и «Golos Text», `unicode-range: U+20BD`; рисунок и пересборка — `scripts/ruble-glyph.json`, `scripts/ruble-glyph.py` | собственный рисунок Totus Club |
 
-Старое имя `"Golos Text"` в `globals.css` указывает на те же файлы Museo — им пользуется виджет Милы (`@tosmedia/ai-assistant`).
+Старое имя `"Golos Text"` в `globals.css` указывает на те же файлы Museo — им пользуется виджет Маши (`@tosmedia/ai-assistant`).
 
 При покупке Museo Sans Cyrl замените файлы `MuseoSansCyrl-*.woff2` файлами из купленного веб-пакета с теми же именами — CSS менять не нужно.
 Проверка: `node scripts/check-pagespeed-c3.mjs` (наличие файлов, WOFF2, символы кириллицы и латиницы, знак ₽, отсутствие внешних шрифтов).

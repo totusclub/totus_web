@@ -132,7 +132,7 @@ check('шрифты: Museo Sans Cyrl 300/500/700/900, Forum, знаки (₽, с
   for (const f of [...faceOf('Totus Symbols'), ...faceOf('Golos Text')].filter((x) => x.includes('GolosSymbols'))) {
     assert.match(f, /unicode-range: U\+00B2-00B3, U\+00B9, U\+2010-2011, U\+2190-21FF;/);
   }
-  // старое имя "Golos Text" (виджет Милы) — на файлах Museo и знаках
+  // старое имя "Golos Text" (виджет Маши) — на файлах Museo и знаках
   assert.deepEqual(faceOf('Golos Text').filter((f) => !f.includes('url(data:')).map((f) => f.match(/fonts\/([\w.-]+)"/)[1]),
     ['MuseoSansCyrl-300.woff2', 'MuseoSansCyrl-500.woff2', 'MuseoSansCyrl-700.woff2', 'MuseoSansCyrl-900.woff2',
       'GolosSymbols-500.woff2', 'GolosSymbols-500.woff2', 'GolosSymbols-700.woff2', 'GolosSymbols-700.woff2']);
