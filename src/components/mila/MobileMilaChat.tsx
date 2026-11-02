@@ -1,6 +1,6 @@
 /**
- * Мила на телефоне и планшете (ширина до 1024px) — чат на весь экран.
- * Макет «Мила на телефоне» утверждён владельцем 09.10.2026.
+ * Маша на телефоне и планшете (ширина до 1024px) — чат на весь экран.
+ * Макет «Маша на телефоне» утверждён владельцем 09.10.2026.
  *
  * Компьютер не трогаем: там по-прежнему ChatWidget из пакета (см. GlobalAiChat).
  * Данные и сокет — те же, что у ChatWidget: useAssistant / useAssistantStore из пакета,
@@ -31,7 +31,7 @@ export const MILA_STARTS = [
   },
 ]
 
-/** Подсказки следующего шага — под лентой, когда Мила показала туры. */
+/** Подсказки следующего шага — под лентой, когда Маша показала туры. */
 export const MILA_FOLLOW_UPS = [
   { label: 'Дешевле', prompt: 'Покажи варианты дешевле' },
   { label: 'Ближе к морю', prompt: 'Покажи отели ближе к морю' },
@@ -293,7 +293,7 @@ export default function MobileMilaChat({ hideFab = false }: { hideFab?: boolean 
     if (hideFab) return null
     return (
       <div className={styles.fabWrap}>
-        <button type="button" className={styles.fab} onClick={() => setOpen(true)} aria-label="Открыть чат с Милой">
+        <button type="button" className={styles.fab} onClick={() => setOpen(true)} aria-label="Открыть чат с Машей">
           <ChatIcon />
         </button>
       </div>
@@ -301,7 +301,7 @@ export default function MobileMilaChat({ hideFab = false }: { hideFab?: boolean 
   }
 
   return (
-    <div ref={sheetRef} className={styles.sheet} role="dialog" aria-modal="true" aria-label="Чат с Милой">
+    <div ref={sheetRef} className={styles.sheet} role="dialog" aria-modal="true" aria-label="Чат с Машей">
       {view === 'list' ? (
         <>
           <header className={styles.head}>
@@ -343,7 +343,7 @@ export default function MobileMilaChat({ hideFab = false }: { hideFab?: boolean 
                 <p className={styles.listHint}>Чтобы удалить чат, смахните строку влево</p>
               </>
             ) : (
-              <p className={styles.listHint}>Здесь появятся ваши разговоры с Милой</p>
+              <p className={styles.listHint}>Здесь появятся ваши разговоры с Машей</p>
             )}
           </div>
         </>
@@ -357,7 +357,7 @@ export default function MobileMilaChat({ hideFab = false }: { hideFab?: boolean 
               ☀️
             </span>
             <div className={styles.who}>
-              <p className={styles.headTitle}>Мила</p>
+              <p className={styles.headTitle}>Маша</p>
               <small className={isConnected ? styles.online : styles.offline}>
                 {isConnected ? 'Онлайн · подбор туров' : 'Переподключение…'}
               </small>
@@ -373,7 +373,7 @@ export default function MobileMilaChat({ hideFab = false }: { hideFab?: boolean 
                 <span className={`${styles.ava} ${styles.avaBig}`} aria-hidden="true">
                   ☀️
                 </span>
-                <h2 className={styles.helloTitle}>Здравствуйте! Я Мила, помогу выбрать тур</h2>
+                <h2 className={styles.helloTitle}>Здравствуйте! Я Маша, помогу выбрать тур</h2>
                 <p className={styles.helloText}>Напишите, куда и когда хотите поехать, или начните с готового вопроса.</p>
                 <div className={styles.starts}>
                   {MILA_STARTS.map((s) => (
@@ -425,10 +425,10 @@ export default function MobileMilaChat({ hideFab = false }: { hideFab?: boolean 
                 className={styles.field}
                 rows={1}
                 value={draft}
-                placeholder={isEmpty ? 'Куда хотите поехать?' : 'Сообщение Миле'}
+                placeholder={isEmpty ? 'Куда хотите поехать?' : 'Сообщение Маше'}
                 onChange={(e) => setDraft(e.target.value)}
                 enterKeyHint="enter"
-                aria-label="Сообщение Миле"
+                aria-label="Сообщение Маше"
               />
               <button
                 type="submit"
@@ -441,7 +441,7 @@ export default function MobileMilaChat({ hideFab = false }: { hideFab?: boolean 
                 <SendIcon />
               </button>
             </div>
-            {!isEmpty && <p className={styles.hint}>Мила может ошибаться — проверяйте детали тура перед оплатой</p>}
+            {!isEmpty && <p className={styles.hint}>Маша может ошибаться — проверяйте детали тура перед оплатой</p>}
           </form>
         </>
       )}

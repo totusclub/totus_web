@@ -21,7 +21,7 @@ export const SUPPORT_CHAT_PATH = '/profile/support-chat';
  * Глобальный «шлюз» чата с поддержкой: после hydrate для авторизованного пользователя
  * подтягивает счётчик непрочитанных (chat.userUnread), держит socket.io-соединение с voip
  * и кладёт события support:* в Redux. Ничего не рендерит — второго плавающего виджета нет,
- * чтобы не конфликтовать с кнопкой Милы (GlobalAiChat).
+ * чтобы не конфликтовать с кнопкой Маши (GlobalAiChat).
  */
 export default function SupportChatGate() {
     const { user, token } = useAuth();

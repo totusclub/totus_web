@@ -129,7 +129,7 @@ function HelpActions() {
         if (token && pending.current) {
             const action = pending.current;
             pending.current = null;
-            // Даём виджету Милы и звонку подключиться после входа.
+            // Даём виджету Маши и звонку подключиться после входа.
             setTimeout(action, 600);
         }
     }, [token]);
@@ -153,9 +153,9 @@ function HelpActions() {
         },
         {
             icon: 'sparkle' as const,
-            title: 'Спросить Милу',
+            title: 'Спросить Машу',
             text: 'ИИ-ассистент подберёт тур и ответит на вопросы о поездке.',
-            button: 'Открыть Милу',
+            button: 'Открыть Машу',
             primary: false,
             onClick: () => run(() => void openMila()),
         },

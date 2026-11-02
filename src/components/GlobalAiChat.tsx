@@ -26,11 +26,11 @@ function useIsMobile() {
   return isMobile
 }
 
-/** Полноэкранный чат с поддержкой на телефоне: внизу поле ввода — там кнопку Милы не показываем. */
+/** Полноэкранный чат с поддержкой на телефоне: внизу поле ввода — там кнопку Маши не показываем. */
 const HIDE_ON_MOBILE_PATHS = ['/profile/support-chat']
 
 /**
- * Плавающая кнопка Милы — только для авторизованных, после hydrate (без SSR mismatch),
+ * Плавающая кнопка Маши — только для авторизованных, после hydrate (без SSR mismatch),
  * и только при доступе в Calling Admin (как вкладка Totus AI в приложении, см. SupportCallProvider).
  */
 export default function GlobalAiChat() {
@@ -49,7 +49,7 @@ export default function GlobalAiChat() {
 
   // Same on server + first client paint → no hydration mismatch.
   if (!mounted || !user || !token) return null
-  // «Заблок.» в Calling Admin или доступ ещё проверяется — Милы нет.
+  // «Заблок.» в Calling Admin или доступ ещё проверяется — Маши нет.
   if (!milaAllowed) return null
 
   return (
@@ -63,7 +63,7 @@ export default function GlobalAiChat() {
       historyMode="auto"
     >
       {isMobile ? (
-        // Телефон и планшет: чат на весь экран (макет «Мила на телефоне», утверждён 09.10.2026).
+        // Телефон и планшет: чат на весь экран (макет «Маша на телефоне», утверждён 09.10.2026).
         <MobileMilaChat hideFab={HIDE_ON_MOBILE_PATHS.includes(pathname)} />
       ) : (
         // Компьютер: плавающее окно пакета, как раньше. Обёртка — на случай ширины на границе 1024px

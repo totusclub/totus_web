@@ -25,7 +25,7 @@ import AuthOnly from '@/components/AuthOnly';
 import { useStopSearchPollOnLeave } from '@/hooks/useStopSearchPollOnLeave';
 // import ScrollRestoration from '@/components/ScrollRestoration';
 
-// Только для вошедших: отдельные чанки, гостям не загружаются (Мила, сокет поддержки, уведомления).
+// Только для вошедших: отдельные чанки, гостям не загружаются (Маша, сокет поддержки, уведомления).
 const GlobalAiChat = dynamic(() => import('@/components/GlobalAiChat'), { ssr: false });
 const SupportChatGate = dynamic(() => import('@/components/support/SupportChatGate'), { ssr: false });
 const NotificationsBridge = dynamic(() => import('@/components/notifications/NotificationsBridge'), { ssr: false });
@@ -33,7 +33,7 @@ const NotificationsBridge = dynamic(() => import('@/components/notifications/Not
 function MyApp({ Component, pageProps }: AppProps) {
     const dispatch = useDispatch();
     const router = useRouter();
-    // Только /ai и /ai/* (переадресации Милы). Проверка по префиксу «/ai» без слэша задевала /airlines и /airline-fees.
+    // Только /ai и /ai/* (переадресации Маши). Проверка по префиксу «/ai» без слэша задевала /airlines и /airline-fees.
     const isAiRoute = router.pathname === '/ai' || router.pathname.startsWith('/ai/');
     useStopSearchPollOnLeave();
     // Яндекс Метрика — только после согласия на аналитику в cookie-баннере (Политика cookie, п. 4.2).
@@ -137,7 +137,7 @@ function MyApp({ Component, pageProps }: AppProps) {
                 {!isAiRoute && <MobileBottomBar />}
                 {!isAiRoute && <CookieConsent />}
                 <AuthOnly>
-                {/* Мила FAB on all site pages; /ai home redirects to / */}
+                {/* Маша FAB on all site pages; /ai home redirects to / */}
                 {!isAiRoute && <GlobalAiChat />}
                 {/* Чат с поддержкой: сокет + счётчик непрочитанных (без UI) — только при «Доступ» в Calling Admin */}
                 <CallingOnly>

@@ -170,7 +170,7 @@ export async function endCallRequest(callId: string, deviceId: string, options: 
     });
 }
 
-/** Профиль пользователя в calling_api_v2 — нужны только поля для доступа к Calling и Миле. */
+/** Профиль пользователя в calling_api_v2 — нужны только поля для доступа к Calling и Маше. */
 export interface VoipUserProfile {
     id?: number;
     loyaltyId?: string;

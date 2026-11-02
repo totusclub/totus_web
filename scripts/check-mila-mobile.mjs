@@ -1,4 +1,4 @@
-// Мила на телефоне (до 1024px): чат на весь экран — макет «Мила на телефоне», утверждён 09.10.2026.
+// Маша на телефоне (до 1024px): чат на весь экран — макет «Маша на телефоне», утверждён 09.10.2026.
 // Без масштаба страницы (поле 16px), без прокрутки вбок, поле над клавиатурой, «Назад» закрывает чат.
 // Компьютер — по-прежнему ChatWidget пакета.
 // Запуск: node scripts/check-mila-mobile.mjs (без npm install).
@@ -32,7 +32,7 @@ const rule = (sel) => {
   return m ? m[1] : '';
 };
 
-console.log('Мила на телефоне');
+console.log('Маша на телефоне');
 
 check('до 1024px — MobileMilaChat, на компьютере — ChatWidget пакета, как раньше', () => {
   assert.match(g, /const MOBILE_QUERY = '\(max-width: 1024px\)'/);
@@ -51,7 +51,7 @@ check('чат на весь экран, поверх меню, cookies и пои
   assert.match(s, /position: fixed;/);
   assert.match(s, /left: 0;\s*right: 0;/);
   assert.match(s, /z-index: 100000002;/);
-  assert.match(tsx, /role="dialog" aria-modal="true" aria-label="Чат с Милой"/);
+  assert.match(tsx, /role="dialog" aria-modal="true" aria-label="Чат с Машей"/);
 });
 
 check('поле ввода над клавиатурой: высота = visualViewport', () => {
@@ -97,7 +97,7 @@ check('кнопки пакет не перебивает (.totus-ai-root button)
   }
 });
 
-check('кнопка Милы над нижним меню (80px), в чате поддержки скрыта', () => {
+check('кнопка Маши над нижним меню (80px), в чате поддержки скрыта', () => {
   assert.match(rule('.fabWrap'), /right: 20px;\s*bottom: 80px;/);
   assert.match(tsx, /if \(hideFab\) return null/);
 });

@@ -32,7 +32,7 @@ const icon = code(read('src/components/icons/Icon.tsx'));
 
 console.log('Бандл: общий код страниц');
 
-check('_app: Мила, сокет поддержки и уведомления — dynamic, только после входа', () => {
+check('_app: Маша, сокет поддержки и уведомления — dynamic, только после входа', () => {
   for (const [name, mod] of [
     ['GlobalAiChat', '@/components/GlobalAiChat'],
     ['SupportChatGate', '@/components/support/SupportChatGate'],
