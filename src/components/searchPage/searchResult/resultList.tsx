@@ -14,6 +14,12 @@ import { pickAppliedFiltersFromHotels, replaceSearchListFilters } from '@/utils/
 import SelectedFilters from './selectedFilters';
 import { buildRemoveChipParams, type FilterChip } from '@/utils/filterChips';
 import { MobileHotelCardSkeleton, MobileSearchLoading } from './mobileSkeleton';
+import {
+    PROGRESSIVE_SEARCH_ENABLED,
+    countCardsAboveViewportBottom,
+    formatOperatorsLeft,
+    setVisibleHotelCountProvider,
+} from '@/utils/progressiveSearch';
 
 interface ResultListProps {
     tickets?: boolean;
@@ -27,9 +33,13 @@ const PAGE_LIMIT = 50;
 const ResultList = ({ tickets, loading, data, setFiltersRequest }: ResultListProps) => {
     const dispatch = useDispatch();
     const router = useRouter();
-    const { allMyHotels, hotels, loadMore, loading: storeLoading, error, startSearchValid } = useSelector(
+    const { allMyHotels, hotels, loadMore, loading: storeLoading, error, startSearchValid, searchingOperators, refreshing } = useSelector(
         (state: RootState) => state.search,
     );
+    // Постепенная выдача: поиск ещё идёт — «Ищем ещё у N операторов» (Р4); фильтр — список виден до ответа.
+    const searchingMore = PROGRESSIVE_SEARCH_ENABLED && Number(searchingOperators ?? 0) > 0;
+    const listRefreshing = PROGRESSIVE_SEARCH_ENABLED && Boolean(refreshing);
+    const listRef = useRef<HTMLDivElement | null>(null);
     const isLoading = loading ?? storeLoading;
 
     const hasSearchQuery = useMemo(() => {
@@ -311,6 +321,15 @@ const ResultList = ({ tickets, loading, data, setFiltersRequest }: ResultListPro
         }
     }, [storeLoading, loadMore, hotels?.ui_page_number, hotels?.request_id]);
 
+    // Постепенная выдача: сколько карточек человек уже видел — их новые отели не сдвигают (Р1).
+    useEffect(() => {
+        if (!PROGRESSIVE_SEARCH_ENABLED) return;
+        setVisibleHotelCountProvider(() =>
+            countCardsAboveViewportBottom(listRef.current, typeof window !== 'undefined' ? window.innerHeight : 0),
+        );
+        return () => setVisibleHotelCountProvider(null);
+    }, []);
+
     // Restore scroll after returning from hotel details.
     useEffect(() => {
         if (showSkeleton || isLoading) return;
@@ -377,7 +396,13 @@ const ResultList = ({ tickets, loading, data, setFiltersRequest }: ResultListPro
                     )}
                     <div className={styles.resultListSorting}>
                         <p>
-                            {hasMore
+                            {searchingMore ? (
+                                <>
+                                    {`Найдено ${totalHotelsCount} отелей · `}
+                                    <span className={styles.searchingMore}>{formatOperatorsLeft(Number(searchingOperators))}</span>
+                                    <span className={styles.searchingBar} aria-hidden><span /></span>
+                                </>
+                            ) : hasMore
                                 ? `Показано ${shownHotelsCount} из ${totalHotelsCount} отелей`
                                 : `Найдено ${totalHotelsCount} отелей`}
                         </p>
@@ -392,7 +417,12 @@ const ResultList = ({ tickets, loading, data, setFiltersRequest }: ResultListPro
                 </div>
             )}
 
-            <div className={styles.resultListItems}>
+            <div
+                ref={listRef}
+                className={styles.resultListItems}
+                aria-busy={listRefreshing || undefined}
+                style={listRefreshing ? { opacity: 0.55, pointerEvents: 'none', transition: 'opacity 0.15s' } : undefined}
+            >
                 {showSkeleton && (
                     <>
                         <div className={styles.desktopOnly}>
@@ -409,7 +439,7 @@ const ResultList = ({ tickets, loading, data, setFiltersRequest }: ResultListPro
                 )}
 
                 {!showSkeleton && !showErrorState && allMyHotels?.map((item, index) => (
-                    <div key={getHotelListItemKey(item) ?? `hotel-${index}`}>
+                    <div key={getHotelListItemKey(item) ?? `hotel-${index}`} data-hotel-card="">
                         <HotelCard request_id={data?.request_id ?? hotels?.request_id} item={item} />
                     </div>
                 ))}

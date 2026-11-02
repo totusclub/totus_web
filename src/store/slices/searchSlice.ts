@@ -173,7 +173,14 @@ import {
     getReadySearchOperators,
     shouldStopSearchPolling,
 } from '@/utils/searchStatus';
-import { sanitizeListingFilterParams } from '@/utils/searchListState';
+import { pickAppliedFiltersFromHotels, sanitizeListingFilterParams } from '@/utils/searchListState';
+import {
+    PROGRESSIVE_SEARCH_ENABLED,
+    appendUniqueHotels,
+    getVisibleHotelCount,
+    mergeProgressiveHotels,
+    runProgressiveSearch,
+} from '@/utils/progressiveSearch';
 
 let activeSearchPoll: ReturnType<typeof setTimeout> | null = null;
 let activeSearchPollAttempts = 0;
@@ -191,7 +198,12 @@ function clearActiveSearchPoll() {
     activeSearchPollReject = null;
 }
 
+// Постепенная выдача (utils/progressiveSearch.ts): id текущего поиска (requestId thunk-а).
+// Новый поиск или уход со страницы обнуляет его — цикл старого поиска сам останавливается.
+let activeProgressiveId: string | null = null;
+
 export function stopActiveSearchPoll() {
+    activeProgressiveId = null;
     if (activeSearchPoll) {
         clearTimeout(activeSearchPoll);
         activeSearchPoll = null;
@@ -216,6 +228,14 @@ interface SearchState {
     startSearchValid:boolean
     loadMore: boolean;
     allMyHotels: [];
+    /** Постепенная выдача: id текущего поиска; ответы других поисков выбрасываются. */
+    activeSearchId?: string | null;
+    /** Сколько операторов ещё ищут (null — поиск не идёт). «Ищем ещё у N операторов». */
+    searchingOperators?: number | null;
+    /** Запрос фильтра / сортировки: прежний список виден, пока не придёт новый. */
+    refreshing?: boolean;
+    /** Последний запрос фильтра первой страницы — более ранние ответы выбрасываются. */
+    filterRequestId?: string | null;
 }
 
 const initialState: SearchState = {
@@ -226,8 +246,93 @@ const initialState: SearchState = {
     headerName:'',
     startSearchValid:true,
     loadMore:false,
-    allMyHotels:[]
+    allMyHotels:[],
+    activeSearchId: null,
+    searchingOperators: null,
+    refreshing: false,
+    filterRequestId: null,
 };
+
+/** Параметры выдачи из формы поиска: без ответа LT и без замороженных операторов. */
+function listParamsFromFilterParams(filterParams: unknown): Record<string, unknown> {
+    if (!filterParams || typeof filterParams !== 'object') return {};
+    const {
+        hotels: _h,
+        hotels_count: _hc,
+        filters: _f,
+        status: _s,
+        request_id: _r,
+        readyOperators: _ro,
+        operator_ids: _oi,
+        ui_page_number: _u,
+        page_number: _pn,
+        ...rest
+    } = filterParams as Record<string, unknown>;
+    return rest;
+}
+
+// Постепенная выдача: первая страница с первого опроса, без operator_ids, дозапрос по мере поиска.
+async function runProgressiveFlow(
+    { searchParams, filterParams }: { searchParams: any | null; filterParams?: any | null },
+    thunkApi: { dispatch: any; getState: () => unknown; requestId: string; rejectWithValue: (v: string) => any },
+) {
+    const { dispatch, getState, requestId, rejectWithValue } = thunkApi;
+    clearActiveSearchPoll();
+    activeProgressiveId = requestId;
+    const isCurrent = () => activeProgressiveId === requestId;
+    const initialListParams = listParamsFromFilterParams(filterParams);
+    const searchState = () => (getState() as { search: SearchState }).search;
+
+    try {
+        const result = await runProgressiveSearch({
+            searchParams,
+            startSearch,
+            checkStatus: checkSearchStatus,
+            fetchPage: getGroupedHotels,
+            isCurrent,
+            isListBusy: () => Boolean(searchState().refreshing),
+            getListParams: () => {
+                const hotels = searchState().hotels;
+                // После первой страницы фильтры и сортировка живут в hotels (их меняет человек).
+                const applied = hotels ? pickAppliedFiltersFromHotels(hotels) : {};
+                return {
+                    ...initialListParams,
+                    ...applied,
+                    page_limit: Math.max(1, Number(initialListParams.page_limit) || 50),
+                };
+            },
+            onStatus: ({ statusMap, operatorsLeft }) => {
+                dispatch(progressiveStatus({ searchId: requestId, statusMap, operatorsLeft }));
+            },
+            onPage: (page, { first, final, listParams }) => {
+                const {
+                    request_id: _rid,
+                    page_number: _pn,
+                    page_limit: _pl,
+                    ...applied
+                } = listParams;
+                dispatch(progressivePage({
+                    searchId: requestId,
+                    first,
+                    final,
+                    frozenCount: first ? 0 : getVisibleHotelCount(),
+                    page: {
+                        ...page,
+                        request_id: page?.request_id ?? listParams.request_id,
+                        ...sanitizeListingFilterParams(applied),
+                        ui_page_number: 1,
+                    },
+                }));
+            },
+        });
+        if (isCurrent()) activeProgressiveId = null;
+        return { progressive: true, ...result };
+    } catch (err: any) {
+        if (!isCurrent()) return { progressive: true, outcome: 'cancelled' };
+        activeProgressiveId = null;
+        return rejectWithValue(err?.message || 'Failed to complete search');
+    }
+}
 
 // Thunk
 export const runFullSearchFlow = createAsyncThunk(
@@ -237,8 +342,11 @@ export const runFullSearchFlow = createAsyncThunk(
             searchParams,
             filterParams,
         }: { searchParams: any | null; filterParams?: any | null },
-        { rejectWithValue, dispatch }
+        { rejectWithValue, dispatch, getState, requestId }
     ) => {
+        if (PROGRESSIVE_SEARCH_ENABLED) {
+            return runProgressiveFlow({ searchParams, filterParams }, { dispatch, getState, requestId, rejectWithValue });
+        }
         clearActiveSearchPoll();
 
         try {
@@ -355,7 +463,8 @@ export const runFullSearchFlow = createAsyncThunk(
 export const searchFilters = createAsyncThunk(
     'search/filters',
     async (params: any, { rejectWithValue }) => {
-        clearActiveSearchPoll();
+        // Постепенная выдача: фильтр во время поиска не останавливает поиск.
+        if (!PROGRESSIVE_SEARCH_ENABLED) clearActiveSearchPoll();
 
         if (!params?.request_id) {
             return rejectWithValue('Missing request_id');
@@ -422,6 +531,9 @@ const searchSlice = createSlice({
             state.startSearchValid = true;
             state.loadMore = false;
             state.allMyHotels = [];
+            state.searchingOperators = null;
+            state.refreshing = false;
+            state.filterRequestId = null;
             // state.requestId = '';
         },
         setHeaderName(state, action) {
@@ -436,7 +548,38 @@ const searchSlice = createSlice({
         appendAllHotels(state, action) {
             state.allMyHotels = [...state.allMyHotels, action.payload.hotels];
         },
+        progressiveStatus(state, action) {
+            if (action.payload?.searchId !== state.activeSearchId) return;
+            state.progress = action.payload.statusMap || {};
+            state.searchingOperators = Number(action.payload.operatorsLeft) || 0;
+        },
+        progressivePage(state, action) {
+            const { searchId, first, final, frozenCount, page } = action.payload || {};
+            if (searchId !== state.activeSearchId) return;
+            // Идёт запрос фильтра / сортировки — его ответ заменит список.
+            if (state.refreshing) return;
+            const incoming = page?.hotels || [];
+            if (first || state.hotels == null) {
+                state.hotels = page;
+                state.allMyHotels = incoming;
+            } else {
+                state.hotels = { ...page, ui_page_number: state.hotels?.ui_page_number ?? 1 };
+                state.allMyHotels = mergeProgressiveHotels(state.allMyHotels as any[], incoming, {
+                    sortBy: page?.sort_by,
+                    frozenCount,
+                }) as any;
+            }
+            // Идёт догрузка следующей страницы — её флаг загрузки не трогаем.
+            if (!state.loadMore) state.loading = false;
+            state.error = null;
+            if (final) state.searchingOperators = null;
+        },
         setAllMyHotels(state, action) {
+            // Постепенная выдача: список очищают только перед запросом фильтра / сортировки
+            // (filters.tsx, resultList.tsx). Теперь он остаётся на экране до ответа (refreshing) —
+            // без заглушек и мигания; ответ запроса заменит его целиком.
+            const nextList = Array.isArray(action.payload) ? action.payload : action.payload?.hotels;
+            if (PROGRESSIVE_SEARCH_ENABLED && (!nextList || nextList.length === 0)) return;
             // Handle both { hotels: [] } and [] formats
             if (Array.isArray(action.payload)) {
                 state.allMyHotels = action.payload;
@@ -448,8 +591,12 @@ const searchSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
-            .addCase(runFullSearchFlow.pending, (state) => {
+            .addCase(runFullSearchFlow.pending, (state, action) => {
                 clearActiveSearchPoll();
+                state.activeSearchId = action.meta.requestId;
+                state.searchingOperators = null;
+                state.refreshing = false;
+                state.filterRequestId = null;
                 state.loading = true;
                 state.error = null;
                 state.loadMore = false;
@@ -459,6 +606,13 @@ const searchSlice = createSlice({
                 state.progress = {};
             })
             .addCase(runFullSearchFlow.fulfilled, (state, action) => {
+                if ((action.payload as any)?.progressive) {
+                    // Список уже собран progressivePage; здесь только конец поиска.
+                    if (action.meta.requestId !== state.activeSearchId) return;
+                    state.loading = false;
+                    state.searchingOperators = null;
+                    return;
+                }
                 state.hotels = action.payload;
                 state.loading = false;
                 state.loadMore = false;
@@ -468,10 +622,26 @@ const searchSlice = createSlice({
                 if (action.error?.message === SEARCH_POLL_CANCELLED) {
                     return;
                 }
+                if (PROGRESSIVE_SEARCH_ENABLED && action.meta.requestId !== state.activeSearchId) return;
+                state.searchingOperators = null;
                 state.loading = false;
                 state.error = action.payload as string;
             })
             .addCase(searchFilters.pending, (state, action) => {
+                if (PROGRESSIVE_SEARCH_ENABLED) {
+                    const page = parseUiPageNumber(action.meta?.arg?.page_number);
+                    state.error = null;
+                    if (page <= 1 && !state.loadMore) {
+                        state.filterRequestId = action.meta.requestId;
+                        // Список уже есть — оставляем его на экране до ответа (без заглушек и мигания).
+                        if ((state.allMyHotels?.length || 0) > 0) {
+                            state.refreshing = true;
+                            return;
+                        }
+                    }
+                    state.loading = true;
+                    return;
+                }
                 clearActiveSearchPoll();
                 state.loading = true;
                 state.error = null;
@@ -483,6 +653,29 @@ const searchSlice = createSlice({
                 }
             })
             .addCase(searchFilters.fulfilled, (state, action) => {
+                if (PROGRESSIVE_SEARCH_ENABLED) {
+                    const page = parseUiPageNumber(action.meta?.arg?.page_number);
+                    const list = action.payload?.hotels || [];
+                    if (page <= 1) {
+                        // Ответ более раннего клика по фильтру — не нужен.
+                        if (state.filterRequestId && action.meta.requestId !== state.filterRequestId) return;
+                        state.hotels = action.payload;
+                        state.allMyHotels = list;
+                    } else {
+                        // Догрузка страницы другого (старого) поиска — не нужна.
+                        if (state.hotels?.request_id && action.payload?.request_id !== state.hotels.request_id) {
+                            state.loading = false;
+                            state.loadMore = false;
+                            return;
+                        }
+                        state.hotels = action.payload;
+                        state.allMyHotels = appendUniqueHotels(state.allMyHotels as any[], list) as any;
+                    }
+                    state.loading = false;
+                    state.loadMore = false;
+                    state.refreshing = false;
+                    return;
+                }
                 const requestedPage = parseUiPageNumber(action.meta?.arg?.page_number);
                 state.hotels = action.payload;
                 state.loading = false;
@@ -496,6 +689,11 @@ const searchSlice = createSlice({
                 }
             })
             .addCase(searchFilters.rejected, (state, action) => {
+                if (PROGRESSIVE_SEARCH_ENABLED) {
+                    const page = parseUiPageNumber(action.meta?.arg?.page_number);
+                    if (page <= 1 && state.filterRequestId && action.meta.requestId !== state.filterRequestId) return;
+                    state.refreshing = false;
+                }
                 state.loading = false;
                 state.loadMore = false;
                 state.error = action.payload as string;
@@ -503,6 +701,6 @@ const searchSlice = createSlice({
     },
 });
 
-export const { updateProgress, clearSearch,setHeaderName,setStartSearch,setLoadMore,setAllMyHotels } = searchSlice.actions;
+export const { updateProgress, clearSearch,setHeaderName,setStartSearch,setLoadMore,setAllMyHotels, progressiveStatus, progressivePage } = searchSlice.actions;
 
 export default searchSlice.reducer;

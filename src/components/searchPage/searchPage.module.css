@@ -629,3 +629,46 @@
     animation: none;
   }
 }
+
+/* Постепенная выдача (Р4, макет «Переключатель «Тур / Отель» на странице выдачи», вариант A, 02.11.2026):
+   «Найдено N отелей · Ищем ещё у M операторов» и тонкая полоска под счётчиком, пока поиск идёт. */
+.searchingMore {
+  color: #c2410b;
+}
+/* Тёмная тема: #c2410b на тёмном фоне не читается — светлее (#fa8842, --secondary_orange). */
+:global([data-theme="dark"]) .searchingMore {
+  color: var(--secondary_orange, #fa8842);
+}
+.searchingBar {
+  display: block;
+  width: 100%;
+  max-width: 260px;
+  height: 4px;
+  margin-top: 6px;
+  border-radius: 2px;
+  background: #ffe3d3;
+  overflow: hidden;
+}
+.searchingBar > span {
+  display: block;
+  width: 40%;
+  height: 4px;
+  background: var(--core_Orange);
+  animation: searchingBarMove 1.6s ease-in-out infinite;
+}
+@keyframes searchingBarMove {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(250%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .searchingBar > span {
+    animation: none;
+    width: 100%;
+    opacity: 0.6;
+  }
+}
+@media (max-width: 1024px) {
+  .searchingBar {
+    margin-left: auto;
+  }
+}
