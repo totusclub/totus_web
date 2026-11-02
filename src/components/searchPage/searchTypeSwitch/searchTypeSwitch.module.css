@@ -1,0 +1,105 @@
+/* Переключатель «Тур / Отель» на странице выдачи — вариант A макета (02.11.2026). */
+
+/* Компьютер: в шапке слева от формы поиска */
+.headerTabs {
+  flex: none;
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 14px;
+  background: var(--bgSecondary);
+}
+.headerTabs .tab {
+  height: 48px;
+  padding: 0 14px;
+  border-radius: 10px;
+}
+
+/* Телефон и планшет: строка над выдачей, кнопки поровну */
+.mobileTabs {
+  display: none;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 0;
+  background: transparent;
+  color: var(--textPrimary);
+  font: inherit;
+  font-family: var(--font-text);
+  cursor: pointer;
+  transition: background 0.15s ease, box-shadow 0.15s ease;
+}
+.tab:focus-visible {
+  outline: 2px solid var(--core_Orange);
+  outline-offset: 2px;
+}
+.tabActive {
+  background: var(--bgPrimary);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 0 0 1px var(--borderTertiary);
+  cursor: default;
+}
+.tab:not(.tabActive) .tabLabel {
+  color: var(--textTertiary);
+}
+.tabText {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 15px;
+}
+.tabLabel {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 15px;
+  white-space: nowrap;
+}
+.tabHint {
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 14px;
+  color: var(--textTertiary);
+  white-space: nowrap;
+}
+
+/* 1025–1280 px: в шапке тесно — без подсказок «С перелётом» / «Без перелёта» */
+@media (max-width: 1280px) {
+  .headerTabs .tab {
+    padding: 0 10px;
+  }
+  .tabHint {
+    display: none;
+  }
+}
+
+@media (max-width: 1024px) {
+  .headerTabs {
+    display: none;
+  }
+  .mobileTabs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 4px;
+    padding: 4px;
+    border-radius: 12px;
+    background: var(--borderTertiary);
+  }
+  .mobileTabs .tab {
+    height: 44px;
+    border-radius: 9px;
+    gap: 6px;
+  }
+  .mobileTabs .tabLabel {
+    font-size: 15px;
+    line-height: 20px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tab {
+    transition: none;
+  }
+}
