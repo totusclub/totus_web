@@ -15,7 +15,7 @@ import type { RootState } from '@/store';
 import {
     pickAppliedFiltersFromHotels,
     peekSearchListRestoreFlag,
-    readSearchListState,
+    readSearchListStateFor,
     replaceSearchListFilters,
     shouldRestoreSearchFilters,
 } from '@/utils/searchListState';
@@ -121,7 +121,8 @@ const TOUR_ONLY_FILTER_KEYS = new Set<string>(['filter_direct_flight']);
 
 /** isHotelSearch — поиск отелей: звёзды 3–5 по умолчанию не отмечаются (у отеля их нет в запросе). */
 function buildFiltersFromHotels(hotels: any, isHotelSearch = false) {
-    const saved = readSearchListState();
+    // Фильтры сессии — только от поиска того же типа: фильтры тура не попадают в поиск отелей.
+    const saved = readSearchListStateFor(isHotelSearch ? 'hotel' : 'package');
     const fromHotels = pickAppliedFiltersFromHotels(hotels);
     const fromSession = saved?.filters ?? {};
     // Do NOT pass saved.autoSearchKey here — that compared the key to itself

@@ -87,6 +87,32 @@ export function readSearchListState(): SearchListState | null {
   }
 }
 
+/**
+ * Тип поиска, к которому относится снимок: по autoSearchKey (в нём есть search_type).
+ * Пустой или битый ключ (например, «{}» после главной) — тип неизвестен (null).
+ */
+export function searchTypeOfListState(state: SearchListState | null | undefined): 'package' | 'hotel' | null {
+  try {
+    const core = JSON.parse(String(state?.autoSearchKey || ''));
+    if (!core || typeof core !== 'object' || Object.keys(core).length === 0) return null;
+    return core.search_type === 'hotel' ? 'hotel' : 'package';
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Снимок выдачи для поиска нужного типа. Фильтры тура не применяются к поиску отелей
+ * и наоборот: если снимок от другого типа (или тип неизвестен) — без фильтров.
+ */
+export function readSearchListStateFor(searchType: unknown): SearchListState | null {
+  const state = readSearchListState();
+  if (!state) return null;
+  const want = searchType === 'hotel' ? 'hotel' : 'package';
+  if (searchTypeOfListState(state) === want) return state;
+  return { ...state, filters: undefined };
+}
+
 export function writeSearchListState(patch: Partial<SearchListState> & { autoSearchKey?: string }) {
   if (typeof window === 'undefined') return;
   try {

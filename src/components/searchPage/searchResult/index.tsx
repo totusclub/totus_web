@@ -7,7 +7,6 @@ import { RootState } from "@/store";
 import { useMemo } from "react";
 import FiltersPackage from "@/components/searchPage/searchResult/filtersPackage";
 import { toOperatorIdsCsv } from "@/utils/searchResults";
-import SearchTypeSwitch from "@/components/searchPage/searchTypeSwitch";
 
 interface SearchResultProps {
     tickets?: any
@@ -36,8 +35,6 @@ const SearchResult = ({ tickets, flights, packages, flightsFilter, setFiltersReq
         <div className={'content'}>
 
             <div className={styles.searchResultWrapper}>
-                {/* Телефон и планшет: «Тур / Отель» строкой под шапкой (вариант A); на компьютере — в шапке */}
-                {!tickets && <SearchTypeSwitch variant="mobile" />}
 
                 {tickets ? (
                     <FiltersPackage netPrice={packages?.price} allFilters={flightsFilter} setFiltersRequest={setFiltersRequest} />
