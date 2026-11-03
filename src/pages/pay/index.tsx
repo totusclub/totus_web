@@ -34,10 +34,15 @@ export default function Pay() {
         });
     },[router])
 
-    const SendModalMessage = ()=>{
+    // Кнопки «Перейти в профиль» / «Перейти на главную». Раньше они только слали сообщение
+    // в WebView приложения, а в обычном браузере (куда банк возвращает после оплаты — и с сайта,
+    // и из приложения) ничего не делали. Теперь — переход на сайте: /profile (без входа
+    // withAuth вернёт на главную) или /. Сообщение в WebView оставлено, как было.
+    const SendModalMessage = (href: string)=>{
         if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
             window.ReactNativeWebView.postMessage({status:status});
         }
+        void router.push(href);
     }
 
     if (status === 'RECONCILED' && isInternal) {
@@ -56,14 +61,14 @@ export default function Pay() {
                         <div style={{width:'380px'}}>
                             <p style={{textAlign: 'center', marginTop: '15vh',fontSize:32}}>Спасибо за ваш заказ</p>
                             <p style={{textAlign: 'center',marginTop:4,fontSize:18,marginBottom:30}}>Платёж успешно выполнен</p>
-                            <Button title={'Перейти в профиль'} onClick={()=>SendModalMessage()} />
+                            <Button title={'Перейти в профиль'} onClick={()=>SendModalMessage('/profile')} />
                         </div>
                     )}
                     {status !== 'RECONCILED' && (
                         <div style={{width:'380px'}}>
                             <p style={{textAlign: 'center', marginTop: '15vh',fontSize:32}}>Оплата не завершена</p>
                             <p style={{textAlign: 'center',marginTop:4,fontSize:18,marginBottom:30}}>К сожалению, платёж не был завершён. Попробуйте снова или используйте другой способ</p>
-                            <Button title={'Перейти на главную'} onClick={()=>SendModalMessage()} />
+                            <Button title={'Перейти на главную'} onClick={()=>SendModalMessage('/')} />
                         </div>
                     )}
 
