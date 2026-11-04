@@ -27,6 +27,15 @@ const STORE_URLS = {
     appStore: 'https://apps.apple.com/am/app/totus-club/id6748902937',
 };
 
+// Стрелка «открыть в магазине» (вариант E макета, утверждён владельцем 04.11.2026).
+function StoreArrow() {
+    return (
+        <svg className={styles.storeArrow} width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M7 17L17 7M9 7h8v8" />
+        </svg>
+    );
+}
+
 const HELP_LINKS = [
     { href: '/help-faq', label: 'Помощь и FAQ' },
     { href: '/airlines', label: 'Авиакомпании' },
@@ -90,15 +99,36 @@ const Footer = () => {
                     <div className={styles.colApp}>
                         <div className={styles.appBlock}>
                             <p className={styles.footerColumnTitle}>Приложение Totus Club</p>
-                            <div className={styles.stores}>
-                                <a href={STORE_URLS.ruStore} target="_blank" rel="noopener noreferrer" className={styles.storeTile} title="RuStore" aria-label="Totus Club в RuStore">
-                                    <Icon name={'ruStore'} />
+                            <div className={styles.storeList}>
+                                <a href={STORE_URLS.ruStore} target="_blank" rel="noopener noreferrer" className={styles.storeRow} aria-label="Totus Club в RuStore">
+                                    <span className={styles.storeTile}>
+                                        <Icon name={'ruStore'} />
+                                    </span>
+                                    <span className={styles.storeText}>
+                                        <span className={styles.storeName}>RuStore</span>
+                                        <span className={styles.storePlatform}>Android</span>
+                                    </span>
+                                    <StoreArrow />
                                 </a>
-                                <a href={STORE_URLS.googlePlay} target="_blank" rel="noopener noreferrer" className={styles.storeTile} title="Google Play" aria-label="Totus Club в Google Play">
-                                    <Icon name={'googlePlay'} />
+                                <a href={STORE_URLS.googlePlay} target="_blank" rel="noopener noreferrer" className={styles.storeRow} aria-label="Totus Club в Google Play">
+                                    <span className={styles.storeTile}>
+                                        <Icon name={'googlePlay'} />
+                                    </span>
+                                    <span className={styles.storeText}>
+                                        <span className={styles.storeName}>Google Play</span>
+                                        <span className={styles.storePlatform}>Android</span>
+                                    </span>
+                                    <StoreArrow />
                                 </a>
-                                <a href={STORE_URLS.appStore} target="_blank" rel="noopener noreferrer" className={styles.storeTile} title="App Store" aria-label="Totus Club в App Store">
-                                    <Icon name={'appStore'} />
+                                <a href={STORE_URLS.appStore} target="_blank" rel="noopener noreferrer" className={styles.storeRow} aria-label="Totus Club в App Store">
+                                    <span className={styles.storeTile}>
+                                        <Icon name={'appStore'} />
+                                    </span>
+                                    <span className={styles.storeText}>
+                                        <span className={styles.storeName}>App Store</span>
+                                        <span className={styles.storePlatform}>iPhone и iPad</span>
+                                    </span>
+                                    <StoreArrow />
                                 </a>
                             </div>
                         </div>

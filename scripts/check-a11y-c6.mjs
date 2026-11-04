@@ -47,10 +47,10 @@ check('label: поля кода подписаны', () => {
   assert.match(s, /autoComplete=\{idx === 0 \? 'one-time-code' : 'off'\}/);
 });
 
-// 04.11.2026: значки магазинов стали ссылками на страницы приложения — у каждой ссылки есть имя (aria-label).
+// 04.11.2026: магазины — ссылки-строки (вариант E) на страницы приложения, у каждой есть имя (aria-label).
 check('link-name: иконки магазинов — ссылки с именем, логотип-ссылка с именем', () => {
   const f = code(read('src/components/footer/index.tsx'));
-  assert.equal((f.match(/<a href=\{STORE_URLS\.\w+\} target="_blank" rel="noopener noreferrer" className=\{styles\.storeTile\} title="[^"]+" aria-label="[^"]+">/g) || []).length, 3);
+  assert.equal((f.match(/<a href=\{STORE_URLS\.\w+\} target="_blank" rel="noopener noreferrer" className=\{styles\.storeRow\} aria-label="Totus Club в [^"]+">/g) || []).length, 3);
   assert.ok(!/role="img"/.test(f), 'у ссылок магазинов не должно быть role="img"');
   assert.match(code(read('src/components/header/index.tsx')), /<Link href="\/" aria-label="Totus Club — на главную">/);
 });
