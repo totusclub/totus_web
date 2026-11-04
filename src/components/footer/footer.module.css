@@ -63,39 +63,76 @@
     letter-spacing: -0.32px;
     padding-bottom: 16px;
 }
-.stores{
+/* Магазины приложений — список строк со стрелкой (вариант E, утверждён владельцем 04.11.2026). */
+.storeList{
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
     gap: 8px;
+    width: 100%;
+    max-width: 300px;
 }
-.storeTile{
-    width: 48px;
-    height: 48px;
+.storeRow{
+    height: 56px;
+    padding: 0 16px 0 8px;
     border-radius: 12px;
     background: var(--bgSecondary);
+    color: var(--textPrimary);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    transition: background-color 0.2s;
+}
+.storeRow:hover{
+    background: var(--hoverPrimary);
+}
+.storeRow:focus-visible{
+    outline: 2px solid var(--textPrimary);
+    outline-offset: 2px;
+}
+.storeTile{
+    width: 40px;
+    height: 40px;
+    flex: none;
+    border-radius: 10px;
+    background: var(--bgPrimary);
     display: flex;
     align-items: center;
     justify-content: center;
 }
-a.storeTile{
-    text-decoration: none;
-    cursor: pointer;
-    transition: opacity 0.2s;
-}
-a.storeTile:hover{
-    opacity: 0.8;
-}
-a.storeTile:focus-visible{
-    outline: 2px solid var(--textPrimary);
-    outline-offset: 2px;
-}
 .storeTile svg{
-    width: 24px;
-    height: 24px;
+    width: 22px;
+    height: 22px;
 }
-/* Значки сторов нарисованы чёрным — в тёмной теме инвертируем. */
+/* Значки сторов нарисованы чёрным — в тёмной теме инвертируем; плитка — на тон светлее строки. */
+:global([data-theme="dark"]) .storeTile{
+    background: var(--bgActive);
+}
 :global([data-theme="dark"]) .storeTile svg{
     filter: invert(1);
+}
+.storeText{
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.storeName{
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 18px;
+}
+/* Платформа — textSecondary: textTertiary на фоне строки не добирает контраста 4,5:1. */
+.storePlatform{
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 16px;
+    color: var(--textSecondary);
+}
+.storeArrow{
+    flex: none;
+    color: var(--textSecondary);
 }
 .social>ul{
     list-style-type: none;
@@ -215,6 +252,10 @@ a.storeTile:focus-visible{
     }
     .appBlock{
         order: 1;
+    }
+    /* На телефоне строки магазинов — на всю ширину */
+    .storeList{
+        max-width: none;
     }
     .colCompany{
         order: 2;
