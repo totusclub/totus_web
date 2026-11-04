@@ -20,6 +20,13 @@ const COMPANY_LINKS = [
     { href: '/requisites', label: 'Реквизиты и контакты' },
 ];
 
+// Приложение Totus Club в магазинах (порядок и адреса — по решению владельца 04.11.2026).
+const STORE_URLS = {
+    ruStore: 'https://www.rustore.ru/catalog/app/com.totus.com',
+    googlePlay: 'https://play.google.com/store/apps/details?id=com.totus.com',
+    appStore: 'https://apps.apple.com/am/app/totus-club/id6748902937',
+};
+
 const HELP_LINKS = [
     { href: '/help-faq', label: 'Помощь и FAQ' },
     { href: '/airlines', label: 'Авиакомпании' },
@@ -84,15 +91,15 @@ const Footer = () => {
                         <div className={styles.appBlock}>
                             <p className={styles.footerColumnTitle}>Приложение Totus Club</p>
                             <div className={styles.stores}>
-                                <span className={styles.storeTile} title="App Store" role="img" aria-label="App Store">
-                                    <Icon name={'appStore'} />
-                                </span>
-                                <span className={styles.storeTile} title="Google Play" role="img" aria-label="Google Play">
-                                    <Icon name={'googlePlay'} />
-                                </span>
-                                <span className={styles.storeTile} title="RuStore" role="img" aria-label="RuStore">
+                                <a href={STORE_URLS.ruStore} target="_blank" rel="noopener noreferrer" className={styles.storeTile} title="RuStore" aria-label="Totus Club в RuStore">
                                     <Icon name={'ruStore'} />
-                                </span>
+                                </a>
+                                <a href={STORE_URLS.googlePlay} target="_blank" rel="noopener noreferrer" className={styles.storeTile} title="Google Play" aria-label="Totus Club в Google Play">
+                                    <Icon name={'googlePlay'} />
+                                </a>
+                                <a href={STORE_URLS.appStore} target="_blank" rel="noopener noreferrer" className={styles.storeTile} title="App Store" aria-label="Totus Club в App Store">
+                                    <Icon name={'appStore'} />
+                                </a>
                             </div>
                         </div>
                         <SocialLinks items={socialLinks} />
