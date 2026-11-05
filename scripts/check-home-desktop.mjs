@@ -81,12 +81,12 @@ check('шаг секций 56, заголовки 28/36 и 16 до карточ�
   assert.match(rule(homeD, '.faqRow'), /margin-top: 24px;\s*gap: 16px;/);
 });
 
-check('картинки прямоугольные: горящие туры 16:10 от верха кадра, направления 3 колонки 3:2', () => {
+check('картинки прямоугольные: горящие туры 16:10 от верха кадра, направления 4 в ряд 3:2', () => {
   const img = rule(boxD, '.hotelBoxCardImage');
   assert.match(img, /height: auto;\s*aspect-ratio: 16 \/ 10;/);
   assert.match(img, /background-position: center top;/);
   const d = rule(homeD, '.recomendDeslistItem');
-  assert.match(d, /flex: 0 0 calc\(\(100% - 32px\) \/ 3\);\s*min-width: 0;\s*height: auto;\s*aspect-ratio: 3 \/ 2;/);
+  assert.match(d, /flex: 0 0 calc\(\(100% - 48px\) \/ 4\);\s*min-width: 0;\s*height: auto;\s*aspect-ratio: 3 \/ 2;/);
   assert.match(rule(homeD, '.recomendDeslistItemInfo'), /height: 60%;\s*background: linear-gradient\(180deg, rgba\(0, 0, 0, 0\) 0%, rgba\(0, 0, 0, 0\.6\) 100%\);/);
 });
 
