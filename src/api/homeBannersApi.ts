@@ -2,7 +2,10 @@ import { API_BASE_URL } from '@/config/api';
 
 export interface HomeBanner {
     position: number;
+    /** Картинка для светлой темы ('' — не загружена). */
     image: string;
+    /** Картинка для тёмной темы ('' или нет поля — не загружена, показывается светлая). */
+    image_dark?: string;
     url: string;
 }
 

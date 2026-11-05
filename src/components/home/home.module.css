@@ -227,6 +227,15 @@
 .bannerItem:nth-child(2) {
   background-image: url("./../../assets/images/bannerVtb.png");
 }
+/* Картинки из админки (banners.tsx ставит --banner-light / --banner-dark и классы).
+   Светлая тема — своя картинка, иначе стандартная выше. Тёмная тема — своя тёмная,
+   иначе светлая из админки, иначе стандартная. Тема меняется — картинка меняется сразу. */
+.bannerItem.bannerLight {
+  background-image: var(--banner-light);
+}
+:global([data-theme="dark"]) .bannerItem.bannerDark {
+  background-image: var(--banner-dark);
+}
 
 .recomendlist {
   display: flex;
