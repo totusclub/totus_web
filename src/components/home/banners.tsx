@@ -2,6 +2,31 @@ import React, { useEffect, useState } from "react";
 import styles from './home.module.css'
 import { getHomeBanners, HomeBanner } from "@/api/homeBannersApi";
 
+/** url("…") для CSS: кавычки и переводы строк в ссылке не ломают правило. */
+function cssUrl(src: string): string {
+    return `url("${src.replace(/["\\\n\r]/g, encodeURIComponent)}")`;
+}
+
+/**
+ * Картинки баннера под тему сайта. Обе ссылки уходят в CSS-переменные, выбор делает CSS
+ * (home.module.css: .bannerLight / [data-theme="dark"] .bannerDark) — без JS и без мигания
+ * при переключении темы. Нет тёмной — в тёмной теме светлая; нет ни одной — стандартная картинка.
+ */
+function bannerTheme(banner?: HomeBanner): { className: string; style?: React.CSSProperties } {
+    const light = banner?.image || '';
+    const dark = banner?.image_dark || '';
+    const classes = [styles.bannerItem];
+    const style: Record<string, string> = {};
+    if (light) {
+        classes.push(styles.bannerLight);
+        style['--banner-light'] = cssUrl(light);
+    }
+    if (dark) {
+        classes.push(styles.bannerDark);
+        style['--banner-dark'] = cssUrl(dark);
+    }
+    return { className: classes.join(' '), style: light || dark ? (style as React.CSSProperties) : undefined };
+}
 
 /** initialBanners — с сервера (главная, getServerSideProps); null — запросить в браузере, как раньше. */
 export default function HomeBanners({ initialBanners = null }: { initialBanners?: HomeBanner[] | null }) {
@@ -16,7 +41,7 @@ export default function HomeBanners({ initialBanners = null }: { initialBanners?
 
     const renderItem = (position: number) => {
         const banner = getBanner(position);
-        const style = banner?.image ? { backgroundImage: `url(${banner.image})` } : undefined;
+        const { className, style } = bannerTheme(banner);
 
         if (banner?.url) {
             return (
@@ -24,13 +49,13 @@ export default function HomeBanners({ initialBanners = null }: { initialBanners?
                     href={banner.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={styles.bannerItem}
+                    className={className}
                     style={style}
                 />
             );
         }
 
-        return <div className={styles.bannerItem} style={style} />;
+        return <div className={className} style={style} />;
     };
 
     return (
