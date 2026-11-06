@@ -26,15 +26,18 @@ function securityHeaders() {
     const mode = String(process.env.CSP_MODE || 'report-only').toLowerCase();
     const extra = String(process.env.CSP_EXTRA_SOURCES || '').split(',').map((s) => s.trim()).filter(Boolean).join(' ');
     const yandex = 'https://mc.yandex.ru https://*.yandex.ru https://yastatic.net https://*.yastatic.net';
+    // Yandex SmartCaptcha (@yandex/smart-captcha в окне входа): скрипт виджета, iframe задания и его запросы
+    // идут с smartcaptcha.yandexcloud.net (captcha-api.yandexcloud.net — API проверки, на случай обращений с клиента).
+    const smartCaptcha = 'https://smartcaptcha.yandexcloud.net https://captcha-api.yandexcloud.net';
     const csp = [
         "default-src 'self'",
-        `script-src 'self' 'unsafe-inline' 'unsafe-eval' ${yandex} ${extra}`.trim(),
+        `script-src 'self' 'unsafe-inline' 'unsafe-eval' ${yandex} ${smartCaptcha} ${extra}`.trim(),
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
         "img-src 'self' data: blob: https:",
         "font-src 'self' data: https://fonts.gstatic.com",
-        `connect-src 'self' https://*.totus.club wss://*.totus.club ${yandex} ${extra}`.trim(),
+        `connect-src 'self' https://*.totus.club wss://*.totus.club ${yandex} ${smartCaptcha} ${extra}`.trim(),
         "media-src 'self' blob: data: https:",
-        `frame-src 'self' ${yandex}`,
+        `frame-src 'self' ${yandex} ${smartCaptcha}`,
         "frame-ancestors 'self'",
         "object-src 'none'",
         "base-uri 'self'",
