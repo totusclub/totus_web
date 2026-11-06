@@ -77,7 +77,7 @@ function normalizeCmsHtml(html?: string | null): string {
     );
 
     raw = raw
-        .replace(/(?:&nbsp;| |\s){2,}/gi, ' ')
+        .replace(/(?:&nbsp;|\xa0|\s){2,}/gi, ' ')
         .replace(/<(p|div|span)[^>]*>\s*<\/\1>/gi, '')
         .replace(/^(?:\s|<br\s*\/?>)+/i, '')
         .trim();
