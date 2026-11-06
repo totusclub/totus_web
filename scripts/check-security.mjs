@@ -31,6 +31,28 @@ check('next.config: заголовки безопасности на /:path*, CS
   assert.ok(cfg.includes("frame-ancestors 'self'") && cfg.includes("object-src 'none'"));
 });
 
+check('next.config: CSP пускает Yandex SmartCaptcha (script-src, connect-src, frame-src)', () => {
+  const cfg = read('next.config.ts');
+  assert.ok(cfg.includes("const smartCaptcha = 'https://smartcaptcha.yandexcloud.net"), 'нет константы smartCaptcha');
+  assert.match(cfg, /script-src [^`]*\$\{smartCaptcha\}/);
+  assert.match(cfg, /connect-src [^`]*\$\{smartCaptcha\}/);
+  assert.match(cfg, /frame-src [^`]*\$\{smartCaptcha\}/);
+});
+
+check('бронирование только для вошедших: /booking и /checkout под withBookingAuth, Header открывает окно входа по событию', () => {
+  const gate = read('src/utils/withBookingAuth.tsx');
+  assert.ok(gate.includes("export const AUTH_OPEN_EVENT = 'totus:auth-open'"));
+  assert.ok(gate.includes('isTokenAlive(stored)') && gate.includes('if (!alive) openAuthModal();'));
+  assert.ok(gate.includes('return <WrappedComponent {...props} />;'));
+  for (const page of ['src/pages/booking/index.tsx', 'src/pages/checkout/index.tsx']) {
+    const src = read(page);
+    assert.ok(src.includes("import withBookingAuth from \"@/utils/withBookingAuth\""), `${page}: нет импорта`);
+    assert.match(src, /export default withBookingAuth\((Booking|Checkout)\);/, `${page}: страница не обёрнута`);
+  }
+  const header = read('src/components/header/index.tsx');
+  assert.ok(header.includes('subscribeAuthOpen(() => setAuthModalOpen(true))'), 'Header не подписан на событие');
+});
+
 // Санитайзер (серверный путь) — через транспиляцию TS без зависимостей (typescript есть в node_modules Next).
 try {
   const ts = await import('typescript').then((m) => m.default ?? m);

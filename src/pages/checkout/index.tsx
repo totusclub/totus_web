@@ -1,7 +1,9 @@
 import Steps from "@/components/searchPage/steps";
 import CheckoutScreen from "@/components/checkoutPage";
+import withBookingAuth from "@/utils/withBookingAuth";
 
-export default function Checkout() {
+// Оплата — продолжение бронирования: тоже только для вошедших (см. utils/withBookingAuth.tsx).
+function Checkout() {
     return (
         <main className={'searchContainer'}>
             <Steps activeStep="checkout" />
@@ -9,3 +11,5 @@ export default function Checkout() {
         </main>
     );
 }
+
+export default withBookingAuth(Checkout);
