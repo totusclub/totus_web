@@ -5,6 +5,7 @@ import Head from 'next/head';
 import type { CmsPagePayload } from '@/lib/cmsPage';
 import { getCmsPageDef, type CmsPageSlug } from '@/config/cmsPageDefs';
 import { API_BASE_URL } from '@/config/api';
+import { sanitizeCmsHtml } from '@/lib/sanitizeHtml';
 import { StaticInfoPage } from './index';
 import styles from './staticInfoPage.module.css';
 
@@ -76,50 +77,28 @@ function normalizeCmsHtml(html?: string | null): string {
     );
 
     raw = raw
-        .replace(/(?:&nbsp;|\u00a0|\s){2,}/gi, ' ')
+        .replace(/(?:&nbsp;| |\s){2,}/gi, ' ')
         .replace(/<(p|div|span)[^>]*>\s*<\/\1>/gi, '')
         .replace(/^(?:\s|<br\s*\/?>)+/i, '')
         .trim();
 
-    return stripWhiteBackgrounds(raw);
+    // H6 аудита: HTML из CMS — только разметка статьи, без скриптов/фреймов/обработчиков (src/lib/sanitizeHtml.ts).
+    return sanitizeCmsHtml(stripWhiteBackgrounds(raw));
 }
 
+// Только публичный маршрут страниц. Запасные обращения к админским маршрутам страниц убраны
+// (SECURITY_ENFORCE_MATRIX: админские маршруты закрываются для сайта при AUTH_MODE=enforce).
 async function loadCmsPage(slug: string): Promise<CmsPagePayload | null> {
-    const urls = [
-        `${API_BASE_URL}/api/pages/slug/${encodeURIComponent(slug)}`,
-        `${API_BASE_URL}/api/admin/pages/slug/${encodeURIComponent(slug)}`,
-    ];
-
-    for (const url of urls) {
-        try {
-            const response = await fetch(url, {
-                headers: { Accept: 'application/json' },
-                cache: 'no-store',
-            });
-            if (response.status === 404) continue;
-            if (!response.ok) continue;
-            return (await response.json()) as CmsPagePayload;
-        } catch {
-            // try next url
-        }
-    }
-
     try {
-        const response = await fetch(`${API_BASE_URL}/api/admin/pages`, {
+        const response = await fetch(`${API_BASE_URL}/api/pages/slug/${encodeURIComponent(slug)}`, {
             headers: { Accept: 'application/json' },
             cache: 'no-store',
         });
-        if (response.ok) {
-            const rows = (await response.json()) as CmsPagePayload[];
-            if (Array.isArray(rows)) {
-                return rows.find((row) => row?.slug === slug) ?? null;
-            }
-        }
+        if (!response.ok) return null;
+        return (await response.json()) as CmsPagePayload;
     } catch {
-        // ignore
+        return null;
     }
-
-    return null;
 }
 
 export function CmsStaticPage({ slug, cms: initialCms }: Props) {
