@@ -4,27 +4,18 @@ import { useEffect, useState } from 'react';
 import { API_BASE_URL } from '@/config/api';
 import type { CmsPagePayload } from '@/lib/cmsPage';
 
+// Только публичный маршрут страниц (запасное обращение к админскому маршруту убрано — SECURITY_ENFORCE_MATRIX).
 async function loadCmsPage(slug: string): Promise<CmsPagePayload | null> {
-    const urls = [
-        `${API_BASE_URL}/api/pages/slug/${encodeURIComponent(slug)}`,
-        `${API_BASE_URL}/api/admin/pages/slug/${encodeURIComponent(slug)}`,
-    ];
-
-    for (const url of urls) {
-        try {
-            const response = await fetch(url, {
-                headers: { Accept: 'application/json' },
-                cache: 'no-store',
-            });
-            if (response.status === 404) continue;
-            if (!response.ok) continue;
-            return (await response.json()) as CmsPagePayload;
-        } catch {
-            // try next url
-        }
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/pages/slug/${encodeURIComponent(slug)}`, {
+            headers: { Accept: 'application/json' },
+            cache: 'no-store',
+        });
+        if (!response.ok) return null;
+        return (await response.json()) as CmsPagePayload;
+    } catch {
+        return null;
     }
-
-    return null;
 }
 
 export function useCmsPage(slug: string) {
