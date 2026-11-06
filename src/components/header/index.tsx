@@ -3,9 +3,10 @@ import styles from './header.module.css';
 import Icon from "@/components/icons/Icon";
 import Button from "@/components/UI/button";
 import dynamic from "next/dynamic";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import AuthModal from "@/components/auth/LazyAuthModal";
 import useAuth from "@/hooks/useAuth";
+import { subscribeAuthOpen } from "@/utils/withBookingAuth";
 import { useRouter } from "next/router";
 import { clearSearch } from '@/store/slices/searchSlice';
 import { clearSearchListState } from '@/utils/searchListState';
@@ -34,6 +35,9 @@ const Header = ({ heroTitle: ssrHeroTitle = null }: { heroTitle?: string | null 
     const heroTitle = useHomeHeroTitle() ?? ssrHeroTitle;
     // Логотип и кнопки мобильной шапки: чёрные, в тёмной теме — белые
     const iconColor = useIconColor();
+
+    // Страницы бронирования (/booking, /checkout) просят открыть окно входа для гостя — см. utils/withBookingAuth.tsx
+    useEffect(() => subscribeAuthOpen(() => setAuthModalOpen(true)), []);
 
     const showSearch = useMemo(() => {
         if (!pathname) return 'home';
