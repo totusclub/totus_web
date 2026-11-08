@@ -15,10 +15,10 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { PointerEvent as ReactPointerEvent } from 'react'
 import { useRouter } from 'next/router'
-import { ChatMessage, useAssistant, useAssistantStore } from '@tosmedia/ai-assistant'
+import { ChatMessage, MashaFabIcon, useAssistant, useAssistantStore } from '@tosmedia/ai-assistant'
 import styles from './mobileMilaChat.module.css'
 import TotusIcon from '@/components/icons/totus/TotusIcon'
-import { iconChevronLeft, iconClose, iconMila, iconPlus, iconSend } from '@/components/icons/totus/icons.generated'
+import { iconChevronLeft, iconClose, iconPlus, iconSend } from '@/components/icons/totus/icons.generated'
 
 /** Готовые вопросы на первом экране — те же, что в пакете (QuickActions). */
 export const MILA_STARTS = [
@@ -52,7 +52,6 @@ const ListIcon = () => (
 const BackIcon = () => <TotusIcon icon={iconChevronLeft} />
 const SendIcon = () => <TotusIcon icon={iconSend} accent={false} />
 const PlusIcon = () => <TotusIcon icon={iconPlus} accent={false} />
-const ChatIcon = () => <TotusIcon icon={iconMila} accent={false} />
 
 /** Строка «Мои чаты»: смахивание влево открывает «Удалить». */
 function ChatRow({
@@ -294,7 +293,8 @@ export default function MobileMilaChat({ hideFab = false }: { hideFab?: boolean 
     return (
       <div className={styles.fabWrap}>
         <button type="button" className={styles.fab} onClick={() => setOpen(true)} aria-label="Открыть чат с Машей">
-          <ChatIcon />
+          {/* Смена сценариев путешествий (владелец, 09.11.2026) — из пакета, как на компьютере */}
+          <MashaFabIcon />
         </button>
       </div>
     )
