@@ -41,7 +41,7 @@ check('до 1024px — MobileMilaChat, на компьютере — ChatWidget 
 });
 
 check('те же данные и сокет, что у ChatWidget: useAssistant / useAssistantStore / ChatMessage пакета', () => {
-  assert.match(tsx, /import \{ ChatMessage, useAssistant, useAssistantStore \} from '@tosmedia\/ai-assistant'/);
+  assert.match(tsx, /import \{ ChatMessage, MashaFabIcon, useAssistant, useAssistantStore \} from '@tosmedia\/ai-assistant'/);
   assert.equal((tsx.match(/useAssistant\(\)/g) || []).length, 1, 'один useAssistant — одно соединение');
   assert.match(tsx, /window\.addEventListener\('assistant:send', handler\)/);
 });
@@ -100,6 +100,11 @@ check('кнопки пакет не перебивает (.totus-ai-root button)
 check('кнопка Маши над нижним меню (80px), в чате поддержки скрыта', () => {
   assert.match(rule('.fabWrap'), /right: 20px;\s*bottom: 80px;/);
   assert.match(tsx, /if \(hideFab\) return null/);
+});
+
+check('значок кнопки — смена сценариев путешествий из пакета (MashaFabIcon), кнопка — основа для него', () => {
+  assert.match(tsx, /<MashaFabIcon \/>/);
+  assert.match(rule('.fabWrap .fab'), /position: relative;/);
 });
 
 check('первый экран, подсказки после туров, «Мои чаты» со смахиванием', () => {
