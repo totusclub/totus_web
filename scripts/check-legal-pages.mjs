@@ -1,6 +1,6 @@
 // Проверка юридических страниц ООО «ТОТУСКЛАБ» на чистом Node ≥ 22, без npm install:
 //   node scripts/check-legal-pages.mjs
-// Для каждого из 12 документов: есть страница src/pages/<slug>/index.tsx с <CmsStaticPage slug="<slug>" />,
+// Для каждого из 16 документов (редакция 30.10.2026): есть страница src/pages/<slug>/index.tsx с <CmsStaticPage slug="<slug>" />,
 // slug объявлен в типах/defs (getCmsPageDef его находит, SEO и моб. заголовок берутся из defs),
 // заголовок страницы — полное название.
 // Футер v2 (Figma 2291:105683): из юр. документов в футере только «Правовая информация» (/legal),
@@ -23,12 +23,17 @@ const DOCS = [
     { slug: 'terms', title: 'Пользовательское соглашение', short: 'Пользовательское соглашение' },
     { slug: 'privacy-policy', title: 'Политика обработки персональных данных', short: 'Политика обработки персональных данных' },
     { slug: 'consent', title: 'Согласие на обработку персональных данных', short: 'Согласие на обработку персональных данных' },
+    // Редакция 30.10.2026: отдельные согласия и приложения к договору — только на /legal, полные названия.
+    { slug: 'personalization-consent', title: 'Согласие на обработку персональных данных для персональных рекомендаций', short: 'Согласие на обработку персональных данных для персональных рекомендаций', pack2: true },
     { slug: 'ads-consent', title: 'Согласие на получение рекламы', short: 'Согласие на рекламу' },
+    { slug: 'marketing-data-consent', title: 'Согласие на обработку персональных данных для направления рекламы', short: 'Согласие на обработку персональных данных для направления рекламы', pack2: true },
     { slug: 'cookie-settings', title: 'Политика использования файлов cookie', short: 'Политика cookie' },
     { slug: 'recommendations', title: 'Правила применения рекомендательных технологий', short: 'Рекомендательные технологии' },
     // Пачка 2: полные названия везде, без сокращений (title = currentLabel = mobileHeaderTitle).
     ...[
         ['tour-offer', 'Оферта о заключении договора о реализации туристского продукта'],
+        ['booking-application', 'Форма заявки на бронирование туристского продукта'],
+        ['operator-information', 'Форма информации о туроператоре'],
         ['hotel-booking', 'Условия бронирования размещения'],
         ['cancellation', 'Изменение, отмена и возврат'],
         ['tourist-memo', 'Памятка туристу'],
@@ -246,10 +251,10 @@ check('футер: мобильная версия — столбиком и с 
     has(footerCss, /@media \(max-width: 1024px\)[\s\S]*\.footerRow\{\s*flex-direction: column;/);
 });
 
-check('legalDocs.ts: ровно 12 опубликованных документов, реквизиты — последним', () => {
+check('legalDocs.ts: ровно 16 опубликованных документов, реквизиты — последним', () => {
     const { LEGAL_DOCS, LEGAL_REQUISITES, LEGAL_COMPANY } = cfg();
-    assert.equal(LEGAL_DOCS.length, 12);
-    assert.deepEqual(LEGAL_DOCS.map((d) => d.slug), DOCS.map((d) => d.slug), 'порядок/набор документов ≠ 12 юр. страниц');
+    assert.equal(LEGAL_DOCS.length, 16);
+    assert.deepEqual(LEGAL_DOCS.map((d) => d.slug), DOCS.map((d) => d.slug), 'порядок/набор документов ≠ 16 юр. страниц');
     assert.equal(LEGAL_DOCS[LEGAL_DOCS.length - 1], LEGAL_REQUISITES, 'последний пункт — «Реквизиты и контакты»');
     assert.equal(LEGAL_REQUISITES.description, 'Реквизиты ООО «ТОТУСКЛАБ» и контакты поддержки');
     for (const d of LEGAL_DOCS) {
@@ -282,7 +287,7 @@ check('/legal: страница существует, шаблон StaticInfoPag
     has(legalPage, /export default function/);
 });
 
-check('/legal: все 12 документов — ссылки из конфига', () => {
+check('/legal: все 16 документов — ссылки из конфига', () => {
     has(legalPage, /from '@\/config\/legalDocs'/);
     has(legalPage, /\{LEGAL_DOCS\.map\(\(doc\) => \([\s\S]*?<Link href=\{doc\.href\}/, 'LEGAL_DOCS → <Link href={doc.href}>');
     assert.equal((legalPage.match(/\.map\(/g) || []).length, 1, 'на странице один список — LEGAL_DOCS');

@@ -39,10 +39,22 @@ export const LEGAL_DOCS: LegalDoc[] = [
         description: 'Текст согласия, которое даётся в формах сайта и приложения',
     },
     {
+        slug: 'personalization-consent',
+        href: '/personalization-consent',
+        title: 'Согласие на обработку персональных данных для персональных рекомендаций',
+        description: 'Что учитывается в подборках, срок согласия и как его отозвать',
+    },
+    {
         slug: 'ads-consent',
         href: '/ads-consent',
         title: 'Согласие на получение рекламы',
         description: 'Рассылки, push-уведомления и как от них отказаться',
+    },
+    {
+        slug: 'marketing-data-consent',
+        href: '/marketing-data-consent',
+        title: 'Согласие на обработку персональных данных для направления рекламы',
+        description: 'Какие данные нужны для рекламных писем, срок согласия и отказ',
     },
     {
         slug: 'cookie-settings',
@@ -61,6 +73,18 @@ export const LEGAL_DOCS: LegalDoc[] = [
         href: '/tour-offer',
         title: 'Оферта о заключении договора о реализации туристского продукта',
         description: 'Условия покупки тура: заявка, цена и оплата, права сторон, отмена, претензии',
+    },
+    {
+        slug: 'booking-application',
+        href: '/booking-application',
+        title: 'Форма заявки на бронирование туристского продукта',
+        description: 'Какие сведения о заказе, туристах и услугах указываются в заявке',
+    },
+    {
+        slug: 'operator-information',
+        href: '/operator-information',
+        title: 'Форма информации о туроператоре',
+        description: 'Сведения о туроператоре, финансовом обеспечении и порядке возмещения',
     },
     {
         slug: 'hotel-booking',
